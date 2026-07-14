@@ -404,6 +404,11 @@ const GenerateContractPdfLoader = Loadable(
 const ViewAiProposal = Loadable(
   lazy(() => import("../pages/view-ai-proposal")),
 );
+//web-based-proposal
+const WebBasedProposal = Loadable(
+  lazy(() => import("../pages/web-based-proposal")),
+);
+
 function AppContent() {
   const {
     loginLoader,
@@ -1454,6 +1459,10 @@ function Index() {
                     <Route
                       path="/view-ai-proposal"
                       element={<ViewAiProposal />}
+                    />
+                    <Route
+                      path="/web-based-proposal"
+                      element={<WebBasedProposal />}
                     />
                   </Routes>
                 </ColorProvider>

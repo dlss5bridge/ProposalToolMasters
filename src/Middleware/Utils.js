@@ -374,6 +374,24 @@ const PreviewSelection = [
     value: 2,
     label: "PDF",
   },
+  {
+    value: 3,
+    label: "Web-Proposal",
+  },
+];
+const webBasedProposalTypes = [
+  {
+    value: 1,
+    label: "Standard Slideshow",
+  },
+  {
+    value: 2,
+    label: "Slideshow with Input Fields",
+  },
+  {
+    value: 3,
+    label: "Proposal Amendment",
+  },
 ];
 const CalenderFilter = [
   {
@@ -776,6 +794,7 @@ export default {
   Payment_Frequency,
   paymentStatus,
   PreviewSelection,
+  webBasedProposalTypes,
   TemplateTypeLookupListSuperAdmin,
   payment_gateway,
   fees,
