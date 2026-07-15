@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 
 export default function ProposalFooter({
+  theme,
   steps,
   activeStep,
   setActiveStep,
@@ -16,25 +17,43 @@ export default function ProposalFooter({
   const isLast = activeStep === steps.length - 1;
 
   return (
-    <footer className="border-t border-slate-200 bg-white">
+    <footer
+      style={{
+        backgroundColor: theme.footerBackground,
+        color: theme.footerText,
+      }}
+    >
       <div className="flex h-16 items-center justify-between px-6">
         {/* PDF Controls */}
         {isSlider ? (
           <div className="flex items-center gap-4">
             <button
               onClick={zoomOut}
-              className="rounded-md border p-2 hover:bg-slate-100"
+              className="rounded-md border p-2 transition"
+              style={{
+                borderColor: theme.secondaryButtonBorder,
+                backgroundColor: theme.secondaryButtonBackground,
+                color: theme.secondaryButtonText,
+              }}
             >
               <ZoomOut size={18} />
             </button>
 
-            <span className="text-sm font-medium">
+            <span
+              className="text-sm font-medium"
+              style={{ color: theme.footerText }}
+            >
               {(zoom * 100).toFixed(0)}%
             </span>
 
             <button
               onClick={zoomIn}
-              className="rounded-md border p-2 hover:bg-slate-100"
+              className="rounded-md border p-2 transition"
+              style={{
+                borderColor: theme.secondaryButtonBorder,
+                backgroundColor: theme.secondaryButtonBackground,
+                color: theme.secondaryButtonText,
+              }}
             >
               <ZoomIn size={18} />
             </button>
@@ -43,19 +62,32 @@ export default function ProposalFooter({
               <button
                 onClick={onPreviousPage}
                 disabled={pageNumber === 1}
-                className="rounded-md border p-2 disabled:opacity-40"
+                className="rounded-md border p-2 transition disabled:cursor-not-allowed disabled:opacity-40"
+                style={{
+                  borderColor: theme.secondaryButtonBorder,
+                  backgroundColor: theme.secondaryButtonBackground,
+                  color: theme.secondaryButtonText,
+                }}
               >
                 <ChevronLeft size={18} />
               </button>
 
-              <span className="text-sm">
+              <span
+                className="text-sm font-medium"
+                style={{ color: theme.footerText }}
+              >
                 {pageNumber} / {numPages}
               </span>
 
               <button
                 onClick={onNextPage}
                 disabled={pageNumber === numPages}
-                className="rounded-md border p-2 disabled:opacity-40"
+                className="rounded-md border p-2 transition disabled:cursor-not-allowed disabled:opacity-40"
+                style={{
+                  borderColor: theme.secondaryButtonBorder,
+                  backgroundColor: theme.secondaryButtonBackground,
+                  color: theme.secondaryButtonText,
+                }}
               >
                 <ChevronRight size={18} />
               </button>
@@ -70,7 +102,12 @@ export default function ProposalFooter({
           {activeStep > 0 && (
             <button
               onClick={() => setActiveStep((s) => s - 1)}
-              className="rounded-lg border border-slate-300 px-5 py-2 text-sm font-medium hover:bg-slate-100"
+              className="rounded-lg border px-5 py-2 text-sm font-medium transition"
+              style={{
+                backgroundColor: theme.secondaryButtonBackground,
+                color: theme.secondaryButtonText,
+                borderColor: theme.secondaryButtonBorder,
+              }}
             >
               Previous
             </button>
@@ -79,12 +116,22 @@ export default function ProposalFooter({
           {!isLast ? (
             <button
               onClick={() => setActiveStep((s) => s + 1)}
-              className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="rounded-lg px-6 py-2 text-sm font-medium transition"
+              style={{
+                backgroundColor: theme.primaryButtonBackground,
+                color: theme.primaryButtonText,
+              }}
             >
               Next
             </button>
           ) : (
-            <button className="rounded-lg bg-emerald-600 px-6 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+            <button
+              className="rounded-lg px-6 py-2 text-sm font-medium transition"
+              style={{
+                backgroundColor: theme.successButtonBackground,
+                color: theme.successButtonText,
+              }}
+            >
               Accept Proposal
             </button>
           )}

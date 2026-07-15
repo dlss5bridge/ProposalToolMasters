@@ -1,8 +1,17 @@
-export default function ProposalHeader() {
+export default function ProposalHeader({ theme }) {
   return (
-    <header className="bg-white border-b border-slate-200  ">
-      <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
-        <h1 className="mx-auto text-xl font-semibold tracking-tight text-slate-800 text-center underline tracking-normal leading-5">
+    <header
+      className="border-b shadow-sm"
+      style={{
+        backgroundColor: theme.headerBackground,
+        borderBottom: `1px solid ${theme.border}`,
+      }}
+    >
+      <div className="flex h-16 items-center justify-center px-4 sm:px-6 lg:px-8">
+        <h1
+          className="text-center text-lg font-semibold tracking-wide sm:text-xl"
+          style={{ color: theme.headerText }}
+        >
           Web Based Proposal
         </h1>
       </div>

@@ -34,17 +34,43 @@ export default function ProposalLayout({
   };
 
   return (
-    <div className="flex h-screen flex-col bg-slate-100">
-      <ProposalHeader style={{ backgroundColor: theme.secondary }} />
+    <div
+      className="flex h-screen flex-col"
+      style={{ backgroundColor: theme.background }}
+    >
+      <ProposalHeader theme={theme} />
 
-      <main className="flex-1 overflow-hidden p-2 sm:p-6">
-        <div className="mx-auto flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <ProposalStepper steps={steps} />
+      <main
+        className="flex-1 overflow-hidden p-1 sm:p-5 lg:p-6"
+        style={{
+          backgroundColor: theme.background,
+        }}
+      >
+        <div
+          className="mx-auto flex h-full flex-col overflow-hidden rounded-3xl shadow-xl"
+          style={{
+            backgroundColor: theme.surface,
+            border: `1px solid ${theme.border}`,
+          }}
+        >
+          {/* Stepper */}
+          <ProposalStepper
+            theme={theme}
+            steps={steps}
+            activeStep={activeStep}
+          />
 
-          {/* PDF Area */}
-          <div className="flex-1 overflow-hidden">
+          {/* PDF Viewer */}
+          <div
+            className="flex-1 overflow-hidden"
+            style={{
+              backgroundColor: theme.pdfBackground,
+            }}
+          >
             <PdfViewer
+              theme={theme}
               pageNumber={pageNumber}
+              setPageNumber={setPageNumber}
               numPages={numPages}
               zoom={zoom}
               setNumPages={setNumPages}
@@ -57,9 +83,17 @@ export default function ProposalLayout({
 
           {children}
 
-          {/* Sticky Footer */}
-          <div className="sticky bottom-0 z-20 border-t border-slate-200 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
+          {/* Footer */}
+          <div
+            className="sticky bottom-0 z-20"
+            style={{
+              backgroundColor: theme.footerBackground,
+              borderTop: `1px solid ${theme.border}`,
+              color: theme.footerText,
+            }}
+          >
             <ProposalFooter
+              theme={theme}
               steps={steps}
               activeStep={activeStep}
               setActiveStep={setActiveStep}

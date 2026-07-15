@@ -57,13 +57,67 @@ const proposalResponse = {
   ],
 };
 const proposalTheme = {
-  primary: "#00BFFF", // Buttons, active step, links
-  secondary: "#00192D", // Header & Footer
-  background: "#FFFFFF", // Page background
-  surface: "#FFFFFF", // Card background
+  // Layout
+  background: "#FFFFFF",
+  surface: "#FFFFFF",
   border: "#E2E8F0",
-  text: "#1E293B",
-  textLight: "#64748B",
+
+  // Brand Colors
+  primary: "#00BFFF",
+  secondary: "#00192D",
+
+  // Text
+  textPrimary: "#1E293B",
+  textSecondary: "#64748B",
+  textLight: "#FFFFFF",
+
+  // Header & Footer
+  headerBackground: "#00192D",
+  headerText: "#FFFFFF",
+
+  footerBackground: "#00192D",
+  footerText: "#FFFFFF",
+
+  // Buttons
+  primaryButtonBackground: "#00BFFF",
+  primaryButtonText: "#FFFFFF",
+  primaryButtonHover: "#00A9E6",
+
+  secondaryButtonBackground: "#FFFFFF",
+  secondaryButtonText: "#00192D",
+  secondaryButtonBorder: "#CBD5E1",
+  secondaryButtonHover: "#F8FAFC",
+
+  successButtonBackground: "#22C55E",
+  successButtonText: "#FFFFFF",
+  successButtonHover: "#16A34A",
+
+  // Stepper
+  activeStepBackground: "#00BFFF",
+  activeStepText: "#FFFFFF",
+
+  completedStepBackground: "#22C55E",
+  completedStepText: "#FFFFFF",
+
+  inactiveStepBackground: "#E2E8F0",
+  inactiveStepText: "#64748B",
+
+  activeStepLabel: "#00BFFF",
+  completedStepLabel: "#22C55E",
+  inactiveStepLabel: "#64748B",
+
+  // PDF Viewer
+  pdfBackground: "#0000004a",
+  pdfShadow: "rgba(15, 23, 42, 0.12)",
+
+  // Controls
+  iconColor: "#475569",
+  iconHoverBackground: "#F1F5F9",
+
+  // Status Colors
+  success: "#22C55E",
+  warning: "#F59E0B",
+  danger: "#EF4444",
 };
 export default function WebBasedProposal() {
   const [activeStep, setActiveStep] = useState(0);
