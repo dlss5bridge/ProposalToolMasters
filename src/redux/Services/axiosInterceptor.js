@@ -1,5 +1,4 @@
 import axios from "axios";
-import { XeroBaseUrl } from "../../Base-Url/Base_Url";
 import { store } from "../store/store";
 
 const apiClient = axios.create();
@@ -16,7 +15,7 @@ apiClient.interceptors.request.use(
     config.headers["Content-Type"] = "application/json";
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Response Interceptor
@@ -28,7 +27,7 @@ apiClient.interceptors.response.use(
       window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

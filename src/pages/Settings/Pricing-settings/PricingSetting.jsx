@@ -13,7 +13,7 @@ import {
   AcceptServiceFeeInflationSAChanges,
   DeclineServiceFeeInflation,
 } from "../../../redux/Services/Config/ServicesApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SuccessModal from "../../../components/SuccessModal";
 import { AuthContextProvider } from "../../../AuthContext/AuthContext";
 import Footer from "../../../components/Footer";
@@ -22,8 +22,14 @@ import Utils from "../../../Middleware/Utils";
 import ConfirmModel from "../../../components/ConfirmationBox";
 import SAPredefinedChangesNotifyMessageModel from "../../../components/SAPredefinedChangesNotifyMessageModel";
 import ConfirmSAChangesModel from "../../../components/AcceptSuperAdminChangesConfirmation";
+import pricingSettingsReducer, {
+  GetAllProposalGlobalVariables,
+  selectProposalGlobalVariables,
+} from "../../../redux/reducer/pricingSettings";
 
 const Pricing_Settings = () => {
+  const auth = useSelector((state) => state?.Storage);
+  const dispatch = useDispatch();
   const moduleName = "FeeInflation";
   // A] States Declaration :
   const [activeTab, setActiveTab] = useState("PricingSetting");
@@ -46,6 +52,8 @@ const Pricing_Settings = () => {
     paymentFrequencyID: null,
     enableMasterProposalType: false,
     defaultProposalFormatID: null,
+    webProposalTypeID: null,
+    globalPricingDriverID: [],
   });
   const [ServiceFeeInflationConfig, setServiceFeeInflationConfig] = useState({
     OrganisationKeyID: null,
@@ -74,14 +82,6 @@ const Pricing_Settings = () => {
   //   Payment_Frequency: 2 // Example initial value, adjust as needed
   // };
 
-  useEffect(() => {
-    if (pricingSettingObj.paymentFrequencyID !== null) {
-      const foundFrequency = Utils.Payment_Frequency.find(
-        (item) => item.value === pricingSettingObj.paymentFrequencyID,
-      );
-      setSelectedFrequency(foundFrequency);
-    }
-  }, [pricingSettingObj.paymentFrequencyID]);
   const [PrevPricingSettingObj, setPrevPricingSettingObj] = useState({
     userKeyID: null,
     minOneOffPriceForQC: "",
@@ -91,6 +91,8 @@ const Pricing_Settings = () => {
     enableMasterProposalType: false,
     defaultProposalFormatID: null,
     remainingESignatures: null,
+    webProposalTypeID: null,
+    globalPricingDriverID: [],
   });
   const [errorMessage, setErrorMessage] = useState("");
   const {
@@ -103,6 +105,15 @@ const Pricing_Settings = () => {
   } = useContext(AuthContextProvider);
   const common = useSelector((state) => state.Storage); //Getting Logged Users Details From Persist Storage of redux hooks
   const [isFormChanged, setIsFormChanged] = useState(false);
+  //========================redux state===============================
+  const globalVariables = useSelector(selectProposalGlobalVariables);
+
+  //===================useEffects====================================
+  //fetch all global variables list
+  useEffect(() => {
+    dispatch(GetAllProposalGlobalVariables(auth?.organisationKeyID));
+  }, [dispatch, auth?.organisationKeyID]);
+
   // B] Initial useEffect : Will call when Add/Update button click from list page
   useEffect(() => {
     setTopbar("block");
@@ -113,7 +124,14 @@ const Pricing_Settings = () => {
       GetPricingSettingModelData(common.organisationKeyID);
     }
   }, [common.organisationKeyID]);
-
+  useEffect(() => {
+    if (pricingSettingObj.paymentFrequencyID !== null) {
+      const foundFrequency = Utils.Payment_Frequency.find(
+        (item) => item.value === pricingSettingObj.paymentFrequencyID,
+      );
+      setSelectedFrequency(foundFrequency);
+    }
+  }, [pricingSettingObj.paymentFrequencyID]);
   const getProposalFormatOptions = () => {
     if (PrevPricingSettingObj.remainingESignatures !== true) {
       return Utils.PreviewSelection.filter((x) => x.value === 3); //TODO:change to 3 after web based developement
@@ -152,6 +170,8 @@ const Pricing_Settings = () => {
             enableMasterProposalType: ModelData.enableMasterProposalType,
             defaultProposalFormatID: ModelData.defaultProposalFormatID,
             remainingESignatures: ModelData.remainingESignatures,
+            webProposalTypeID: ModelData?.webProposalTypeID,
+            globalPricingDriverID: ModelData?.globalPricingDriverID,
           });
           setPrevPricingSettingObj({
             ...pricingSettingObj,
@@ -164,6 +184,8 @@ const Pricing_Settings = () => {
             enableMasterProposalType: ModelData.enableMasterProposalType,
             defaultProposalFormatID: ModelData.defaultProposalFormatID,
             remainingESignatures: ModelData.remainingESignatures,
+            webProposalTypeID: ModelData?.webProposalTypeID,
+            globalPricingDriverID: ModelData?.globalPricingDriverID,
           });
         }
       } else {
@@ -312,8 +334,13 @@ const Pricing_Settings = () => {
       pricingSettingObj.enableMasterProposalType ==
         PrevPricingSettingObj.enableMasterProposalType &&
       pricingSettingObj.defaultProposalFormatID ==
-        PrevPricingSettingObj.defaultProposalFormatID
+        PrevPricingSettingObj.defaultProposalFormatID &&
+      pricingSettingObj.webProposalTypeID ==
+        PrevPricingSettingObj.webProposalTypeID &&
+      pricingSettingObj.globalPricingDriverID ==
+        PrevPricingSettingObj.globalPricingDriverID
     ) {
+      debugger;
       SetPrevError(true);
       return false;
     }
@@ -330,6 +357,8 @@ const Pricing_Settings = () => {
       enableMasterProposalType:
         pricingSettingObj.enableMasterProposalType || false,
       defaultProposalFormatID: pricingSettingObj.defaultProposalFormatID,
+      webProposalTypeID: pricingSettingObj?.webProposalTypeID,
+      globalPricingDriverID: pricingSettingObj?.globalPricingDriverID,
     };
 
     setErrorMessage("");
@@ -609,23 +638,7 @@ const Pricing_Settings = () => {
                           <div class="col-lg-2 col-md-4 col-sm-12"></div>
                         </div>
                       </div>
-                      <div class="fieldset col-6">
-                        <label class=" fieldset-label pe-2">
-                          Enable {masterProposalType}
-                        </label>
-                        <input
-                          type="checkbox"
-                          className="check check_tick"
-                          style={{ verticalAlign: "middle" }}
-                          checked={pricingSettingObj.enableMasterProposalType}
-                          onChange={(e) => {
-                            setPricingSettingObj({
-                              ...pricingSettingObj,
-                              enableMasterProposalType: e.target.checked,
-                            });
-                          }}
-                        />
-                      </div>
+
                       <div class="fieldset col-6">
                         <label class=" fieldset-label pe-2">
                           Default Proposal Format
@@ -643,47 +656,78 @@ const Pricing_Settings = () => {
                             setPricingSettingObj({
                               ...pricingSettingObj,
                               defaultProposalFormatID: selectedOption.value,
+                              webProposalTypeID: null,
+                              globalPricingDriverID: [],
                             });
                           }}
                         />
                       </div>
 
-                      <div class="fieldset col-6">
-                        <label class=" fieldset-label pe-2">
-                          Proposal Types
-                        </label>
-                        <Select
-                          className="phone-input-country-code selectDropDown Drop-down-width pt-2"
-                          options={Utils?.webBasedProposalTypes}
-                          value={Utils.webBasedProposalTypes.find(
-                            (x) =>
-                              x.value === pricingSettingObj?.proposalTypeID,
-                          )}
-                          onChange={(selectedOption) => {
-                            setPricingSettingObj({
-                              ...pricingSettingObj,
-                              proposalTypeID: selectedOption.value,
-                            });
-                          }}
-                        />
-                      </div>
+                      {pricingSettingObj?.defaultProposalFormatID === 3 && (
+                        <div class="fieldset col-6">
+                          <label class=" fieldset-label pe-2">
+                            Proposal Types
+                          </label>
+                          <Select
+                            className="phone-input-country-code selectDropDown Drop-down-width pt-2"
+                            options={Utils?.webBasedProposalTypes}
+                            value={Utils.webBasedProposalTypes.find(
+                              (x) =>
+                                x.value ===
+                                pricingSettingObj?.webProposalTypeID,
+                            )}
+                            onChange={(selectedOption) => {
+                              setPricingSettingObj({
+                                ...pricingSettingObj,
+                                webProposalTypeID: selectedOption.value,
+                                globalPricingDriverID: [],
+                              });
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {(pricingSettingObj?.webProposalTypeID == 2 ||
+                        pricingSettingObj?.webProposalTypeID == 3) && (
+                        <div className="fieldset col-6">
+                          <label className="fieldset-label pe-2">
+                            Global {proposalName} Variables
+                          </label>
+
+                          <Select
+                            isMulti
+                            className="phone-input-country-code selectDropDown Drop-down-width pt-2"
+                            options={globalVariables}
+                            value={globalVariables.filter((option) =>
+                              pricingSettingObj.globalPricingDriverID?.includes(
+                                option.value,
+                              ),
+                            )}
+                            onChange={(selectedOptions) => {
+                              setPricingSettingObj({
+                                ...pricingSettingObj,
+                                globalPricingDriverID:
+                                  selectedOptions?.map((item) => item.value) ||
+                                  [],
+                              });
+                            }}
+                          />
+                        </div>
+                      )}
 
                       <div class="fieldset col-6">
                         <label class=" fieldset-label pe-2">
-                          Global {proposalName} Variables
+                          Enable {masterProposalType}
                         </label>
-                        <Select
-                          isMulti
-                          className="phone-input-country-code selectDropDown Drop-down-width pt-2"
-                          options={Utils?.webBasedProposalTypes}
-                          value={Utils.webBasedProposalTypes.find(
-                            (x) =>
-                              x.value === pricingSettingObj?.proposalTypeID,
-                          )}
-                          onChange={(selectedOption) => {
+                        <input
+                          type="checkbox"
+                          className="check check_tick"
+                          style={{ verticalAlign: "middle" }}
+                          checked={pricingSettingObj.enableMasterProposalType}
+                          onChange={(e) => {
                             setPricingSettingObj({
                               ...pricingSettingObj,
-                              proposalTypeID: selectedOption.value,
+                              enableMasterProposalType: e.target.checked,
                             });
                           }}
                         />

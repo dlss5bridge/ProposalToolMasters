@@ -5,6 +5,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../reducer/authSlice";
 import quickBookReducer from "../reducer/quickBookSlice";
 import metricReducer from "../reducer/metricsSlice";
+import pricingSettingsReducer from "../reducer/pricingSettings/pricingSettingsSlice";
 
 const persistConfig = { key: "Proposal Tool", version: 1, storage };
 const authPersistConfig = {
@@ -21,5 +22,6 @@ export const store = configureStore({
     auth: persistedAuthReducer,
     quickBook: quickBookReducer,
     metric: metricReducer,
+    pricingSetting: pricingSettingsReducer,
   },
 });
