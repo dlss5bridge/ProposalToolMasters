@@ -1057,6 +1057,100 @@ const ChoosePlanForPurchase = (props) => {
                                                                   </span>
                                                                 </div>
 
+                                                                <div>
+                                                                  {PurchasePlanList?.enableXERO ===
+                                                                  true ? (
+                                                                    <span
+                                                                      style={{
+                                                                        color:
+                                                                          "green",
+                                                                      }}
+                                                                      className="fa fa-check"
+                                                                    ></span>
+                                                                  ) : (
+                                                                    <span
+                                                                      style={{
+                                                                        color:
+                                                                          "red",
+                                                                      }}
+                                                                      className="fa fa-times"
+                                                                    ></span>
+                                                                  )}
+                                                                  <span
+                                                                    style={{
+                                                                      marginLeft:
+                                                                        "10px",
+                                                                    }}
+                                                                  >
+                                                                    {" "}
+                                                                    Xero
+                                                                    Subscription
+                                                                  </span>
+                                                                </div>
+
+                                                                <div>
+                                                                  {PurchasePlanList?.enableQBO ===
+                                                                  true ? (
+                                                                    <span
+                                                                      style={{
+                                                                        color:
+                                                                          "green",
+                                                                      }}
+                                                                      className="fa fa-check"
+                                                                    ></span>
+                                                                  ) : (
+                                                                    <span
+                                                                      style={{
+                                                                        color:
+                                                                          "red",
+                                                                      }}
+                                                                      className="fa fa-times"
+                                                                    ></span>
+                                                                  )}
+                                                                  <span
+                                                                    style={{
+                                                                      marginLeft:
+                                                                        "10px",
+                                                                    }}
+                                                                  >
+                                                                    {" "}
+                                                                    Quickbooks
+                                                                    Subscription
+                                                                  </span>
+                                                                </div>
+
+                                                                {/* ai agent enable start  */}
+                                                                <div>
+                                                                  {PurchasePlanList?.enableAIAgent ===
+                                                                  true ? (
+                                                                    <span
+                                                                      style={{
+                                                                        color:
+                                                                          "green",
+                                                                      }}
+                                                                      className="fa fa-check"
+                                                                    ></span>
+                                                                  ) : (
+                                                                    <span
+                                                                      style={{
+                                                                        color:
+                                                                          "red",
+                                                                      }}
+                                                                      className="fa fa-times"
+                                                                    ></span>
+                                                                  )}
+                                                                  <span
+                                                                    style={{
+                                                                      marginLeft:
+                                                                        "10px",
+                                                                    }}
+                                                                  >
+                                                                    {" "}
+                                                                    AI Agent
+                                                                    Subscription
+                                                                  </span>
+                                                                </div>
+
                                                                 {PurchasePlanList && (
                                                                   <div
                                                                     className="d-flex flex-column"

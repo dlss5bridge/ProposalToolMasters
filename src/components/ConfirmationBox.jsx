@@ -586,6 +586,9 @@ function ConfirmModel({
                     modelRequestData.Action === "PaidUser" ||
                     modelRequestData.Action === "2FaStatusChange" ||
                     modelRequestData.Action === "ELStatusChange" ||
+                    modelRequestData.Action === "Redirect" ||
+                    modelRequestData.Action === "Add Contact" ||
+                    modelRequestData.Action === "Add Contact Mapping" ||
                     modelRequestData.Action === "emailStatusChange") && (
                     <span>Yes, Change It!</span>
                   )}

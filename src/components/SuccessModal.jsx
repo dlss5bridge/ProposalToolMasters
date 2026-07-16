@@ -200,6 +200,9 @@ const SuccessModal = (props) => {
                   {props.modelAction === "ResetEmailConfigurationChange"
                     ? `${props.message} has been reset successfully!`
                     : null}
+                  {props.modelAction === "AddContact"
+                    ? `${props.message}!`
+                    : null}
                   {/* {(props.modelAction === "Update" && props.modelRequestData?.Action === "Update") &&
                       (
                         <>

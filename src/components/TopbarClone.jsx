@@ -729,55 +729,35 @@ const TopbarClone = () => {
     // }
   };
 
-  //show  function for setting sub list
-  // const showSettingSubList = (id) => {
-  //   const list = document.getElementById(id);
-  //   if (list) list.style.display = "block";
-  // };
-
-  // hide function for setting
-  // hide function for setting sub list
-  // const hideSettingSubList = (id) => {
-  //   const list = document.getElementById(id);
-  //   if (list) list.style.display = "none";
-  // };
-
-  // const toggleSettingSubList = (id) => {
-  //   const list = document.getElementById(id);
-  //   const allLists = document.querySelectorAll(".subList");
-
-  //   allLists.forEach((element) => {
-  //     if (element.classList.contains("d-block") && element.id !== id) {
-  //       element.classList.remove("d-block");
-  //       element.classList.add("d-none");
-  //     }
-  //   });
-
-  //   if (list.classList.contains("d-block")) {
-  //     list.classList.remove("d-block");
-  //     list.classList.add("d-none");
-  //   } else {
-  //     list.classList.add("d-block");
-  //     list.classList.remove("d-none");
-  //     list.scrollIntoView({ behavior: "smooth", block: "start" });
-  //   }
-  // };
   const toggleSettingSubList = (id) => {
     const list = document.getElementById(id);
     if (!list) return;
 
     const isOpen = list.classList.contains("show");
 
-    document.querySelectorAll("#Setting .subList").forEach((el) => {
-      el.classList.remove("show");
-      const link = el.parentElement.querySelector(".nav-link");
-      if (link) link.setAttribute("aria-expanded", "false");
+    // Close only sibling submenus
+    const parent = list.parentElement.parentElement;
+
+    parent.querySelectorAll(":scope > .nav-item > .subList").forEach((el) => {
+      if (el !== list) {
+        el.classList.remove("show");
+        const link = el.parentElement.querySelector(".nav-link");
+        if (link) link.setAttribute("aria-expanded", "false");
+      }
     });
 
-    if (!isOpen) {
+    if (isOpen) {
+      list.classList.remove("show");
+    } else {
       list.classList.add("show");
-      const link = list.parentElement.querySelector(".nav-link");
-      if (link) link.setAttribute("aria-expanded", "true");
+    }
+
+    const link = list.parentElement.querySelector(".nav-link");
+    if (link) {
+      link.setAttribute(
+        "aria-expanded",
+        String(list.classList.contains("show")),
+      );
     }
   };
 
@@ -2195,12 +2175,6 @@ const TopbarClone = () => {
                                 activeOrganizationSubscriptionPlan?.apiIntegration && (
                                   <li
                                     class="nav-item"
-                                    // onMouseLeave={() =>
-                                    //   hideSettingSubList("WebIntegration")
-                                    // }
-                                    // onMouseEnter={() =>
-                                    //   showSettingSubList("WebIntegration")
-                                    // }
                                     onClick={() =>
                                       toggleSettingSubList("WebIntegration")
                                     }
@@ -2305,14 +2279,6 @@ const TopbarClone = () => {
                                     style={{
                                       "--subListColor": subListColor,
                                     }}
-                                    // style={{
-                                    //       display: "none",      // toggled via toggleConfigSubList
-                                    //       width: "100%",        // full parent width
-                                    //       paddingLeft: "16px",  // optional indentation
-                                    //       background: "#f8f9fa",
-                                    //       borderRadius: "4px",
-                                    //       marginTop: "4px",
-                                    //     }}
                                   >
                                     <ul class="nav nav-sm flex-column">
                                       <li class="nav-item">
@@ -2352,7 +2318,8 @@ const TopbarClone = () => {
                                           }}
                                           style={{ textDecoration: "none" }}
                                         >
-                                          <span>Bookkeeping Gateway</span>
+                                          Bookkeeping Gateway
+                                          <span className="sub-arrow"></span>
                                         </a>
 
                                         <div

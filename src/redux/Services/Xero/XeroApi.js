@@ -24,7 +24,7 @@ export const ConnectionAuthentication = async (id, activePlatform) => {
 
 export const OrganisationToQuickBookAuthentication = async (
   id,
-  activePlatform
+  activePlatform,
 ) => {
   let baseUrl;
   switch (activePlatform) {
@@ -43,7 +43,7 @@ export const OrganisationToQuickBookAuthentication = async (
 
 export const GetAllClientLookupList = async (
   organisationKeyID,
-  activePlatform
+  activePlatform,
 ) => {
   debugger;
   let baseUrl;
@@ -58,14 +58,14 @@ export const GetAllClientLookupList = async (
       throw new Error("Invalid platform selected");
   }
   const res = await getListWithAuthenticated(
-    `${baseUrl}mappings/${organisationKeyID}`
+    `${baseUrl}mappings/${organisationKeyID}`,
   );
   return res;
 };
 
 export const GetAllCachedXeroContacts = async (
   organisationKeyID,
-  activePlatform
+  activePlatform,
 ) => {
   debugger;
   let baseUrl;
@@ -80,7 +80,7 @@ export const GetAllCachedXeroContacts = async (
       throw new Error("Invalid platform selected");
   }
   const res = await getListWithAuthenticated(
-    `${baseUrl}contacts/${organisationKeyID}`
+    `${baseUrl}contacts/${organisationKeyID}`,
   );
   return res;
 };
@@ -88,7 +88,7 @@ export const GetAllCachedXeroContacts = async (
 export const ProspectConnectionAuthentication = async (
   organisationKeyId,
   clientKeyId,
-  activePlatform
+  activePlatform,
 ) => {
   debugger;
   let baseUrl;
@@ -103,7 +103,7 @@ export const ProspectConnectionAuthentication = async (
       throw new Error("Invalid platform selected");
   }
   const res = await getListWithAuthenticated(
-    `${baseUrl}client/connection-url/${organisationKeyId}/${clientKeyId}`
+    `${baseUrl}client/connection-url/${organisationKeyId}/${clientKeyId}`,
   );
   return res;
 };
@@ -111,9 +111,8 @@ export const ProspectConnectionAuthentication = async (
 export const CreateXeroContactFromOutbooks = async (
   param,
   organisationKeyId,
-  activePlatform
+  activePlatform,
 ) => {
-  debugger;
   let baseUrl;
   switch (activePlatform) {
     case "QuickBooks":
