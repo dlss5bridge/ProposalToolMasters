@@ -2734,6 +2734,15 @@ const Engagement_Letter = () => {
                                                                         setOpenSuccessModal(
                                                                           true,
                                                                         );
+                                                                        setModelRequestData(
+                                                                          {
+                                                                            ...modelRequestData,
+                                                                            Action:
+                                                                              "Create Invoice",
+                                                                            message:
+                                                                              "Invoice Created Successfully!",
+                                                                          },
+                                                                        );
                                                                       } catch (error) {
                                                                         // ERROR
                                                                         setErrorMessage(
@@ -3762,7 +3771,13 @@ const Engagement_Letter = () => {
                                     : modelRequestData.Action ===
                                         "ArchiveContract"
                                       ? EngagementName
-                                      : ""
+                                      : modelRequestData.Action ===
+                                          "ArchiveContract"
+                                        ? EngagementName
+                                        : modelRequestData.Action ===
+                                            "Create Invoice"
+                                          ? "Invoice created successfully!"
+                                          : ""
                       }
                       refIdStore={modelRequestData.refId}
                     />

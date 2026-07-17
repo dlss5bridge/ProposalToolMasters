@@ -203,6 +203,10 @@ const SuccessModal = (props) => {
                   {props.modelAction === "AddContact"
                     ? `${props.message}!`
                     : null}
+                  {props.modelAction === "Create Invoice"
+                    ? `${props?.message}!`
+                    : null}
+
                   {/* {(props.modelAction === "Update" && props.modelRequestData?.Action === "Update") &&
                       (
                         <>
