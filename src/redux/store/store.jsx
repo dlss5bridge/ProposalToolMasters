@@ -6,6 +6,8 @@ import authReducer from "../reducer/authSlice";
 import quickBookReducer from "../reducer/quickBookSlice";
 import metricReducer from "../reducer/metricsSlice";
 import pricingSettingsReducer from "../reducer/pricingSettings/pricingSettingsSlice";
+import proposalStepperReducer from "../reducer/webProposal/proposalStepperSlice";
+import pdfViewerReducer from "../reducer/pdfViewer/pdfViewerSlice";
 
 const persistConfig = { key: "Proposal Tool", version: 1, storage };
 const authPersistConfig = {
@@ -23,5 +25,7 @@ export const store = configureStore({
     quickBook: quickBookReducer,
     metric: metricReducer,
     pricingSetting: pricingSettingsReducer,
+    proposalStepper: proposalStepperReducer,
+    pdfViewer: pdfViewerReducer,
   },
 });

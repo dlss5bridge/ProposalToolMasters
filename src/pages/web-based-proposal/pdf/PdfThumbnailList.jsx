@@ -1,11 +1,19 @@
 import { Page } from "react-pdf";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectCurrentPage,
+  selectNumPages,
+  selectPdfFile,
+  selectZoom,
+  setCurrentPage,
+} from "../../../redux/reducer/pdfViewer";
 
-export default function PdfThumbnailList({
-  theme,
-  numPages,
-  pageNumber,
-  setPageNumber,
-}) {
+export default function PdfThumbnailList({ theme }) {
+  const dispatch = useDispatch();
+
+  const pageNumber = useSelector(selectCurrentPage);
+  const numPages = useSelector(selectNumPages);
+
   return (
     <aside
       className="hidden md:flex w-52 shrink-0 flex-col overflow-y-auto border-r p-3"
@@ -27,7 +35,7 @@ export default function PdfThumbnailList({
             <button
               key={page}
               type="button"
-              onClick={() => setPageNumber(page)}
+              onClick={() => dispatch(setCurrentPage(page))}
               className="w-full rounded-lg border p-2 transition-all"
               style={{
                 borderColor: selected ? theme.primary : theme.border,

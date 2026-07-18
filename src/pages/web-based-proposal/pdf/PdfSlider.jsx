@@ -3,21 +3,33 @@ import PdfThumbnailList from "./PdfThumbnailList";
 
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectCurrentPage,
+  selectNumPages,
+  selectPdfFile,
+  selectZoom,
+  setCurrentPage,
+  setNumPages,
+} from "../../../redux/reducer/pdfViewer";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-export default function PdfSlider({
-  theme,
-  pageNumber,
-  setPageNumber,
-  numPages,
-  scale,
-  setNumPages,
-}) {
+export default function PdfSlider({ theme }) {
+  const dispatch = useDispatch();
+
+  const pageNumber = useSelector(selectCurrentPage);
+  const numPages = useSelector(selectNumPages);
+  const zoom = useSelector(selectZoom);
+  const pdfFile = useSelector(selectPdfFile);
+
   return (
     <Document
       file="https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf"
-      onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+      // onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+      onLoadSuccess={({ numPages }) => {
+        dispatch(setNumPages(numPages));
+      }}
     >
       <div
         className="flex h-full"
@@ -30,14 +42,14 @@ export default function PdfSlider({
           theme={theme}
           numPages={numPages}
           pageNumber={pageNumber}
-          setPageNumber={setPageNumber}
+          onSelectPage={(page) => dispatch(setCurrentPage(page))}
         />
 
         {/* Right PDF Preview */}
         <div className="flex flex-1 justify-center overflow-auto p-4">
           <Page
             pageNumber={pageNumber}
-            scale={scale}
+            scale={zoom}
             renderTextLayer={false}
             renderAnnotationLayer={false}
           />

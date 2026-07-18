@@ -1,17 +1,7 @@
 import PdfSlider from "./PdfSlider";
+import PdfToolbar from "./PdfToolbar";
 
-export default function PdfViewer({
-  theme,
-  pageNumber,
-  numPages,
-  zoom,
-  setNumPages,
-  setPageNumber,
-  onPreviousPage,
-  onNextPage,
-  zoomIn,
-  zoomOut,
-}) {
+export default function PdfViewer({ theme }) {
   return (
     <section
       className="flex h-full flex-col"
@@ -21,15 +11,9 @@ export default function PdfViewer({
         className="flex-1 overflow-auto"
         style={{ backgroundColor: theme.pdfBackground }}
       >
-        <PdfSlider
-          theme={theme}
-          pageNumber={pageNumber}
-          setPageNumber={setPageNumber}
-          numPages={numPages}
-          scale={zoom}
-          setNumPages={setNumPages}
-        />
+        <PdfSlider theme={theme} />
       </div>
+      <PdfToolbar theme={theme} />
     </section>
   );
 }

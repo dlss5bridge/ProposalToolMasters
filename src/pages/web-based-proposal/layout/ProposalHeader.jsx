@@ -1,19 +1,38 @@
-export default function ProposalHeader({ theme }) {
+export default function ProposalHeader({
+  theme,
+  title = "Accounting Proposal",
+  logo,
+}) {
   return (
     <header
-      className="border-b shadow-sm"
+      className="h-12 border-b bg-white"
       style={{
-        backgroundColor: theme.headerBackground,
-        borderBottom: `1px solid ${theme.border}`,
+        borderColor: theme.border,
       }}
     >
-      <div className="flex h-16 items-center justify-center px-4 sm:px-6 lg:px-8">
-        <h1
-          className="text-center text-lg font-semibold tracking-wide sm:text-xl"
-          style={{ color: theme.headerText }}
-        >
-          Web Based Proposal
-        </h1>
+      <div className="flex h-full items-center justify-between px-5">
+        {/* Left */}
+        <div className="flex items-center gap-3">
+          {logo && (
+            <img src={logo} alt="Logo" className="h-7 w-auto object-contain" />
+          )}
+
+          <h1
+            className="text-[15px] font-semibold"
+            style={{
+              color: theme.textPrimary,
+            }}
+          >
+            {title}
+          </h1>
+        </div>
+
+        {/* Future Actions */}
+        <div className="flex items-center gap-2">
+          {/* Download */}
+          {/* Print */}
+          {/* Share */}
+        </div>
       </div>
     </header>
   );
