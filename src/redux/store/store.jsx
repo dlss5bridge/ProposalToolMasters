@@ -8,6 +8,7 @@ import metricReducer from "../reducer/metricsSlice";
 import pricingSettingsReducer from "../reducer/pricingSettings/pricingSettingsSlice";
 import proposalStepperReducer from "../reducer/webProposal/proposalStepperSlice";
 import pdfViewerReducer from "../reducer/pdfViewer/pdfViewerSlice";
+import stepperReducer from "../reducer/webProposal/stepper/stepperSlice";
 
 const persistConfig = { key: "Proposal Tool", version: 1, storage };
 const authPersistConfig = {
@@ -27,5 +28,6 @@ export const store = configureStore({
     pricingSetting: pricingSettingsReducer,
     proposalStepper: proposalStepperReducer,
     pdfViewer: pdfViewerReducer,
+    stepper: stepperReducer,
   },
 });

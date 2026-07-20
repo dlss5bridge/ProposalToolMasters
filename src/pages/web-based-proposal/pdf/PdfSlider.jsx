@@ -3,39 +3,40 @@ import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectCurrentPage,
-  selectNumPages,
-  selectPdfFile,
-  selectZoom,
-  setNumPages,
-} from "../../../redux/reducer/pdfViewer";
-import { useEffect, useRef, useState } from "react";
+import { selectNumPages, setNumPages } from "../../../redux/reducer/pdfViewer";
+import { useLayoutEffect, useRef, useState } from "react";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function PdfSlider({ theme }) {
   const dispatch = useDispatch();
-
   const numPages = useSelector(selectNumPages);
   const containerRef = useRef(null);
-  const [pageWidth, setPageWidth] = useState(900);
+  const [pageWidth, setPageWidth] = useState(750);
 
-  useEffect(() => {
-    const updateWidth = () => {
+  useLayoutEffect(() => {
+    if (!containerRef.current) return;
+
+    const calculateWidth = () => {
       if (!containerRef.current) return;
 
-      const width = containerRef.current.clientWidth;
+      const containerWidth = containerRef.current.clientWidth;
 
-      // Leave some padding around the PDF
-      setPageWidth(Math.min(width - 32, 950));
+      let width = containerWidth * 0.95;
+
+      width = Math.min(width, 950);
+      width = Math.max(width, 280);
+
+      setPageWidth(width);
     };
 
-    updateWidth();
+    calculateWidth();
 
-    window.addEventListener("resize", updateWidth);
+    const observer = new ResizeObserver(calculateWidth);
 
-    return () => window.removeEventListener("resize", updateWidth);
+    observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
   }, []);
 
   return (

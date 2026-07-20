@@ -1,11 +1,28 @@
-import ProposalFooter from "../layout/ProposalFooter";
-import ProposalHeader from "../layout/ProposalHeader";
+import { useSelector } from "react-redux";
+
+import { selectActiveStep } from "../../../redux/reducer/webProposal/stepper";
 import ProposalLayout from "../layout/ProposalLayout";
-import ProposalSidebar from "../layout/ProposalSidebar";
+import ProposalHeader from "../layout/ProposalHeader";
+import ProposalFooter from "../layout/ProposalFooter";
 import ProposalStepper from "../layout/ProposalStepper";
-import PdfViewer from "../pdf/PdfViewer";
+import ProposalSidebar from "../layout/ProposalSidebar";
+
+import ProposalPdfStep from "../steps/ProposalPdfStep";
+import ProposalInputFieldsStep from "../steps/ProposalInputFieldsStep";
 
 export default function StandardProposalWithInputs({ proposal, theme }) {
+  const activeStep = useSelector(selectActiveStep);
+
+  const stepComponents = [
+    <ProposalPdfStep theme={theme} />,
+    <ProposalInputFieldsStep theme={theme} />,
+    // <ProposalBasicInformationStep theme={theme} />,
+    // <ProposalServicesStep theme={theme} />,
+    // <ProposalPricingTableStep theme={theme} />,
+    // <ProposalPreviewStep theme={theme} />,
+    // <ProposalSignStep theme={theme} />,
+  ];
+
   return (
     <ProposalLayout theme={theme}>
       {/* Mobile Header */}
@@ -13,56 +30,38 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
         <ProposalHeader theme={theme} title={proposal.title} />
       </div>
 
-      {/* Main Content */}
       <div
         className="flex flex-1 overflow-hidden"
         style={{
           backgroundColor: theme.background,
         }}
       >
-        {/* Sidebar */}
-        <aside
-          className="hidden lg:flex lg:w-1/3 overflow-y-auto border-r p-5"
-          style={{
-            backgroundColor: theme.background,
-            borderColor: theme.border,
-          }}
-        >
-          <ProposalSidebar theme={theme} proposal={proposal} />
-        </aside>
+        {/* Sidebar only for PDF step */}
+        {activeStep === 0 && (
+          <aside
+            className="hidden lg:flex lg:w-1/3 border-r p-5"
+            style={{
+              backgroundColor: theme.background,
+              borderColor: theme.border,
+            }}
+          >
+            <ProposalSidebar theme={theme} proposal={proposal} />
+          </aside>
+        )}
 
-        {/* Right Section */}
+        {/* Step Content */}
         <main
-          className="flex-1 overflow-hidden p-5"
+          className="flex-1 overflow-hidden"
           style={{
             backgroundColor: theme.background,
           }}
         >
-          <div className="mx-auto h-full">
-            <div
-              className="flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-lg"
-              style={{
-                borderColor: theme.border,
-              }}
-            >
-              <div
-                className="h-1.5"
-                style={{
-                  background: `linear-gradient(90deg, ${theme.primary}, ${theme.secondary})`,
-                }}
-              />
-
-              <div className="flex-1 overflow-hidden">
-                <PdfViewer theme={theme} />
-              </div>
-            </div>
-          </div>
+          {stepComponents[activeStep]}
         </main>
       </div>
 
-      {/* Full Width Footer */}
       <ProposalFooter theme={theme}>
-        <ProposalStepper theme={theme} steps={proposal.steps} activeStep={0} />
+        <ProposalStepper theme={theme} steps={proposal.steps} />
       </ProposalFooter>
     </ProposalLayout>
   );
