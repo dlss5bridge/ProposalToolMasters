@@ -1,10 +1,84 @@
+import ProposalHeader from "../layout/ProposalHeader";
 import ProposalLayout from "../layout/ProposalLayout";
+import ProposalSidebar from "../layout/ProposalSidebar";
 import PdfViewer from "../pdf/PdfViewer";
 
 export default function StandardProposal({ proposal, theme }) {
   return (
-    <ProposalLayout theme={theme} title={proposal.title} showSidebar={false}>
-      <PdfViewer theme={theme} />
+    <ProposalLayout theme={theme}>
+      {/* Mobile Header */}
+      <div className="block lg:hidden">
+        <ProposalHeader theme={theme} title={proposal.title} />
+      </div>
+
+      <div
+        className="flex h-full overflow-hidden"
+        style={{
+          backgroundColor: theme.background,
+        }}
+      >
+        {/* Sidebar */}
+        <aside
+          className="
+        hidden
+        lg:flex
+        lg:w-1/3
+        overflow-y-auto
+        border-r
+        p-5
+      "
+          style={{
+            backgroundColor: theme.background,
+            borderColor: theme.border,
+          }}
+        >
+          <ProposalSidebar theme={theme} proposal={proposal} />
+        </aside>
+
+        {/* PDF Section */}
+        <main
+          className="
+        w-full
+        lg:w-2/3
+        overflow-hidden
+        p-5
+      "
+          style={{
+            backgroundColor: theme.background,
+          }}
+        >
+          <div className="mx-auto h-full">
+            <div
+              className="
+            flex
+            h-full
+            flex-col
+            overflow-hidden
+            rounded-2xl
+            border
+            bg-white
+            shadow-lg
+          "
+              style={{
+                borderColor: theme.border,
+              }}
+            >
+              {/* Top Accent */}
+              <div
+                className="h-1.5"
+                style={{
+                  background: `linear-gradient(90deg, ${theme.primary}, ${theme.secondary})`,
+                }}
+              />
+
+              {/* PDF Viewer */}
+              <div className="flex-1 overflow-hidden bg-white">
+                <PdfViewer theme={theme} />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
     </ProposalLayout>
   );
 }

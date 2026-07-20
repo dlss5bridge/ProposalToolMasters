@@ -13,7 +13,7 @@ export default function PdfViewer({ theme }) {
       >
         <PdfSlider theme={theme} />
       </div>
-      <PdfToolbar theme={theme} />
+      {/* <PdfToolbar theme={theme} /> */}
     </section>
   );
 }

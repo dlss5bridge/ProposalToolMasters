@@ -5,9 +5,9 @@ export default function ProposalHeader({
 }) {
   return (
     <header
-      className="h-12 border-b bg-white"
+      className="py-2 sticky top-0 z-20 bg-white shadow-sm"
       style={{
-        borderColor: theme.border,
+        borderBottom: `1px solid ${theme.border}`,
       }}
     >
       <div className="flex h-full items-center justify-between px-5">
@@ -23,7 +23,7 @@ export default function ProposalHeader({
               color: theme.textPrimary,
             }}
           >
-            {title}
+            {title || "Web Proposal"}
           </h1>
         </div>
 

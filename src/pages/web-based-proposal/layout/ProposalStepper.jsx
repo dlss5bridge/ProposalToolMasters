@@ -1,15 +1,34 @@
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
+
 export default function ProposalStepper({
   theme,
   steps = [],
   activeStep = 0,
-  onStepChange,
-  clickable = true,
+  onPrevious,
+  onNext,
 }) {
-  if (!steps.length) return null;
+  const isFirstStep = activeStep === 0;
+  const isLastStep = activeStep === steps.length - 1;
 
   return (
-    <div className="overflow-x-auto lg:overflow-x-hidden">
-      <div className="flex min-w-max items-center px-4 py-3 lg:min-w-0 lg:w-full lg:justify-between">
+    <div className="grid grid-cols-[90px_1fr_90px] items-center gap-4">
+      {/* Back */}
+      <button
+        onClick={onPrevious}
+        disabled={isFirstStep}
+        className="flex h-9 items-center justify-center gap-1 rounded-md border text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40"
+        style={{
+          borderColor: theme.border,
+          color: theme.textPrimary,
+          background: "#fff",
+        }}
+      >
+        <ChevronLeft size={16} />
+        Back
+      </button>
+
+      {/* Steps */}
+      <div className="flex items-center justify-center gap-5 overflow-hidden">
         {steps.map((step, index) => {
           const active = index === activeStep;
           const completed = index < activeStep;
@@ -17,54 +36,59 @@ export default function ProposalStepper({
           return (
             <div
               key={step}
-              className="flex min-w-[150px] justify-center lg:min-w-0 lg:flex-1"
+              className="flex items-center gap-2 whitespace-nowrap"
             >
               <div
-                className="flex items-center gap-2 rounded-full px-3 py-2 transition-all duration-300"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-all"
                 style={{
-                  backgroundColor: active
-                    ? `${theme.activeStepBackground}15`
-                    : completed
-                      ? `${theme.completedStepBackground}15`
-                      : "transparent",
+                  backgroundColor: completed
+                    ? theme.completedStepBackground
+                    : active
+                      ? theme.primary
+                      : "#fff",
+
+                  border: `2px solid ${
+                    completed
+                      ? theme.completedStepBackground
+                      : active
+                        ? theme.primary
+                        : theme.border
+                  }`,
+
+                  color: completed || active ? "#fff" : theme.textSecondary,
                 }}
               >
-                {/* Number */}
-                <div
-                  className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold transition-all duration-300"
-                  style={{
-                    backgroundColor: active
-                      ? theme.activeStepBackground
-                      : completed
-                        ? theme.completedStepBackground
-                        : theme.inactiveStepBackground,
-                    color:
-                      active || completed
-                        ? theme.activeStepText
-                        : theme.inactiveStepText,
-                  }}
-                >
-                  {completed ? "✓" : index + 1}
-                </div>
-
-                {/* Title */}
-                <span
-                  className="whitespace-nowrap text-[12px] font-medium transition-colors duration-300"
-                  style={{
-                    color: active
-                      ? theme.activeStepLabel
-                      : completed
-                        ? theme.completedStepLabel
-                        : theme.inactiveStepLabel,
-                  }}
-                >
-                  {step}
-                </span>
+                {completed ? <Check size={13} /> : index + 1}
               </div>
+
+              <span
+                className="text-[13px] font-medium"
+                style={{
+                  color: active
+                    ? theme.primary
+                    : completed
+                      ? theme.completedStepBackground
+                      : theme.textSecondary,
+                }}
+              >
+                {step}
+              </span>
             </div>
           );
         })}
       </div>
+
+      {/* Next */}
+      <button
+        onClick={onNext}
+        className="flex h-9 items-center justify-center gap-1 rounded-md text-sm font-medium text-white transition hover:opacity-90"
+        style={{
+          background: theme.primary,
+        }}
+      >
+        {isLastStep ? "Finish" : "Next"}
+        {!isLastStep && <ChevronRight size={16} />}
+      </button>
     </div>
   );
 }

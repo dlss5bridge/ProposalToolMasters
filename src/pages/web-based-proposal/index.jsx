@@ -1,3 +1,5 @@
+import ProposalAmendment from "./proposalTypes/ProposalAmendment";
+import StandardProposalWithInputs from "./proposalTypes/ProposalInputForm";
 import StandardProposal from "./proposalTypes/StandardProposal";
 // import StandardProposalWithInputs from "./proposalTypes/StandardProposalWithInputs";
 // import ProposalAmendment from "./proposalTypes/ProposalAmendment";
@@ -42,7 +44,7 @@ export const proposalTheme = {
 export default function WebBasedProposal() {
   // Later this object will come from Redux/API
   const proposal = {
-    proposalType: "STANDARD", // STANDARD | STANDARD_INPUT | AMENDMENT
+    proposalType: "STANDARD_INPUT", // STANDARD | STANDARD_INPUT | AMENDMENT
     title: "Accounting Proposal",
 
     showSidebar: false,
@@ -52,7 +54,7 @@ export default function WebBasedProposal() {
       "Input Fields",
       "Basic Information",
       "Services",
-      "Review",
+      "Pricing Table",
       "Preview",
       "Sign",
     ],
@@ -64,21 +66,16 @@ export default function WebBasedProposal() {
     case "STANDARD":
       return <StandardProposal proposal={proposal} theme={proposal.theme} />;
 
-    // case "STANDARD_INPUT":
-    //   return (
-    //     <StandardProposalWithInputs
-    //       proposal={proposal}
-    //       theme={proposal.theme}
-    //     />
-    //   );
+    case "STANDARD_INPUT":
+      return (
+        <StandardProposalWithInputs
+          proposal={proposal}
+          theme={proposal.theme}
+        />
+      );
 
-    // case "AMENDMENT":
-    //   return (
-    //     <ProposalAmendment
-    //       proposal={proposal}
-    //       theme={proposal.theme}
-    //     />
-    //   );
+    case "AMENDMENT":
+      return <ProposalAmendment proposal={proposal} theme={proposal.theme} />;
 
     default:
       return <div>Invalid Proposal Type</div>;

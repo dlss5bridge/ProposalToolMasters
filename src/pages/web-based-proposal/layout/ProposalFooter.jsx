@@ -1,19 +1,12 @@
-export default function ProposalFooter({ theme, left, center, right }) {
+export default function ProposalFooter({ theme, children }) {
   return (
     <footer
-      className="h-16 border-t"
+      className="border-t px-3 py-3 rounded-t-2xl bg-slate-800"
       style={{
-        background: theme.surface,
         borderColor: theme.border,
       }}
     >
-      <div className="flex h-full items-center justify-between px-6">
-        <div className="min-w-[220px]">{left}</div>
-
-        <div className="flex-1 flex justify-center">{center}</div>
-
-        <div className="min-w-[220px] flex justify-end">{right}</div>
-      </div>
+      {children}
     </footer>
   );
 }

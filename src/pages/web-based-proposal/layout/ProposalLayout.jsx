@@ -1,6 +1,3 @@
-import ProposalHeader from "./ProposalHeader";
-import ProposalSidebar from "./ProposalSidebar";
-import ProposalFooter from "./ProposalFooter";
 export default function ProposalLayout({
   theme,
   showSidebar = false,
@@ -9,7 +6,7 @@ export default function ProposalLayout({
 }) {
   return (
     <div
-      className="flex h-screen flex-col"
+      className="flex h-screen flex-col overflow-hidden"
       style={{ background: theme.background }}
     >
       {children}

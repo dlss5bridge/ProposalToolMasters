@@ -1,5 +1,4 @@
 import { Document, Page, pdfjs } from "react-pdf";
-import PdfThumbnailList from "./PdfThumbnailList";
 
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -9,100 +8,61 @@ import {
   selectNumPages,
   selectPdfFile,
   selectZoom,
-  setCurrentPage,
   setNumPages,
 } from "../../../redux/reducer/pdfViewer";
+import { useEffect, useRef, useState } from "react";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function PdfSlider({ theme }) {
   const dispatch = useDispatch();
 
-  const pageNumber = useSelector(selectCurrentPage);
   const numPages = useSelector(selectNumPages);
-  const zoom = useSelector(selectZoom);
-  const pdfFile = useSelector(selectPdfFile);
+  const containerRef = useRef(null);
+  const [pageWidth, setPageWidth] = useState(900);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (!containerRef.current) return;
+
+      const width = containerRef.current.clientWidth;
+
+      // Leave some padding around the PDF
+      setPageWidth(Math.min(width - 32, 950));
+    };
+
+    updateWidth();
+
+    window.addEventListener("resize", updateWidth);
+
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
 
   return (
     <Document
       file="https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf"
-      // onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-      onLoadSuccess={({ numPages }) => {
-        dispatch(setNumPages(numPages));
-      }}
+      onLoadSuccess={({ numPages }) => dispatch(setNumPages(numPages))}
     >
       <div
-        className="flex h-full"
+        ref={containerRef}
+        className="h-full overflow-y-auto overflow-x-hidden"
         style={{
           backgroundColor: theme.pdfBackground,
         }}
       >
-        {/* Left Sidebar */}
-        <PdfThumbnailList
-          theme={theme}
-          numPages={numPages}
-          pageNumber={pageNumber}
-          onSelectPage={(page) => dispatch(setCurrentPage(page))}
-        />
-
-        {/* Right PDF Preview */}
-        <div className="flex flex-1 justify-center overflow-auto p-4">
-          <Page
-            pageNumber={pageNumber}
-            scale={zoom}
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
-          />
+        <div className="flex flex-col items-center gap-6 p-4 lg:p-6">
+          {Array.from({ length: numPages }, (_, index) => (
+            <div key={index} className="rounded-lg bg-white shadow-md">
+              <Page
+                pageNumber={index + 1}
+                width={pageWidth}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </Document>
   );
 }
-
-// import { Document, Page, pdfjs } from "react-pdf";
-// import "react-pdf/dist/Page/TextLayer.css";
-// import "react-pdf/dist/Page/AnnotationLayer.css";
-// import { useEffect, useRef, useState } from "react";
-
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-
-// export default function PdfSlider({ theme, pageNumber, scale, setNumPages }) {
-//   const containerRef = useRef(null);
-//   const [pageWidth, setPageWidth] = useState(0);
-
-//   //=================useEffect==================
-//   // useEffect(() => {
-//   //   const updateWidth = () => {
-//   //     if (containerRef.current) {
-//   //       setPageWidth(containerRef.current.clientWidth - 12); // padding
-//   //     }
-//   //   };
-
-//   //   updateWidth();
-
-//   //   window.addEventListener("resize", updateWidth);
-
-//   //   return () => window.removeEventListener("resize", updateWidth);
-//   // }, []); //preview pdf on full screen
-
-//   return (
-//     <div
-//       ref={containerRef}
-//       className="flex flex-1 justify-center overflow-auto p-1"
-//       style={{ backgroundColor: theme.pdfBackground }}
-//     >
-//       <Document
-//         file="https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf"
-//         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-//       >
-//         <Page
-//           pageNumber={pageNumber}
-//           width={pageWidth}
-//           scale={scale}
-//           renderTextLayer={false}
-//           renderAnnotationLayer={false}
-//         />
-//       </Document>
-//     </div>
-//   );
-// }
