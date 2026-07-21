@@ -122,7 +122,7 @@ export default function ProposalInputFieldsStep({ theme }) {
 
           {/* Buttons */}
           <div
-            className={`mt-8 border-t pt-5 ${
+            className={`mt-4 border-t pt-2 ${
               isTwoColumn
                 ? "flex justify-end gap-3"
                 : "flex max-w-[420px] justify-end gap-3"

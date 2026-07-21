@@ -1,5 +1,5 @@
 import PdfSlider from "./PdfSlider";
-import PdfToolbar from "./PdfToolbar";
+// import PdfToolbar from "./PdfToolbar";
 
 export default function PdfViewer({ theme }) {
   return (

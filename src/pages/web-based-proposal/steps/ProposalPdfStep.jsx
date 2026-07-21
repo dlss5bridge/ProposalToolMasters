@@ -17,7 +17,7 @@ export default function ProposalPdfStep({ theme }) {
         <div
           className="h-1.5"
           style={{
-            background: `linear-gradient(90deg, ${theme.primary}, ${theme.secondary})`,
+            background: `${theme.primary}`,
           }}
         />
 

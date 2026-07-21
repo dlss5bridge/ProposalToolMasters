@@ -9,6 +9,8 @@ import ProposalSidebar from "../layout/ProposalSidebar";
 
 import ProposalPdfStep from "../steps/ProposalPdfStep";
 import ProposalInputFieldsStep from "../steps/ProposalInputFieldsStep";
+import ProposalBasicInformationStep from "../steps/ProposalBasicInformationStep";
+import ProposalServicesStep from "../steps/ProposalServicesStep";
 
 export default function StandardProposalWithInputs({ proposal, theme }) {
   const activeStep = useSelector(selectActiveStep);
@@ -17,7 +19,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     <ProposalPdfStep theme={theme} />,
     <ProposalInputFieldsStep theme={theme} />,
     // <ProposalBasicInformationStep theme={theme} />,
-    // <ProposalServicesStep theme={theme} />,
+    <ProposalServicesStep theme={theme} />,
     // <ProposalPricingTableStep theme={theme} />,
     // <ProposalPreviewStep theme={theme} />,
     // <ProposalSignStep theme={theme} />,
