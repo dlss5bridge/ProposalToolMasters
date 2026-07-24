@@ -303,9 +303,25 @@ function ConfirmModel({
                 )}
                 {modelRequestData.Action ===
                   "DeleteServiceFeeInflationRule" && (
-                  <span class="text-muted mb-0">
-                    {modelRequestData.message}
-                  </span>
+                  <>
+                    <span class="text-muted mb-0">
+                      {modelRequestData.message}
+                    </span>
+                    {modelRequestData.ServiceName?.length > 0 && (
+                      <ul
+                        className="designed-list"
+                        style={{
+                          textAlign: "left",
+                          maxHeight: "180px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        {modelRequestData.ServiceName.map((item, idx) => (
+                          <li key={`draft-${idx}`}>{item}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
                 )}
                 {modelRequestData.Action === "ServiceWarning" && (
                   <div
@@ -568,6 +584,7 @@ function ConfirmModel({
                 modelRequestData.Action === "Copy" ||
                 modelRequestData.Action === "emailStatusChange" ||
                 modelRequestData.Action === "Redirect" ||
+                modelRequestData.Action === "Disconnect" ||
                 modelRequestData.Action === "Add Contact" ||
                 modelRequestData.Action === "Add Contact Mapping" ||
                 modelRequestData.Action === "ResetPaymentGatewayChange") && (
@@ -632,6 +649,9 @@ function ConfirmModel({
                   {modelRequestData.Action ===
                     "DeleteServiceFeeInflationRule" && <span>Yes</span>}
                   {modelRequestData.Action === "Copy" && <span>Yes! Copy</span>}
+                  {modelRequestData.Action === "Disconnect" && (
+                    <span>Yes, Disconnect It!</span>
+                  )}
                   {(modelRequestData.Action == "PracticeWarning" ||
                     modelRequestData.Action === "Upload" ||
                     modelRequestData.Action === "PaymentStatus") && (

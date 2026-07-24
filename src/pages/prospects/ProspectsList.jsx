@@ -1567,7 +1567,7 @@ const Prospects = () => {
                                                   {/* View */}
                                                   <li>
                                                     <a
-                                                      className="dropdown-item"
+                                                      className="dropdown-item cursor-pointer"
                                                       onClick={() =>
                                                         handleViewProspectDetails(
                                                           Prospect,
@@ -1583,7 +1583,7 @@ const Prospects = () => {
                                                   {userAccessData.Admin_Prospect_CanEdit && (
                                                     <li>
                                                       <a
-                                                        className="dropdown-item"
+                                                        className="dropdown-item cursor-pointer"
                                                         onClick={() =>
                                                           ClientEditBtnClicked(
                                                             Prospect,
@@ -1603,7 +1603,7 @@ const Prospects = () => {
                                                   {userAccessData.Admin_Prospect_CanDelete && (
                                                     <li>
                                                       <a
-                                                        className="dropdown-item"
+                                                        className="dropdown-item cursor-pointer"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#ConfirmModel"
                                                         onClick={() =>
@@ -1635,7 +1635,7 @@ const Prospects = () => {
                                                     ).some((val) => val) && (
                                                       <li>
                                                         <a
-                                                          className="dropdown-item"
+                                                          className="dropdown-item cursor-pointer"
                                                           data-bs-toggle="modal"
                                                           data-bs-target="#ConfirmModel"
                                                           onClick={() =>
@@ -1669,7 +1669,7 @@ const Prospects = () => {
                                                     ).some((val) => val) && (
                                                       <li>
                                                         <a
-                                                          className="dropdown-item"
+                                                          className="dropdown-item cursor-pointer"
                                                           data-bs-toggle="modal"
                                                           data-bs-target="#ConfirmModel"
                                                           onClick={() =>
@@ -1715,7 +1715,7 @@ const Prospects = () => {
                                                     ).some((val) => val) && (
                                                       <li>
                                                         <a
-                                                          className="dropdown-item"
+                                                          className="dropdown-item cursor-pointer"
                                                           data-bs-toggle="modal"
                                                           data-bs-target="#ConfirmModel"
                                                           onClick={() => {

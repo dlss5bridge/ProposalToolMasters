@@ -396,26 +396,56 @@ export default function MappingUI({
                     </label>
 
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
                       placeholder="Enter deviation"
-                      min={0}
-                      max={100}
-                      value={data.thresholdPercent || ""}
+                      value={data.thresholdPercent ?? ""}
                       onChange={(e) => {
-                        let value = Number(e.target.value);
+                        const value = e.target.value;
 
-                        if (value > 100) value = 100;
-                        if (value < 0) value = 0;
+                        // Allow empty value
+                        if (value === "") {
+                          setMapping((prev) => ({
+                            ...prev,
+                            [metricKey]: {
+                              ...prev[metricKey],
+                              thresholdPercent: "",
+                            },
+                          }));
+                          return;
+                        }
+
+                        // Allow only numbers with up to 2 decimal places
+                        if (!/^\d{0,3}(\.\d{0,2})?$/.test(value)) {
+                          return;
+                        }
+
+                        const numValue = Number(value);
+
+                        // Prevent values greater than 100
+                        if (numValue > 100) return;
 
                         setMapping((prev) => ({
                           ...prev,
                           [metricKey]: {
                             ...prev[metricKey],
-                            thresholdPercent: value,
+                            thresholdPercent: value, // Keep as string while typing
                           },
                         }));
                       }}
+                      // onBlur={() => {
+                      //   const value = Number(data.thresholdPercent);
+
+                      //   if (!isNaN(value)) {
+                      //     setMapping((prev) => ({
+                      //       ...prev,
+                      //       [metricKey]: {
+                      //         ...prev[metricKey],
+                      //         thresholdPercent: value.toFixed(2),
+                      //       },
+                      //     }));
+                      //   }
+                      // }}
                     />
                   </div>
                 </>
