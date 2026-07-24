@@ -1,5 +1,4 @@
 import Select from "react-select";
-// import { primarySelectStyles } from "../../../../Utils/Utils";
 
 // driverTypeID: 2 = quantity (number input), 3 = variation (select), 4 = slab (select)
 const PricingDriverField = ({ driver, entry, onChange }) => {
@@ -8,9 +7,7 @@ const PricingDriverField = ({ driver, entry, onChange }) => {
 
     return (
       <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">
-          {driver.driverName}
-        </label>
+        <label className="pss-field-label">{driver.driverName}</label>
         <input
           type="number"
           value={entry?.value ?? ""}
@@ -18,7 +15,7 @@ const PricingDriverField = ({ driver, entry, onChange }) => {
           max={quantity?.quantityTo || undefined}
           onChange={(e) => onChange({ value: e.target.value })}
           placeholder={`Enter ${driver.driverName}`}
-          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
+          className="pss-field-input"
         />
       </div>
     );
@@ -38,9 +35,7 @@ const PricingDriverField = ({ driver, entry, onChange }) => {
 
     return (
       <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">
-          {driver.driverName}
-        </label>
+        <label className="pss-field-label">{driver.driverName}</label>
         <Select
           options={options}
           value={selected}
@@ -50,7 +45,6 @@ const PricingDriverField = ({ driver, entry, onChange }) => {
               label: option?.label ?? null,
             })
           }
-          // styles={primarySelectStyles}
           menuPortalTarget={document.body}
           placeholder={`Select ${driver.driverName}`}
         />

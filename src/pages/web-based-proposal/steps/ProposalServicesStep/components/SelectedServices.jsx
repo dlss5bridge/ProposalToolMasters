@@ -13,33 +13,33 @@ const SelectedGroup = ({ label, icon: Icon, items, onRemove }) => {
 
   return (
     <div>
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 tracking-wide mb-2">
+      <div className="pss-sidebar-group-label">
         <Icon size={12} />
         <span>{label}</span>
       </div>
 
-      <ul className="space-y-2.5">
+      <ul className="pss-sidebar-group-list">
         {items.map((item) => (
-          <li key={item.serviceID} className="group">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{item.serviceName}</p>
-                <p className="text-xs text-gray-400">{item.categoryName}</p>
+          <li key={item.serviceID} className="pss-sidebar-item">
+            <div className="pss-sidebar-item-row">
+              <div className="pss-sidebar-item-info">
+                <p className="pss-sidebar-item-name">{item.serviceName}</p>
+                <p className="pss-sidebar-item-category">{item.categoryName}</p>
               </div>
               <button
                 type="button"
                 onClick={() => onRemove(item.listType, item.serviceID)}
-                className="shrink-0 text-gray-300 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="pss-sidebar-item-remove"
               >
                 <X size={13} />
               </button>
             </div>
 
             {getDriverSummary(item.driverValues).length > 0 && (
-              <ul className="mt-1 space-y-0.5">
+              <ul className="pss-sidebar-item-drivers">
                 {getDriverSummary(item.driverValues).map((driver, index) => (
-                  <li key={index} className="text-xs text-gray-400">
-                    {driver.driverName}: <span className="text-gray-600">{driver.label ?? driver.value}</span>
+                  <li key={index} className="pss-sidebar-item-driver">
+                    {driver.driverName}: <span className="pss-sidebar-item-driver-value">{driver.label ?? driver.value}</span>
                   </li>
                 ))}
               </ul>
@@ -62,65 +62,48 @@ const SelectedServices = ({ recurringSelected, oneOffSelected, onRemove, onRevie
   const hiddenCount = totalCount - visibleRecurring.length - visibleOneOff.length;
 
   return (
-    <aside className="w-full lg:w-80 shrink-0">
-      <div className="lg:sticky lg:top-4 bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex flex-col gap-4">
-        <div className="flex items-start justify-between">
+    <aside className="pss-sidebar">
+      <div className="pss-sidebar-inner">
+        <div className="pss-sidebar-header">
           <div>
-            <h3 className="font-semibold text-gray-900 text-sm">Selected Services</h3>
-            <p className="text-xs text-gray-500 mt-0.5">{totalCount} Items Total</p>
+            <h3 className="pss-sidebar-title">Selected Services</h3>
+            <p className="pss-sidebar-subtitle">{totalCount} Items Total</p>
           </div>
-          <button
-            type="button"
-            className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300"
-          >
+          <button type="button" className="pss-sidebar-print-btn">
             <ClipboardList size={16} />
           </button>
         </div>
 
         {totalCount === 0 ? (
-          <p className="text-sm text-gray-400 py-4 text-center border-t border-gray-100">
-            No services selected yet.
-          </p>
+          <p className="pss-sidebar-empty">No services selected yet.</p>
         ) : (
-          <div className="border-t border-gray-100 pt-3 flex flex-col gap-4 max-h-[360px] overflow-y-auto">
+          <div className="pss-sidebar-groups">
             <SelectedGroup label="Recurring Services" icon={RotateCw} items={visibleRecurring} onRemove={onRemove} />
             <SelectedGroup label="One-off Services" icon={FileStack} items={visibleOneOff} onRemove={onRemove} />
           </div>
         )}
 
         {!showAll && hiddenCount > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowAll(true)}
-            className="w-full text-center text-sm text-gray-600 border border-gray-200 rounded-lg py-2 hover:bg-gray-50"
-          >
+          <button type="button" onClick={() => setShowAll(true)} className="pss-sidebar-view-all-btn">
             View all {totalCount} items
           </button>
         )}
 
-        <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
+        <div className="pss-sidebar-actions">
           <button
             type="button"
             onClick={onReviewNext}
             disabled={totalCount === 0}
-            className="w-full bg-gray-900 hover:bg-black disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
+            className="pss-sidebar-primary-btn"
           >
             Review Selection & Next
           </button>
 
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onBack}
-              className="flex-1 border border-gray-200 text-gray-700 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-50"
-            >
+          <div className="pss-sidebar-secondary-row">
+            <button type="button" onClick={onBack} className="pss-sidebar-back-btn">
               Back
             </button>
-            <button
-              type="button"
-              onClick={onSaveDraft}
-              className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium py-2.5 rounded-lg"
-            >
+            <button type="button" onClick={onSaveDraft} className="pss-sidebar-save-btn">
               Save Draft
             </button>
           </div>

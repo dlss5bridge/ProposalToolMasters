@@ -11,22 +11,19 @@ const ServiceSelectionToolbar = ({
   onCollapseAll,
 }) => {
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-4">
-      <div className="relative flex-1 min-w-[220px] max-w-xs">
-        <Search
-          size={15}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-        />
+    <div className="pss-toolbar">
+      <div className="pss-toolbar-search">
+        <Search size={15} className="pss-toolbar-search-icon" />
         <input
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search services..."
-          className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
+          className="pss-toolbar-search-input"
         />
       </div>
 
-      <div className="relative">
+      <div className="pss-toolbar-select-wrap">
         <select
           value={categoryFilter}
           onChange={(e) =>
@@ -34,7 +31,7 @@ const ServiceSelectionToolbar = ({
               e.target.value === "all" ? "all" : Number(e.target.value),
             )
           }
-          className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
+          className="pss-toolbar-select"
         >
           <option value="all">All Categories</option>
           {categoryOptions.map((option) => (
@@ -43,31 +40,18 @@ const ServiceSelectionToolbar = ({
             </option>
           ))}
         </select>
-        <ChevronDown
-          size={14}
-          className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400"
-        />
+        <ChevronDown size={14} className="pss-toolbar-select-icon" />
       </div>
 
-      <div className="ml-auto flex items-center gap-4">
-        <span className="text-sm font-medium text-blue-600">
-          {totalSelected} Selected
-        </span>
+      <div className="pss-toolbar-actions">
+        <span className="pss-toolbar-selected-count">{totalSelected} Selected</span>
 
-        <div className="flex items-center gap-2 text-sm">
-          <button
-            type="button"
-            onClick={onExpandAll}
-            className="text-gray-600 hover:text-gray-900 font-medium"
-          >
+        <div className="pss-toolbar-expand-actions">
+          <button type="button" onClick={onExpandAll} className="pss-toolbar-link-btn">
             Expand All
           </button>
-          <span className="text-gray-300">|</span>
-          <button
-            type="button"
-            onClick={onCollapseAll}
-            className="text-gray-600 hover:text-gray-900 font-medium"
-          >
+          <span className="pss-toolbar-divider">|</span>
+          <button type="button" onClick={onCollapseAll} className="pss-toolbar-link-btn">
             Collapse All
           </button>
         </div>

@@ -11,9 +11,9 @@ const RecurringServices = ({
 }) => {
   return (
     <div>
-      <h2 className="text-sm font-semibold text-gray-900 mb-3">Recurring Services</h2>
+      <h2 className="pss-list-heading">Recurring Services</h2>
 
-      <div className="space-y-3">
+      <div className="pss-list-stack">
         {categories.map((category) => (
           <CategoryCard
             key={category.serviceCatID}
@@ -29,7 +29,7 @@ const RecurringServices = ({
         ))}
 
         {categories.length === 0 && (
-          <p className="text-sm text-gray-400 py-6 text-center">No recurring services match your filters.</p>
+          <p className="pss-empty-state">No recurring services match your filters.</p>
         )}
       </div>
     </div>

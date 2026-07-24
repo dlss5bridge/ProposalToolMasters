@@ -8,32 +8,29 @@ const ServiceRow = ({ service, isSelected, disabledReason, driverValues, onToggl
   const isDisabled = Boolean(disabledReason);
 
   return (
-    <div className={isDisabled ? "opacity-60" : ""}>
+    <div className={isDisabled ? "pss-service-row--disabled" : undefined}>
       <button
         type="button"
         disabled={isDisabled}
         onClick={onToggle}
-        className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left transition-colors
-          ${isSelected ? "bg-blue-50" : "bg-white hover:bg-gray-50"}
-          disabled:cursor-not-allowed
-        `}
+        className={`pss-service-btn${isSelected ? " pss-service-btn--selected" : ""}`}
       >
         <span>
-          <span className="block text-sm font-medium text-gray-900">{service.serviceName}</span>
+          <span className="pss-service-name">{service.serviceName}</span>
           {disabledReason && (
-            <span className="block text-xs text-amber-600 mt-0.5">{disabledReason}</span>
+            <span className="pss-service-disabled-reason">{disabledReason}</span>
           )}
         </span>
 
         {isSelected && (
-          <span className="shrink-0 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-            <Check size={12} className="text-white" strokeWidth={3} />
+          <span className="pss-service-check">
+            <Check size={12} strokeWidth={3} />
           </span>
         )}
       </button>
 
       {isSelected && visibleDrivers.length > 0 && (
-        <div className="px-4 pb-3 pt-1 space-y-3 bg-blue-50/40">
+        <div className="pss-service-drivers">
           {visibleDrivers.map((driver) => (
             <PricingDriverField
               key={driver.globalPricingDriverID}

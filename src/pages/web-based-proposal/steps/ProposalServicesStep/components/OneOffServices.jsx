@@ -11,9 +11,9 @@ const OneOffServices = ({
 }) => {
   return (
     <div>
-      <h2 className="text-sm font-semibold text-gray-900 mb-3">One-Off / Ad Hoc Services</h2>
+      <h2 className="pss-list-heading">One-Off / Ad Hoc Services</h2>
 
-      <div className="space-y-3">
+      <div className="pss-list-stack">
         {categories.map((category) => (
           <CategoryCard
             key={category.serviceCatID}
@@ -29,7 +29,7 @@ const OneOffServices = ({
         ))}
 
         {categories.length === 0 && (
-          <p className="text-sm text-gray-400 py-6 text-center">No one-off services match your filters.</p>
+          <p className="pss-empty-state">No one-off services match your filters.</p>
         )}
       </div>
     </div>
