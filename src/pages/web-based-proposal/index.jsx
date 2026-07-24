@@ -44,7 +44,7 @@ export const proposalTheme = {
 export default function WebBasedProposal() {
   // Later this object will come from Redux/API
   const proposal = {
-    proposalType: "STANDARD_INPUT", // STANDARD | STANDARD_INPUT | AMENDMENT
+    proposalType: "AMENDMENT", // STANDARD | STANDARD_INPUT | AMENDMENT
     title: "Accounting Proposal",
 
     showSidebar: false,
@@ -52,7 +52,7 @@ export default function WebBasedProposal() {
     steps: [
       "Proposal",
       "Input Fields",
-      "Basic Information",
+      //"Basic Information",
       "Services",
       "Pricing Table",
       "Preview",
