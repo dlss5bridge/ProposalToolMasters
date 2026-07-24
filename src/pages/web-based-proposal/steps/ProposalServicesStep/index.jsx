@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from "react";
 
-import ServiceSelectionToolbar from "./components/ServiceSelectionToolbar";
 import RecurringServices from "./components/RecurringServices";
 import OneOffServices from "./components/OneOffServices";
 import SelectedServices from "./components/SelectedServices";
@@ -53,8 +52,6 @@ const ServiceSelectionPOC = () => {
   const [expandedOneOff, setExpandedOneOff] = useState(
     () => new Set(Services[0] ? [Services[0].serviceCatID] : []),
   );
-  const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
   const orderRef = useRef(0);
 
   const toggleService = (listType, category, service) => {
@@ -130,30 +127,9 @@ const ServiceSelectionPOC = () => {
   };
 
   const filteredCategories = useMemo(
-    () => filterCategories(Services, search, categoryFilter),
-    [search, categoryFilter],
+    () => filterCategories(Services, "", "all"),
+    [],
   );
-
-  // While searching/filtering, auto-expand every matching category so results are visible.
-  const visibleExpandedRecurring = useMemo(() => {
-    if (!search.trim() && categoryFilter === "all") return expandedRecurring;
-    return new Set(filteredCategories.map((category) => category.serviceCatID));
-  }, [search, categoryFilter, expandedRecurring, filteredCategories]);
-
-  const visibleExpandedOneOff = useMemo(() => {
-    if (!search.trim() && categoryFilter === "all") return expandedOneOff;
-    return new Set(filteredCategories.map((category) => category.serviceCatID));
-  }, [search, categoryFilter, expandedOneOff, filteredCategories]);
-
-  const expandAll = () => {
-    const allIds = new Set(Services.map((category) => category.serviceCatID));
-    setExpandedRecurring(allIds);
-    setExpandedOneOff(new Set(allIds));
-  };
-  const collapseAll = () => {
-    setExpandedRecurring(new Set());
-    setExpandedOneOff(new Set());
-  };
 
   const recurringSelectedList = useMemo(
     () => Object.values(recurringSelections).sort((a, b) => a.order - b.order),
@@ -164,33 +140,15 @@ const ServiceSelectionPOC = () => {
     [oneOffSelections],
   );
 
-  const categoryOptions = Services.map((category) => ({
-    id: category.serviceCatID,
-    name: category.serviceCatName,
-  }));
-
-  const totalSelected = recurringSelectedList.length + oneOffSelectedList.length;
-
   return (
     <div className="pss-root">
-      <ServiceSelectionToolbar
-        search={search}
-        onSearchChange={setSearch}
-        categoryFilter={categoryFilter}
-        onCategoryFilterChange={setCategoryFilter}
-        categoryOptions={categoryOptions}
-        totalSelected={totalSelected}
-        onExpandAll={expandAll}
-        onCollapseAll={collapseAll}
-      />
-
       <div className="pss-columns">
-        <div className="pss-lists">
+        <div className="pss-list-column">
           <RecurringServices
             categories={filteredCategories}
             selections={recurringSelections}
             crossSelections={oneOffSelections}
-            expandedIds={visibleExpandedRecurring}
+            expandedIds={expandedRecurring}
             onToggleExpand={(categoryId) =>
               toggleCategoryExpand("recurring", categoryId)
             }
@@ -206,12 +164,14 @@ const ServiceSelectionPOC = () => {
               )
             }
           />
+        </div>
 
+        <div className="pss-list-column">
           <OneOffServices
             categories={filteredCategories}
             selections={oneOffSelections}
             crossSelections={recurringSelections}
-            expandedIds={visibleExpandedOneOff}
+            expandedIds={expandedOneOff}
             onToggleExpand={(categoryId) =>
               toggleCategoryExpand("oneOff", categoryId)
             }
@@ -228,12 +188,13 @@ const ServiceSelectionPOC = () => {
             }
           />
         </div>
-
-        <SelectedServices
-          recurringSelected={recurringSelectedList}
-          oneOffSelected={oneOffSelectedList}
-          onRemove={removeSelection}
-        />
+        <div className="pss-list-column">
+          <SelectedServices
+            recurringSelected={recurringSelectedList}
+            oneOffSelected={oneOffSelectedList}
+            onRemove={removeSelection}
+          />
+        </div>
       </div>
     </div>
   );

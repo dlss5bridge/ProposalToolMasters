@@ -5,7 +5,10 @@ const PREVIEW_LIMIT = 5;
 
 const getDriverSummary = (driverValues) =>
   Object.values(driverValues || {}).filter(
-    (driver) => driver.value !== "" && driver.value !== null && driver.value !== undefined,
+    (driver) =>
+      driver.value !== "" &&
+      driver.value !== null &&
+      driver.value !== undefined,
   );
 
 const SelectedGroup = ({ label, icon: Icon, items, onRemove }) => {
@@ -39,7 +42,10 @@ const SelectedGroup = ({ label, icon: Icon, items, onRemove }) => {
               <ul className="pss-sidebar-item-drivers">
                 {getDriverSummary(item.driverValues).map((driver, index) => (
                   <li key={index} className="pss-sidebar-item-driver">
-                    {driver.driverName}: <span className="pss-sidebar-item-driver-value">{driver.label ?? driver.value}</span>
+                    {driver.driverName}:{" "}
+                    <span className="pss-sidebar-item-driver-value">
+                      {driver.label ?? driver.value}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -51,15 +57,27 @@ const SelectedGroup = ({ label, icon: Icon, items, onRemove }) => {
   );
 };
 
-const SelectedServices = ({ recurringSelected, oneOffSelected, onRemove, onReviewNext, onBack, onSaveDraft }) => {
+const SelectedServices = ({
+  recurringSelected,
+  oneOffSelected,
+  onRemove,
+  onReviewNext,
+  onBack,
+  onSaveDraft,
+}) => {
   const [showAll, setShowAll] = useState(false);
 
   const totalCount = recurringSelected.length + oneOffSelected.length;
 
-  const visibleRecurring = showAll ? recurringSelected : recurringSelected.slice(0, PREVIEW_LIMIT);
+  const visibleRecurring = showAll
+    ? recurringSelected
+    : recurringSelected.slice(0, PREVIEW_LIMIT);
   const remaining = Math.max(PREVIEW_LIMIT - visibleRecurring.length, 0);
-  const visibleOneOff = showAll ? oneOffSelected : oneOffSelected.slice(0, remaining);
-  const hiddenCount = totalCount - visibleRecurring.length - visibleOneOff.length;
+  const visibleOneOff = showAll
+    ? oneOffSelected
+    : oneOffSelected.slice(0, remaining);
+  const hiddenCount =
+    totalCount - visibleRecurring.length - visibleOneOff.length;
 
   return (
     <aside className="pss-sidebar">
@@ -78,36 +96,30 @@ const SelectedServices = ({ recurringSelected, oneOffSelected, onRemove, onRevie
           <p className="pss-sidebar-empty">No services selected yet.</p>
         ) : (
           <div className="pss-sidebar-groups">
-            <SelectedGroup label="Recurring Services" icon={RotateCw} items={visibleRecurring} onRemove={onRemove} />
-            <SelectedGroup label="One-off Services" icon={FileStack} items={visibleOneOff} onRemove={onRemove} />
+            <SelectedGroup
+              label="Recurring Services"
+              icon={RotateCw}
+              items={visibleRecurring}
+              onRemove={onRemove}
+            />
+            <SelectedGroup
+              label="One-off Services"
+              icon={FileStack}
+              items={visibleOneOff}
+              onRemove={onRemove}
+            />
           </div>
         )}
 
         {!showAll && hiddenCount > 0 && (
-          <button type="button" onClick={() => setShowAll(true)} className="pss-sidebar-view-all-btn">
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            className="pss-sidebar-view-all-btn"
+          >
             View all {totalCount} items
           </button>
         )}
-
-        <div className="pss-sidebar-actions">
-          <button
-            type="button"
-            onClick={onReviewNext}
-            disabled={totalCount === 0}
-            className="pss-sidebar-primary-btn"
-          >
-            Review Selection & Next
-          </button>
-
-          <div className="pss-sidebar-secondary-row">
-            <button type="button" onClick={onBack} className="pss-sidebar-back-btn">
-              Back
-            </button>
-            <button type="button" onClick={onSaveDraft} className="pss-sidebar-save-btn">
-              Save Draft
-            </button>
-          </div>
-        </div>
       </div>
     </aside>
   );

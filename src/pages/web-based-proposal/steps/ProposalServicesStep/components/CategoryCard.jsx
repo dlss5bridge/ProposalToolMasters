@@ -16,7 +16,7 @@ const CategoryCard = ({
   const selectedCount = category.servicesList.filter((service) => selections[service.serviceID]).length;
 
   return (
-    <div className={`pss-category-card${expanded ? " pss-category-card--expanded" : ""}`}>
+    <div className="pss-category-card">
       <button type="button" onClick={onToggleExpand} className="pss-category-header">
         <span className="pss-category-header-left">
           <span className="pss-category-icon">

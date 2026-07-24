@@ -7,8 +7,16 @@ const ServiceRow = ({ service, isSelected, disabledReason, driverValues, onToggl
   );
   const isDisabled = Boolean(disabledReason);
 
+  const rowClassName = [
+    "pss-service-row",
+    isSelected && "pss-service-row--selected",
+    isDisabled && "pss-service-row--disabled",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className={isDisabled ? "pss-service-row--disabled" : undefined}>
+    <div className={rowClassName}>
       <button
         type="button"
         disabled={isDisabled}
