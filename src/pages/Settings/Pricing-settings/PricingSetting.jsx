@@ -12,6 +12,7 @@ import {
   DeleteAllServiceFeeInflationConfiguration,
   AcceptServiceFeeInflationSAChanges,
   DeclineServiceFeeInflation,
+  GetDraftsAffectedByFeeInflationBatch,
 } from "../../../redux/Services/Config/ServicesApi";
 import { useDispatch, useSelector } from "react-redux";
 import SuccessModal from "../../../components/SuccessModal";
@@ -22,7 +23,7 @@ import Utils from "../../../Middleware/Utils";
 import ConfirmModel from "../../../components/ConfirmationBox";
 import SAPredefinedChangesNotifyMessageModel from "../../../components/SAPredefinedChangesNotifyMessageModel";
 import ConfirmSAChangesModel from "../../../components/AcceptSuperAdminChangesConfirmation";
-import pricingSettingsReducer, {
+import {
   GetAllProposalGlobalVariables,
   selectProposalGlobalVariables,
 } from "../../../redux/reducer/pricingSettings";
@@ -48,6 +49,9 @@ const Pricing_Settings = () => {
     userKeyID: null,
     minOneOffPriceForQC: "",
     minMonthlyPriceForQC: "",
+    minQuarterlyPriceForQC: "",
+    minHalfYearlyPriceForQC: "",
+    minYearlyPriceForQC: "",
     maxDiscountForQC: null,
     paymentFrequencyID: null,
     enableMasterProposalType: false,
@@ -95,15 +99,18 @@ const Pricing_Settings = () => {
     globalPricingDriverID: [],
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const [feeInflationErrorMessage, setFeeInflationErrorMessage] = useState("");
   const {
     setLoader,
     setTopbar,
     proposalName,
     EngagementName,
     staticCurrencySymbols,
+    getCurrencySymbol,
     userAccessData,
   } = useContext(AuthContextProvider);
   const common = useSelector((state) => state.Storage); //Getting Logged Users Details From Persist Storage of redux hooks
+  const currencySymbol = getCurrencySymbol(common.currency);
   const [isFormChanged, setIsFormChanged] = useState(false);
   //========================redux state===============================
   const globalVariables = useSelector(selectProposalGlobalVariables);
@@ -164,6 +171,9 @@ const Pricing_Settings = () => {
             userKeyID: common.userKeyID,
             minOneOffPriceForQC: ModelData.minOneOffPriceForQC,
             minMonthlyPriceForQC: ModelData.minMonthlyPriceForQC,
+            minQuarterlyPriceForQC: ModelData.minQuarterlyPriceForQC,
+            minHalfYearlyPriceForQC: ModelData.minHalfYearlyPriceForQC,
+            minYearlyPriceForQC: ModelData.minYearlyPriceForQC,
             maxDiscountForQC: ModelData.maxDiscountForQC,
             organisationKeyID: ModelData.organisationKeyID,
             paymentFrequencyID: ModelData.paymentFrequencyID,
@@ -178,6 +188,9 @@ const Pricing_Settings = () => {
             userKeyID: common.userKeyID,
             minOneOffPriceForQC: ModelData.minOneOffPriceForQC,
             minMonthlyPriceForQC: ModelData.minMonthlyPriceForQC,
+            minQuarterlyPriceForQC: ModelData.minQuarterlyPriceForQC,
+            minHalfYearlyPriceForQC: ModelData.minHalfYearlyPriceForQC,
+            minYearlyPriceForQC: ModelData.minYearlyPriceForQC,
             maxDiscountForQC: ModelData.maxDiscountForQC,
             organisationKeyID: ModelData.organisationKeyID,
             paymentFrequencyID: ModelData.paymentFrequencyID,
@@ -242,19 +255,21 @@ const Pricing_Settings = () => {
 
   // Submit Service Fee Inflation rules
   const SubmitServiceFeeInflation = async () => {
-    setErrorMessage("");
+    setFeeInflationErrorMessage("");
     if (
       !ServiceFeeInflationConfig.SelectedServices ||
       ServiceFeeInflationConfig.SelectedServices.length === 0
     ) {
-      setErrorMessage("Please select one or more services to configure.");
+      setFeeInflationErrorMessage(
+        "Please select one or more services to configure.",
+      );
       return;
     }
     if (
       !ServiceFeeInflationConfig.InflationRule.operator ||
       ServiceFeeInflationConfig.InflationRule.value === null
     ) {
-      setErrorMessage(
+      setFeeInflationErrorMessage(
         "Please choose an operator and enter a value for the rule.",
       );
       return;
@@ -282,7 +297,7 @@ const Pricing_Settings = () => {
         // refresh list
         GetServiceFeeInflationConfigData();
       } else {
-        setErrorMessage(
+        setFeeInflationErrorMessage(
           response?.data?.errorMessage ||
             response?.response?.data?.errorMessage,
         );
@@ -291,6 +306,40 @@ const Pricing_Settings = () => {
       setLoader(false);
       console.error(error);
     }
+  };
+
+  // Check for draft PL/ELs
+  const HandleDeleteRuleClick = async (row) => {
+    setLoader(true);
+    let drafts = [];
+    try {
+      const res = await GetDraftsAffectedByFeeInflationBatch({
+        organisationKeyID: common.organisationKeyID,
+        userKeyID: common.userKeyID,
+        batchID: row.batchID,
+      });
+      if (res?.data?.statusCode === 200) {
+        drafts = res?.data?.responseData?.data || [];
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setLoader(false);
+
+    setModelRequestData({
+      Action: "DeleteServiceFeeInflationRule",
+      batchID: row.batchID,
+      message:
+        drafts.length > 0
+          ? "Deleting this rule will change the pricing for the following draft records. Their prices will be recalculated the next time they are opened. Sent and accepted records are not affected."
+          : "This will delete the Inflation rule. Are you sure?",
+      ServiceName: drafts.map(
+        (d) =>
+          `${d.refID}${d.clientName ? " — " + d.clientName : ""} (${d.recordType})`,
+      ),
+    });
+
+    $("#ConfirmModel").modal("show");
   };
 
   // Delete all Services and Configurations
@@ -306,12 +355,14 @@ const Pricing_Settings = () => {
         modelRequestData.batchID,
       );
       if (data?.data?.statusCode === 200) {
-        setOpenSuccessModal(true);
-        setIsAddUpdateActionDone(true);
-        GetServiceFeeInflationConfigData();
-        $("#" + "confirm").modal("hide");
+        $("#ConfirmModel").one("hidden.bs.modal", () => {
+          setIsAddUpdateActionDone(true);
+          setOpenSuccessModal(true);
+          GetServiceFeeInflationConfigData();
+        });
+        $("#ConfirmModel").modal("hide");
       } else {
-        setErrorMessage(
+        setFeeInflationErrorMessage(
           data?.data?.errorMessage || data?.response?.data?.errorMessage,
         );
       }
@@ -320,6 +371,7 @@ const Pricing_Settings = () => {
       setLoader(false);
     }
   };
+
   // 2) Add Update Button Click Function
   const PricingSettingAddUpdateBtnClicked = () => {
     if (
@@ -329,6 +381,12 @@ const Pricing_Settings = () => {
         PrevPricingSettingObj.minMonthlyPriceForQC &&
       pricingSettingObj.minOneOffPriceForQC ==
         PrevPricingSettingObj.minOneOffPriceForQC &&
+      pricingSettingObj.minQuarterlyPriceForQC ==
+        PrevPricingSettingObj.minQuarterlyPriceForQC &&
+      pricingSettingObj.minHalfYearlyPriceForQC ==
+        PrevPricingSettingObj.minHalfYearlyPriceForQC &&
+      pricingSettingObj.minYearlyPriceForQC ==
+        PrevPricingSettingObj.minYearlyPriceForQC &&
       pricingSettingObj.paymentFrequencyID ==
         PrevPricingSettingObj.paymentFrequencyID &&
       pricingSettingObj.enableMasterProposalType ==
@@ -345,6 +403,33 @@ const Pricing_Settings = () => {
       return false;
     }
 
+    // Validation Checks for Min. Reccuring prices
+    const priceLadder = [
+      { label: "Monthly", value: pricingSettingObj.minMonthlyPriceForQC },
+      { label: "Quarterly", value: pricingSettingObj.minQuarterlyPriceForQC },
+      {
+        label: "Half-Yearly",
+        value: pricingSettingObj.minHalfYearlyPriceForQC,
+      },
+      { label: "Yearly", value: pricingSettingObj.minYearlyPriceForQC },
+    ].filter(
+      (x) =>
+        x.value !== "" &&
+        x.value !== null &&
+        x.value !== undefined &&
+        !isNaN(Number(x.value)),
+    );
+
+    for (let i = 1; i < priceLadder.length; i++) {
+      if (Number(priceLadder[i].value) <= Number(priceLadder[i - 1].value)) {
+        SetPrevError(false);
+        setErrorMessage(
+          `Min. ${priceLadder[i].label} price must be higher than Min. ${priceLadder[i - 1].label} price.`,
+        );
+        return false;
+      }
+    }
+
     const ApiRequest_ParamsObj = {
       // global level params: fixed
       organisationKeyID: common.organisationKeyID,
@@ -352,6 +437,10 @@ const Pricing_Settings = () => {
       // form level params: fixed
       minOneOffPriceForQC: pricingSettingObj.minOneOffPriceForQC || null,
       minMonthlyPriceForQC: pricingSettingObj.minMonthlyPriceForQC || null,
+      minQuarterlyPriceForQC: pricingSettingObj.minQuarterlyPriceForQC || null,
+      minHalfYearlyPriceForQC:
+        pricingSettingObj.minHalfYearlyPriceForQC || null,
+      minYearlyPriceForQC: pricingSettingObj.minYearlyPriceForQC || null,
       maxDiscountForQC: pricingSettingObj.maxDiscountForQC || null,
       paymentFrequencyID: pricingSettingObj.paymentFrequencyID || null,
       enableMasterProposalType:
@@ -487,7 +576,7 @@ const Pricing_Settings = () => {
                           <div class="fieldset  col-md-6 col-sm-12">
                             <label class="fieldset-label table-content-font ">
                               Min. One-Off Price for {proposalName}/
-                              {EngagementName} (£)
+                              {EngagementName} ({currencySymbol})
                             </label>
                           </div>
                           <div class="col-lg-12 col-md-12 col-sm-12 fieldset">
@@ -530,7 +619,7 @@ const Pricing_Settings = () => {
                           <div class="fieldset col-12 col-md-12 col-sm-12">
                             <label class="fieldset-label table-content-font PricingSetting-Proposal">
                               Min. Monthly Price for {proposalName}/
-                              {EngagementName} (£)
+                              {EngagementName} ({currencySymbol})
                             </label>
                           </div>
                           <div class="col-lg-12 col-md-12 col-sm-12 fieldset">
@@ -565,6 +654,135 @@ const Pricing_Settings = () => {
                                 setPricingSettingObj({
                                   ...pricingSettingObj,
                                   minMonthlyPriceForQC: formattedInput,
+                                });
+                              }}
+                            />
+                          </div>
+
+                          <div class="fieldset col-12 col-md-12 col-sm-12">
+                            <label class="fieldset-label table-content-font PricingSetting-Proposal">
+                              Min. Quarterly Price for {proposalName}/
+                              {EngagementName} ({currencySymbol})
+                            </label>
+                          </div>
+                          <div class="col-lg-12 col-md-12 col-sm-12 fieldset">
+                            <input
+                              class="input-text table-content-font"
+                              type="text"
+                              placeholder="Enter Min. Quarterly Price"
+                              value={pricingSettingObj.minQuarterlyPriceForQC
+                                ?.toString()
+                                ?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              onChange={(e) => {
+                                SetPrevError(false);
+                                // Ensure that the input only contains numeric and dot characters
+                                const sanitizedInput = e.target.value
+                                  .replace(/[^0-9.]/g, "") // Allow only numeric and dot characters
+                                  .slice(0, 16); // Limit to 7 characters (5 digits + 1 dot + 1 decimal)
+
+                                // Split the input into integer and decimal parts
+                                const [integerPart, decimalPart] =
+                                  sanitizedInput.split(".");
+
+                                // Combine integer and decimal parts with appropriate precision
+                                const formattedInput =
+                                  decimalPart !== undefined
+                                    ? `${integerPart.slice(
+                                        0,
+                                        12,
+                                      )}.${decimalPart.slice(0, 2)}`
+                                    : integerPart.slice(0, 12);
+
+                                setRequireErrorMessage(false);
+                                setPricingSettingObj({
+                                  ...pricingSettingObj,
+                                  minQuarterlyPriceForQC: formattedInput,
+                                });
+                              }}
+                            />
+                          </div>
+
+                          <div class="fieldset col-12 col-md-12 col-sm-12">
+                            <label class="fieldset-label table-content-font PricingSetting-Proposal">
+                              Min. Half-Yearly Price for {proposalName}/
+                              {EngagementName} ({currencySymbol})
+                            </label>
+                          </div>
+                          <div class="col-lg-12 col-md-12 col-sm-12 fieldset">
+                            <input
+                              class="input-text table-content-font"
+                              type="text"
+                              placeholder="Enter Min. Half-Yearly Price"
+                              value={pricingSettingObj.minHalfYearlyPriceForQC
+                                ?.toString()
+                                ?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              onChange={(e) => {
+                                SetPrevError(false);
+                                // Ensure that the input only contains numeric and dot characters
+                                const sanitizedInput = e.target.value
+                                  .replace(/[^0-9.]/g, "") // Allow only numeric and dot characters
+                                  .slice(0, 16); // Limit to 7 characters (5 digits + 1 dot + 1 decimal)
+
+                                // Split the input into integer and decimal parts
+                                const [integerPart, decimalPart] =
+                                  sanitizedInput.split(".");
+
+                                // Combine integer and decimal parts with appropriate precision
+                                const formattedInput =
+                                  decimalPart !== undefined
+                                    ? `${integerPart.slice(
+                                        0,
+                                        12,
+                                      )}.${decimalPart.slice(0, 2)}`
+                                    : integerPart.slice(0, 12);
+
+                                setRequireErrorMessage(false);
+                                setPricingSettingObj({
+                                  ...pricingSettingObj,
+                                  minHalfYearlyPriceForQC: formattedInput,
+                                });
+                              }}
+                            />
+                          </div>
+
+                          <div class="fieldset col-12 col-md-12 col-sm-12">
+                            <label class="fieldset-label table-content-font PricingSetting-Proposal">
+                              Min. Yearly Price for {proposalName}/
+                              {EngagementName} ({currencySymbol})
+                            </label>
+                          </div>
+                          <div class="col-lg-12 col-md-12 col-sm-12 fieldset">
+                            <input
+                              class="input-text table-content-font"
+                              type="text"
+                              placeholder="Enter Min. Yearly Price"
+                              value={pricingSettingObj.minYearlyPriceForQC
+                                ?.toString()
+                                ?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              onChange={(e) => {
+                                SetPrevError(false);
+                                // Ensure that the input only contains numeric and dot characters
+                                const sanitizedInput = e.target.value
+                                  .replace(/[^0-9.]/g, "") // Allow only numeric and dot characters
+                                  .slice(0, 16); // Limit to 7 characters (5 digits + 1 dot + 1 decimal)
+
+                                // Split the input into integer and decimal parts
+                                const [integerPart, decimalPart] =
+                                  sanitizedInput.split(".");
+
+                                // Combine integer and decimal parts with appropriate precision
+                                const formattedInput =
+                                  decimalPart !== undefined
+                                    ? `${integerPart.slice(
+                                        0,
+                                        12,
+                                      )}.${decimalPart.slice(0, 2)}`
+                                    : integerPart.slice(0, 12);
+
+                                setRequireErrorMessage(false);
+                                setPricingSettingObj({
+                                  ...pricingSettingObj,
+                                  minYearlyPriceForQC: formattedInput,
                                 });
                               }}
                             />
@@ -636,6 +854,27 @@ const Pricing_Settings = () => {
                           </div>
                           <div class="col-lg-2 col-md-4 col-sm-12"></div>
                           <div class="col-lg-2 col-md-4 col-sm-12"></div>
+                          <div class="fieldset col-12">
+                            <label class=" fieldset-label pe-2">
+                              Default Proposal Format
+                            </label>
+                            <Select
+                              className="phone-input-country-code selectDropDown Drop-down-width pt-2"
+                              options={getProposalFormatOptions()}
+                              value={Utils.PreviewSelection.find(
+                                (x) =>
+                                  x.value ===
+                                  pricingSettingObj.defaultProposalFormatID,
+                              )}
+                              // isDisabled={PrevPricingSettingObj.defaultProposalFormatID === 2}
+                              onChange={(selectedOption) => {
+                                setPricingSettingObj({
+                                  ...pricingSettingObj,
+                                  defaultProposalFormatID: selectedOption.value,
+                                });
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -772,7 +1011,7 @@ const Pricing_Settings = () => {
               }}
             />
             {/* ── Header ── */}
-            <div className="row">
+            <div className="row mb-3">
               <div className="col-12 mt-3">
                 <strong>
                   Configure a price adjustment rule for one or more services.
@@ -784,9 +1023,14 @@ const Pricing_Settings = () => {
             </div>
 
             {/* ── Service Select ── */}
-            <div className="row mt-3">
-              <div className="col-md-3">
-                <label className="form-label">Select Services</label>
+            <div className="row mt-4">
+              <div className="col-md-2">
+                <div
+                  className="form-label fw-bold pt-1"
+                  style={{ fontSize: "14px" }}
+                >
+                  Select Services
+                </div>
               </div>
               <div className="col-md-6">
                 <Select
@@ -870,8 +1114,8 @@ const Pricing_Settings = () => {
                     {[
                       { symbol: "+", label: "Add" },
                       { symbol: "-", label: "Subtract" },
-                      { symbol: "*", label: "Markup %" },
-                      { symbol: "/", label: "Discount %" },
+                      { symbol: "*", label: "Markup (%)" },
+                      { symbol: "/", label: "Discount (%)" },
                     ].map((op) => (
                       <button
                         key={op.symbol}
@@ -907,13 +1151,13 @@ const Pricing_Settings = () => {
                       {ServiceFeeInflationConfig.InflationRule.operator ===
                         "+" ||
                       ServiceFeeInflationConfig.InflationRule.operator === "-"
-                        ? "Amount"
-                        : "Percentage (%)"}
+                        ? `Amount (${currencySymbol})`
+                        : `Percentage (%) (${currencySymbol})`}
                     </label>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
                       className="form-control"
-                      min={0}
                       placeholder={
                         ServiceFeeInflationConfig.InflationRule.operator ===
                           "+" ||
@@ -924,33 +1168,61 @@ const Pricing_Settings = () => {
                       value={
                         ServiceFeeInflationConfig.InflationRule.value ?? ""
                       }
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        // Allow empty value
+                        if (value === "") {
+                          setServiceFeeInflationConfig({
+                            ...ServiceFeeInflationConfig,
+                            InflationRule: {
+                              ...ServiceFeeInflationConfig.InflationRule,
+                              value: null,
+                            },
+                          });
+                          return;
+                        }
+
+                        // First digit must be 1-9, following digits can be 0-9
+                        if (!/^[1-9][0-9]*$/.test(value)) {
+                          return;
+                        }
+
+                        const maxValue =
+                          ServiceFeeInflationConfig.InflationRule.operator ===
+                            "+" ||
+                          ServiceFeeInflationConfig.InflationRule.operator ===
+                            "-"
+                            ? 9999
+                            : 100;
+
+                        if (parseInt(value, 10) > maxValue) {
+                          return;
+                        }
+
                         setServiceFeeInflationConfig({
                           ...ServiceFeeInflationConfig,
                           InflationRule: {
                             ...ServiceFeeInflationConfig.InflationRule,
-                            value:
-                              e.target.value === ""
-                                ? null
-                                : parseFloat(e.target.value),
+                            value,
                           },
-                        })
-                      }
+                        });
+                      }}
                     />
                     {ServiceFeeInflationConfig.InflationRule.value > 0 && (
                       <small className="text-muted mt-1 d-block">
                         {ServiceFeeInflationConfig.InflationRule.operator ===
                           "+" &&
-                          `price + ${ServiceFeeInflationConfig.InflationRule.value}`}
+                          `Price + ${ServiceFeeInflationConfig.InflationRule.value}`}
                         {ServiceFeeInflationConfig.InflationRule.operator ===
                           "-" &&
-                          `price − ${ServiceFeeInflationConfig.InflationRule.value}`}
+                          `Price − ${ServiceFeeInflationConfig.InflationRule.value}`}
                         {ServiceFeeInflationConfig.InflationRule.operator ===
                           "*" &&
-                          `price × ${(1 + ServiceFeeInflationConfig.InflationRule.value / 100).toFixed(2)}`}
+                          `Price × ${(1 + ServiceFeeInflationConfig.InflationRule.value / 100).toFixed(2)}`}
                         {ServiceFeeInflationConfig.InflationRule.operator ===
                           "/" &&
-                          `price ÷ ${(1 + ServiceFeeInflationConfig.InflationRule.value / 100).toFixed(2)}`}
+                          `Price × ${(1 - ServiceFeeInflationConfig.InflationRule.value / 100).toFixed(2)}`}
                       </small>
                     )}
                   </div>
@@ -960,21 +1232,21 @@ const Pricing_Settings = () => {
 
             {/* ── Submit / Delete Buttons ── */}
             {userAccessData.Admin_Setting_Practice_Config_CanEdit && (
-              <div className="col-12 text-end mt-3">
-                <label className="validation">{errorMessage}</label>
-                <button
-                  style={{
-                    fontSize: "14px",
-                    marginTop: "10px",
-                    marginRight: "10px",
-                  }}
-                  className="btn btn-primary create-item-btn"
-                  onClick={() => SubmitServiceFeeInflation()}
-                >
-                  <span>Submit</span>
-                </button>
+              <>
+                <div className="col-12 text-start me-2 mt-3">
+                  <button
+                    style={{
+                      fontSize: "14px",
+                      marginTop: "10px",
+                      marginRight: "25px",
+                    }}
+                    className="btn btn-primary create-item-btn"
+                    onClick={() => SubmitServiceFeeInflation()}
+                  >
+                    <span>Submit</span>
+                  </button>
 
-                {/* {(ServiceFeeInflationConfig.HasExistingConfig ||
+                  {/* {(ServiceFeeInflationConfig.HasExistingConfig ||
           ServiceFeeInflationConfig.SelectedServices.length > 0) && (
           <button
             className="btn btn-danger btn-sm mt-2"
@@ -991,7 +1263,9 @@ const Pricing_Settings = () => {
             Delete Configuration
           </button>
         )} */}
-              </div>
+                </div>
+                <label className="validation">{feeInflationErrorMessage}</label>
+              </>
             )}
 
             {/* ── Configured Rules Table ── */}
@@ -1034,16 +1308,19 @@ const Pricing_Settings = () => {
                 if (op === "*")
                   return `× ${(1 + val / 100).toFixed(2)} (${val}% markup)`;
                 if (op === "/")
-                  return `÷ ${(1 + val / 100).toFixed(2)} (${val}% discount)`;
+                  return `× ${(1 - val / 100).toFixed(2)} (${val}% discount)`;
                 return `${op} ${val}`;
               };
 
               return (
                 <div className="row mt-4">
                   <div className="col-12">
-                    <label className="form-label">
+                    <div
+                      className="form-label fw-bold"
+                      style={{ fontSize: "14px" }}
+                    >
                       Configured Inflation Rules
-                    </label>
+                    </div>
                     <table className="table table-bordered table-sm">
                       <thead className="table-light">
                         <tr>
@@ -1124,15 +1401,7 @@ const Pricing_Settings = () => {
                                 ) : (
                                   <button
                                     className="btn btn-danger text-white btn-outline-danger btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#ConfirmModel"
-                                    onClick={() =>
-                                      setModelRequestData({
-                                        Action: "DeleteServiceFeeInflationRule",
-                                        batchID: row.batchID,
-                                        message: `This will delete the inflation rule. Are you sure?`,
-                                      })
-                                    }
+                                    onClick={() => HandleDeleteRuleClick(row)}
                                   >
                                     Delete
                                   </button>
@@ -1207,7 +1476,11 @@ const Pricing_Settings = () => {
         setOpenSuccessModal={setOpenSuccessModal}
         openSuccessModal={openSuccessModal}
         modelAction={"Update"}
-        message={"Pricing setting"}
+        message={
+          activeTab === "FeeInflation"
+            ? "Service Fee Inflation "
+            : "Pricing Settings"
+        }
       />
     </div>
   );
