@@ -476,7 +476,7 @@ const ChoosePlanForPurchase = (props) => {
                                                             <CardBody
                                                               style={{
                                                                 width: "305px",
-                                                                height: "450px",
+                                                                height: "auto",
                                                               }}
                                                               className="p-3"
                                                             >

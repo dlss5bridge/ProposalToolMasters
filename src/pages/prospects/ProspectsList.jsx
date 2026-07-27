@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Select from "react-select";
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { parse, isValid, format } from "date-fns";
 import { AuthContextProvider } from "../../AuthContext/AuthContext";
 import FilterModel from "../../components/FilterModel";
 import CommonButtonComponent from "../../components/CommonButtonComponent";
@@ -13,6 +15,8 @@ import {
   DeleteClient,
   ClientChangeStatus,
   DeleteSingleApiClient,
+  GetClientGlobalVariables,
+  AddUpdateClientGlobalVariables,
 } from "../../redux/Services/client/clientAPI";
 import SuccessModal from "../../components/SuccessModal";
 import ErrorModel from "../../components/ErrorModel";
@@ -110,7 +114,9 @@ const Prospects = () => {
     message: null,
     tabName: null,
   });
-
+  const [prospectVariables, setProspectVariables] = useState([]);
+  const [selectedProspectKeyID, setSelectedProspectKeyID] = useState(null);
+  const [showVarModal, setShowVarModal] = useState(false);
   const [authLoadingRow, setAuthLoadingRow] = useState(null);
   const pageSize = isMobile ? isMobileRecords : desktopRecords;
   const formattedErrorMessage = handleErrorMessage(errorMessage);
@@ -118,6 +124,7 @@ const Prospects = () => {
   const [contactsLookupList, setContactsLookupList] = useState([]);
   const [contactDetails, setContactDetails] = useState();
   const [openIntegrationDialog, setOpenIntegrationDialog] = useState(false);
+  const [invalidFieldIds, setInvalidFieldIds] = useState([]);
   //=====================useEffects==============================
   useEffect(() => {
     setTopbar("block");
@@ -177,6 +184,50 @@ const Prospects = () => {
       }
     }
   }, [modelRequestData]);
+
+  const formatNumber = (num, decimalPlaces) => {
+    if (num == null || num === "") return ""; // empty safety
+    const n = parseFloat(num); // ensure it's a number
+    if (isNaN(n)) return "";
+    const str = n.toFixed(decimalPlaces); // fix decimals
+    const [intPart, fracPart] = str.split(".");
+    // add commas only to integer part
+    return (
+      intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",") +
+      (decimalPlaces > 0 ? "." + fracPart : "")
+    );
+  };
+
+  const parseStoredDate = (dateStr, formatStr) => {
+    if (!dateStr) return null;
+
+    try {
+      const parsed = parse(dateStr, formatStr, new Date());
+      return isValid(parsed) ? parsed : null;
+    } catch (err) {
+      console.error("Invalid date string:", dateStr, "with format:", formatStr);
+      return null;
+    }
+  };
+
+  const getMinDate = (blocks, formatStr) => {
+    console.log(blocks);
+    if (!blocks?.length) return null;
+    const firstBlock = blocks[0].blocks[0];
+    const fromDate = firstBlock.fromDate
+      ? parseStoredDate(firstBlock.fromDate, formatStr)
+      : null;
+    return fromDate instanceof Date && !isNaN(fromDate) ? fromDate : null;
+  };
+
+  const getMaxDate = (blocks, formatStr) => {
+    if (!blocks?.length) return null;
+    const lastBlock = blocks[0]?.blocks[blocks.length - 1];
+    const toDate = lastBlock.toDate
+      ? parseStoredDate(lastBlock.toDate, formatStr)
+      : null;
+    return toDate instanceof Date && !isNaN(toDate) ? toDate : null;
+  };
 
   const handleView = (item) => {};
 
@@ -326,6 +377,141 @@ const Prospects = () => {
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleVariablesDataSubmit = async () => {
+    try {
+      debugger;
+      // handle all validations
+      const invalidFields = prospectVariables
+        .filter((v) => {
+          const type = Number(v.dataType);
+
+          if (type === 2) {
+            const val = Number(v.value);
+            if (v.value === "" || isNaN(val)) return true;
+
+            const isValid = v.quantity?.some((q) => {
+              const from = Number(q.quantityFrom);
+              const to = Number(q.quantityTo);
+
+              return !isNaN(from) && !isNaN(to) && val >= from && val <= to;
+            });
+
+            return !isValid;
+          }
+
+          if (type === 4) {
+            if (v.isOther) return !v.otherValue;
+            return !v.value;
+          }
+
+          if (type === 3) {
+            return !v.value;
+          }
+
+          return false;
+        })
+        .map((v) => v.globalVariableID);
+
+      if (invalidFields.length > 0) {
+        setInvalidFieldIds(invalidFields);
+        return;
+      }
+
+      const payload = {
+        clientKeyID: selectedProspectKeyID,
+        userKeyID: common.userKeyID,
+        organisationKeyID: common.organisationKeyID,
+        variables: prospectVariables.map((v) => ({
+          prospectVariableKeyID: v.prospectVariableKeyID,
+          globalPricingDriverID: v.globalVariableID,
+          value: (() => {
+            const resolved = v.isOther ? v.otherValue : v.value;
+            return resolved !== null && resolved !== undefined
+              ? String(resolved)
+              : null;
+          })(),
+          isActive: true,
+        })),
+      };
+
+      setLoader(true);
+      const response = await AddUpdateClientGlobalVariables(payload);
+      const result = response?.data?.responseData?.data;
+
+      if (result) {
+        setLoader(false);
+        setShowVarModal(false);
+        setProspectVariables([]);
+        setSelectedProspectKeyID(null);
+        // toast/alert success if you have one
+      }
+    } catch (error) {
+      setLoader(false);
+      console.error(error);
+    } finally {
+      // setVarSubmitLoading(false);
+    }
+  };
+
+  const GetClientGlobalVariablesData = async (clientKeyID) => {
+    try {
+      const data = await GetClientGlobalVariables(clientKeyID);
+      const responseData = data?.data?.responseData?.data;
+
+      const formatted = responseData.map((item) => ({
+        globalVariableKeyID: item.globalVariableKeyID,
+        globalVariableID: item.globalVariableID,
+        globalVariableName: item.globalVariableName,
+        dataType: item.dataType,
+        value: item.value ?? "",
+        variation: item.variation,
+        slab: item.slab,
+        text: item.text,
+        date: item.date,
+        quantity: item.quantity,
+      }));
+
+      const initializeVariable = (variable) => {
+        if (variable.dataType == 4 && variable.slab) {
+          const hasOtherSlab = variable.slab.some(
+            (item) => item.slabTypeID === 2,
+          );
+
+          const matchedSlab = variable.slab.find((item) => {
+            if (item.slabTypeID === 2) return false;
+            const label = `${formatNumber(item.slabFrom, item.decimalPlaces ?? 2)} - ${formatNumber(item.slabTo, item.decimalPlaces ?? 2)}`;
+            return label === variable.value;
+          });
+
+          if (matchedSlab) {
+            return {
+              ...variable,
+              isOther: false,
+              otherValue: "",
+            };
+          }
+
+          // Only treat as "Other" if an Other slab actually exists
+          const isOther = hasOtherSlab && !!variable.value;
+          return {
+            ...variable,
+            isOther,
+            otherValue: isOther ? variable.value : "",
+            value: isOther ? "Other" : variable.value,
+          };
+        }
+        return variable;
+      };
+      let variables = formatted.map((variable) => initializeVariable(variable));
+      console.log(variables);
+      setProspectVariables(variables);
+      setSelectedProspectKeyID(clientKeyID);
+      setShowVarModal(true);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -1599,6 +1785,28 @@ const Prospects = () => {
                                                     </li>
                                                   )}
 
+                                                  {/* prospect variables start */}
+                                                  <li>
+                                                    {/* <Tooltip title={`Edit ${proposalName}`} placement="right"> */}
+                                                    <a
+                                                      className="dropdown-item"
+                                                      onClick={() => {
+                                                        GetClientGlobalVariablesData(
+                                                          Prospect.clientKeyID,
+                                                        );
+                                                      }}
+                                                    >
+                                                      <i
+                                                        className="ri-user-fill"
+                                                        style={{
+                                                          marginRight: "2px",
+                                                        }}
+                                                      ></i>{" "}
+                                                      {prospectName} Variables
+                                                    </a>
+                                                    {/* </Tooltip> */}
+                                                  </li>
+                                                  {/* prospect variables end  */}
                                                   {/* Delete */}
                                                   {userAccessData.Admin_Prospect_CanDelete && (
                                                     <li>
@@ -1749,6 +1957,567 @@ const Prospects = () => {
                                   })}
                               </tbody>
                             </table>
+                          )}
+                          {showVarModal && (
+                            <div
+                              className="modal show"
+                              style={{
+                                display: "block",
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                                zIndex: 9999,
+                              }}
+                              onClick={() => setShowVarModal(false)}
+                            >
+                              <div
+                                className="modal-dialog modal-md modal-dialog-centered"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div className="modal-content">
+                                  <div className="modal-header">
+                                    <h5 className="modal-title">
+                                      Prospect Variables
+                                    </h5>
+                                    <button
+                                      className="btn-close"
+                                      onClick={() => setShowVarModal(false)}
+                                    />
+                                  </div>
+                                  {prospectVariables == null ||
+                                  prospectVariables?.length === 0 ? (
+                                    <>
+                                      <div className="modal-body">
+                                        <h6 className="text-danger mb-2">
+                                          Please add at least one Global
+                                          Prospect Variable
+                                        </h6>
+                                        <p className="text-muted helpMessage">
+                                          Note: You can add these in{" "}
+                                          <strong>
+                                            Configure &#8594; Variables &#8594;
+                                            Global Pricing Drivers
+                                          </strong>
+                                          <br /> inside tab{" "}
+                                          <strong>
+                                            Global Prospect Variables
+                                          </strong>
+                                        </p>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <div className="modal-body">
+                                        {prospectVariables.map(
+                                          (variable, index) => (
+                                            <div
+                                              className="row mb-2"
+                                              key={variable.globalVariableKeyID}
+                                            >
+                                              <div className="col-md-3 d-flex align-items-center">
+                                                <label className="form-label mb-0">
+                                                  {variable.globalVariableName}
+                                                </label>
+                                              </div>
+                                              {/* <div className="col-md-7">
+                                                {renderInput(variable,index)}
+                                              </div> */}
+                                              {variable.dataType == 2 && (
+                                                <>
+                                                  {/* <div className="col-md-3 col-sm-12 text-start text-md-end">
+                                                    <div class=""></div>
+                                                  </div> */}
+
+                                                  <div
+                                                    id={`${variable?.globalVariableName}`}
+                                                    className="col-lg-9 col-md-6 col-sm-6"
+                                                  >
+                                                    <div class="mb-1">
+                                                      <div class="input-group">
+                                                        <input
+                                                          type="number"
+                                                          class="input-text"
+                                                          placeholder={
+                                                            variable?.globalVariableName
+                                                          }
+                                                          value={
+                                                            variable.value ===
+                                                            null
+                                                              ? ""
+                                                              : variable.value
+                                                          }
+                                                          onChange={(e) => {
+                                                            setProspectVariables(
+                                                              (prev) =>
+                                                                prev.map((v) =>
+                                                                  v.globalVariableID ===
+                                                                  variable.globalVariableID
+                                                                    ? {
+                                                                        ...v,
+                                                                        value:
+                                                                          e
+                                                                            .target
+                                                                            .value,
+                                                                      }
+                                                                    : v,
+                                                                ),
+                                                            );
+                                                          }}
+                                                        />
+                                                        {invalidFieldIds.includes(
+                                                          variable.globalVariableID,
+                                                        ) && (
+                                                          <span className="text-danger">
+                                                            {variable.value ===
+                                                            "" ? (
+                                                              <>
+                                                                This field is
+                                                                required
+                                                              </>
+                                                            ) : (
+                                                              <>
+                                                                Value must be
+                                                                between{" "}
+                                                                {variable.quantity
+                                                                  .map(
+                                                                    (q) =>
+                                                                      `${q.quantityFrom} - ${q.quantityTo}`,
+                                                                  )
+                                                                  .join(", ")}
+                                                              </>
+                                                            )}
+                                                          </span>
+                                                        )}
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </>
+                                              )}
+                                              {variable.dataType == 3 && (
+                                                <>
+                                                  {/* <div className="col-md-3 col-sm-12 text-start text-md-end">
+                                                    <div class=""></div>
+                                                  </div> */}
+                                                  <div
+                                                    id={`${variable?.globalVariableName}`}
+                                                    className="col-lg-9 col-md-9 col-sm-12"
+                                                  >
+                                                    <div class="mb-1">
+                                                      <div class="input-group">
+                                                        <Select
+                                                          className="w-100"
+                                                          options={variable.variation?.map(
+                                                            (item) => ({
+                                                              value:
+                                                                item.variationName, // use variationValue as the key
+                                                              label:
+                                                                item.variationName,
+                                                            }),
+                                                          )}
+                                                          value={
+                                                            variable.value
+                                                              ? {
+                                                                  value:
+                                                                    variable.value,
+                                                                  label:
+                                                                    variable.value,
+                                                                }
+                                                              : null
+                                                          }
+                                                          onChange={(
+                                                            selected,
+                                                          ) => {
+                                                            setProspectVariables(
+                                                              (prev) =>
+                                                                prev.map((v) =>
+                                                                  v.globalVariableID ===
+                                                                  variable.globalVariableID
+                                                                    ? {
+                                                                        ...v,
+                                                                        value:
+                                                                          selected?.value,
+                                                                      }
+                                                                    : v,
+                                                                ),
+                                                            );
+                                                          }}
+                                                        />
+                                                      </div>
+                                                      {invalidFieldIds.includes(
+                                                        variable.globalVariableID,
+                                                      ) && (
+                                                        <span className="text-danger">
+                                                          {!variable.value ? (
+                                                            <>
+                                                              This field is
+                                                              required
+                                                            </>
+                                                          ) : (
+                                                            ""
+                                                          )}
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </>
+                                              )}
+                                              {variable.dataType == 6 && (
+                                                <>
+                                                  {/* <div className="col-md-3 col-sm-12 text-start text-md-end">
+                                                    <div class=""></div>
+                                                  </div> */}
+                                                  <div
+                                                    id={`${variable?.globalVariableName}`}
+                                                    className="col-lg-9 col-md-9 col-sm-12"
+                                                  >
+                                                    <div className="mb-1">
+                                                      <div class="input-group">
+                                                        <DatePicker
+                                                          className="input-text"
+                                                          selected={
+                                                            variable.value
+                                                              ? parseStoredDate(
+                                                                  variable.value,
+                                                                  variable
+                                                                    .date?.[0]
+                                                                    ?.dateFormat ||
+                                                                    "dd-MM-yyyy",
+                                                                )
+                                                              : null
+                                                          }
+                                                          dateFormat={
+                                                            variable.date?.[0]
+                                                              ?.dateFormat ||
+                                                            "dd-MM-yyyy"
+                                                          }
+                                                          onChange={(date) => {
+                                                            const formatStr =
+                                                              variable.date?.[0]
+                                                                ?.dateFormat ||
+                                                              "dd-MM-yyyy";
+
+                                                            const formatted =
+                                                              date
+                                                                ? format(
+                                                                    date,
+                                                                    formatStr,
+                                                                  )
+                                                                : null;
+
+                                                            setProspectVariables(
+                                                              (prev) =>
+                                                                prev.map((v) =>
+                                                                  v.globalVariableID ===
+                                                                  variable.globalVariableID
+                                                                    ? {
+                                                                        ...v,
+                                                                        value:
+                                                                          formatted,
+                                                                      }
+                                                                    : v,
+                                                                ),
+                                                            );
+                                                          }}
+                                                          minDate={getMinDate(
+                                                            variable.date,
+                                                            variable.date?.[0]
+                                                              ?.dateFormat,
+                                                          )}
+                                                          maxDate={getMaxDate(
+                                                            variable.date,
+                                                            variable.date?.[0]
+                                                              ?.dateFormat,
+                                                          )}
+                                                          placeholderText="Select any date"
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </>
+                                              )}
+
+                                              {variable.dataType == 5 && (
+                                                <>
+                                                  {/* <div className="col-md-3 col-sm-12 text-start text-md-end"></div> */}
+                                                  <div
+                                                    id={`${variable?.globalVariableName}`}
+                                                    className="col-lg-9 col-md-9 col-sm-12"
+                                                  >
+                                                    <div className="mb-1">
+                                                      <div class="input-group">
+                                                        <input
+                                                          className="input-text"
+                                                          type="text"
+                                                          value={
+                                                            variable?.value ||
+                                                            null
+                                                          }
+                                                          onChange={(e) => {
+                                                            let value =
+                                                              e.target.value;
+
+                                                            const textConfig =
+                                                              variable
+                                                                .text?.[0];
+                                                            const allowedSpecialChars =
+                                                              textConfig?.allowedSpecialCharacters ||
+                                                              "";
+
+                                                            // Escape special characters for regex
+                                                            const escapedChars =
+                                                              allowedSpecialChars.replace(
+                                                                /[-/\\^$*+?.()|[\]{}]/g,
+                                                                "\\$&",
+                                                              );
+
+                                                            // Allow only alphanumeric + allowed special chars
+                                                            const regex =
+                                                              new RegExp(
+                                                                `[^a-zA-Z0-9${escapedChars}]`,
+                                                                "g",
+                                                              );
+
+                                                            value =
+                                                              value.replace(
+                                                                regex,
+                                                                "",
+                                                              );
+
+                                                            setProspectVariables(
+                                                              (prev) =>
+                                                                prev.map((v) =>
+                                                                  v.globalVariableID ===
+                                                                  variable.globalVariableID
+                                                                    ? {
+                                                                        ...v,
+                                                                        value,
+                                                                      }
+                                                                    : v,
+                                                                ),
+                                                            );
+                                                          }}
+                                                          placeholder="Enter Text"
+                                                          maxLength={
+                                                            variable?.text?.[0]
+                                                              ?.textLength ||
+                                                            100
+                                                          }
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </>
+                                              )}
+
+                                              {/* working here  */}
+                                              {variable.dataType == 4 && (
+                                                <>
+                                                  {/* <div className="col-md-3 col-sm-12 text-start text-md-end">
+                                                    <div class="col-md-5 col-sm-12 text-start text-md-start">
+                                                  </div> */}
+                                                  <div
+                                                    id={`${variable?.globalVariableName}`}
+                                                    className="col-lg-9 col-md-9 col-sm-12"
+                                                  >
+                                                    <div class="mb-1">
+                                                      <div class="input-group">
+                                                        <Select
+                                                          className="w-100"
+                                                          options={variable.slab?.map(
+                                                            (item) => ({
+                                                              value:
+                                                                item.slabTypeID ===
+                                                                2
+                                                                  ? "Other"
+                                                                  : `${formatNumber(item.slabFrom, item.decimalPlaces ?? 2)} - ${formatNumber(item.slabTo, item.decimalPlaces ?? 2)}`,
+                                                              label:
+                                                                item.slabTypeID ===
+                                                                2
+                                                                  ? "Other"
+                                                                  : `${formatNumber(item.slabFrom, item.decimalPlaces ?? 2)} - ${formatNumber(item.slabTo, item.decimalPlaces ?? 2)}`,
+                                                              slabKeyID:
+                                                                item.slabKeyID,
+                                                            }),
+                                                          )}
+                                                          value={
+                                                            variable.value
+                                                              ? {
+                                                                  value:
+                                                                    variable.value,
+                                                                  label:
+                                                                    variable.value,
+                                                                }
+                                                              : null
+                                                          }
+                                                          onChange={(
+                                                            selected,
+                                                          ) => {
+                                                            setProspectVariables(
+                                                              (prev) =>
+                                                                prev.map((v) =>
+                                                                  v.globalVariableID ===
+                                                                  variable.globalVariableID
+                                                                    ? {
+                                                                        ...v,
+                                                                        value:
+                                                                          selected?.value, // slabValue stored
+                                                                        isOther:
+                                                                          selected?.label ===
+                                                                          "Other",
+                                                                        otherValue:
+                                                                          selected?.value ===
+                                                                          "Other"
+                                                                            ? v.otherValue
+                                                                            : "",
+                                                                      }
+                                                                    : v,
+                                                                ),
+                                                            );
+                                                          }}
+                                                        />
+                                                      </div>
+                                                      {variable.isOther && (
+                                                        <input
+                                                          type="text"
+                                                          className="input-text mt-2"
+                                                          value={
+                                                            variable.otherValue ||
+                                                            ""
+                                                          }
+                                                          onChange={(e) => {
+                                                            let val =
+                                                              e.target.value;
+
+                                                            // allow numbers
+                                                            val = val.replace(
+                                                              /[^0-9]/g,
+                                                              "",
+                                                            );
+
+                                                            setProspectVariables(
+                                                              (prev) =>
+                                                                prev.map((v) =>
+                                                                  v.globalVariableID ===
+                                                                  variable.globalVariableID
+                                                                    ? {
+                                                                        ...v,
+                                                                        otherValue:
+                                                                          val,
+                                                                      }
+                                                                    : v,
+                                                                ),
+                                                            );
+                                                          }}
+                                                          placeholder="Enter Value"
+                                                        />
+                                                      )}
+                                                      {invalidFieldIds.includes(
+                                                        variable.globalVariableID,
+                                                      ) && (
+                                                        <span className="text-danger">
+                                                          {!variable.value ? (
+                                                            <>
+                                                              This field is
+                                                              required
+                                                            </>
+                                                          ) : (
+                                                            ""
+                                                          )}
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                  {variable?.slab?.find(
+                                                    (s) =>
+                                                      s.slabID ===
+                                                        variable.value &&
+                                                      s.slabTypeID === 2,
+                                                  ) && (
+                                                    <>
+                                                      <div className="col-md-3 col-sm-12 text-start text-md-end"></div>
+
+                                                      <div
+                                                        id={`${variable?.globalVariableName}`}
+                                                        className="col-lg-9 col-md-9 col-sm-12"
+                                                      >
+                                                        <div className="mb-1 d-flex flex-column justify-content-end h-100">
+                                                          <div className="input-group">
+                                                            <input
+                                                              type="text"
+                                                              value={
+                                                                variable.otherValue ||
+                                                                ""
+                                                              }
+                                                              onChange={(e) => {
+                                                                const val =
+                                                                  e.target
+                                                                    .value;
+
+                                                                setProspectVariables(
+                                                                  (prev) =>
+                                                                    prev.map(
+                                                                      (v) =>
+                                                                        v.globalVariableID ===
+                                                                        variable.globalVariableID
+                                                                          ? {
+                                                                              ...v,
+                                                                              otherValue:
+                                                                                val,
+                                                                            }
+                                                                          : v,
+                                                                    ),
+                                                                );
+                                                              }}
+                                                              className="input-text mt-2"
+                                                              placeholder={
+                                                                variable.globalVariableName
+                                                              }
+                                                            />
+                                                          </div>
+                                                          {invalidFieldIds.includes(
+                                                            variable.globalVariableID,
+                                                          ) && (
+                                                            <span className="text-danger">
+                                                              {!variable.value ? (
+                                                                <>
+                                                                  This field is
+                                                                  required
+                                                                </>
+                                                              ) : (
+                                                                ""
+                                                              )}
+                                                            </span>
+                                                          )}
+                                                        </div>
+                                                      </div>
+                                                    </>
+                                                  )}
+                                                </>
+                                              )}
+                                            </div>
+                                          ),
+                                        )}
+                                      </div>
+
+                                      <div className="modal-footer">
+                                        <button
+                                          className="btn btn-sm btn-secondary"
+                                          onClick={() => setShowVarModal(false)}
+                                        >
+                                          Cancel
+                                        </button>
+                                        <button
+                                          className="btn btn-sm create-item-btn"
+                                          onClick={() =>
+                                            handleVariablesDataSubmit()
+                                          }
+                                        >
+                                          Submit
+                                        </button>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
                           )}
                         </div>
 
