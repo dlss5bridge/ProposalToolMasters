@@ -9,6 +9,7 @@ import ProposalPdfStep from "../steps/ProposalPdfStep";
 import ProposalServicesStep from "../steps/ProposalServicesStep";
 import { selectActiveStep } from "../../../redux/reducer/webProposal/stepper";
 import { Services } from "../steps/ProposalServicesStep/data/data";
+
 export default function ProposalAmendment({ theme, proposal, services }) {
   const activeStep = useSelector(selectActiveStep);
 
@@ -59,7 +60,18 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       </div>
 
       <ProposalFooter theme={theme}>
-        <ProposalStepper theme={theme} steps={proposal.steps} />
+        <ProposalStepper
+          theme={theme}
+          steps={[
+            "Proposal",
+            "Input Fields",
+            //"Basic Information",
+            "Services",
+            "Pricing Table",
+            "Preview",
+            "Sign",
+          ]}
+        />
       </ProposalFooter>
     </ProposalLayout>
   );

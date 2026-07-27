@@ -1,8 +1,16 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+
 import ProposalAmendment from "./proposalTypes/ProposalAmendment";
 import StandardProposalWithInputs from "./proposalTypes/ProposalInputForm";
 import StandardProposal from "./proposalTypes/StandardProposal";
-// import StandardProposalWithInputs from "./proposalTypes/StandardProposalWithInputs";
-// import ProposalAmendment from "./proposalTypes/ProposalAmendment";
+import {
+  getQuoteModel,
+  selectQuoteModel,
+  selectQuoteModelLoading,
+  selectQuoteModelError,
+} from "../../redux/reducer/webProposal";
 
 export const proposalTheme = {
   // Layout
@@ -41,32 +49,53 @@ export const proposalTheme = {
   pdfBackground: "#EEF2F7",
 };
 
+const WEB_PROPOSAL_TYPE_ID = {
+  STANDARD: 1,
+  STANDARD_INPUT: 2,
+  AMENDMENT: 3,
+};
+
 export default function WebBasedProposal() {
-  // Later this object will come from Redux/API
+  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const quoteKeyID = searchParams.get("QuoteKeyID");
+
+  const quoteModel = useSelector(selectQuoteModel);
+  const loading = useSelector(selectQuoteModelLoading);
+  const error = useSelector(selectQuoteModelError);
+
+  useEffect(() => {
+    if (quoteKeyID) {
+      dispatch(getQuoteModel(quoteKeyID));
+    }
+  }, [dispatch, quoteKeyID]);
+
+  if (!quoteKeyID) {
+    return <div>Missing QuoteKeyID.</div>;
+  }
+
+  if (loading || (!quoteModel && !error)) {
+    return <div>Loading proposal...</div>;
+  }
+
+  if (error || !quoteModel) {
+    return <div>Failed to load proposal.</div>;
+  }
+
   const proposal = {
-    proposalType: "AMENDMENT", // STANDARD | STANDARD_INPUT | AMENDMENT
-    title: "Accounting Proposal",
+    quoteModel,
+    title: quoteModel.quotationName || "Proposal",
 
     showSidebar: false,
-
-    steps: [
-      "Proposal",
-      "Input Fields",
-      //"Basic Information",
-      "Services",
-      "Pricing Table",
-      "Preview",
-      "Sign",
-    ],
 
     theme: proposalTheme,
   };
 
-  switch (proposal.proposalType) {
-    case "STANDARD":
+  switch (quoteModel.webProposalTypeID || 3) {
+    case WEB_PROPOSAL_TYPE_ID.STANDARD:
       return <StandardProposal proposal={proposal} theme={proposal.theme} />;
 
-    case "STANDARD_INPUT":
+    case WEB_PROPOSAL_TYPE_ID.STANDARD_INPUT:
       return (
         <StandardProposalWithInputs
           proposal={proposal}
@@ -74,8 +103,14 @@ export default function WebBasedProposal() {
         />
       );
 
-    case "AMENDMENT":
-      return <ProposalAmendment proposal={proposal} theme={proposal.theme} />;
+    case WEB_PROPOSAL_TYPE_ID.AMENDMENT:
+      return (
+        <ProposalAmendment
+          proposal={proposal}
+          theme={proposal.theme}
+          quoteModel={quoteModel}
+        />
+      );
 
     default:
       return <div>Invalid Proposal Type</div>;

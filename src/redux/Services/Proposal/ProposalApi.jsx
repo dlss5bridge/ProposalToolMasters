@@ -55,6 +55,12 @@ export const GetProposalModel = async (id) => {
   return res;
 };
 
+export const GetProposalModelWithoutToken = async (id) => {
+  const res = await getList(
+    `${ProposalBaseUrlQuote}/GetQuoteModel?QuoteKeyID=${id}`,
+  );
+  return res;
+};
 //AddUpdate Service Category Callback function
 export const AddUpdateProposal = async (url, params) => {
   const res = await postApiWithAuthenticated(

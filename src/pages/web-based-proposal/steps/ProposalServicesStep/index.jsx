@@ -1,11 +1,22 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import RecurringServices from "./components/RecurringServices";
 import OneOffServices from "./components/OneOffServices";
 import SelectedServices from "./components/SelectedServices";
 import { filterCategories } from "./utils/filterCategories";
-import { Services } from "./data/data";
+import {
+  getRecurringServices,
+  getOneOffServices,
+  selectRecurringServices,
+  selectRecurringServicesLoading,
+  selectRecurringServicesError,
+  selectOneOffServices,
+  selectOneOffServicesLoading,
+  selectOneOffServicesError,
+} from "../../../../redux/reducer/webProposal/services";
 import "./ProposalServicesStep.css";
+import { selectQuoteModel } from "../../../../redux/reducer/webProposal";
 
 const buildInitialDriverValues = (service) => {
   const values = {};
@@ -43,16 +54,48 @@ const buildInitialDriverValues = (service) => {
   return values;
 };
 
-const ServiceSelectionPOC = () => {
+const ServiceSelectionComponent = () => {
+  const dispatch = useDispatch();
+  const quoteModel = useSelector(selectQuoteModel);
+
+  const { userKeyID, organisationKeyID } = useSelector(
+    (state) => state.Storage,
+  );
+
+  const recurringServices = useSelector(selectRecurringServices);
+  const recurringServicesLoading = useSelector(selectRecurringServicesLoading);
+  const recurringServicesError = useSelector(selectRecurringServicesError);
+
+  const oneOffServices = useSelector(selectOneOffServices);
+  const oneOffServicesLoading = useSelector(selectOneOffServicesLoading);
+  const oneOffServicesError = useSelector(selectOneOffServicesError);
+
   const [recurringSelections, setRecurringSelections] = useState({});
   const [oneOffSelections, setOneOffSelections] = useState({});
-  const [expandedRecurring, setExpandedRecurring] = useState(
-    () => new Set(Services[0] ? [Services[0].serviceCatID] : []),
-  );
-  const [expandedOneOff, setExpandedOneOff] = useState(
-    () => new Set(Services[0] ? [Services[0].serviceCatID] : []),
-  );
+  const [expandedRecurring, setExpandedRecurring] = useState(() => new Set());
+  const [expandedOneOff, setExpandedOneOff] = useState(() => new Set());
   const orderRef = useRef(0);
+
+  useEffect(() => {
+    dispatch(getRecurringServices({ userKeyID, organisationKeyID }));
+    dispatch(getOneOffServices({ userKeyID, organisationKeyID }));
+  }, [dispatch, userKeyID, organisationKeyID]);
+
+  useEffect(() => {
+    if (recurringServices[0]) {
+      setExpandedRecurring((prev) =>
+        prev.size === 0 ? new Set([recurringServices[0].serviceCatID]) : prev,
+      );
+    }
+  }, [recurringServices]);
+
+  useEffect(() => {
+    if (oneOffServices[0]) {
+      setExpandedOneOff((prev) =>
+        prev.size === 0 ? new Set([oneOffServices[0].serviceCatID]) : prev,
+      );
+    }
+  }, [oneOffServices]);
 
   const toggleService = (listType, category, service) => {
     const setSelections =
@@ -126,9 +169,13 @@ const ServiceSelectionPOC = () => {
     });
   };
 
-  const filteredCategories = useMemo(
-    () => filterCategories(Services, "", "all"),
-    [],
+  const filteredRecurringCategories = useMemo(
+    () => filterCategories(recurringServices, "", "all"),
+    [recurringServices],
+  );
+  const filteredOneOffCategories = useMemo(
+    () => filterCategories(oneOffServices, "", "all"),
+    [oneOffServices],
   );
 
   const recurringSelectedList = useMemo(
@@ -144,49 +191,67 @@ const ServiceSelectionPOC = () => {
     <div className="pss-root">
       <div className="pss-columns">
         <div className="pss-list-column">
-          <RecurringServices
-            categories={filteredCategories}
-            selections={recurringSelections}
-            crossSelections={oneOffSelections}
-            expandedIds={expandedRecurring}
-            onToggleExpand={(categoryId) =>
-              toggleCategoryExpand("recurring", categoryId)
-            }
-            onToggleService={(category, service) =>
-              toggleService("recurring", category, service)
-            }
-            onDriverChange={(serviceID, globalPricingDriverID, patch) =>
-              updateDriverValue(
-                "recurring",
-                serviceID,
-                globalPricingDriverID,
-                patch,
-              )
-            }
-          />
+          {recurringServicesLoading && (
+            <p className="pss-empty-state">Loading recurring services...</p>
+          )}
+          {recurringServicesError && (
+            <p className="pss-empty-state">
+              Failed to load recurring services.
+            </p>
+          )}
+          {!recurringServicesLoading && !recurringServicesError && (
+            <RecurringServices
+              categories={filteredRecurringCategories}
+              selections={recurringSelections}
+              crossSelections={oneOffSelections}
+              expandedIds={expandedRecurring}
+              onToggleExpand={(categoryId) =>
+                toggleCategoryExpand("recurring", categoryId)
+              }
+              onToggleService={(category, service) =>
+                toggleService("recurring", category, service)
+              }
+              onDriverChange={(serviceID, globalPricingDriverID, patch) =>
+                updateDriverValue(
+                  "recurring",
+                  serviceID,
+                  globalPricingDriverID,
+                  patch,
+                )
+              }
+            />
+          )}
         </div>
 
         <div className="pss-list-column">
-          <OneOffServices
-            categories={filteredCategories}
-            selections={oneOffSelections}
-            crossSelections={recurringSelections}
-            expandedIds={expandedOneOff}
-            onToggleExpand={(categoryId) =>
-              toggleCategoryExpand("oneOff", categoryId)
-            }
-            onToggleService={(category, service) =>
-              toggleService("oneOff", category, service)
-            }
-            onDriverChange={(serviceID, globalPricingDriverID, patch) =>
-              updateDriverValue(
-                "oneOff",
-                serviceID,
-                globalPricingDriverID,
-                patch,
-              )
-            }
-          />
+          {oneOffServicesLoading && (
+            <p className="pss-empty-state">Loading one-off services...</p>
+          )}
+          {oneOffServicesError && (
+            <p className="pss-empty-state">Failed to load one-off services.</p>
+          )}
+          {!oneOffServicesLoading && !oneOffServicesError && (
+            <OneOffServices
+              categories={filteredOneOffCategories}
+              selections={oneOffSelections}
+              crossSelections={recurringSelections}
+              expandedIds={expandedOneOff}
+              onToggleExpand={(categoryId) =>
+                toggleCategoryExpand("oneOff", categoryId)
+              }
+              onToggleService={(category, service) =>
+                toggleService("oneOff", category, service)
+              }
+              onDriverChange={(serviceID, globalPricingDriverID, patch) =>
+                updateDriverValue(
+                  "oneOff",
+                  serviceID,
+                  globalPricingDriverID,
+                  patch,
+                )
+              }
+            />
+          )}
         </div>
         <div className="pss-list-column">
           <SelectedServices
@@ -200,4 +265,4 @@ const ServiceSelectionPOC = () => {
   );
 };
 
-export default ServiceSelectionPOC;
+export default ServiceSelectionComponent;

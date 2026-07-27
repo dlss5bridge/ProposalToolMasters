@@ -5,11 +5,14 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import { useDispatch, useSelector } from "react-redux";
 import { selectNumPages, setNumPages } from "../../../redux/reducer/pdfViewer";
 import { useLayoutEffect, useRef, useState } from "react";
+import { selectQuoteModel } from "../../../redux/reducer/webProposal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function PdfSlider({ theme }) {
   const dispatch = useDispatch();
+  const quoteModel = useSelector(selectQuoteModel);
+
   const numPages = useSelector(selectNumPages);
   const containerRef = useRef(null);
   const [pageWidth, setPageWidth] = useState(750);
@@ -41,7 +44,7 @@ export default function PdfSlider({ theme }) {
 
   return (
     <Document
-      file="https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf"
+      file={quoteModel?.quotePDFUrl}
       onLoadSuccess={({ numPages }) => dispatch(setNumPages(numPages))}
     >
       <div

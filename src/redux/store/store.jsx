@@ -9,6 +9,8 @@ import pricingSettingsReducer from "../reducer/pricingSettings/pricingSettingsSl
 import proposalStepperReducer from "../reducer/webProposal/proposalStepperSlice";
 import pdfViewerReducer from "../reducer/pdfViewer/pdfViewerSlice";
 import stepperReducer from "../reducer/webProposal/stepper/stepperSlice";
+import webProposalServicesReducer from "../reducer/webProposal/services";
+import webProposalReducer from "../reducer/webProposal";
 
 const persistConfig = { key: "Proposal Tool", version: 1, storage };
 const authPersistConfig = {
@@ -29,5 +31,7 @@ export const store = configureStore({
     proposalStepper: proposalStepperReducer,
     pdfViewer: pdfViewerReducer,
     stepper: stepperReducer,
+    webProposalServices: webProposalServicesReducer,
+    webProposal: webProposalReducer,
   },
 });
