@@ -1,7 +1,14 @@
 import { Check } from "lucide-react";
 import PricingDriverField from "./PricingDriverField";
 
-const ServiceRow = ({ service, isSelected, disabledReason, driverValues, onToggle, onDriverChange }) => {
+const ServiceRow = ({
+  service,
+  isSelected,
+  disabledReason,
+  driverValues,
+  onToggle,
+  onDriverChange,
+}) => {
   const visibleDrivers = (service.pricingDriverList || []).filter(
     (driver) => driver.driverVisibility,
   );
@@ -26,7 +33,9 @@ const ServiceRow = ({ service, isSelected, disabledReason, driverValues, onToggl
         <span>
           <span className="pss-service-name">{service.serviceName}</span>
           {disabledReason && (
-            <span className="pss-service-disabled-reason">{disabledReason}</span>
+            <span className="pss-service-disabled-reason">
+              {disabledReason}
+            </span>
           )}
         </span>
 
@@ -44,7 +53,9 @@ const ServiceRow = ({ service, isSelected, disabledReason, driverValues, onToggl
               key={driver.globalPricingDriverID}
               driver={driver}
               entry={driverValues?.[driver.globalPricingDriverID]}
-              onChange={(patch) => onDriverChange(driver.globalPricingDriverID, patch)}
+              onChange={(patch) =>
+                onDriverChange(driver.globalPricingDriverID, patch)
+              }
             />
           ))}
         </div>

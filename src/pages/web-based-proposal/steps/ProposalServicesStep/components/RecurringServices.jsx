@@ -29,7 +29,9 @@ const RecurringServices = ({
         ))}
 
         {categories.length === 0 && (
-          <p className="pss-empty-state">No recurring services match your filters.</p>
+          <p className="pss-empty-state">
+            No recurring services match your filters.
+          </p>
         )}
       </div>
     </div>

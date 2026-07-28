@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Plus, X } from "lucide-react";
+import { Modal, Box } from "@mui/material";
 
 import RecurringServices from "./components/RecurringServices";
 import OneOffServices from "./components/OneOffServices";
 import SelectedServices from "./components/SelectedServices";
 import { filterCategories } from "./utils/filterCategories";
+import { buildSelectionsFromQuoteModel } from "./utils/buildSelectionsFromQuoteModel";
 import {
   getRecurringServices,
   getOneOffServices,
@@ -16,7 +19,6 @@ import {
   selectOneOffServicesError,
 } from "../../../../redux/reducer/webProposal/services";
 import "./ProposalServicesStep.css";
-import { selectQuoteModel } from "../../../../redux/reducer/webProposal";
 
 const buildInitialDriverValues = (service) => {
   const values = {};
@@ -56,7 +58,6 @@ const buildInitialDriverValues = (service) => {
 
 const ServiceSelectionComponent = () => {
   const dispatch = useDispatch();
-  const quoteModel = useSelector(selectQuoteModel);
 
   const { userKeyID, organisationKeyID } = useSelector(
     (state) => state.Storage,
@@ -75,11 +76,35 @@ const ServiceSelectionComponent = () => {
   const [expandedRecurring, setExpandedRecurring] = useState(() => new Set());
   const [expandedOneOff, setExpandedOneOff] = useState(() => new Set());
   const orderRef = useRef(0);
+  const hydratedRef = useRef(false);
+  const [isAddServiceModalOpen, setIsAddServiceModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(getRecurringServices({ userKeyID, organisationKeyID }));
     dispatch(getOneOffServices({ userKeyID, organisationKeyID }));
   }, [dispatch, userKeyID, organisationKeyID]);
+
+  useEffect(() => {
+    if (hydratedRef.current) return;
+    if (recurringServicesLoading || oneOffServicesLoading) return;
+    if (!recurringServices.length && !oneOffServices.length) return;
+
+    const {
+      recurringSelections: hydratedRecurring,
+      oneOffSelections: hydratedOneOff,
+      nextOrder,
+    } = buildSelectionsFromQuoteModel(recurringServices, oneOffServices);
+
+    setRecurringSelections(hydratedRecurring);
+    setOneOffSelections(hydratedOneOff);
+    orderRef.current = nextOrder;
+    hydratedRef.current = true;
+  }, [
+    recurringServices,
+    oneOffServices,
+    recurringServicesLoading,
+    oneOffServicesLoading,
+  ]);
 
   useEffect(() => {
     if (recurringServices[0]) {
@@ -187,73 +212,83 @@ const ServiceSelectionComponent = () => {
     [oneOffSelections],
   );
 
+  const recurringPanel = (
+    <>
+      {recurringServicesLoading && (
+        <p className="pss-empty-state">Loading recurring services...</p>
+      )}
+      {recurringServicesError && (
+        <p className="pss-empty-state">Failed to load recurring services.</p>
+      )}
+      {!recurringServicesLoading && !recurringServicesError && (
+        <RecurringServices
+          categories={filteredRecurringCategories}
+          selections={recurringSelections}
+          crossSelections={oneOffSelections}
+          expandedIds={expandedRecurring}
+          onToggleExpand={(categoryId) =>
+            toggleCategoryExpand("recurring", categoryId)
+          }
+          onToggleService={(category, service) =>
+            toggleService("recurring", category, service)
+          }
+          onDriverChange={(serviceID, globalPricingDriverID, patch) =>
+            updateDriverValue(
+              "recurring",
+              serviceID,
+              globalPricingDriverID,
+              patch,
+            )
+          }
+        />
+      )}
+    </>
+  );
+
+  const oneOffPanel = (
+    <>
+      {oneOffServicesLoading && (
+        <p className="pss-empty-state">Loading one-off services...</p>
+      )}
+      {oneOffServicesError && (
+        <p className="pss-empty-state">Failed to load one-off services.</p>
+      )}
+      {!oneOffServicesLoading && !oneOffServicesError && (
+        <OneOffServices
+          categories={filteredOneOffCategories}
+          selections={oneOffSelections}
+          crossSelections={recurringSelections}
+          expandedIds={expandedOneOff}
+          onToggleExpand={(categoryId) =>
+            toggleCategoryExpand("oneOff", categoryId)
+          }
+          onToggleService={(category, service) =>
+            toggleService("oneOff", category, service)
+          }
+          onDriverChange={(serviceID, globalPricingDriverID, patch) =>
+            updateDriverValue("oneOff", serviceID, globalPricingDriverID, patch)
+          }
+        />
+      )}
+    </>
+  );
+
   return (
     <div className="pss-root">
       <div className="pss-columns">
-        <div className="pss-list-column">
-          {recurringServicesLoading && (
-            <p className="pss-empty-state">Loading recurring services...</p>
-          )}
-          {recurringServicesError && (
-            <p className="pss-empty-state">
-              Failed to load recurring services.
-            </p>
-          )}
-          {!recurringServicesLoading && !recurringServicesError && (
-            <RecurringServices
-              categories={filteredRecurringCategories}
-              selections={recurringSelections}
-              crossSelections={oneOffSelections}
-              expandedIds={expandedRecurring}
-              onToggleExpand={(categoryId) =>
-                toggleCategoryExpand("recurring", categoryId)
-              }
-              onToggleService={(category, service) =>
-                toggleService("recurring", category, service)
-              }
-              onDriverChange={(serviceID, globalPricingDriverID, patch) =>
-                updateDriverValue(
-                  "recurring",
-                  serviceID,
-                  globalPricingDriverID,
-                  patch,
-                )
-              }
-            />
-          )}
-        </div>
+        <div className="pss-list-column">{recurringPanel}</div>
+
+        <div className="pss-list-column">{oneOffPanel}</div>
 
         <div className="pss-list-column">
-          {oneOffServicesLoading && (
-            <p className="pss-empty-state">Loading one-off services...</p>
-          )}
-          {oneOffServicesError && (
-            <p className="pss-empty-state">Failed to load one-off services.</p>
-          )}
-          {!oneOffServicesLoading && !oneOffServicesError && (
-            <OneOffServices
-              categories={filteredOneOffCategories}
-              selections={oneOffSelections}
-              crossSelections={recurringSelections}
-              expandedIds={expandedOneOff}
-              onToggleExpand={(categoryId) =>
-                toggleCategoryExpand("oneOff", categoryId)
-              }
-              onToggleService={(category, service) =>
-                toggleService("oneOff", category, service)
-              }
-              onDriverChange={(serviceID, globalPricingDriverID, patch) =>
-                updateDriverValue(
-                  "oneOff",
-                  serviceID,
-                  globalPricingDriverID,
-                  patch,
-                )
-              }
-            />
-          )}
-        </div>
-        <div className="pss-list-column">
+          <button
+            type="button"
+            className="pss-add-service-btn"
+            onClick={() => setIsAddServiceModalOpen(true)}
+          >
+            <Plus size={16} />
+            <span>Add Service</span>
+          </button>
           <SelectedServices
             recurringSelected={recurringSelectedList}
             oneOffSelected={oneOffSelectedList}
@@ -261,6 +296,29 @@ const ServiceSelectionComponent = () => {
           />
         </div>
       </div>
+
+      <Modal
+        open={isAddServiceModalOpen}
+        onClose={() => setIsAddServiceModalOpen(false)}
+      >
+        <Box className="pss-modal-box">
+          <div className="pss-modal-header">
+            <h2 className="pss-modal-title">Add Service</h2>
+            <button
+              type="button"
+              className="pss-modal-close"
+              onClick={() => setIsAddServiceModalOpen(false)}
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <div className="pss-modal-columns">
+            <div className="pss-list-column">{recurringPanel}</div>
+            <div className="pss-list-column">{oneOffPanel}</div>
+          </div>
+        </Box>
+      </Modal>
     </div>
   );
 };

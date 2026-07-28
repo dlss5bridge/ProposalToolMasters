@@ -265,8 +265,98 @@
 
 /* Selected services sidebar */
 
+.pss-add-service-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #2563eb;
+  background-color: #eff6ff;
+  border: 1px dashed #93c5fd;
+  border-radius: 0.75rem;
+  padding: 0.625rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.pss-add-service-btn:hover {
+  background-color: #dbeafe;
+  border-color: #60a5fa;
+}
+
 .pss-sidebar {
   min-width: 0;
+}
+
+/* Add Service modal */
+
+.pss-modal-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(1100px, 92vw);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 40px -8px rgba(15, 23, 42, 0.25);
+  outline: none;
+  overflow: hidden;
+}
+
+.pss-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.pss-modal-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.pss-modal-close {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.pss-modal-close:hover {
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+.pss-modal-columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+@media (min-width: 640px) {
+  .pss-modal-columns {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .pss-sidebar-inner {

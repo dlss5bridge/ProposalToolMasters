@@ -6,6 +6,7 @@ export {
   selectQuoteModel,
   selectQuoteModelLoading,
   selectQuoteModelError,
+  selectSelectedServicesList,
 } from "./webProposalSelectors";
 
 export default reducer;
