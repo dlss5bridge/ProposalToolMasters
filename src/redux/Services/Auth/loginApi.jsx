@@ -10,6 +10,7 @@ import {
 const loginUrl = `${Base_Url}/Login/authenticate`;
 const AuthenticateWithSocialMedia = `${Base_Url}/Login/AuthenticateWithSocialMedia`;
 const AuthenticateWithSocialMediaByToken = `${Base_Url}/Login/AuthenticateWithSocialMediaByToken`;
+const refreshTokenUrl = `${Base_Url}/Login/RefreshToken`;
 
 // Arrow function as a method
 
@@ -31,6 +32,13 @@ export const VerifyAuthenticateWithSocialMediaByToken = async (params) => {
 export const GetAuthenticateWithMFA = async (param) => {
     const res = await postApi(
         `${Base_Url}/Login/AuthenticateWithMFA`, param
+    );
+    return res;
+};
+
+export const RefreshToken = async (userKeyID) => {
+    const res = await getListWithAuthenticated(
+        `${refreshTokenUrl}?UserKeyID=${userKeyID}`
     );
     return res;
 };
