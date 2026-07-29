@@ -1,10 +1,13 @@
 import { Box, Card, CardContent, Typography } from "@mui/material";
 import Select from "react-select";
 import { useDispatch, useSelector } from "react-redux";
+import { useMemo } from "react";
 
 import {
   selectAdditionalInformationList,
+  selectAdditionalInformationValidationVisible,
   setAdditionalInformationList,
+  getAdditionalInformationFieldErrors,
 } from "../../../redux/reducer/webProposal/additionalInformation";
 
 // driverTypeID: 2 = quantity (number), 3 = variation (select), 4 = slab (select),
@@ -16,14 +19,26 @@ const updateItem = (list, globalPricingDriverID, patch) =>
       : item,
   );
 
+// Matches the standard single-column field width used across the other
+// web-proposal steps (see ProposalInputFieldsStep).
+const FIELD_MAX_WIDTH = 420;
+
 export default function ProposalAdditionalInformationStep({ theme }) {
   const dispatch = useDispatch();
   const additionalInformationList = useSelector(
     selectAdditionalInformationList,
   );
+  const validationVisible = useSelector(
+    selectAdditionalInformationValidationVisible,
+  );
 
   const visibleItems = (additionalInformationList || []).filter(
     (item) => item.driverTypeID !== 1 && item.driverVisibility !== false,
+  );
+
+  const fieldErrors = useMemo(
+    () => getAdditionalInformationFieldErrors(additionalInformationList),
+    [additionalInformationList],
   );
 
   const handleChange = (globalPricingDriverID, patch) => {
@@ -34,7 +49,13 @@ export default function ProposalAdditionalInformationStep({ theme }) {
     );
   };
 
-  const renderField = (item) => {
+  const renderField = (item, errorMessage) => {
+    const hasError = Boolean(errorMessage);
+    const inputClassName = `w-full rounded-lg border px-3 py-2 text-sm${
+      hasError ? " border-red-500" : ""
+    }`;
+    const inputStyle = { borderColor: hasError ? "#dc2626" : theme.border };
+
     if (item.driverTypeID === 2) {
       const quantity = item.quantity?.[0];
 
@@ -50,8 +71,8 @@ export default function ProposalAdditionalInformationStep({ theme }) {
             })
           }
           placeholder={`Enter ${item.driverName}`}
-          className="w-full rounded-lg border px-3 py-2 text-sm"
-          style={{ borderColor: theme.border }}
+          className={inputClassName}
+          style={inputStyle}
         />
       );
     }
@@ -91,6 +112,13 @@ export default function ProposalAdditionalInformationStep({ theme }) {
           }}
           menuPortalTarget={document.body}
           placeholder={`Select ${item.driverName}`}
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderRadius: "0.5rem",
+              borderColor: hasError ? "#dc2626" : base.borderColor,
+            }),
+          }}
         />
       );
     }
@@ -109,8 +137,8 @@ export default function ProposalAdditionalInformationStep({ theme }) {
             })
           }
           placeholder={`Enter ${item.driverName}`}
-          className="w-full rounded-lg border px-3 py-2 text-sm"
-          style={{ borderColor: theme.border }}
+          className={inputClassName}
+          style={inputStyle}
         />
       );
     }
@@ -125,8 +153,8 @@ export default function ProposalAdditionalInformationStep({ theme }) {
               enteredDate: e.target.value,
             })
           }
-          className="w-full rounded-lg border px-3 py-2 text-sm"
-          style={{ borderColor: theme.border }}
+          className={inputClassName}
+          style={inputStyle}
         />
       );
     }
@@ -162,20 +190,40 @@ export default function ProposalAdditionalInformationStep({ theme }) {
           </div>
 
           <div className="flex flex-col gap-5">
-            {visibleItems.map((item) => (
-              <div
-                key={item.globalPricingDriverID}
-                className="flex flex-col gap-2"
-              >
-                <Typography
-                  sx={{ fontSize: 13, fontWeight: 600, color: theme.textPrimary }}
-                >
-                  {item.driverName}
-                </Typography>
+            {visibleItems.map((item) => {
+              const errorMessage = validationVisible
+                ? fieldErrors[item.globalPricingDriverID]
+                : null;
 
-                {renderField(item)}
-              </div>
-            ))}
+              return (
+                <div
+                  key={item.globalPricingDriverID}
+                  className="flex flex-col gap-2"
+                  style={{ maxWidth: FIELD_MAX_WIDTH }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: theme.textPrimary,
+                    }}
+                  >
+                    {item.driverName}
+                    <Box component="span" sx={{ color: "#dc2626", ml: 0.25 }}>
+                      *
+                    </Box>
+                  </Typography>
+
+                  {renderField(item, errorMessage)}
+
+                  {errorMessage && (
+                    <Typography sx={{ fontSize: 12, color: "#dc2626" }}>
+                      {errorMessage}
+                    </Typography>
+                  )}
+                </div>
+              );
+            })}
 
             {visibleItems.length === 0 && (
               <Typography sx={{ fontSize: 14, color: theme.textSecondary }}>

@@ -21,7 +21,9 @@ import {
   selectOneOffServices,
   selectOneOffServicesLoading,
   selectOneOffServicesError,
+  selectServicesSelectionError,
   setSelectedServiceIDs,
+  setServicesSelectionError,
 } from "../../../../redux/reducer/webProposal/services";
 import "./ProposalServicesStep.css";
 import { selectQuoteModel } from "../../../../redux/reducer/webProposal";
@@ -75,6 +77,8 @@ const ServiceSelectionComponent = () => {
   const oneOffServices = useSelector(selectOneOffServices);
   const oneOffServicesLoading = useSelector(selectOneOffServicesLoading);
   const oneOffServicesError = useSelector(selectOneOffServicesError);
+
+  const selectionError = useSelector(selectServicesSelectionError);
 
   const [recurringSelections, setRecurringSelections] = useState({});
   const [oneOffSelections, setOneOffSelections] = useState({});
@@ -520,12 +524,14 @@ const ServiceSelectionComponent = () => {
   );
 
   useEffect(() => {
-    dispatch(
-      setSelectedServiceIDs([
-        ...recurringSelectedList.map((selection) => selection.serviceID),
-        ...oneOffSelectedList.map((selection) => selection.serviceID),
-      ]),
-    );
+    const nextSelectedServiceIDs = [
+      ...recurringSelectedList.map((selection) => selection.serviceID),
+      ...oneOffSelectedList.map((selection) => selection.serviceID),
+    ];
+    dispatch(setSelectedServiceIDs(nextSelectedServiceIDs));
+    if (nextSelectedServiceIDs.length > 0) {
+      dispatch(setServicesSelectionError(false));
+    }
   }, [dispatch, recurringSelectedList, oneOffSelectedList]);
 
   const renderRecurringPanel = ({
@@ -594,6 +600,11 @@ const ServiceSelectionComponent = () => {
 
   return (
     <div className="pss-root">
+      {selectionError && (
+        <p className="pss-selection-error">
+          Please select at least one service to continue.
+        </p>
+      )}
       <div className="pss-columns">
         <div className="pss-list-column">
           {renderRecurringPanel({

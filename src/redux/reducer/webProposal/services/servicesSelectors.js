@@ -7,3 +7,4 @@ export const selectOneOffServicesLoading = (state) => state.webProposalServices.
 export const selectOneOffServicesError = (state) => state.webProposalServices.oneOffServicesError;
 
 export const selectSelectedServiceIDs = (state) => state.webProposalServices.selectedServiceIDs;
+export const selectServicesSelectionError = (state) => state.webProposalServices.selectionError;

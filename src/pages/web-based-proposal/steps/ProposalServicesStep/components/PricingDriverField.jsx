@@ -7,7 +7,10 @@ const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
 
     return (
       <div>
-        <label className="pss-field-label">{driver.driverName}</label>
+        <label className="pss-field-label">
+          {driver.driverName}
+          <span className="pss-field-required-mark">*</span>
+        </label>
         <input
           type="number"
           value={entry?.value ?? ""}
@@ -36,7 +39,10 @@ const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
 
     return (
       <div>
-        <label className="pss-field-label">{driver.driverName}</label>
+        <label className="pss-field-label">
+          {driver.driverName}
+          <span className="pss-field-required-mark">*</span>
+        </label>
         <Select
           options={options}
           value={selected}

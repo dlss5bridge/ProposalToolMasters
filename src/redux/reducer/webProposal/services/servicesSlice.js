@@ -11,6 +11,7 @@ const initialState = {
   oneOffServicesError: null,
 
   selectedServiceIDs: [],
+  selectionError: false,
 };
 
 const servicesSlice = createSlice({
@@ -19,6 +20,9 @@ const servicesSlice = createSlice({
   reducers: {
     setSelectedServiceIDs(state, action) {
       state.selectedServiceIDs = action.payload || [];
+    },
+    setServicesSelectionError(state, action) {
+      state.selectionError = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -50,6 +54,7 @@ const servicesSlice = createSlice({
   },
 });
 
-export const { setSelectedServiceIDs } = servicesSlice.actions;
+export const { setSelectedServiceIDs, setServicesSelectionError } =
+  servicesSlice.actions;
 
 export default servicesSlice.reducer;

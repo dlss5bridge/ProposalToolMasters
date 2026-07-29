@@ -13,22 +13,18 @@ import {
   updateTotalSteps,
 } from "../../../redux/reducer/webProposal/stepper";
 import { selectQuoteModel } from "../../../redux/reducer/webProposal";
-import { selectSelectedServiceIDs } from "../../../redux/reducer/webProposal/services";
+import {
+  selectSelectedServiceIDs,
+  setServicesSelectionError,
+} from "../../../redux/reducer/webProposal/services";
 import {
   getAdditionalInformationList,
+  getAdditionalInformationFieldErrors,
+  selectAdditionalInformationList,
   selectHasAdditionalInformation,
+  setAdditionalInformationValidationVisible,
 } from "../../../redux/reducer/webProposal/additionalInformation";
 import { Services } from "../steps/ProposalServicesStep/data/data";
-
-const BASE_STEP_LABELS = [
-  "Proposal",
-  "Input Fields",
-  "Services",
-  "Pricing Table",
-  "Preview",
-  "Sign",
-];
-const SERVICES_STEP_INDEX = 2;
 
 export default function ProposalAmendment({ theme, proposal, services }) {
   const dispatch = useDispatch();
@@ -36,30 +32,68 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const quoteModel = useSelector(selectQuoteModel);
   const selectedServiceIDs = useSelector(selectSelectedServiceIDs);
   const hasAdditionalInformation = useSelector(selectHasAdditionalInformation);
+  const additionalInformationList = useSelector(selectAdditionalInformationList);
 
-  const stepLabels = hasAdditionalInformation
-    ? [
-        ...BASE_STEP_LABELS.slice(0, SERVICES_STEP_INDEX + 1),
-        "Additional Information",
-        ...BASE_STEP_LABELS.slice(SERVICES_STEP_INDEX + 1),
-      ]
-    : BASE_STEP_LABELS;
-
-  const stepComponents = [
-    <ProposalPdfStep theme={theme} />,
-    <ProposalInputFieldsStep theme={theme} />,
-    // <ProposalBasicInformationStep theme={theme} />,
-    <ProposalServicesStep theme={theme} Services={Services} />,
-    ...(hasAdditionalInformation
-      ? [<ProposalAdditionalInformationStep theme={theme} />]
-      : []),
-    // <ProposalPricingTableStep theme={theme} />,
-    // <ProposalPreviewStep theme={theme} />,
-    // <ProposalSignStep theme={theme} />,
+  // Single source of truth pairing each step's label with its component, so
+  // the two can never drift out of sync (steps not yet built get a `null`
+  // component but still reserve their place in the flow).
+  const baseSteps = [
+    { label: "Proposal", component: <ProposalPdfStep theme={theme} /> },
+    {
+      label: "Services",
+      component: <ProposalServicesStep theme={theme} Services={Services} />,
+    },
+    { label: "Pricing Table", component: null },
+    { label: "Preview", component: null },
+    {
+      label: "Input Fields",
+      component: <ProposalInputFieldsStep theme={theme} />,
+    },
+    { label: "Sign", component: null },
   ];
+  const SERVICES_STEP_INDEX = baseSteps.findIndex(
+    (step) => step.label === "Services",
+  );
+
+  const steps = hasAdditionalInformation
+    ? [
+        ...baseSteps.slice(0, SERVICES_STEP_INDEX + 1),
+        {
+          label: "Additional Information",
+          component: <ProposalAdditionalInformationStep theme={theme} />,
+        },
+        ...baseSteps.slice(SERVICES_STEP_INDEX + 1),
+      ]
+    : baseSteps;
+
+  const stepLabels = steps.map((step) => step.label);
+  const stepComponents = steps.map((step) => step.component);
+
+  const ADDITIONAL_INFO_STEP_INDEX = SERVICES_STEP_INDEX + 1;
 
   const handleBeforeNextStep = async (currentStepIndex) => {
+    if (
+      hasAdditionalInformation &&
+      currentStepIndex === ADDITIONAL_INFO_STEP_INDEX
+    ) {
+      const fieldErrors = getAdditionalInformationFieldErrors(
+        additionalInformationList,
+      );
+      if (Object.keys(fieldErrors).length > 0) {
+        dispatch(setAdditionalInformationValidationVisible(true));
+        return false;
+      }
+      dispatch(setAdditionalInformationValidationVisible(false));
+      return true;
+    }
+
     if (currentStepIndex !== SERVICES_STEP_INDEX) return true;
+
+    if (selectedServiceIDs.length === 0) {
+      dispatch(setServicesSelectionError(true));
+      return false;
+    }
+    dispatch(setServicesSelectionError(false));
 
     let list = [];
     try {
@@ -78,7 +112,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     }
 
     dispatch(
-      updateTotalSteps(BASE_STEP_LABELS.length + (list.length > 0 ? 1 : 0)),
+      updateTotalSteps(baseSteps.length + (list.length > 0 ? 1 : 0)),
     );
 
     return true;

@@ -2,7 +2,10 @@ import reducer from "./servicesSlice";
 
 export { getRecurringServices, getOneOffServices } from "./servicesThunk";
 
-export { setSelectedServiceIDs } from "./servicesSlice";
+export {
+  setSelectedServiceIDs,
+  setServicesSelectionError,
+} from "./servicesSlice";
 
 export {
   selectRecurringServices,
@@ -12,6 +15,7 @@ export {
   selectOneOffServicesLoading,
   selectOneOffServicesError,
   selectSelectedServiceIDs,
+  selectServicesSelectionError,
 } from "./servicesSelectors";
 
 export default reducer;

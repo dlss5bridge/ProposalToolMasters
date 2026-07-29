@@ -33,6 +33,17 @@
   padding:10px 5px
 }
 
+.pss-selection-error {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #dc2626;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  margin: 5px 0 0.75rem;
+}
+
 /* List columns (Recurring / One-off) */
 
 .pss-list-heading {
@@ -247,6 +258,11 @@
   font-weight: 500;
   color: #4b5563;
   margin-bottom: 0.25rem;
+}
+
+.pss-field-required-mark {
+  color: #dc2626;
+  margin-left: 0.125rem;
 }
 
 .pss-field-input {

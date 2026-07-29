@@ -5,10 +5,16 @@ import {
   updateTotalSteps,
 } from "../../../redux/reducer/webProposal/stepper";
 import { selectQuoteModel } from "../../../redux/reducer/webProposal";
-import { selectSelectedServiceIDs } from "../../../redux/reducer/webProposal/services";
+import {
+  selectSelectedServiceIDs,
+  setServicesSelectionError,
+} from "../../../redux/reducer/webProposal/services";
 import {
   getAdditionalInformationList,
+  getAdditionalInformationFieldErrors,
+  selectAdditionalInformationList,
   selectHasAdditionalInformation,
+  setAdditionalInformationValidationVisible,
 } from "../../../redux/reducer/webProposal/additionalInformation";
 import ProposalLayout from "../layout/ProposalLayout";
 import ProposalHeader from "../layout/ProposalHeader";
@@ -38,6 +44,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
   const quoteModel = useSelector(selectQuoteModel);
   const selectedServiceIDs = useSelector(selectSelectedServiceIDs);
   const hasAdditionalInformation = useSelector(selectHasAdditionalInformation);
+  const additionalInformationList = useSelector(selectAdditionalInformationList);
 
   const baseStepLabels = BASE_STEP_LABELS;
   const stepLabels = hasAdditionalInformation
@@ -61,8 +68,31 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     // <ProposalSignStep theme={theme} />,
   ];
 
+  const ADDITIONAL_INFO_STEP_INDEX = SERVICES_STEP_INDEX + 1;
+
   const handleBeforeNextStep = async (currentStepIndex) => {
+    if (
+      hasAdditionalInformation &&
+      currentStepIndex === ADDITIONAL_INFO_STEP_INDEX
+    ) {
+      const fieldErrors = getAdditionalInformationFieldErrors(
+        additionalInformationList,
+      );
+      if (Object.keys(fieldErrors).length > 0) {
+        dispatch(setAdditionalInformationValidationVisible(true));
+        return false;
+      }
+      dispatch(setAdditionalInformationValidationVisible(false));
+      return true;
+    }
+
     if (currentStepIndex !== SERVICES_STEP_INDEX) return true;
+
+    if (selectedServiceIDs.length === 0) {
+      dispatch(setServicesSelectionError(true));
+      return false;
+    }
+    dispatch(setServicesSelectionError(false));
 
     let list = [];
     try {

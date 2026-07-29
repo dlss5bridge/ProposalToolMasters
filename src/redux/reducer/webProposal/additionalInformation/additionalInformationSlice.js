@@ -5,6 +5,7 @@ const initialState = {
   list: [],
   listLoading: false,
   listError: null,
+  validationVisible: false,
 };
 
 const additionalInformationSlice = createSlice({
@@ -14,9 +15,13 @@ const additionalInformationSlice = createSlice({
     setAdditionalInformationList(state, action) {
       state.list = action.payload || [];
     },
+    setAdditionalInformationValidationVisible(state, action) {
+      state.validationVisible = action.payload;
+    },
     clearAdditionalInformationList(state) {
       state.list = [];
       state.listError = null;
+      state.validationVisible = false;
     },
   },
   extraReducers: (builder) => {
@@ -37,7 +42,10 @@ const additionalInformationSlice = createSlice({
   },
 });
 
-export const { setAdditionalInformationList, clearAdditionalInformationList } =
-  additionalInformationSlice.actions;
+export const {
+  setAdditionalInformationList,
+  setAdditionalInformationValidationVisible,
+  clearAdditionalInformationList,
+} = additionalInformationSlice.actions;
 
 export default additionalInformationSlice.reducer;

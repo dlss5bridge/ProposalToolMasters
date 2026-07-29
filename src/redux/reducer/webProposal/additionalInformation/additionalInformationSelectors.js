@@ -9,3 +9,6 @@ export const selectAdditionalInformationListError = (state) =>
 
 export const selectHasAdditionalInformation = (state) =>
   state.webProposalAdditionalInformation.list.length > 0;
+
+export const selectAdditionalInformationValidationVisible = (state) =>
+  state.webProposalAdditionalInformation.validationVisible;
