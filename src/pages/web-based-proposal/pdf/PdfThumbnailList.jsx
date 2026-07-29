@@ -22,7 +22,10 @@ export default function PdfThumbnailList({ theme }) {
         borderColor: theme.border,
       }}
     >
-      <h3 className="mb-3 text-sm font-semibold" style={{ color: theme.text }}>
+      <h3
+        className="mb-3 text-sm font-semibold"
+        style={{ color: theme.textPrimary }}
+      >
         Pages
       </h3>
 
@@ -54,7 +57,7 @@ export default function PdfThumbnailList({ theme }) {
               <p
                 className="mt-2 text-center text-xs font-medium"
                 style={{
-                  color: selected ? theme.primary : theme.textLight,
+                  color: selected ? theme.primary : theme.textSecondary,
                 }}
               >
                 Page {page}

@@ -1,53 +1,18 @@
-import { useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
 import ProposalAmendment from "./proposalTypes/ProposalAmendment";
 import StandardProposalWithInputs from "./proposalTypes/ProposalInputForm";
 import StandardProposal from "./proposalTypes/StandardProposal";
+import { getProposalTheme } from "./theme/proposalTheme";
+import "./theme/proposalTheme.css";
 import {
   getQuoteModel,
   selectQuoteModel,
   selectQuoteModelLoading,
   selectQuoteModelError,
 } from "../../redux/reducer/webProposal";
-
-export const proposalTheme = {
-  // Layout
-  background: "#F8FAFC",
-  surface: "#FFFFFF",
-  border: "#E2E8F0",
-
-  // Brand
-  primary: "#00BFFF",
-  secondary: "#00192D",
-
-  // Header/Footer
-  headerBackground: "#00192D",
-  headerText: "#FFFFFF",
-
-  footerBackground: "#00192D",
-  footerText: "#FFFFFF",
-
-  // Sidebar
-  sidebarBackground: "#FFFFFF",
-  sidebarBorder: "#E2E8F0",
-
-  // Text
-  textPrimary: "#1E293B",
-  textSecondary: "#64748B",
-
-  // Buttons
-  primaryButtonBackground: "#00BFFF",
-  primaryButtonText: "#FFFFFF",
-
-  secondaryButtonBackground: "#FFFFFF",
-  secondaryButtonBorder: "#CBD5E1",
-  secondaryButtonText: "#00192D",
-
-  // PDF
-  pdfBackground: "#EEF2F7",
-};
 
 const WEB_PROPOSAL_TYPE_ID = {
   STANDARD: 1,
@@ -63,6 +28,10 @@ export default function WebBasedProposal() {
   const quoteModel = useSelector(selectQuoteModel);
   const loading = useSelector(selectQuoteModelLoading);
   const error = useSelector(selectQuoteModelError);
+
+  // Uses quoteModel.brandColor (from GetQuoteModel) when present, otherwise
+  // falls back to the default theme.
+  const theme = useMemo(() => getProposalTheme(quoteModel), [quoteModel]);
 
   useEffect(() => {
     if (quoteKeyID) {
@@ -88,7 +57,7 @@ export default function WebBasedProposal() {
 
     showSidebar: false,
 
-    theme: proposalTheme,
+    theme,
   };
 
   switch (quoteModel.webProposalTypeID || 3) {

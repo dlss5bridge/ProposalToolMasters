@@ -1,0 +1,38 @@
+/*
+ * Fallback CSS variable values for the web-based-proposal theme.
+ * ProposalLayout sets these same variables inline from the resolved theme
+ * (default, or derived from GetQuoteModel's brandColor) so descendant CSS
+ * files can read colors via var(--wp-*). These :root values only apply
+ * before that inline override is present.
+ */
+:root {
+  --wp-background: #f8fafc;
+  --wp-surface: #ffffff;
+  --wp-border: #e2e8f0;
+
+  --wp-primary: #00bfff;
+  --wp-secondary: #00192d;
+
+  --wp-header-bg: #00192d;
+  --wp-header-text: #ffffff;
+
+  --wp-footer-bg: #00192d;
+  --wp-footer-text: #ffffff;
+
+  --wp-sidebar-bg: #ffffff;
+  --wp-sidebar-border: #e2e8f0;
+
+  --wp-text-primary: #1e293b;
+  --wp-text-secondary: #64748b;
+
+  --wp-primary-btn-bg: #00bfff;
+  --wp-primary-btn-text: #ffffff;
+
+  --wp-secondary-btn-bg: #ffffff;
+  --wp-secondary-btn-border: #cbd5e1;
+  --wp-secondary-btn-text: #00192d;
+
+  --wp-pdf-bg: #eef2f7;
+
+  --wp-completed-step-bg: #10b981;
+}
