@@ -55,7 +55,14 @@ export default function ProposalAmendment({ theme, proposal, services }) {
             backgroundColor: theme.background,
           }}
         >
-          {stepComponents[activeStep]}
+          {stepComponents.map((component, index) => (
+            <div
+              key={index}
+              className={index === activeStep ? "contents" : "hidden"}
+            >
+              {component}
+            </div>
+          ))}
         </main>
       </div>
 

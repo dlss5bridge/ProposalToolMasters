@@ -58,7 +58,14 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
             backgroundColor: theme.background,
           }}
         >
-          {stepComponents[activeStep]}
+          {stepComponents.map((component, index) => (
+            <div
+              key={index}
+              className={index === activeStep ? "contents" : "hidden"}
+            >
+              {component}
+            </div>
+          ))}
         </main>
       </div>
 
