@@ -36,7 +36,7 @@ import {
 import Utils from "../../../Middleware/Utils";
 function Modal(props) {
   //A] Declare State
-  const moduleName = "Global Pricing Driver";
+  const moduleName = props.modelRequestData?.addedFor === "GlobalProspect" ? "Global Prospect Variable" : "Global Pricing Driver";
   const modalRef = useRef(null);
   const [Status, setStatus] = React.useState(false);
   const [gdrivererror, setGdriverError] = useState(false);
@@ -240,6 +240,22 @@ function Modal(props) {
     });
     setDriverTypeValue1("");
     setVariations([]);
+    setDates([]);
+    setTextDriver({
+      textKeyID: null,
+      textLength: null,
+      textValue: null,
+      allowedSpecialCharacters: "",
+    }
+  );
+    setQuantity([
+    {
+      quantityKeyID: null,
+      quantityDecimalPlaces: 0,
+      quantityFrom: null,
+      quantityTo: null,
+    },
+    ]);
     setErrorMessage("");
     setGdriverError(false);
     setVariationError({
@@ -3092,7 +3108,7 @@ function Modal(props) {
                           <input
                             className="input-text"
                             type="text"
-                            value={quantity[0].quantityFrom || ""}
+                            value={quantity[0]?.quantityFrom || ""}
                             onChange={(e) => {
                               const decimalPlaces =
                                 quantity[0]?.quantityDecimalPlaces ?? 0;
@@ -3213,7 +3229,7 @@ function Modal(props) {
                   {qtyError.quantityError &&
                     quantity[0].quantityFrom !== "" &&
                     quantity[0].quantityTo !== "" &&
-                    Number(quantity[0].quantityTo) <
+                    Number(quantity[0].quantityTo) <=
                       Number(quantity[0].quantityFrom) && (
                       <label className="text-danger text-center">
                         Invalid Range

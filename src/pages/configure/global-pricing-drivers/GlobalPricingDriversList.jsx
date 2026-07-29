@@ -404,6 +404,10 @@ function Predefined_Global_Pricing_Drivers() {
   const TabHandle = async (tab) => {
     if (tab === "GlobalPricingDriver") {
       setActiveTab(tab);
+      setModelRequestData({
+        ...modelRequestData,
+        addedFor: null
+      })
       if (common.organisationKeyID !== null) {
         GetGlobalPricingDriverListData(1, null, null, null);
       }
@@ -497,6 +501,7 @@ function Predefined_Global_Pricing_Drivers() {
                                   <b>Global Pricing Drivers{" "}</b>
                                 </a>
                               </li>
+                              {common.organisationKeyID !== null && 
                                <li className="nav-item">
                                   <a
                                     className={`nav-link tab_nav ${
@@ -517,29 +522,31 @@ function Predefined_Global_Pricing_Drivers() {
                                     <b>Global Prospect Variables{" "}</b>
                                   </a>
                                 </li>
+                              }
                         </ul>
             </div>
                 </div>
                 <div className="col-auto ms-auto">
                   <div className="d-flex justify-content-sm-end add-new-letter">
-                    {((userAccessData.Admin_Config_Global_Driver_CanAdd &&
-                      common.organisationKeyID !== null) ||
-                      (userAccessData.SuperAdmin_Config_Global_Driver_CanAdd &&
-                        common.organisationKeyID === null)) && (
-                        <CommonButtonComponent
-                          title={getCrudButtonToolTipName("Add",
-                            activeTab === "GlobalProspectDriver"
-                              ? moduleNameGlobalProspect : moduleName)}
-                          dataBsTarget="#GlobalPricingModel"
-                          data_bs_toggle="modal"
-                          AddBtn={() => {
-                            GlobalPricingDriverAddBtnClicked();
-                          }}
-                          name={getCrudButtonTextName("Add",
-                            activeTab === "GlobalProspectDriver"
-                              ? moduleNameGlobalProspect : moduleName)}
-                        />
-                      )}
+                    {(common.organisationKeyID !== null
+                      ? userAccessData.Admin_Config_Global_Driver_CanAdd
+                      : userAccessData.SuperAdmin_Config_Global_Driver_CanAdd) && (
+                      <CommonButtonComponent
+                        title={getCrudButtonToolTipName(
+                          "Add",
+                          activeTab === "GlobalProspectDriver" ? moduleNameGlobalProspect : moduleName
+                        )}
+                        dataBsTarget="#GlobalPricingModel"
+                        data_bs_toggle="modal"
+                        AddBtn={() => {
+                          GlobalPricingDriverAddBtnClicked();
+                        }}
+                        name={getCrudButtonTextName(
+                          "Add",
+                          activeTab === "GlobalProspectDriver" ? moduleNameGlobalProspect : moduleName
+                        )}
+                      />
+                    )}
                   </div>
                 </div>
                 </div>
