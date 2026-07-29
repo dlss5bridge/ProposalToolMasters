@@ -2,6 +2,7 @@ import reducer from "./stepperSlice";
 
 export {
   initializeStepper,
+  updateTotalSteps,
   nextStep,
   previousStep,
   goToStep,

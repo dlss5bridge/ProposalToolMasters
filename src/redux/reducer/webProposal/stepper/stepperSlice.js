@@ -18,6 +18,14 @@ const stepperSlice = createSlice({
       state.maxVisitedStep = 0;
     },
 
+    // Used when the step count changes after the stepper is already in
+    // progress (e.g. an "Additional Information" step is inserted once the
+    // selected services are known) — unlike initializeStepper, this must not
+    // reset activeStep/maxVisitedStep.
+    updateTotalSteps(state, action) {
+      state.totalSteps = action.payload;
+    },
+
     nextStep(state) {
       if (state.activeStep < state.totalSteps - 1) {
         state.activeStep++;
@@ -51,6 +59,7 @@ const stepperSlice = createSlice({
 
 export const {
   initializeStepper,
+  updateTotalSteps,
   nextStep,
   previousStep,
   goToStep,

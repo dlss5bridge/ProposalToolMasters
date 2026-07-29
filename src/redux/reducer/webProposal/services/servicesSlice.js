@@ -9,12 +9,18 @@ const initialState = {
   oneOffServices: [],
   oneOffServicesLoading: false,
   oneOffServicesError: null,
+
+  selectedServiceIDs: [],
 };
 
 const servicesSlice = createSlice({
   name: "webProposalServices",
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedServiceIDs(state, action) {
+      state.selectedServiceIDs = action.payload || [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getRecurringServices.pending, (state) => {
@@ -43,5 +49,7 @@ const servicesSlice = createSlice({
       });
   },
 });
+
+export const { setSelectedServiceIDs } = servicesSlice.actions;
 
 export default servicesSlice.reducer;

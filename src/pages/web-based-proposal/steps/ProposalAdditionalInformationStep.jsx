@@ -1,0 +1,190 @@
+import { Box, Card, CardContent, Typography } from "@mui/material";
+import Select from "react-select";
+import { useDispatch, useSelector } from "react-redux";
+
+import {
+  selectAdditionalInformationList,
+  setAdditionalInformationList,
+} from "../../../redux/reducer/webProposal/additionalInformation";
+
+// driverTypeID: 2 = quantity (number), 3 = variation (select), 4 = slab (select),
+// 5 = free text, 6 = date
+const updateItem = (list, globalPricingDriverID, patch) =>
+  list.map((item) =>
+    item.globalPricingDriverID === globalPricingDriverID
+      ? { ...item, ...patch }
+      : item,
+  );
+
+export default function ProposalAdditionalInformationStep({ theme }) {
+  const dispatch = useDispatch();
+  const additionalInformationList = useSelector(
+    selectAdditionalInformationList,
+  );
+
+  const visibleItems = (additionalInformationList || []).filter(
+    (item) => item.driverTypeID !== 1 && item.driverVisibility !== false,
+  );
+
+  const handleChange = (globalPricingDriverID, patch) => {
+    dispatch(
+      setAdditionalInformationList(
+        updateItem(additionalInformationList, globalPricingDriverID, patch),
+      ),
+    );
+  };
+
+  const renderField = (item) => {
+    if (item.driverTypeID === 2) {
+      const quantity = item.quantity?.[0];
+
+      return (
+        <input
+          type="number"
+          value={item.driverValue ?? ""}
+          min={quantity?.quantityFrom ?? undefined}
+          max={quantity?.quantityTo ?? undefined}
+          onChange={(e) =>
+            handleChange(item.globalPricingDriverID, {
+              driverValue: e.target.value,
+            })
+          }
+          placeholder={`Enter ${item.driverName}`}
+          className="w-full rounded-lg border px-3 py-2 text-sm"
+          style={{ borderColor: theme.border }}
+        />
+      );
+    }
+
+    if (item.driverTypeID === 3 || item.driverTypeID === 4) {
+      const isSlab = item.driverTypeID === 4;
+      const source = isSlab ? item.slab : item.variation;
+      const options = (source || []).map((option) => ({
+        value: isSlab ? option.slabID : option.variationID,
+        label: isSlab
+          ? `${option.slabFrom} - ${option.slabTo}`
+          : option.variationName,
+      }));
+      const selected =
+        options.find((option) =>
+          isSlab
+            ? source.find((o) => o.slabID === option.value)?.isDefault
+            : source.find((o) => o.variationID === option.value)?.isDefault,
+        ) || null;
+
+      return (
+        <Select
+          options={options}
+          value={selected}
+          onChange={(option) => {
+            const updatedSource = (source || []).map((o) => ({
+              ...o,
+              isDefault: isSlab
+                ? o.slabID === option?.value
+                : o.variationID === option?.value,
+            }));
+
+            handleChange(item.globalPricingDriverID, {
+              [isSlab ? "slab" : "variation"]: updatedSource,
+              driverValue: option?.value ?? null,
+            });
+          }}
+          menuPortalTarget={document.body}
+          placeholder={`Select ${item.driverName}`}
+        />
+      );
+    }
+
+    if (item.driverTypeID === 5) {
+      const textBlock = item.text?.[0] ?? {};
+
+      return (
+        <input
+          type="text"
+          value={item.enteredText ?? ""}
+          maxLength={textBlock.textLength || 100}
+          onChange={(e) =>
+            handleChange(item.globalPricingDriverID, {
+              enteredText: e.target.value,
+            })
+          }
+          placeholder={`Enter ${item.driverName}`}
+          className="w-full rounded-lg border px-3 py-2 text-sm"
+          style={{ borderColor: theme.border }}
+        />
+      );
+    }
+
+    if (item.driverTypeID === 6) {
+      return (
+        <input
+          type="date"
+          value={item.enteredDate ?? ""}
+          onChange={(e) =>
+            handleChange(item.globalPricingDriverID, {
+              enteredDate: e.target.value,
+            })
+          }
+          className="w-full rounded-lg border px-3 py-2 text-sm"
+          style={{ borderColor: theme.border }}
+        />
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <Box className="h-full overflow-auto bg-white p-2 lg:p-4">
+      <Card
+        elevation={0}
+        className="rounded-2xl"
+        sx={{
+          width: { xs: "100%", sm: "100%", md: "78%", lg: "58%", xl: "50%" },
+          border: `1px solid ${theme.border}`,
+          boxShadow: "0 12px 30px rgba(15,23,42,.06)",
+        }}
+      >
+        <CardContent className="!p-8">
+          <div className="mb-8">
+            <Typography
+              variant="h5"
+              sx={{ fontWeight: 700, color: theme.textPrimary }}
+            >
+              Additional Information
+            </Typography>
+            <Typography
+              sx={{ mt: 0.5, fontSize: 14, color: theme.textSecondary }}
+            >
+              Provide the additional details required for the selected
+              services.
+            </Typography>
+          </div>
+
+          <div className="flex flex-col gap-5">
+            {visibleItems.map((item) => (
+              <div
+                key={item.globalPricingDriverID}
+                className="flex flex-col gap-2"
+              >
+                <Typography
+                  sx={{ fontSize: 13, fontWeight: 600, color: theme.textPrimary }}
+                >
+                  {item.driverName}
+                </Typography>
+
+                {renderField(item)}
+              </div>
+            ))}
+
+            {visibleItems.length === 0 && (
+              <Typography sx={{ fontSize: 14, color: theme.textSecondary }}>
+                No additional information required.
+              </Typography>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </Box>
+  );
+}

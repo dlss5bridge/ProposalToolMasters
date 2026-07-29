@@ -21,6 +21,7 @@ import {
   selectOneOffServices,
   selectOneOffServicesLoading,
   selectOneOffServicesError,
+  setSelectedServiceIDs,
 } from "../../../../redux/reducer/webProposal/services";
 import "./ProposalServicesStep.css";
 import { selectQuoteModel } from "../../../../redux/reducer/webProposal";
@@ -517,6 +518,15 @@ const ServiceSelectionComponent = () => {
     () => Object.values(oneOffSelections).sort((a, b) => a.order - b.order),
     [oneOffSelections],
   );
+
+  useEffect(() => {
+    dispatch(
+      setSelectedServiceIDs([
+        ...recurringSelectedList.map((selection) => selection.serviceID),
+        ...oneOffSelectedList.map((selection) => selection.serviceID),
+      ]),
+    );
+  }, [dispatch, recurringSelectedList, oneOffSelectedList]);
 
   const renderRecurringPanel = ({
     categories,

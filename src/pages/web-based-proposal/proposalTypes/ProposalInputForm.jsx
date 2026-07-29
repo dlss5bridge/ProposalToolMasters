@@ -1,6 +1,15 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { selectActiveStep } from "../../../redux/reducer/webProposal/stepper";
+import {
+  selectActiveStep,
+  updateTotalSteps,
+} from "../../../redux/reducer/webProposal/stepper";
+import { selectQuoteModel } from "../../../redux/reducer/webProposal";
+import { selectSelectedServiceIDs } from "../../../redux/reducer/webProposal/services";
+import {
+  getAdditionalInformationList,
+  selectHasAdditionalInformation,
+} from "../../../redux/reducer/webProposal/additionalInformation";
 import ProposalLayout from "../layout/ProposalLayout";
 import ProposalHeader from "../layout/ProposalHeader";
 import ProposalFooter from "../layout/ProposalFooter";
@@ -11,19 +20,72 @@ import ProposalPdfStep from "../steps/ProposalPdfStep";
 import ProposalInputFieldsStep from "../steps/ProposalInputFieldsStep";
 import ProposalBasicInformationStep from "../steps/ProposalBasicInformationStep";
 import ProposalServicesStep from "../steps/ProposalServicesStep";
+import ProposalAdditionalInformationStep from "../steps/ProposalAdditionalInformationStep";
+
+const BASE_STEP_LABELS = [
+  "Proposal",
+  "Input Fields",
+  "Services",
+  "Pricing Table",
+  "Preview",
+  "Sign",
+];
+const SERVICES_STEP_INDEX = 2;
 
 export default function StandardProposalWithInputs({ proposal, theme }) {
+  const dispatch = useDispatch();
   const activeStep = useSelector(selectActiveStep);
+  const quoteModel = useSelector(selectQuoteModel);
+  const selectedServiceIDs = useSelector(selectSelectedServiceIDs);
+  const hasAdditionalInformation = useSelector(selectHasAdditionalInformation);
+
+  const baseStepLabels = BASE_STEP_LABELS;
+  const stepLabels = hasAdditionalInformation
+    ? [
+        ...baseStepLabels.slice(0, SERVICES_STEP_INDEX + 1),
+        "Additional Information",
+        ...baseStepLabels.slice(SERVICES_STEP_INDEX + 1),
+      ]
+    : baseStepLabels;
 
   const stepComponents = [
     <ProposalPdfStep theme={theme} />,
     <ProposalInputFieldsStep theme={theme} />,
     // <ProposalBasicInformationStep theme={theme} />,
     <ProposalServicesStep theme={theme} />,
+    ...(hasAdditionalInformation
+      ? [<ProposalAdditionalInformationStep theme={theme} />]
+      : []),
     // <ProposalPricingTableStep theme={theme} />,
     // <ProposalPreviewStep theme={theme} />,
     // <ProposalSignStep theme={theme} />,
   ];
+
+  const handleBeforeNextStep = async (currentStepIndex) => {
+    if (currentStepIndex !== SERVICES_STEP_INDEX) return true;
+
+    let list = [];
+    try {
+      list = await dispatch(
+        getAdditionalInformationList({
+          organisationKeyID: quoteModel?.organisationKeyID,
+          userKeyID: quoteModel?.userKeyID,
+          quoteKeyID: quoteModel?.quoteKeyID,
+          clientID: quoteModel?.clientID,
+          servicesIDs: selectedServiceIDs,
+        }),
+      ).unwrap();
+    } catch (err) {
+      // Proceed without the Additional Information step if the lookup fails.
+      list = [];
+    }
+
+    dispatch(
+      updateTotalSteps(baseStepLabels.length + (list.length > 0 ? 1 : 0)),
+    );
+
+    return true;
+  };
 
   return (
     <ProposalLayout theme={theme}>
@@ -70,7 +132,11 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       </div>
 
       <ProposalFooter theme={theme}>
-        <ProposalStepper theme={theme} steps={proposal.steps} />
+        <ProposalStepper
+          theme={theme}
+          steps={stepLabels}
+          onNext={handleBeforeNextStep}
+        />
       </ProposalFooter>
     </ProposalLayout>
   );

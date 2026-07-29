@@ -5,3 +5,5 @@ export const selectRecurringServicesError = (state) => state.webProposalServices
 export const selectOneOffServices = (state) => state.webProposalServices.oneOffServices;
 export const selectOneOffServicesLoading = (state) => state.webProposalServices.oneOffServicesLoading;
 export const selectOneOffServicesError = (state) => state.webProposalServices.oneOffServicesError;
+
+export const selectSelectedServiceIDs = (state) => state.webProposalServices.selectedServiceIDs;

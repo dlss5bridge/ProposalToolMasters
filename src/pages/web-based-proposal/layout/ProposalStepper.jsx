@@ -1,8 +1,9 @@
-import { useEffect } from "react";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   initializeStepper,
+  updateTotalSteps,
   selectActiveStep,
   selectMaxVisitedStep,
   selectTotalSteps,
@@ -13,15 +14,27 @@ import {
   handlePreviousStep,
 } from "../../../redux/reducer/webProposal/stepper/stepperThunk";
 
-export default function ProposalStepper({ theme, steps = [] }) {
+// `onNext`, if provided, is called with the current step index before the
+// stepper advances. It may run async work (e.g. fetching data that decides
+// whether a step should be inserted) and return `false` to block advancing.
+export default function ProposalStepper({ theme, steps = [], onNext }) {
   const dispatch = useDispatch();
 
   const activeStep = useSelector(selectActiveStep);
   const maxVisitedStep = useSelector(selectMaxVisitedStep);
   const totalSteps = useSelector(selectTotalSteps);
+  const isInitialized = useRef(false);
+  const [isAdvancing, setIsAdvancing] = useState(false);
 
   useEffect(() => {
-    dispatch(initializeStepper(steps.length));
+    if (!isInitialized.current) {
+      dispatch(initializeStepper(steps.length));
+      isInitialized.current = true;
+    } else {
+      // The step count can change later on (e.g. an "Additional Information"
+      // step gets inserted) — this must not reset activeStep/maxVisitedStep.
+      dispatch(updateTotalSteps(steps.length));
+    }
   }, [dispatch, steps.length]);
 
   const isFirstStep = activeStep === 0;
@@ -31,6 +44,20 @@ export default function ProposalStepper({ theme, steps = [] }) {
     if (index <= maxVisitedStep) {
       dispatch(handleGoToStep(index));
     }
+  };
+
+  const handleNext = async () => {
+    if (onNext) {
+      setIsAdvancing(true);
+      let canProceed;
+      try {
+        canProceed = await onNext(activeStep);
+      } finally {
+        setIsAdvancing(false);
+      }
+      if (canProceed === false) return;
+    }
+    dispatch(handleNextStep());
   };
 
   return (
@@ -142,16 +169,21 @@ export default function ProposalStepper({ theme, steps = [] }) {
 
       {/* Next Button */}
       <button
-        onClick={() => dispatch(handleNextStep())}
-        disabled={isLastStep}
+        onClick={handleNext}
+        disabled={isLastStep || isAdvancing}
         className="flex h-9 items-center justify-center gap-1 rounded-md text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-40"
         style={{
           backgroundColor: theme.primary,
         }}
       >
-        {isLastStep ? "Finish" : "Next"}
-
-        {!isLastStep && <ChevronRight size={16} />}
+        {isAdvancing ? (
+          <Loader2 size={16} className="animate-spin" />
+        ) : (
+          <>
+            {isLastStep ? "Finish" : "Next"}
+            {!isLastStep && <ChevronRight size={16} />}
+          </>
+        )}
       </button>
     </div>
   );
