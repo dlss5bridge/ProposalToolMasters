@@ -8,6 +8,7 @@ const RecurringServices = ({
   onToggleExpand,
   onToggleService,
   onDriverChange,
+  fieldErrors,
 }) => {
   return (
     <div>
@@ -25,6 +26,7 @@ const RecurringServices = ({
             onToggleExpand={() => onToggleExpand(category.serviceCatID)}
             onToggleService={onToggleService}
             onDriverChange={onDriverChange}
+            fieldErrors={fieldErrors}
           />
         ))}
 

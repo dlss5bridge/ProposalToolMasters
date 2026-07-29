@@ -1,7 +1,7 @@
 import Select from "react-select";
 
 // driverTypeID: 2 = quantity (number input), 3 = variation (select), 4 = slab (select)
-const PricingDriverField = ({ driver, entry, onChange }) => {
+const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
   if (driver.driverTypeID === 2) {
     const quantity = driver.quantity?.[0];
 
@@ -15,8 +15,9 @@ const PricingDriverField = ({ driver, entry, onChange }) => {
           max={quantity?.quantityTo || undefined}
           onChange={(e) => onChange({ value: e.target.value })}
           placeholder={`Enter ${driver.driverName}`}
-          className="pss-field-input"
+          className={`pss-field-input${errorMessage ? " pss-field-input--error" : ""}`}
         />
+        {errorMessage && <p className="pss-field-error">{errorMessage}</p>}
       </div>
     );
   }
@@ -47,7 +48,14 @@ const PricingDriverField = ({ driver, entry, onChange }) => {
           }
           menuPortalTarget={document.body}
           placeholder={`Select ${driver.driverName}`}
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderColor: errorMessage ? "#f87171" : base.borderColor,
+            }),
+          }}
         />
+        {errorMessage && <p className="pss-field-error">{errorMessage}</p>}
       </div>
     );
   }

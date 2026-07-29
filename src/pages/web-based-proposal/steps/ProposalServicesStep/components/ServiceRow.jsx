@@ -6,6 +6,7 @@ const ServiceRow = ({
   isSelected,
   disabledReason,
   driverValues,
+  fieldErrors,
   onToggle,
   onDriverChange,
 }) => {
@@ -53,6 +54,7 @@ const ServiceRow = ({
               key={driver.globalPricingDriverID}
               driver={driver}
               entry={driverValues?.[driver.globalPricingDriverID]}
+              errorMessage={fieldErrors?.[driver.globalPricingDriverID]}
               onChange={(patch) =>
                 onDriverChange(driver.globalPricingDriverID, patch)
               }

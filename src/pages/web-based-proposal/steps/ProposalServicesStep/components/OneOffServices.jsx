@@ -8,6 +8,7 @@ const OneOffServices = ({
   onToggleExpand,
   onToggleService,
   onDriverChange,
+  fieldErrors,
 }) => {
   return (
     <div>
@@ -25,6 +26,7 @@ const OneOffServices = ({
             onToggleExpand={() => onToggleExpand(category.serviceCatID)}
             onToggleService={onToggleService}
             onDriverChange={onDriverChange}
+            fieldErrors={fieldErrors}
           />
         ))}
 

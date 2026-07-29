@@ -263,6 +263,16 @@
   box-shadow: 0 0 0 2px #dbeafe;
 }
 
+.pss-field-input--error {
+  border-color: #f87171;
+}
+
+.pss-field-error {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin: 0.25rem 0 0;
+}
+
 /* Selected services sidebar */
 
 .pss-add-service-btn {
@@ -357,6 +367,42 @@
   .pss-modal-columns {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+.pss-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.pss-modal-footer-count {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.pss-modal-submit-btn {
+  background-color: #111827;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.pss-modal-submit-btn:hover:not(:disabled) {
+  background-color: #000;
+}
+
+.pss-modal-submit-btn:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
 }
 
 .pss-sidebar-inner {

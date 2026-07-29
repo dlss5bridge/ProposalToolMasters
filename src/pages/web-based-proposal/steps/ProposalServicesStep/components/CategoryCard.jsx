@@ -11,6 +11,7 @@ const CategoryCard = ({
   onToggleExpand,
   onToggleService,
   onDriverChange,
+  fieldErrors,
 }) => {
   const Icon = getCategoryIcon(category.serviceCatName);
   const selectedCount = category.servicesList.filter((service) => selections[service.serviceID]).length;
@@ -56,6 +57,7 @@ const CategoryCard = ({
                 isSelected={isSelected}
                 disabledReason={disabledReason}
                 driverValues={selections[service.serviceID]?.driverValues}
+                fieldErrors={fieldErrors?.[service.serviceID]}
                 onToggle={() => !disabledReason && onToggleService(category, service)}
                 onDriverChange={(globalPricingDriverID, patch) =>
                   onDriverChange(service.serviceID, globalPricingDriverID, patch)

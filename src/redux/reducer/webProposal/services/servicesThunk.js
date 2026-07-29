@@ -18,6 +18,7 @@ const buildServicesPayload = (
   userKeyID: "af735c9a-bb05-481a-866f-4bcc1a325a41", //fetch from the url
   moduleKeyID: "2aa8603a-3736-422a-a77d-baf437cba51d", //quoteKeyID from getquote api response
   ClientKeyID: "2581", //clientID from the getquote api response
+  QuoteTypeID: 3, //quoteTypeID from the getquote api response
   ServiceChargeTypeID: serviceChargeTypeID,
   moduleName: "Quotation",
   ProfessionTypeIDs: null,
@@ -25,7 +26,6 @@ const buildServicesPayload = (
   BusinessNatureIDs: null,
   ServicePackageIDs: [],
   QuoteKeyID: null,
-  QuoteTypeID: 3,
   SourceID: null,
 });
 
