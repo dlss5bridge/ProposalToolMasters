@@ -64,11 +64,9 @@ const buildInitialDriverValues = (service) => {
 const ServiceSelectionComponent = () => {
   const dispatch = useDispatch();
 
-  // const { userKeyID, organisationKeyID } = useSelector(
-  //   (state) => state.Storage,
-  // );
-  const { userKeyID, organisationKeyID } = useSelector(selectQuoteModel);
-  debugger;
+  const { userKeyID, organisationKeyID, quoteKeyID, clientID, quoteTypeID } =
+    useSelector(selectQuoteModel) || {};
+
   const recurringServices = useSelector(selectRecurringServices);
   const recurringServicesLoading = useSelector(selectRecurringServicesLoading);
   const recurringServicesError = useSelector(selectRecurringServicesError);
@@ -98,9 +96,26 @@ const ServiceSelectionComponent = () => {
   });
 
   useEffect(() => {
-    dispatch(getRecurringServices({ userKeyID, organisationKeyID }));
-    dispatch(getOneOffServices({ userKeyID, organisationKeyID }));
-  }, [dispatch, userKeyID, organisationKeyID]);
+    if (!organisationKeyID || !quoteKeyID) return;
+
+    const quoteIdentity = {
+      userKeyID,
+      organisationKeyID,
+      quoteKeyID,
+      clientID,
+      quoteTypeID,
+    };
+
+    dispatch(getRecurringServices(quoteIdentity));
+    dispatch(getOneOffServices(quoteIdentity));
+  }, [
+    dispatch,
+    userKeyID,
+    organisationKeyID,
+    quoteKeyID,
+    clientID,
+    quoteTypeID,
+  ]);
 
   useEffect(() => {
     if (hydratedRef.current) return;

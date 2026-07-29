@@ -7,18 +7,18 @@ const SERVICE_CHARGE_TYPE_ID = {
   ONE_OFF: 2,
 };
 
-// TODO: ClientKeyID/QuoteKeyID/QuoteTypeID are hardcoded until the wizard
-// threads real proposal/client identity through routing or redux state.
+// The web-based-proposal route runs outside the authenticated app (no login,
+// no redux/local-storage auth state), so all identity values are sourced
+// from the GetQuoteModel API response (webProposal.quoteModel) instead.
 const buildServicesPayload = (
-  userKeyID,
-  organisationKeyID,
+  { organisationKeyID, userKeyID, quoteKeyID, clientID, quoteTypeID },
   serviceChargeTypeID,
 ) => ({
-  organisationKeyID: "16c73999-e14a-41fc-9ec3-1e30fa23d2f6", //organisationKeyID from  getquote api response
-  userKeyID: "af735c9a-bb05-481a-866f-4bcc1a325a41", //fetch from the url
-  moduleKeyID: "2aa8603a-3736-422a-a77d-baf437cba51d", //quoteKeyID from getquote api response
-  ClientKeyID: "2581", //clientID from the getquote api response
-  QuoteTypeID: 3, //quoteTypeID from the getquote api response
+  organisationKeyID,
+  userKeyID: "af735c9a-bb05-481a-866f-4bcc1a325a41", //TODO: revert this later
+  moduleKeyID: quoteKeyID,
+  ClientKeyID: String(clientID),
+  QuoteTypeID: quoteTypeID,
   ServiceChargeTypeID: serviceChargeTypeID,
   moduleName: "Quotation",
   ProfessionTypeIDs: null,
@@ -31,13 +31,13 @@ const buildServicesPayload = (
 
 const fetchServicesByChargeType = async (
   serviceChargeTypeID,
-  { userKeyID, organisationKeyID },
+  quoteModel,
   thunkAPI,
 ) => {
   try {
     const res = await apiClient.post(
       `${Base_Url}/configure/Services/GetServicesWithGlobalPricingDriverListByServiceChargeType`,
-      buildServicesPayload(userKeyID, organisationKeyID, serviceChargeTypeID),
+      buildServicesPayload(quoteModel, serviceChargeTypeID),
     );
 
     return res.data?.responseData?.data || [];
