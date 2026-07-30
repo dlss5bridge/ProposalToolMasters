@@ -25,6 +25,7 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
   const totalSteps = useSelector(selectTotalSteps);
   const isInitialized = useRef(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const activeStepRef = useRef(null);
 
   useEffect(() => {
     if (!isInitialized.current) {
@@ -36,6 +37,16 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
       dispatch(updateTotalSteps(steps.length));
     }
   }, [dispatch, steps.length]);
+
+  // Keep the active step centered so users swipe/scroll between steps rather
+  // than hunting for the current one along a long, off-screen row.
+  useEffect(() => {
+    activeStepRef.current?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  }, [activeStep]);
 
   const isFirstStep = activeStep === 0;
   const isLastStep = activeStep === totalSteps - 1;
@@ -78,93 +89,62 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
       </button>
 
       {/* Steps */}
-      {/* Center */}
-      <div className="flex items-center justify-center overflow-hidden">
-        {/* Mobile */}
-        <div className="flex flex-col items-center lg:hidden">
-          <div
-            className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold"
-            style={{
-              backgroundColor: theme.primary,
-              color: "#fff",
-            }}
-          >
-            {activeStep + 1}
-          </div>
+      {/* Center — a single horizontally scrollable row at every breakpoint, so
+          steps that don't fit the available width stay reachable and clickable
+          instead of being clipped or collapsed into a non-interactive summary. */}
+      <div className="hide-scrollbar flex min-w-0 items-center gap-5 overflow-x-auto scroll-smooth px-1 py-1 lg:justify-center">
+        {steps.map((step, index) => {
+          const active = index === activeStep;
+          const completed = index < maxVisitedStep;
+          const clickable = index <= maxVisitedStep;
 
-          <span
-            className="mt-1 text-sm font-semibold"
-            style={{
-              color: theme.primary,
-            }}
-          >
-            {steps[activeStep]}
-          </span>
-
-          <span
-            className="text-xs"
-            style={{
-              color: theme.textSecondary,
-            }}
-          >
-            Step {activeStep + 1} of {steps.length}
-          </span>
-        </div>
-
-        {/* Desktop */}
-        <div className="hidden items-center justify-center gap-5 lg:flex">
-          {steps.map((step, index) => {
-            const active = index === activeStep;
-            const completed = index < maxVisitedStep;
-            const clickable = index <= maxVisitedStep;
-
-            return (
+          return (
+            <div
+              key={step}
+              ref={active ? activeStepRef : null}
+              onClick={() => handleStepClick(index)}
+              className={`flex flex-shrink-0 items-center gap-2 whitespace-nowrap ${
+                clickable ? "cursor-pointer" : "cursor-not-allowed opacity-40"
+              }`}
+            >
               <div
-                key={step}
-                onClick={() => handleStepClick(index)}
-                className={`flex items-center gap-2 whitespace-nowrap ${
-                  clickable ? "cursor-pointer" : "cursor-not-allowed opacity-40"
-                }`}
-              >
-                <div
-                  className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold"
-                  style={{
-                    backgroundColor: completed
+                className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold"
+                style={{
+                  backgroundColor: completed
+                    ? theme.completedStepBackground
+                    : active
+                      ? theme.primary
+                      : "#fff",
+
+                  border: `2px solid ${
+                    completed
                       ? theme.completedStepBackground
                       : active
                         ? theme.primary
-                        : "#fff",
+                        : theme.border
+                  }`,
 
-                    border: `2px solid ${
-                      completed
-                        ? theme.completedStepBackground
-                        : active
-                          ? theme.primary
-                          : theme.border
-                    }`,
-
-                    color: completed || active ? "#fff" : theme.textSecondary,
-                  }}
-                >
-                  {completed ? <Check size={13} /> : index + 1}
-                </div>
-
-                <span
-                  className="text-[13px] font-medium"
-                  style={{
-                    color: active
-                      ? theme.primary
-                      : completed
-                        ? theme.completedStepBackground
-                        : theme.textSecondary,
-                  }}
-                >
-                  {step}
-                </span>
+                  color: completed || active ? "#fff" : theme.textSecondary,
+                }}
+              >
+                {completed ? <Check size={13} /> : index + 1}
               </div>
-            );
-          })}
-        </div>
+
+              <span
+                className="text-[13px] font-medium"
+                style={{
+                  color: active
+                    ? theme.primary
+                    : completed
+                      ? theme.completedStepBackground
+                      : theme.textSecondary,
+                }}
+              >
+                {step}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       {/* Next Button */}

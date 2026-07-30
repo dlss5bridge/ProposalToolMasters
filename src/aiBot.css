@@ -263,6 +263,15 @@
 .dark-scrollbar::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* Keeps native touch/trackpad swipe scrolling but hides the visible scrollbar track/thumb. */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 main::-webkit-scrollbar {
   width: 8px;
 }
