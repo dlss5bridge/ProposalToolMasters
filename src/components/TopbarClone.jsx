@@ -1413,6 +1413,8 @@ const TopbarClone = () => {
                                 OnOrganisationsChange(e);
                                 // xeroConnectionStatus(e.target.value)
                                 try {
+                                  // Skip API calls for "Create New Practice"
+                                  if (e.target.value === "1") return;
                                   const orgId = e.target.value.split(",")[0];
                                   dispatch(xeroConnectionStatus(orgId));
                                   dispatch(quickBooksConnectionStatus(orgId));
