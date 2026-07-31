@@ -640,7 +640,7 @@ const ServiceSelectionComponent = () => {
           })}
         </div>
 
-        <div className="pss-list-column">
+        <div className="pss-list-column pss-actions-column">
           <button
             type="button"
             className="pss-add-service-btn"

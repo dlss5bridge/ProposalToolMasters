@@ -82,9 +82,9 @@ const SelectedServices = ({
   return (
     <aside className="pss-sidebar">
       <div className="pss-sidebar-inner">
-        <div className="pss-sidebar-header">
+        <div className="pss-list-card-header pss-sidebar-header">
           <div>
-            <h3 className="pss-sidebar-title">Selected Services</h3>
+            <h2 className="pss-list-heading">Selected Services</h2>
             <p className="pss-sidebar-subtitle">{totalCount} Items Total</p>
           </div>
           <button type="button" className="pss-sidebar-print-btn">
@@ -92,34 +92,36 @@ const SelectedServices = ({
           </button>
         </div>
 
-        {totalCount === 0 ? (
-          <p className="pss-sidebar-empty">No services selected yet.</p>
-        ) : (
-          <div className="pss-sidebar-groups">
-            <SelectedGroup
-              label="Recurring Services"
-              icon={RotateCw}
-              items={visibleRecurring}
-              onRemove={onRemove}
-            />
-            <SelectedGroup
-              label="One-off Services"
-              icon={FileStack}
-              items={visibleOneOff}
-              onRemove={onRemove}
-            />
-          </div>
-        )}
+        <div className="pss-sidebar-body">
+          {totalCount === 0 ? (
+            <p className="pss-sidebar-empty">No services selected yet.</p>
+          ) : (
+            <div className="pss-sidebar-groups">
+              <SelectedGroup
+                label="Recurring Services"
+                icon={RotateCw}
+                items={visibleRecurring}
+                onRemove={onRemove}
+              />
+              <SelectedGroup
+                label="One-off Services"
+                icon={FileStack}
+                items={visibleOneOff}
+                onRemove={onRemove}
+              />
+            </div>
+          )}
 
-        {!showAll && hiddenCount > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowAll(true)}
-            className="pss-sidebar-view-all-btn"
-          >
-            View all {totalCount} items
-          </button>
-        )}
+          {!showAll && hiddenCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              className="pss-sidebar-view-all-btn"
+            >
+              View all {totalCount} items
+            </button>
+          )}
+        </div>
       </div>
     </aside>
   );

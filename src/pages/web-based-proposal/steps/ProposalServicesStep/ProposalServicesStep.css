@@ -1,4 +1,3 @@
-/* ProposalServicesStep - plain custom CSS only (no Tailwind, no Bootstrap) */
 
 .pss-root {
   max-width: 1400px;
@@ -46,11 +45,29 @@
 
 /* List columns (Recurring / One-off) */
 
+.pss-list-card {
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #fff;
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.pss-list-card-header {
+  background: linear-gradient(160deg, #ffffff 0%, #f7f9ff 55%, #eef3ff 100%);
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.875rem 1.125rem;
+}
+
+.pss-list-card-body {
+  padding: 0.875rem;
+}
+
 .pss-list-heading {
   font-size: 0.875rem;
   font-weight: 600;
   color: #111827;
-  margin: 0 0 0.75rem;
+  margin: 0;
 }
 
 .pss-list-stack {
@@ -318,6 +335,22 @@
   border-color: color-mix(in srgb, var(--wp-primary, #3b82f6) 55%, white);
 }
 
+/* On mobile/tablet the Recurring and One-off lists can push the Add
+   Service button far down the page. Surface it right below the error
+   banner and keep it pinned while the user scrolls the lists. */
+@media (max-width: 1023px) {
+  .pss-actions-column {
+    order: -1;
+  }
+
+  .pss-add-service-btn {
+    position: sticky;
+    top: 0.5rem;
+    z-index: 5;
+    margin-bottom: 1rem;
+  }
+}
+
 .pss-sidebar {
   min-width: 0;
 }
@@ -429,11 +462,8 @@
   border-radius: 0.75rem;
   border: 1px solid #e5e7eb;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 @media (min-width: 1024px) {
@@ -449,11 +479,11 @@
   justify-content: space-between;
 }
 
-.pss-sidebar-title {
-  font-weight: 600;
-  color: #111827;
-  font-size: 0.875rem;
-  margin: 0;
+.pss-sidebar-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .pss-sidebar-subtitle {
@@ -485,13 +515,10 @@
   color: #9ca3af;
   padding: 1rem 0;
   text-align: center;
-  border-top: 1px solid #f3f4f6;
   margin: 0;
 }
 
 .pss-sidebar-groups {
-  border-top: 1px solid #f3f4f6;
-  padding-top: 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
