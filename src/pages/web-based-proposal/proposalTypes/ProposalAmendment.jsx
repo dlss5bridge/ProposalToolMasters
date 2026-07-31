@@ -32,7 +32,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const quoteModel = useSelector(selectQuoteModel);
   const selectedServiceIDs = useSelector(selectSelectedServiceIDs);
   const hasAdditionalInformation = useSelector(selectHasAdditionalInformation);
-  const additionalInformationList = useSelector(selectAdditionalInformationList);
+  const additionalInformationList = useSelector(
+    selectAdditionalInformationList,
+  );
 
   // Single source of truth pairing each step's label with its component, so
   // the two can never drift out of sync (steps not yet built get a `null`
@@ -44,12 +46,11 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       component: <ProposalServicesStep theme={theme} Services={Services} />,
     },
     { label: "Pricing Table", component: null },
-    { label: "Preview", component: null },
+
     {
       label: "Input Fields",
       component: <ProposalInputFieldsStep theme={theme} />,
     },
-    { label: "Sign", component: null },
   ];
   const SERVICES_STEP_INDEX = baseSteps.findIndex(
     (step) => step.label === "Services",
@@ -111,9 +112,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       list = [];
     }
 
-    dispatch(
-      updateTotalSteps(baseSteps.length + (list.length > 0 ? 1 : 0)),
-    );
+    dispatch(updateTotalSteps(baseSteps.length + (list.length > 0 ? 1 : 0)));
 
     return true;
   };
