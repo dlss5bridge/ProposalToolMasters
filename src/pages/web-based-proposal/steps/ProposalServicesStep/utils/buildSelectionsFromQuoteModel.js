@@ -57,6 +57,7 @@ export const buildSelectionsFromQuoteModel = (
             serviceID: service.serviceID,
             serviceName: service.serviceName,
             categoryName: category.serviceCatName,
+            serviceCatID: category.serviceCatID,
             driverValues: buildDriverValues(service),
             order: order++,
           };

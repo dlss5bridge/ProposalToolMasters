@@ -1,10 +1,16 @@
 import reducer from "./servicesSlice";
 
-export { getRecurringServices, getOneOffServices } from "./servicesThunk";
+export {
+  getRecurringServices,
+  getOneOffServices,
+  getCalculatedServicesPriceByPackages,
+} from "./servicesThunk";
 
 export {
   setSelectedServiceIDs,
   setServicesSelectionError,
+  setServiceSelections,
+  setDefaultServiceSelections,
 } from "./servicesSlice";
 
 export {
@@ -16,6 +22,15 @@ export {
   selectOneOffServicesError,
   selectSelectedServiceIDs,
   selectServicesSelectionError,
+  selectRecurringSelections,
+  selectOneOffSelections,
+  selectDefaultRecurringSelections,
+  selectDefaultOneOffSelections,
+  selectServicesPricing,
+  selectServicesPricingLoading,
+  selectServicesPricingError,
+  selectServicesVatPercentage,
+  selectServicesCurrencyID,
 } from "./servicesSelectors";
 
 export default reducer;

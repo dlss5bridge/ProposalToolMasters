@@ -1,5 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getRecurringServices, getOneOffServices } from "./servicesThunk";
+import {
+  getRecurringServices,
+  getOneOffServices,
+  getCalculatedServicesPriceByPackages,
+} from "./servicesThunk";
 
 const initialState = {
   recurringServices: [],
@@ -12,6 +16,26 @@ const initialState = {
 
   selectedServiceIDs: [],
   selectionError: false,
+
+  // Full selection detail (including chosen driver values), mirrored from
+  // ProposalServicesStep's local state so the Pricing Table step can build
+  // the GetCalculatedServicesPriceByPackages payload without re-deriving it.
+  recurringSelections: {},
+  oneOffSelections: {},
+
+  // Snapshot of recurringSelections/oneOffSelections taken once, right after
+  // hydrating from the quote model (i.e. the services the client was already
+  // quoted for an Amendment proposal). Kept immutable afterwards so the
+  // Pricing Table step can tell whether the user has since changed the
+  // selection and, if so, compare against the original priced set.
+  defaultRecurringSelections: {},
+  defaultOneOffSelections: {},
+
+  pricing: [],
+  pricingLoading: false,
+  pricingError: null,
+  vatPercentage: 0,
+  currencyID: 1,
 };
 
 const servicesSlice = createSlice({
@@ -23,6 +47,15 @@ const servicesSlice = createSlice({
     },
     setServicesSelectionError(state, action) {
       state.selectionError = action.payload;
+    },
+    setServiceSelections(state, action) {
+      state.recurringSelections = action.payload?.recurringSelections || {};
+      state.oneOffSelections = action.payload?.oneOffSelections || {};
+    },
+    setDefaultServiceSelections(state, action) {
+      state.defaultRecurringSelections =
+        action.payload?.recurringSelections || {};
+      state.defaultOneOffSelections = action.payload?.oneOffSelections || {};
     },
   },
   extraReducers: (builder) => {
@@ -50,11 +83,35 @@ const servicesSlice = createSlice({
       .addCase(getOneOffServices.rejected, (state, action) => {
         state.oneOffServicesLoading = false;
         state.oneOffServicesError = action.payload;
-      });
+      })
+      .addCase(getCalculatedServicesPriceByPackages.pending, (state) => {
+        state.pricingLoading = true;
+        state.pricingError = null;
+      })
+      .addCase(
+        getCalculatedServicesPriceByPackages.fulfilled,
+        (state, action) => {
+          state.pricingLoading = false;
+          state.pricing = action.payload.prices;
+          state.vatPercentage = action.payload.vatPercentage;
+          state.currencyID = action.payload.currencyID;
+        },
+      )
+      .addCase(
+        getCalculatedServicesPriceByPackages.rejected,
+        (state, action) => {
+          state.pricingLoading = false;
+          state.pricingError = action.payload;
+        },
+      );
   },
 });
 
-export const { setSelectedServiceIDs, setServicesSelectionError } =
-  servicesSlice.actions;
+export const {
+  setSelectedServiceIDs,
+  setServicesSelectionError,
+  setServiceSelections,
+  setDefaultServiceSelections,
+} = servicesSlice.actions;
 
 export default servicesSlice.reducer;

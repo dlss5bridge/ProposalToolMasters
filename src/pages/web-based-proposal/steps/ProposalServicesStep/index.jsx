@@ -24,6 +24,8 @@ import {
   selectServicesSelectionError,
   setSelectedServiceIDs,
   setServicesSelectionError,
+  setServiceSelections,
+  setDefaultServiceSelections,
 } from "../../../../redux/reducer/webProposal/services";
 import "./ProposalServicesStep.css";
 import { selectQuoteModel } from "../../../../redux/reducer/webProposal";
@@ -135,6 +137,12 @@ const ServiceSelectionComponent = () => {
 
     setRecurringSelections(hydratedRecurring);
     setOneOffSelections(hydratedOneOff);
+    dispatch(
+      setDefaultServiceSelections({
+        recurringSelections: hydratedRecurring,
+        oneOffSelections: hydratedOneOff,
+      }),
+    );
     orderRef.current = nextOrder;
     hydratedRef.current = true;
 
@@ -161,6 +169,7 @@ const ServiceSelectionComponent = () => {
       ),
     );
   }, [
+    dispatch,
     recurringServices,
     oneOffServices,
     recurringServicesLoading,
@@ -529,10 +538,17 @@ const ServiceSelectionComponent = () => {
       ...oneOffSelectedList.map((selection) => selection.serviceID),
     ];
     dispatch(setSelectedServiceIDs(nextSelectedServiceIDs));
+    dispatch(setServiceSelections({ recurringSelections, oneOffSelections }));
     if (nextSelectedServiceIDs.length > 0) {
       dispatch(setServicesSelectionError(false));
     }
-  }, [dispatch, recurringSelectedList, oneOffSelectedList]);
+  }, [
+    dispatch,
+    recurringSelectedList,
+    oneOffSelectedList,
+    recurringSelections,
+    oneOffSelections,
+  ]);
 
   const renderRecurringPanel = ({
     categories,

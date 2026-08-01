@@ -7,6 +7,7 @@ import ProposalStepper from "../layout/ProposalStepper";
 import ProposalInputFieldsStep from "../steps/ProposalInputFieldsStep";
 import ProposalPdfStep from "../steps/ProposalPdfStep";
 import ProposalServicesStep from "../steps/ProposalServicesStep";
+import ProposalPricingTableStep from "../steps/ProposalPricingTableStep";
 import ProposalAdditionalInformationStep from "../steps/ProposalAdditionalInformationStep";
 import {
   selectActiveStep,
@@ -36,6 +37,16 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     selectAdditionalInformationList,
   );
 
+  // Base step order is fixed, so the final index of any step can be derived
+  // up front from its position here plus whether Additional Information gets
+  // spliced in after Services — needed below to tell the Pricing Table step
+  // when it becomes the active step.
+  const BASE_STEP_LABELS = ["Proposal", "Services", "Pricing Table", "Input Fields"];
+  const SERVICES_STEP_INDEX = BASE_STEP_LABELS.indexOf("Services");
+  const PRICING_STEP_INDEX =
+    BASE_STEP_LABELS.indexOf("Pricing Table") +
+    (hasAdditionalInformation ? 1 : 0);
+
   // Single source of truth pairing each step's label with its component, so
   // the two can never drift out of sync (steps not yet built get a `null`
   // component but still reserve their place in the flow).
@@ -45,16 +56,21 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       label: "Services",
       component: <ProposalServicesStep theme={theme} Services={Services} />,
     },
-    { label: "Pricing Table", component: null },
+    {
+      label: "Pricing Table",
+      component: (
+        <ProposalPricingTableStep
+          theme={theme}
+          isActive={activeStep === PRICING_STEP_INDEX}
+        />
+      ),
+    },
 
     {
       label: "Input Fields",
       component: <ProposalInputFieldsStep theme={theme} />,
     },
   ];
-  const SERVICES_STEP_INDEX = baseSteps.findIndex(
-    (step) => step.label === "Services",
-  );
 
   const steps = hasAdditionalInformation
     ? [
@@ -130,8 +146,8 @@ export default function ProposalAmendment({ theme, proposal, services }) {
           backgroundColor: theme.background,
         }}
       >
-        {/* Sidebar only for PDF step */}
-        {activeStep === 0 && (
+        {/* Sidebar shown for the PDF step and the Pricing Table step */}
+        {(activeStep === 0 || activeStep === PRICING_STEP_INDEX) && (
           <aside
             className="hidden lg:flex lg:w-1/3 border-r p-5"
             style={{

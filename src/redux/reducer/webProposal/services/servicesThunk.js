@@ -63,3 +63,26 @@ export const getOneOffServices = createAsyncThunk(
   (params, thunkAPI) =>
     fetchServicesByChargeType(SERVICE_CHARGE_TYPE_ID.ONE_OFF, params, thunkAPI),
 );
+
+export const getCalculatedServicesPriceByPackages = createAsyncThunk(
+  "webProposalServices/getCalculatedServicesPriceByPackages",
+  async (payload, thunkAPI) => {
+    try {
+      const res = await apiClient.post(
+        `${Base_Url}/configure/Services/GetCalculatedServicesPriceByPackages`,
+        payload,
+      );
+
+      const responseData = res.data?.responseData || {};
+      return {
+        prices: responseData.data || [],
+        vatPercentage: responseData.vatPercentage || 0,
+        currencyID: responseData.currencyID || 1,
+      };
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err?.response?.data || "Something went wrong",
+      );
+    }
+  },
+);
