@@ -88,26 +88,14 @@ export default function ProposalAdditionalInformationStep({ theme }) {
           : option.variationName,
       }));
       const selected =
-        options.find((option) =>
-          isSlab
-            ? source.find((o) => o.slabID === option.value)?.isDefault
-            : source.find((o) => o.variationID === option.value)?.isDefault,
-        ) || null;
+        options.find((option) => option.value === item.driverValue) || null;
 
       return (
         <Select
           options={options}
           value={selected}
           onChange={(option) => {
-            const updatedSource = (source || []).map((o) => ({
-              ...o,
-              isDefault: isSlab
-                ? o.slabID === option?.value
-                : o.variationID === option?.value,
-            }));
-
             handleChange(item.globalPricingDriverID, {
-              [isSlab ? "slab" : "variation"]: updatedSource,
               driverValue: option?.value ?? null,
             });
           }}

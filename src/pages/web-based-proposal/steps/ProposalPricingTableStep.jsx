@@ -90,9 +90,8 @@ const buildServiceDefMap = (categories) => {
 // the equivalent logic in AddUpdateProposal.jsx's extractServiceData, but
 // reads the *chosen* driver value instead of always the default one.
 const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
-  const visibleDrivers = (serviceDef?.pricingDriverList || []).filter(
-    (driver) => driver.driverVisibility,
-  );
+  const allDrivers = serviceDef?.pricingDriverList || [];
+  const visibleDrivers = allDrivers.filter((driver) => driver.driverVisibility);
 
   const base = {
     serviceID: selection.serviceID,
@@ -102,7 +101,9 @@ const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
     dateID: null,
   };
 
-  if (visibleDrivers.length === 0) {
+  // A service with no pricing drivers at all still needs one row so the
+  // backend has something to price it against.
+  if (allDrivers.length === 0) {
     return [
       {
         ...base,
@@ -112,6 +113,15 @@ const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
         slabID: null,
       },
     ];
+  }
+
+  // Every driver here is hidden (driverVisibility: false) because it's a
+  // global pricing driver captured on the separate Additional Information
+  // step instead — taggedAdditionalDriverEntries supplies its row. Emitting
+  // a driverValue: null placeholder here as well would send a second,
+  // conflicting row for the same service and shadow that real value.
+  if (visibleDrivers.length === 0) {
+    return [];
   }
 
   return visibleDrivers.map((driver) => {
