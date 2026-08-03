@@ -490,6 +490,90 @@ const AuthContext = ({ children }) => {
   //   }
   // };
 
+  const updateImageUrlsInHtml = async (htmlContent) => {
+    // Regular expression to match base64 images
+    const base64ImageRegex =
+      /<img[^>]+src="data:image\/(png|jpeg|jpg);base64,([^"]*)"/g;
+    const matches = [...htmlContent.matchAll(base64ImageRegex)];
+    setLoader(true);
+
+    const urlMap = new Map();
+
+    for (const [index, match] of matches.entries()) {
+      const base64Data = match[2];
+      const contentType = `image/${match[1]}`;
+      const filename = `image-${index}.${match[1]}`;
+
+      const userKeyID = common.userKeyID; // Ensure this is defined or passed in
+      const ApiObject_param = { base64Data, contentType, filename, userKeyID };
+
+      try {
+        const response = await GetSaveImage(ApiObject_param);
+        if (response.data.statusCode === 200) {
+          const imgUrl = response.data.imageUrl;
+
+          urlMap.set(base64Data, imgUrl);
+        } else {
+          console.error("Server response not successful:", response.data);
+        }
+      } catch (error) {
+        console.error("Error saving image:", error);
+      }
+    }
+
+    let updatedHtml = htmlContent;
+
+    // Iterate over URL map and replace base64 data with URLs
+    urlMap.forEach((newUrl, base64Data) => {
+      try {
+        // Use a more generic approach to split and replace
+        updatedHtml = updatedHtml
+          .split(`data:image/png;base64,${base64Data}`)
+          .join(newUrl);
+        updatedHtml = updatedHtml
+          .split(`data:image/jpeg;base64,${base64Data}`)
+          .join(newUrl);
+        updatedHtml = updatedHtml
+          .split(`data:image/jpg;base64,${base64Data}`)
+          .join(newUrl);
+      } catch (error) {
+        console.error("Error replacing base64 data:", error);
+      }
+    });
+
+    setLoader(false);
+    return updatedHtml;
+  };
+
+  const updateTemplateList = async (ListArray, ModuleName) => {
+    if (
+      ModuleName === "Email_Template" ||
+      ModuleName === "Super_Admin_Email_Template"
+    ) {
+      try {
+        const updatedTemplate = await Promise.all(
+          ListArray.map(async (item) => {
+            return {
+              ...item,
+              htmlContent: await updateImageUrlsInHtml(item.htmlContent),
+            };
+          }),
+        );
+        return updatedTemplate;
+      } catch (error) {
+        console.error("Error updating template list:", error);
+      }
+    }
+    if (ModuleName === "CustomizeTemplate") {
+      try {
+        const updatedTemplate = await updateImageUrlsInHtml(ListArray);
+        return updatedTemplate;
+      } catch (error) {
+        console.error("Error updating template list:", error);
+      }
+    }
+  };
+
   const CheckUsersIdleStateAfterSessionTimeoutPopUpOpen = () => {
     if (logoutTimeUpModal.isPopupOpen) {
       Logout();
@@ -3743,6 +3827,7 @@ const AuthContext = ({ children }) => {
         logoutTimeUpModal,
         setLogoutTimeUpModal,
         handleReloadClick,
+        updateTemplateList,
         // updateImageUrlsInHtml,
         // updateTemplateList,
         isMenuVisible,

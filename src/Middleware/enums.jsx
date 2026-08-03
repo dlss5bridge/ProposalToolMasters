@@ -46,6 +46,7 @@ export const EMAIL_TEMPLATE = {
   Quote_AcceptedDeclined_Email_Send_To_Sender: 20,
   Contract_Accepted_Email_Send_To_Sender: 21,
   Contract_Declined_Email_Send_To_Receiver: 22,
+  Web_Based_Proposal: 47,
 };
 export const SUPER_EMAIL_TEMPLATE = {
   SuperAllVariable: null,
@@ -193,7 +194,7 @@ export const EmailTemplates = {
   Reminder: 38,
   FreePackageOrg_FirstMail: 44,
   FreePackageOrg_SecondMail: 45,
-  FreePackageOrg_ThirdMail: 46
+  FreePackageOrg_ThirdMail: 46,
 };
 export const EmailProviderEnum = {
   BT_Internet: 1,
@@ -234,4 +235,16 @@ export const fieldToIdMap = {
   fees: 5,
   serviceScope: 6,
   feesIncVat: 7,
+};
+
+export const servicePackageTypeID = {
+  RecurringServiceTypeID: 1,
+  OneOffServiceTypeID: 2,
+  RecurringPackageTypeID: 3,
+  OneOffPackageTypeID: 4,
+};
+
+export const VATUpdateTypeID = {
+  UpdateAllVAT: 1,
+  UpdateDefaultVATOnly: 2,
 };

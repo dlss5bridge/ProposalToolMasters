@@ -184,57 +184,101 @@ function Add_New_Templates(props) {
   const [isCheck, setIsCheck] = useState(false);
   const [openSuccessModal, setOpenSuccessModal] = React.useState(false);
   const [Status, setStatus] = React.useState(false);
+  const organisationList = JSON.parse(
+    localStorage.getItem("OrganisationLocalList") || "[]",
+  );
+
+  const storedOrg = organisationList.find(
+    (item) => item.organisationKeyID === common.organisationKeyID,
+  );
+  // Remember, here the opposite sign is used for the vatStatus because, in the backend they have stored opposite. If the org is vat reg th en they have stored false else true.
+
+  const isVatEnabledForOrg =
+    storedOrg?.isVatRegistered === true ? false : true || false;
   const [visibleFieldsCustomTemp, setVisibleFieldsCustomTemp] = useState({
     serviceCategory: true,
     serviceName: true,
-    vatRate: true,
-    vat: true,
+    vatRate: isVatEnabledForOrg,
+    vat: isVatEnabledForOrg,
     fees: true,
     serviceScope: true,
-    feesIncVat: true,
+    feesIncVat: isVatEnabledForOrg,
   });
+
+  const VAT_FIELD_KEYS = ["vatRate", "vat", "feesIncVat"];
 
   const getVisibleFieldIds = () => {
     const selectedIds = Object.entries(visibleFieldsCustomTemp)
-      .filter(([_, value]) => value === true)
-      .map(([key]) => fieldToIdMap[key]);
+      .filter(([key, value]) => {
+        if (value !== true) {
+          return false;
+        }
 
-    return selectedIds.join(","); // e.g. "1,2,3,4,5,6,7"
+        // Never send VAT-related column IDs for non-VAT organisations.
+        if (!isVatEnabledForOrg && VAT_FIELD_KEYS.includes(key)) {
+          return false;
+        }
+
+        return true;
+      })
+      .map(([key]) => fieldToIdMap[key])
+      .filter((id) => id !== undefined && id !== null);
+
+    return selectedIds.join(",");
   };
 
   useEffect(() => {
+    if (!isVatEnabledForOrg) {
+      setVisibleFieldsCustomTemp((prev) => ({
+        ...prev,
+        vatRate: false,
+        vat: false,
+        feesIncVat: false,
+      }));
+    }
+  }, [isVatEnabledForOrg]);
+
+  useEffect(() => {
     const updateVisibleFieldsFromIds = (pricingTableColumnIDs) => {
-      // Ensure pricingTableColumnIDs is a string — handle undefined, null, object, or empty values safely
       if (
         typeof pricingTableColumnIDs !== "string" ||
         pricingTableColumnIDs.trim() === ""
       ) {
-        // If no ids provided, set all fields to false (optional)
-        const allFalse = Object.fromEntries(
-          Object.keys(fieldToIdMap).map((key) => [key, true]),
-        );
-        setVisibleFieldsCustomTemp(allFalse);
+        setVisibleFieldsCustomTemp({
+          serviceCategory: true,
+          serviceName: true,
+          serviceScope: true,
+          fees: true,
+
+          // VAT fields depend on organisation VAT registration.
+          vatRate: isVatEnabledForOrg,
+          vat: isVatEnabledForOrg,
+          feesIncVat: isVatEnabledForOrg,
+        });
+
         return;
       }
 
       const idsFromBackend = pricingTableColumnIDs
         .split(",")
         .map((id) => Number(id.trim()))
-        .filter((id) => !isNaN(id)); // avoid NaN if backend sends weird values
+        .filter((id) => !Number.isNaN(id));
 
       const updatedFields = Object.fromEntries(
-        Object.entries(fieldToIdMap).map(([key, id]) => [
-          key,
-          idsFromBackend.includes(id),
-        ]),
+        Object.entries(fieldToIdMap).map(([key, id]) => {
+          if (!isVatEnabledForOrg && VAT_FIELD_KEYS.includes(key)) {
+            return [key, false];
+          }
+
+          return [key, idsFromBackend.includes(id)];
+        }),
       );
 
       setVisibleFieldsCustomTemp(updatedFields);
     };
 
-    // ✅ Call the function here
     updateVisibleFieldsFromIds(TemplateObj.pricingTableColumnIDs);
-  }, [TemplateObj.pricingTableColumnIDs]);
+  }, [TemplateObj.pricingTableColumnIDs, isVatEnabledForOrg]);
   // console.log("getVisibleFieldIds", getVisibleFieldIds());
   // console.log("visibleFieldsCustomTemp", visibleFieldsCustomTemp);
   const [selectedTemplateType, setSelectedTemplateType] = useState(0);
@@ -284,41 +328,41 @@ function Add_New_Templates(props) {
       isPredefined: null,
       fontFamilyID: null,
       professionTypeList: [],
-        // Service description main heading
-    serviceDescriptionMainHeading: "Service Description",
-    serviceDescriptionMainHeadingFontSize: null,
-    serviceDescriptionMainHeadingFontWeight: null,
-    serviceDescriptionMainHeadingFontItalic: null,
-    // Service description Recurring/On-going Heading
-    serviceDescriptionRecurringHeading: "Ongoing/Recurring Services",
-    serviceDescriptionRecurringHeadingFontSize: null,
-    serviceDescriptionRecurringHeadingFontWeight: null,
-    serviceDescriptionRecurringHeadingFontItalic: null,
-    // Service description One-Off/Ad hoc Heading
-    serviceDescriptionOneOffHeading: "One-Off/Ad hoc Services",
-    serviceDescriptionOneOffHeadingFontSize: null,
-    serviceDescriptionOneOffHeadingFontWeight: null,
-    serviceDescriptionOneOffHeadingFontItalic: null,
-    // Service description Service Category Heading
-    serviceDescriptionServiceCatHeading: "",
-    serviceDescriptionServiceCatHeadingFontSize: null,
-    serviceDescriptionServiceCatHeadingFontWeight: null,
-    serviceDescriptionServiceCatHeadingFontItalic: null,
-    // Statement Of Facts main heading
-    statementOfFactsMainHeading: "Statement Of Facts",
-    statementOfFactsMainHeadingFontSize: null,
-    statementOfFactsMainHeadingFontWeight: null,
-    statementOfFactsMainHeadingFontItalic: null,
-    // Statement Of Facts Recurring/On-going Heading
-    statementOfFactsRecurringHeading: "Ongoing/Recurring Services",
-    statementOfFactsRecurringHeadingFontSize: null,
-    statementOfFactsRecurringHeadingFontWeight: null,
-    statementOfFactsRecurringHeadingFontItalic: null,
-    // Statement Of Facts One-Off/Ad hoc Heading
-    statementOfFactsOneOffHeading: "One-Off/Ad hoc Services",
-    statementOfFactsOneOffHeadingFontSize: null,
-    statementOfFactsOneOffHeadingFontWeight: null,
-    statementOfFactsOneOffHeadingFontItalic: null,
+      // Service description main heading
+      serviceDescriptionMainHeading: "Service Description",
+      serviceDescriptionMainHeadingFontSize: null,
+      serviceDescriptionMainHeadingFontWeight: null,
+      serviceDescriptionMainHeadingFontItalic: null,
+      // Service description Recurring/On-going Heading
+      serviceDescriptionRecurringHeading: "Ongoing/Recurring Services",
+      serviceDescriptionRecurringHeadingFontSize: null,
+      serviceDescriptionRecurringHeadingFontWeight: null,
+      serviceDescriptionRecurringHeadingFontItalic: null,
+      // Service description One-Off/Ad hoc Heading
+      serviceDescriptionOneOffHeading: "One-Off/Ad hoc Services",
+      serviceDescriptionOneOffHeadingFontSize: null,
+      serviceDescriptionOneOffHeadingFontWeight: null,
+      serviceDescriptionOneOffHeadingFontItalic: null,
+      // Service description Service Category Heading
+      serviceDescriptionServiceCatHeading: "",
+      serviceDescriptionServiceCatHeadingFontSize: null,
+      serviceDescriptionServiceCatHeadingFontWeight: null,
+      serviceDescriptionServiceCatHeadingFontItalic: null,
+      // Statement Of Facts main heading
+      statementOfFactsMainHeading: "Statement Of Facts",
+      statementOfFactsMainHeadingFontSize: null,
+      statementOfFactsMainHeadingFontWeight: null,
+      statementOfFactsMainHeadingFontItalic: null,
+      // Statement Of Facts Recurring/On-going Heading
+      statementOfFactsRecurringHeading: "Ongoing/Recurring Services",
+      statementOfFactsRecurringHeadingFontSize: null,
+      statementOfFactsRecurringHeadingFontWeight: null,
+      statementOfFactsRecurringHeadingFontItalic: null,
+      // Statement Of Facts One-Off/Ad hoc Heading
+      statementOfFactsOneOffHeading: "One-Off/Ad hoc Services",
+      statementOfFactsOneOffHeadingFontSize: null,
+      statementOfFactsOneOffHeadingFontWeight: null,
+      statementOfFactsOneOffHeadingFontItalic: null,
     });
 
     setErrorMessage("");
@@ -764,7 +808,7 @@ function Add_New_Templates(props) {
   };
 
   // 2) Add Update Button Click Function
-  const TemplateAddUpdateBtnClicked = (Accept) => { 
+  const TemplateAddUpdateBtnClicked = (Accept) => {
     if (Accept === "Accept") {
       $("#" + "ConfirmSAChangesModel").modal("show");
 
@@ -1170,7 +1214,7 @@ function Add_New_Templates(props) {
           oneOffAdhocHeadingIsItalic:
             TemplateObj.statementOfFactsOneOffHeadingFontItalic || null,
         }),
-      }), 
+      }),
     );
 
     const ApiRequest_ParamsObj = {
@@ -1636,30 +1680,36 @@ function Add_New_Templates(props) {
                     Fees (£)
                   </th>
                 )}
-                {vatPercentage && visibleFieldsCustomTemp.vatRate && (
-                  <th
-                    className="tr-table-class text-white text-center"
-                    style={{ width: "16.66%" }}
-                  >
-                    VAT Rate
-                  </th>
-                )}
-                {vatPercentage && visibleFieldsCustomTemp.vat && (
-                  <th
-                    className="tr-table-class text-white text-center"
-                    style={{ width: "16.66%" }}
-                  >
-                    VAT (£)
-                  </th>
-                )}
-                {vatPercentage && visibleFieldsCustomTemp.feesIncVat && (
-                  <th
-                    className="tr-table-class text-white text-center"
-                    style={{ width: "16.66%" }}
-                  >
-                    Fees inc VAT (£)
-                  </th>
-                )}
+                {isVatEnabledForOrg &&
+                  vatPercentage &&
+                  visibleFieldsCustomTemp.vatRate && (
+                    <th
+                      className="tr-table-class text-white text-center"
+                      style={{ width: "16.66%" }}
+                    >
+                      VAT Rate
+                    </th>
+                  )}
+                {isVatEnabledForOrg &&
+                  vatPercentage &&
+                  visibleFieldsCustomTemp.vat && (
+                    <th
+                      className="tr-table-class text-white text-center"
+                      style={{ width: "16.66%" }}
+                    >
+                      VAT (£)
+                    </th>
+                  )}
+                {isVatEnabledForOrg &&
+                  vatPercentage &&
+                  visibleFieldsCustomTemp.feesIncVat && (
+                    <th
+                      className="tr-table-class text-white text-center"
+                      style={{ width: "16.66%" }}
+                    >
+                      Fees inc VAT (£)
+                    </th>
+                  )}
               </tr>
             </thead>
 
@@ -1677,15 +1727,21 @@ function Add_New_Templates(props) {
                 {visibleFieldsCustomTemp.fees && (
                   <td className="text-center">$500</td>
                 )}
-                {vatPercentage && visibleFieldsCustomTemp.vatRate && (
-                  <td className="text-center">20%</td>
-                )}
-                {vatPercentage && visibleFieldsCustomTemp.vat && (
-                  <td className="text-center">$100</td>
-                )}
-                {vatPercentage && visibleFieldsCustomTemp.feesIncVat && (
-                  <td className="text-center">$600</td>
-                )}
+                {isVatEnabledForOrg &&
+                  vatPercentage &&
+                  visibleFieldsCustomTemp.vatRate && (
+                    <td className="text-center">20%</td>
+                  )}
+                {isVatEnabledForOrg &&
+                  vatPercentage &&
+                  visibleFieldsCustomTemp.vat && (
+                    <td className="text-center">$100</td>
+                  )}
+                {isVatEnabledForOrg &&
+                  vatPercentage &&
+                  visibleFieldsCustomTemp.feesIncVat && (
+                    <td className="text-center">$600</td>
+                  )}
               </tr>
 
               {/* === NET TOTAL ROW === */}
@@ -2566,7 +2622,112 @@ function Add_New_Templates(props) {
                   case 3:
                   case "3":
                     // Pricing table
-                   componentToRender = null;
+                    componentToRender = (
+                      <div className="m-3">
+                        {/* === Row with Both Labels === */}
+                        <div className="d-flex align-items-start flex-wrap">
+                          {/* === Template 0 === */}
+                          <div className="d-flex align-items-start me-4">
+                            <input
+                              type="radio"
+                              id={`template-${templates[0].id}`}
+                              value={templates[0].id}
+                              checked={selectedTemplateType === templates[0].id}
+                              onChange={() =>
+                                setSelectedTemplateType(templates[0].id)
+                              }
+                              className="me-2 mt-1"
+                            />
+                            <label
+                              className="form-check-label fs-6"
+                              htmlFor={`template-${templates[0].id}`}
+                              style={{ cursor: "pointer", fontSize: "15px" }}
+                            >
+                              <strong>{templates[0].label}</strong>
+                            </label>
+                          </div>
+
+                          {/* === Template 6 === */}
+                          <div className="d-flex align-items-start">
+                            <input
+                              type="radio"
+                              id={`template-${templates[6].id}`}
+                              value={templates[6].id}
+                              checked={selectedTemplateType === templates[6].id}
+                              onChange={() =>
+                                setSelectedTemplateType(templates[6].id)
+                              }
+                              className="me-2 mt-1"
+                            />
+                            <label
+                              htmlFor={`template-${templates[6].id}`}
+                              className="form-check-label fs-6"
+                              style={{ fontSize: "15px", cursor: "pointer" }}
+                            >
+                              {templates[6].label}
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* === Template 0 Content === */}
+                        {selectedTemplateType === templates[0].id && (
+                          <div className="mt-2">{templates[0].content}</div>
+                        )}
+
+                        {/* === Template 6 Content === */}
+                        {selectedTemplateType === templates[6].id && (
+                          <div
+                            className="mt-2"
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "10px",
+                            }}
+                          >
+                            {/* Checkboxes */}
+                            <div
+                              className="mb-1 d-flex flex-wrap gap-3"
+                              style={{ marginTop: "25px" }}
+                            >
+                              {Object.keys(visibleFieldsCustomTemp)
+                                .filter(
+                                  (field) =>
+                                    isVatEnabledForOrg ||
+                                    !VAT_FIELD_KEYS.includes(field),
+                                )
+                                .map((field) => (
+                                  <div key={field} className="form-check">
+                                    <input
+                                      type="checkbox"
+                                      className="form-check-input"
+                                      id={`pricing-field-${field}`}
+                                      checked={visibleFieldsCustomTemp[field]}
+                                      disabled={
+                                        field === "serviceName" ||
+                                        (isVatEnabledForOrg &&
+                                          field === "feesIncVat")
+                                      }
+                                      onChange={() =>
+                                        handleCheckboxChange(field)
+                                      }
+                                    />
+
+                                    <label
+                                      htmlFor={`pricing-field-${field}`}
+                                      className="form-check-label"
+                                    >
+                                      {formatFieldLabel(field)}
+                                    </label>
+                                  </div>
+                                ))}
+                            </div>
+
+                            {/* Table */}
+                            <div className="mt-1">{templates[6].content}</div>
+                          </div>
+                        )}
+                      </div>
+                    );
                     break;
                   case 4:
                   case "4":
@@ -3035,7 +3196,7 @@ function Add_New_Templates(props) {
                   case 8:
                   case "8":
                     // Statment of facts
-                   componentToRender = (
+                    componentToRender = (
                       <div>
                         <div className="row fieldset">
                           <div className="col-2 fieldset-label">

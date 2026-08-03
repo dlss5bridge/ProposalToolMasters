@@ -12,7 +12,7 @@ import axios from "axios";
 import Switch from "@mui/material/Switch";
 import { useSelector } from "react-redux";
 import Utils from "../../Middleware/Utils";
-import { statusID } from "../../Middleware/enums";
+import { fieldToIdMap, statusID } from "../../Middleware/enums";
 import { Base_Url } from "../../Base-Url/Base_Url";
 import ConfirmModel from "../../components/ConfirmationBox";
 import { ERROR_MESSAGES } from "../../components/GlobalMessage";
@@ -168,6 +168,43 @@ const View_Engagement_Latter = () => {
   // const VoidOn = location.state.voidOn;
   const isSignedStatus = location.state.isSigned;
 
+  const [pricingTableColumnIDs, setPricingTableColumnIDs] = useState("");
+  const [visibleFieldsCustomTemp, setVisibleFieldsCustomTemp] = useState({
+    serviceCategory: true,
+    serviceName: true,
+    vatRate: true,
+    vat: true,
+    fees: true,
+    serviceScope: true,
+    feesIncVat: true,
+  });
+
+  const updateVisibleFieldsFromIds = (idString) => {
+    // Ensure idString is a string — handle undefined, null, object, or empty values safely
+    if (typeof idString !== "string" || idString.trim() === "") {
+      // If no ids provided, set all fields to false (optional)
+      const allFalse = Object.fromEntries(
+        Object.keys(fieldToIdMap).map((key) => [key, true]),
+      );
+      setVisibleFieldsCustomTemp(allFalse);
+      return;
+    }
+
+    const idsFromBackend = idString
+      .split(",")
+      .map((id) => Number(id.trim()))
+      .filter((id) => !isNaN(id)); // avoid NaN if backend sends weird values
+
+    const updatedFields = Object.fromEntries(
+      Object.entries(fieldToIdMap).map(([key, id]) => [
+        key,
+        idsFromBackend.includes(id),
+      ]),
+    );
+
+    setVisibleFieldsCustomTemp(updatedFields);
+  };
+
   useEffect(() => {
     if (location.state?.contractKeyID !== null) {
       GetContractDetailsModelData(location.state?.contractKeyID);
@@ -198,6 +235,8 @@ const View_Engagement_Latter = () => {
 
           setServiceDescriptionHTML(ModelData.serviceDescription);
           setStatementOfFactsHTML(ModelData.statementOfFacts);
+          setPricingTableColumnIDs(ModelData?.pricingTableColumnIDs);
+          updateVisibleFieldsFromIds(ModelData?.pricingTableColumnIDs);
 
           let officerArray = [];
           clientOfficersList.forEach((item) => {
@@ -1021,6 +1060,352 @@ const View_Engagement_Latter = () => {
   };
   const serviceDescriptionHtmlGenerated = generateServiceDescription();
 
+  const hasVatColumn = (vatValue) => {
+    return Number(vatValue || 0) !== 0;
+  };
+
+  const showRecurringVat = hasVatColumn(vatPercentage);
+  const showOneOffVat = hasVatColumn(vatPercentage);
+
+  const hasValue = (value) =>
+    value !== null && value !== undefined && value !== "";
+
+  const toNumber = (value) => {
+    const parsedValue = Number(value);
+    return Number.isFinite(parsedValue) ? parsedValue : 0;
+  };
+
+  const roundCurrency = (value) =>
+    Math.round((toNumber(value) + Number.EPSILON) * 100) / 100;
+
+  const calculateEngagementRecurringServiceRow = ({
+    service,
+    fallbackVatRate = 0,
+  }) => {
+    const price = roundCurrency(service?.contractPrice);
+
+    const hasServiceVatRate = hasValue(service?.vatPercentage);
+    const vatRate = hasServiceVatRate
+      ? toNumber(service?.vatPercentage)
+      : toNumber(fallbackVatRate);
+
+    /*
+     * Prefer the service VAT amount returned by the API.
+     * When it is null, calculate it using the service VAT rate or fallback rate.
+     */
+    const rawVatAmount = hasValue(service?.vatAmount)
+      ? toNumber(service?.vatAmount)
+      : (price * vatRate) / 100;
+
+    const vatAmount = roundCurrency(rawVatAmount);
+    const feesIncludingVat = roundCurrency(price + vatAmount);
+
+    return {
+      ...service,
+      calculatedPrice: price,
+      calculatedVatRate: vatRate,
+      calculatedVatAmount: vatAmount,
+      calculatedRawVatAmount: rawVatAmount,
+      calculatedFeesIncludingVat: feesIncludingVat,
+    };
+  };
+
+  const calculateEngagementRecurringFooterTotals = ({
+    serviceCategories = [],
+    finalAmount = {},
+  }) => {
+    const flattenedServices = serviceCategories.flatMap(
+      (category) => category?.servicesList || [],
+    );
+
+    const calculatedRows = flattenedServices.map((service) =>
+      calculateEngagementRecurringServiceRow({
+        service,
+        fallbackVatRate: finalAmount?.vatPercentage,
+      }),
+    );
+
+    const calculatedNetTotal = roundCurrency(
+      calculatedRows.reduce(
+        (total, service) => total + service.calculatedPrice,
+        0,
+      ),
+    );
+
+    /*
+     * Sum the displayed row VAT amounts so the footer always matches
+     * the visible service rows, including service-wise VAT rounding.
+     */
+    const calculatedNetVat = roundCurrency(
+      calculatedRows.reduce(
+        (total, service) => total + service.calculatedVatAmount,
+        0,
+      ),
+    );
+
+    const netTotal = hasValue(finalAmount?.netTotal)
+      ? roundCurrency(finalAmount.netTotal)
+      : calculatedNetTotal;
+
+    const discountedTotal = hasValue(finalAmount?.discountedTotal)
+      ? roundCurrency(finalAmount.discountedTotal)
+      : netTotal;
+
+    const discount = hasValue(finalAmount?.discounted)
+      ? roundCurrency(finalAmount.discounted)
+      : roundCurrency(netTotal - discountedTotal);
+
+    const netVAT = hasValue(finalAmount?.netVAT)
+      ? roundCurrency(finalAmount.netVAT)
+      : calculatedNetVat;
+
+    const finalVAT = hasValue(finalAmount?.vat)
+      ? roundCurrency(finalAmount.vat)
+      : netVAT;
+
+    const vatDiscount = hasValue(finalAmount?.vatDiscount)
+      ? roundCurrency(finalAmount.vatDiscount)
+      : roundCurrency(Math.max(0, netVAT - finalVAT));
+
+    const netFeesIncVAT = hasValue(finalAmount?.netFeesIncVAT)
+      ? roundCurrency(finalAmount.netFeesIncVAT)
+      : roundCurrency(netTotal + netVAT);
+
+    const grandTotal = hasValue(finalAmount?.grandTotal)
+      ? roundCurrency(finalAmount.grandTotal)
+      : roundCurrency(discountedTotal + finalVAT);
+
+    const discountedFeesIncVAT = hasValue(finalAmount?.discountedFeesIncVAT)
+      ? roundCurrency(finalAmount.discountedFeesIncVAT)
+      : grandTotal;
+
+    return {
+      netTotal,
+      discount,
+      discountedTotal,
+      netVAT,
+      finalVAT,
+      vatDiscount,
+      netFeesIncVAT,
+      discountedFeesIncVAT,
+      grandTotal,
+      discountIncludingVAT: roundCurrency(discount + vatDiscount),
+      hasDiscount: discount > 0,
+    };
+  };
+
+  /* -------------------- API RESPONSE MAPPING -------------------- */
+
+  const recurringServiceCategories = Array.isArray(selectedRecurringServiceList)
+    ? selectedRecurringServiceList
+    : [];
+
+  const recurringFinalAmount =
+    finalContractAmountList?.find(
+      (item) => Number(item?.serviceChargeTypeID) === 1,
+    ) || {};
+
+  const recurringRowsByCategory = recurringServiceCategories.map(
+    (category) => ({
+      ...category,
+      servicesList: (category?.servicesList || []).map((service) =>
+        calculateEngagementRecurringServiceRow({
+          service,
+          fallbackVatRate: recurringFinalAmount?.vatPercentage,
+        }),
+      ),
+    }),
+  );
+
+  const recurringFooterTotals = calculateEngagementRecurringFooterTotals({
+    serviceCategories: recurringServiceCategories,
+    finalAmount: recurringFinalAmount,
+  });
+
+  const showRecurringDiscountLine =
+    EngagementObj?.DiscountLines ?? Boolean(EngagementObj?.showDiscountLine);
+
+  const recurringNetRowValues =
+    recurringFooterTotals.hasDiscount && !showRecurringDiscountLine
+      ? {
+          fees: recurringFooterTotals.discountedTotal,
+          vat: recurringFooterTotals.finalVAT,
+          feesIncVAT: recurringFooterTotals.discountedFeesIncVAT,
+        }
+      : {
+          fees: recurringFooterTotals.netTotal,
+          vat: recurringFooterTotals.netVAT,
+          feesIncVAT: recurringFooterTotals.netFeesIncVAT,
+        };
+
+  // One-off footer calculations, and the row calculations:
+
+  const oneOffFinalAmount =
+    finalContractAmountList?.find(
+      (item) => Number(item.serviceChargeTypeID) === 2,
+    ) || {};
+
+  const calculateOneOffServiceRow = ({ service, fallbackVatRate = 0 }) => {
+    const price = Number(service?.contractPrice || 0);
+
+    const rawVatRate = service?.vatPercentage;
+
+    // Keep service VAT 0 if explicitly provided
+    const hasServiceVatRate =
+      rawVatRate !== null && rawVatRate !== undefined && rawVatRate !== "";
+
+    const vatRate = hasServiceVatRate
+      ? Number(rawVatRate)
+      : Number(fallbackVatRate);
+
+    const vatAmount =
+      service?.vatAmount !== null && service?.vatAmount !== undefined
+        ? Number(service.vatAmount)
+        : (price * vatRate) / 100;
+
+    const feesIncludingVat = price + vatAmount;
+
+    return {
+      price,
+      vatRate,
+      vatAmount,
+      feesIncludingVat,
+    };
+  };
+
+  const calculateOneOffFooterTotals = ({
+    serviceList = [],
+    fallbackVatRate = 0,
+    discountPercentage = 0,
+  }) => {
+    let netTotal = 0;
+    let vatTotal = 0;
+
+    serviceList.forEach((category) => {
+      category.servicesList.forEach((service) => {
+        const row = calculateOneOffServiceRow({
+          service,
+          fallbackVatRate,
+        });
+
+        netTotal += row.price;
+        vatTotal += row.vatAmount;
+      });
+    });
+
+    const discountAmount = (netTotal * Number(discountPercentage)) / 100;
+
+    const discountedNet = netTotal - discountAmount;
+
+    const discountedVat = (discountedNet * Number(fallbackVatRate)) / 100;
+
+    return {
+      netTotal,
+      vatTotal,
+      grossTotal: netTotal + vatTotal,
+
+      discountAmount,
+
+      discountedNet,
+      discountedVat,
+
+      grandTotal: discountedNet + discountedVat,
+    };
+  };
+
+  const oneOffTotals = calculateOneOffFooterTotals({
+    serviceList: selectedOneOffServiceList,
+    fallbackVatRate: oneOffFinalAmount.vatPercentage,
+    discountPercentage: OneOffPricingInfo.DiscountPercentage,
+  });
+
+  // const roundCurrency = (value) => Math.round((Number(value) || 0) * 100) / 100;
+
+  const oneOffNetTotal = roundCurrency(oneOffTotals?.netTotal || 0);
+
+  const oneOffVatTotal = roundCurrency(oneOffTotals?.vatTotal || 0);
+
+  /*
+   * Get the percentage from the API response.
+   *
+   * EngagementObj.oneOffDiscountPercentage_WithAllDecimal
+   * is available in your engagement-letter response.
+   */
+  const explicitOneOffDiscountPercentage = Number(
+    OneOffPricingInfo?.DiscountPercentage ??
+      EngagementObj?.oneOffDiscountPercentage_WithAllDecimal ??
+      EngagementObj?.oneOffDiscountPercentage ??
+      0,
+  );
+
+  /*
+   * OneOffPricingInfo.Discount may contain the discount amount.
+   * Use it only as a fallback when the percentage is unavailable.
+   */
+  const existingOneOffDiscountAmount = roundCurrency(
+    OneOffPricingInfo?.Discount || 0,
+  );
+
+  const oneOffDiscountPercentage =
+    explicitOneOffDiscountPercentage > 0
+      ? explicitOneOffDiscountPercentage
+      : oneOffNetTotal > 0 && existingOneOffDiscountAmount > 0
+        ? (existingOneOffDiscountAmount / oneOffNetTotal) * 100
+        : 0;
+
+  const hasOneOffDiscount = oneOffDiscountPercentage > 0;
+
+  const oneOffDiscountAmount = hasOneOffDiscount
+    ? roundCurrency((oneOffNetTotal * oneOffDiscountPercentage) / 100)
+    : 0;
+
+  /*
+   * The same percentage discount is applied proportionately
+   * to VAT. This also supports rows having different VAT rates.
+   */
+  const oneOffVatDiscountAmount = hasOneOffDiscount
+    ? roundCurrency((oneOffVatTotal * oneOffDiscountPercentage) / 100)
+    : 0;
+
+  const oneOffDiscountedNet = roundCurrency(
+    oneOffNetTotal - oneOffDiscountAmount,
+  );
+
+  const oneOffDiscountedVat = roundCurrency(
+    oneOffVatTotal - oneOffVatDiscountAmount,
+  );
+
+  const oneOffNetFeesIncludingVat = roundCurrency(
+    oneOffNetTotal + oneOffVatTotal,
+  );
+
+  const oneOffDiscountedFeesIncludingVat = roundCurrency(
+    oneOffDiscountAmount + oneOffVatDiscountAmount,
+  );
+
+  const oneOffGrandTotal = roundCurrency(
+    oneOffDiscountedNet + oneOffDiscountedVat,
+  );
+
+  /*
+   * When DiscountLines is false, show discounted values
+   * directly in the Net Total row.
+   */
+  const oneOffFooterNetFees =
+    hasOneOffDiscount && !EngagementObj.DiscountLines
+      ? oneOffDiscountedNet
+      : oneOffNetTotal;
+
+  const oneOffFooterNetVat =
+    hasOneOffDiscount && !EngagementObj.DiscountLines
+      ? oneOffDiscountedVat
+      : oneOffVatTotal;
+
+  const oneOffFooterNetFeesIncludingVat =
+    hasOneOffDiscount && !EngagementObj.DiscountLines
+      ? oneOffGrandTotal
+      : oneOffNetFeesIncludingVat;
+
   return (
     <div className="container">
       {/* <div class="main-content"> */}
@@ -1488,179 +1873,558 @@ const View_Engagement_Latter = () => {
                                           </div>
                                         </div>
                                         <div className="mb-3"></div>
-                                        <div
-                                          style={{ marginTop: "0px" }}
-                                          className="table-responsive"
-                                        >
-                                          <table className="table align-middle table-nowrap">
-                                            <thead className="table-light table-header-font">
-                                              <tr className="head-row">
-                                                <th className="tr-table-class text-white">
-                                                  Services
-                                                </th>
-                                                <th className="tr-table-class text-white text-right">
-                                                  Fees (
-                                                  {getCurrencySymbol(
-                                                    EngagementObj.currencyID,
-                                                  )}
-                                                  )
-                                                </th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {selectedRecurringServiceList.map(
-                                                (service, index) => {
-                                                  return (
-                                                    <>
-                                                      <tr class="a-la-carte-services-review-head-row">
-                                                        <th colspan="2">
-                                                          {
-                                                            service.serviceCatName
-                                                          }
-                                                        </th>
-                                                      </tr>
-                                                      {service.servicesList.map(
-                                                        (
-                                                          subService,
-                                                          subIndex,
-                                                        ) => {
-                                                          return (
-                                                            <tr
-                                                              key={subIndex}
-                                                              className={` ${
-                                                                subService?.isAdditionalService ===
-                                                                true
-                                                                  ? "bg-info  text-white"
-                                                                  : ""
-                                                              }`}
-                                                            >
-                                                              {/* */}
-                                                              <td>
-                                                                <div>
-                                                                  {
-                                                                    subService.serviceName
-                                                                  }
-                                                                </div>
-                                                                <div class="package-variables"></div>
-                                                              </td>
-                                                              <td className="text-right">
-                                                                {EngagementObj.feeTypeId ===
-                                                                  1 && (
-                                                                  <>
-                                                                    {" "}
-                                                                    {formatValue(
-                                                                      subService.contractPrice,
-                                                                    )}
-                                                                  </>
-                                                                )}
-                                                                {EngagementObj.feeTypeId ===
-                                                                  2 && (
-                                                                  <span className="fa fa-check"></span>
-                                                                )}
-                                                              </td>
-                                                            </tr>
-                                                          );
-                                                        },
-                                                      )}
-                                                    </>
-                                                  );
-                                                },
-                                              )}
-                                              <tr className="head-row">
-                                                <td className="tr-table-class font-14 font-14 text-white">
-                                                  Net Total
-                                                </td>
-                                                <td className="tr-table-class font-14 text-white text-right">
-                                                  {" "}
-                                                  {
-                                                    Number(
-                                                      RecurringPricingInfo.OriginalPrice,
-                                                    ) <
+                                        {pricingTableColumnIDs === null ||
+                                        pricingTableColumnIDs === "" ||
+                                        pricingTableColumnIDs === undefined ? (
+                                          <div
+                                            style={{ marginTop: "0px" }}
+                                            className="table-responsive"
+                                          >
+                                            <table className="table align-middle table-nowrap">
+                                              <thead className="table-light table-header-font">
+                                                <tr className="head-row">
+                                                  <th className="tr-table-class text-white">
+                                                    Services
+                                                  </th>
+                                                  <th className="tr-table-class text-white text-right">
+                                                    Fees (
+                                                    {getCurrencySymbol(
+                                                      EngagementObj.currencyID,
+                                                    )}
+                                                    )
+                                                  </th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {selectedRecurringServiceList.map(
+                                                  (service, index) => {
+                                                    return (
+                                                      <>
+                                                        <tr class="a-la-carte-services-review-head-row">
+                                                          <th colspan="2">
+                                                            {
+                                                              service.serviceCatName
+                                                            }
+                                                          </th>
+                                                        </tr>
+                                                        {service.servicesList.map(
+                                                          (
+                                                            subService,
+                                                            subIndex,
+                                                          ) => {
+                                                            return (
+                                                              <tr
+                                                                key={subIndex}
+                                                                className={` ${
+                                                                  subService?.isAdditionalService ===
+                                                                  true
+                                                                    ? "bg-info  text-white"
+                                                                    : ""
+                                                                }`}
+                                                              >
+                                                                {/* */}
+                                                                <td>
+                                                                  <div>
+                                                                    {
+                                                                      subService.serviceName
+                                                                    }
+                                                                  </div>
+                                                                  <div class="package-variables"></div>
+                                                                </td>
+                                                                <td className="text-right">
+                                                                  {EngagementObj.feeTypeId ===
+                                                                    1 && (
+                                                                    <>
+                                                                      {" "}
+                                                                      {formatValue(
+                                                                        subService.contractPrice,
+                                                                      )}
+                                                                    </>
+                                                                  )}
+                                                                  {EngagementObj.feeTypeId ===
+                                                                    2 && (
+                                                                    <span className="fa fa-check"></span>
+                                                                  )}
+                                                                </td>
+                                                              </tr>
+                                                            );
+                                                          },
+                                                        )}
+                                                      </>
+                                                    );
+                                                  },
+                                                )}
+                                                <tr className="head-row">
+                                                  <td className="tr-table-class font-14 font-14 text-white">
+                                                    Net Total
+                                                  </td>
+                                                  <td className="tr-table-class font-14 text-white text-right">
+                                                    {" "}
+                                                    {
                                                       Number(
-                                                        RecurringPricingInfo.DiscountedPrice,
-                                                      ) ||
-                                                    (Number(
-                                                      RecurringPricingInfo.Discount,
-                                                    ) > 0 &&
-                                                      !EngagementObj.DiscountLines)
-                                                      ? formatValue(
+                                                        RecurringPricingInfo.OriginalPrice,
+                                                      ) <
+                                                        Number(
                                                           RecurringPricingInfo.DiscountedPrice,
-                                                        )
-                                                      : // Number(RecurringPricingInfo.DiscountedPrice)
-                                                        //     .toFixed(2)
-                                                        //     .toString()
-                                                        //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                                        formatValue(
-                                                          RecurringPricingInfo.OriginalPrice,
-                                                        )
-                                                    // Number(RecurringPricingInfo.OriginalPrice)
-                                                    //     .toFixed(2)
-                                                    //     .toString()
-                                                    //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                                  }
-                                                </td>
-                                              </tr>
-                                              {Number(
-                                                RecurringPricingInfo.Discount,
-                                              ) > 0 &&
-                                                EngagementObj.DiscountLines && (
+                                                        ) ||
+                                                      (Number(
+                                                        RecurringPricingInfo.Discount,
+                                                      ) > 0 &&
+                                                        !EngagementObj.DiscountLines)
+                                                        ? formatValue(
+                                                            RecurringPricingInfo.DiscountedPrice,
+                                                          )
+                                                        : // Number(RecurringPricingInfo.DiscountedPrice)
+                                                          //     .toFixed(2)
+                                                          //     .toString()
+                                                          //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                          formatValue(
+                                                            RecurringPricingInfo.OriginalPrice,
+                                                          )
+                                                      // Number(RecurringPricingInfo.OriginalPrice)
+                                                      //     .toFixed(2)
+                                                      //     .toString()
+                                                      //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                    }
+                                                  </td>
+                                                </tr>
+                                                {Number(
+                                                  RecurringPricingInfo.Discount,
+                                                ) > 0 &&
+                                                  EngagementObj.DiscountLines && (
+                                                    <>
+                                                      <tr class="head-grey-row">
+                                                        <td className="tr-table-class font-14 text-white">
+                                                          Discount
+                                                        </td>
+                                                        <td className="tr-table-class font-14 text-white text-right">
+                                                          (-){" "}
+                                                          {formatValue(
+                                                            RecurringPricingInfo.Discount,
+                                                          )}
+                                                        </td>
+                                                      </tr>
+                                                      <tr class="head-row">
+                                                        <td className="tr-table-class font-14 text-white">
+                                                          Discounted Total
+                                                        </td>
+                                                        <td className="tr-table-class font-14 text-white text-right">
+                                                          {" "}
+                                                          {formatValue(
+                                                            RecurringPricingInfo.DiscountedTotal,
+                                                          )}
+                                                        </td>
+                                                      </tr>
+                                                    </>
+                                                  )}
+
+                                                {vatPercentage && (
                                                   <>
                                                     <tr class="head-grey-row">
                                                       <td className="tr-table-class font-14 text-white">
-                                                        Discount
+                                                        {getTaxName(
+                                                          EngagementObj.currencyID,
+                                                        )}
                                                       </td>
-                                                      <td className="tr-table-class font-14 text-white text-right">
-                                                        (-){" "}
+                                                      <td className="tr-table-class text-white font-14 text-right">
+                                                        {" "}
                                                         {formatValue(
-                                                          RecurringPricingInfo.Discount,
+                                                          RecurringPricingInfo.VATPrice,
                                                         )}
                                                       </td>
                                                     </tr>
-                                                    <tr class="head-row">
+                                                    <tr className="head-row">
                                                       <td className="tr-table-class font-14 text-white">
-                                                        Discounted Total
+                                                        Grand Total
                                                       </td>
                                                       <td className="tr-table-class font-14 text-white text-right">
                                                         {" "}
                                                         {formatValue(
-                                                          RecurringPricingInfo.DiscountedTotal,
+                                                          RecurringPricingInfo.GrandTotal,
                                                         )}
                                                       </td>
                                                     </tr>
                                                   </>
                                                 )}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        ) : (
+                                          <div
+                                            style={{ marginTop: "0px" }}
+                                            className="table-responsive"
+                                          >
+                                            <table className="table align-middle table-nowrap">
+                                              <thead className="table-dark text-white">
+                                                <tr className="head-row">
+                                                  {visibleFieldsCustomTemp?.serviceCategory && (
+                                                    <th
+                                                      className="tr-table-class text-white text-center"
+                                                      style={{
+                                                        width: "16.66%",
+                                                      }}
+                                                    >
+                                                      Service Category
+                                                    </th>
+                                                  )}
 
-                                              {vatPercentage && (
-                                                <>
-                                                  <tr class="head-grey-row">
-                                                    <td className="tr-table-class font-14 text-white">
-                                                      {getTaxName(
+                                                  {visibleFieldsCustomTemp?.serviceName && (
+                                                    <th
+                                                      className="tr-table-class text-white text-center"
+                                                      style={{
+                                                        width: "16.66%",
+                                                      }}
+                                                    >
+                                                      Services
+                                                    </th>
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.serviceScope && (
+                                                    <th
+                                                      className="tr-table-class text-white text-center"
+                                                      style={{
+                                                        width: "16.66%",
+                                                      }}
+                                                    >
+                                                      Service Scope
+                                                    </th>
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.fees && (
+                                                    <th
+                                                      className="tr-table-class text-white text-center"
+                                                      style={{
+                                                        width: "16.66%",
+                                                      }}
+                                                    >
+                                                      Fees (£)
+                                                    </th>
+                                                  )}
+
+                                                  {showRecurringVat &&
+                                                    visibleFieldsCustomTemp?.vatRate && (
+                                                      <th
+                                                        className="tr-table-class text-white text-center"
+                                                        style={{
+                                                          width: "16.66%",
+                                                        }}
+                                                      >
+                                                        VAT Rate
+                                                      </th>
+                                                    )}
+
+                                                  {showRecurringVat &&
+                                                    visibleFieldsCustomTemp?.vat && (
+                                                      <th
+                                                        className="tr-table-class text-white text-center"
+                                                        style={{
+                                                          width: "16.66%",
+                                                        }}
+                                                      >
+                                                        VAT (£)
+                                                      </th>
+                                                    )}
+
+                                                  {showRecurringVat &&
+                                                    visibleFieldsCustomTemp?.feesIncVat && (
+                                                      <th
+                                                        className="tr-table-class text-white text-center"
+                                                        style={{
+                                                          width: "16.66%",
+                                                        }}
+                                                      >
+                                                        Fees inc VAT (£)
+                                                      </th>
+                                                    )}
+                                                </tr>
+                                              </thead>
+
+                                              <tbody>
+                                                {recurringRowsByCategory.map(
+                                                  (category, categoryIndex) => (
+                                                    <React.Fragment
+                                                      key={`recurring-category-${category.serviceCatID || categoryIndex}`}
+                                                    >
+                                                      {(
+                                                        category?.servicesList ||
+                                                        []
+                                                      ).map(
+                                                        (
+                                                          subService,
+                                                          serviceIndex,
+                                                        ) => {
+                                                          const driverList =
+                                                            subService?.pricingDriverList ||
+                                                            [];
+
+                                                          return (
+                                                            <tr
+                                                              key={`recurring-service-${subService.serviceID || serviceIndex}`}
+                                                            >
+                                                              {visibleFieldsCustomTemp?.serviceCategory && (
+                                                                <td className="text-center">
+                                                                  {
+                                                                    category.serviceCatName
+                                                                  }
+                                                                </td>
+                                                              )}
+
+                                                              {visibleFieldsCustomTemp?.serviceName && (
+                                                                <td className="text-center">
+                                                                  {
+                                                                    subService.serviceName
+                                                                  }
+                                                                </td>
+                                                              )}
+
+                                                              {visibleFieldsCustomTemp?.serviceScope && (
+                                                                <td className="text-center">
+                                                                  {driverList.length >
+                                                                  0
+                                                                    ? driverList.map(
+                                                                        (
+                                                                          driver,
+                                                                          driverIndex,
+                                                                        ) => (
+                                                                          <div
+                                                                            key={`${driver.driverName}-${driverIndex}`}
+                                                                          >
+                                                                            {
+                                                                              driver.driverName
+                                                                            }{" "}
+                                                                            ={" "}
+                                                                            {
+                                                                              driver.driverValue
+                                                                            }
+                                                                          </div>
+                                                                        ),
+                                                                      )
+                                                                    : "-"}
+                                                                </td>
+                                                              )}
+
+                                                              {visibleFieldsCustomTemp?.fees && (
+                                                                <td className="text-center">
+                                                                  {EngagementObj?.feeTypeId ===
+                                                                    1 &&
+                                                                    formatValue(
+                                                                      subService.calculatedPrice,
+                                                                      EngagementObj.currencyID,
+                                                                    )}
+
+                                                                  {EngagementObj?.feeTypeId ===
+                                                                    2 && (
+                                                                    <span className="fa fa-check" />
+                                                                  )}
+                                                                </td>
+                                                              )}
+
+                                                              {showRecurringVat &&
+                                                                visibleFieldsCustomTemp?.vatRate && (
+                                                                  <td className="text-center">
+                                                                    {
+                                                                      subService.calculatedVatRate
+                                                                    }
+                                                                    %
+                                                                  </td>
+                                                                )}
+
+                                                              {showRecurringVat &&
+                                                                visibleFieldsCustomTemp?.vat && (
+                                                                  <td className="text-center">
+                                                                    {EngagementObj?.feeTypeId ===
+                                                                      1 &&
+                                                                      formatValue(
+                                                                        subService.calculatedVatAmount,
+                                                                        EngagementObj.currencyID,
+                                                                      )}
+
+                                                                    {EngagementObj?.feeTypeId ===
+                                                                      2 && (
+                                                                      <span className="fa fa-check" />
+                                                                    )}
+                                                                  </td>
+                                                                )}
+
+                                                              {showRecurringVat &&
+                                                                visibleFieldsCustomTemp?.feesIncVat && (
+                                                                  <td className="text-center">
+                                                                    {EngagementObj?.feeTypeId ===
+                                                                      1 &&
+                                                                      formatValue(
+                                                                        subService.calculatedFeesIncludingVat,
+                                                                        EngagementObj.currencyID,
+                                                                      )}
+
+                                                                    {EngagementObj?.feeTypeId ===
+                                                                      2 && (
+                                                                      <span className="fa fa-check" />
+                                                                    )}
+                                                                  </td>
+                                                                )}
+                                                            </tr>
+                                                          );
+                                                        },
+                                                      )}
+                                                    </React.Fragment>
+                                                  ),
+                                                )}
+
+                                                <tr className="head-row">
+                                                  {visibleFieldsCustomTemp?.serviceCategory && (
+                                                    <td className="tr-table-class text-white">
+                                                      Net Total
+                                                    </td>
+                                                  )}
+                                                  {visibleFieldsCustomTemp?.serviceName && (
+                                                    <td />
+                                                  )}
+                                                  {visibleFieldsCustomTemp?.serviceScope && (
+                                                    <td />
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.fees && (
+                                                    <td className="tr-table-class font-14 text-white text-center">
+                                                      {formatValue(
+                                                        recurringNetRowValues.fees,
                                                         EngagementObj.currencyID,
                                                       )}
                                                     </td>
-                                                    <td className="tr-table-class text-white font-14 text-right">
-                                                      {" "}
-                                                      {formatValue(
-                                                        RecurringPricingInfo.VATPrice,
+                                                  )}
+
+                                                  {showRecurringVat &&
+                                                    visibleFieldsCustomTemp?.vatRate && (
+                                                      <td />
+                                                    )}
+
+                                                  {showRecurringVat &&
+                                                    visibleFieldsCustomTemp?.vat && (
+                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                        {formatValue(
+                                                          recurringNetRowValues.vat,
+                                                          EngagementObj.currencyID,
+                                                        )}
+                                                      </td>
+                                                    )}
+
+                                                  {showRecurringVat &&
+                                                    visibleFieldsCustomTemp?.feesIncVat && (
+                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                        {formatValue(
+                                                          recurringNetRowValues.feesIncVAT,
+                                                          EngagementObj.currencyID,
+                                                        )}
+                                                      </td>
+                                                    )}
+                                                </tr>
+
+                                                {recurringFooterTotals.hasDiscount &&
+                                                  showRecurringDiscountLine && (
+                                                    <tr className="head-grey-row">
+                                                      {visibleFieldsCustomTemp?.serviceCategory && (
+                                                        <td className="tr-table-class font-14 text-white">
+                                                          Discount
+                                                        </td>
                                                       )}
-                                                    </td>
-                                                  </tr>
-                                                  <tr className="head-row">
+                                                      {visibleFieldsCustomTemp?.serviceName && (
+                                                        <td />
+                                                      )}
+                                                      {visibleFieldsCustomTemp?.serviceScope && (
+                                                        <td />
+                                                      )}
+
+                                                      {visibleFieldsCustomTemp?.fees && (
+                                                        <td className="tr-table-class font-14 text-white text-center">
+                                                          (-){" "}
+                                                          {formatValue(
+                                                            recurringFooterTotals.discount,
+                                                            EngagementObj.currencyID,
+                                                          )}
+                                                        </td>
+                                                      )}
+
+                                                      {showRecurringVat &&
+                                                        visibleFieldsCustomTemp?.vatRate && (
+                                                          <td />
+                                                        )}
+
+                                                      {showRecurringVat &&
+                                                        visibleFieldsCustomTemp?.vat && (
+                                                          <td className="tr-table-class font-14 text-white text-right">
+                                                            (-){" "}
+                                                            {formatValue(
+                                                              recurringFooterTotals.vatDiscount,
+                                                              EngagementObj.currencyID,
+                                                            )}
+                                                          </td>
+                                                        )}
+
+                                                      {showRecurringVat &&
+                                                        visibleFieldsCustomTemp?.feesIncVat && (
+                                                          <td className="tr-table-class font-14 text-white text-right">
+                                                            (-){" "}
+                                                            {formatValue(
+                                                              recurringFooterTotals.discountIncludingVAT,
+                                                              EngagementObj.currencyID,
+                                                            )}
+                                                          </td>
+                                                        )}
+                                                    </tr>
+                                                  )}
+
+                                                <tr className="head-row">
+                                                  {visibleFieldsCustomTemp?.serviceCategory && (
                                                     <td className="tr-table-class font-14 text-white">
                                                       Grand Total
                                                     </td>
-                                                    <td className="tr-table-class font-14 text-white text-right">
-                                                      {" "}
+                                                  )}
+                                                  {visibleFieldsCustomTemp?.serviceName && (
+                                                    <td />
+                                                  )}
+                                                  {visibleFieldsCustomTemp?.serviceScope && (
+                                                    <td />
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.fees && (
+                                                    <td className="tr-table-class font-14 text-white text-center">
                                                       {formatValue(
-                                                        RecurringPricingInfo.GrandTotal,
+                                                        recurringFooterTotals.hasDiscount
+                                                          ? recurringFooterTotals.discountedTotal
+                                                          : recurringFooterTotals.netTotal,
+                                                        EngagementObj.currencyID,
                                                       )}
                                                     </td>
-                                                  </tr>
-                                                </>
-                                              )}
-                                            </tbody>
-                                          </table>
-                                        </div>
+                                                  )}
+
+                                                  {showRecurringVat &&
+                                                    visibleFieldsCustomTemp?.vatRate && (
+                                                      <td />
+                                                    )}
+
+                                                  {showRecurringVat &&
+                                                    visibleFieldsCustomTemp?.vat && (
+                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                        {formatValue(
+                                                          recurringFooterTotals.finalVAT,
+                                                          EngagementObj.currencyID,
+                                                        )}
+                                                      </td>
+                                                    )}
+
+                                                  {showRecurringVat &&
+                                                    visibleFieldsCustomTemp?.feesIncVat && (
+                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                        {formatValue(
+                                                          recurringFooterTotals.grandTotal,
+                                                          EngagementObj.currencyID,
+                                                        )}
+                                                      </td>
+                                                    )}
+                                                </tr>
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -1771,179 +2535,568 @@ const View_Engagement_Latter = () => {
                                           </div>
                                         </div>
                                         <div className="mb-3"></div>
-                                        <div
-                                          style={{ marginTop: "0px" }}
-                                          className="table-responsive"
-                                        >
-                                          <table className="table align-middle table-nowrap">
-                                            <thead className="table-light table-header-font">
-                                              <tr className="head-row">
-                                                <th className="tr-table-class text-white">
-                                                  Services
-                                                </th>
-                                                <th className="tr-table-class text-white text-right">
-                                                  Fees (
-                                                  {getCurrencySymbol(
-                                                    EngagementObj.currencyID,
-                                                  )}
-                                                  )
-                                                </th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {selectedOneOffServiceList.map(
-                                                (service, index) => {
-                                                  return (
-                                                    <>
-                                                      <tr class="a-la-carte-services-review-head-row">
-                                                        <th colspan="2">
-                                                          {
-                                                            service.serviceCatName
-                                                          }
-                                                        </th>
-                                                      </tr>
-                                                      {service.servicesList.map(
-                                                        (
-                                                          subService,
-                                                          subIndex,
-                                                        ) => {
-                                                          return (
-                                                            <tr
-                                                              key={subIndex}
-                                                              className={` ${
-                                                                subService?.isAdditionalService ===
-                                                                true
-                                                                  ? "bg-info  text-white"
-                                                                  : ""
-                                                              }`}
-                                                            >
-                                                              {/* */}
-                                                              <td>
-                                                                <div>
-                                                                  {
-                                                                    subService.serviceName
-                                                                  }
-                                                                </div>
-                                                                <div class="package-variables"></div>
-                                                              </td>
-                                                              <td className="text-right">
-                                                                {EngagementObj.feeTypeId ===
-                                                                  1 && (
-                                                                  <>
-                                                                    {" "}
-                                                                    {formatValue(
-                                                                      subService.contractPrice,
-                                                                    )}
-                                                                  </>
-                                                                )}
-                                                                {EngagementObj.feeTypeId ===
-                                                                  2 && (
-                                                                  <span className="fa fa-check"></span>
-                                                                )}
-                                                              </td>
-                                                            </tr>
-                                                          );
-                                                        },
-                                                      )}
-                                                    </>
-                                                  );
-                                                },
-                                              )}
-                                              <tr className="head-row">
-                                                <td className="tr-table-class font-14 text-white">
-                                                  Net Total
-                                                </td>
-                                                <td className="tr-table-class font-14 text-white text-right">
-                                                  {" "}
-                                                  {
-                                                    Number(
-                                                      OneOffPricingInfo.OriginalPrice,
-                                                    ) <
-                                                      Number(
-                                                        OneOffPricingInfo.DiscountedPrice,
-                                                      ) ||
-                                                    (Number(
-                                                      OneOffPricingInfo.Discount,
-                                                    ) > 0 &&
-                                                      !EngagementObj.DiscountLines)
-                                                      ? formatValue(
-                                                          OneOffPricingInfo.DiscountedPrice,
-                                                        )
-                                                      : // Number(OneOffPricingInfo.DiscountedPrice)
-                                                        //     .toFixed(2)
-                                                        //     .toString()
-                                                        //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                                        formatValue(
-                                                          OneOffPricingInfo.OriginalPrice,
-                                                        )
-                                                    //  Number(OneOffPricingInfo.OriginalPrice)
-                                                    //     .toFixed(2)
-                                                    //     .toString()
-                                                    //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                                  }
-                                                </td>
-                                              </tr>
-                                              {Number(
-                                                OneOffPricingInfo.Discount,
-                                              ) > 0 &&
-                                                EngagementObj.DiscountLines && (
-                                                  <>
+                                        {pricingTableColumnIDs === null ||
+                                        pricingTableColumnIDs === "" ||
+                                        pricingTableColumnIDs === undefined ? (
+                                          <div
+                                            style={{ marginTop: "0px" }}
+                                            className="table-responsive"
+                                          >
+                                            <table className="table align-middle table-nowrap">
+                                              <thead className="table-light table-header-font">
+                                                <tr className="head-row">
+                                                  <th className="tr-table-class text-white">
+                                                    Services
+                                                  </th>
+                                                  <th className="tr-table-class text-white text-right">
+                                                    Fees (
+                                                    {getCurrencySymbol(
+                                                      EngagementObj.currencyID,
+                                                    )}
+                                                    )
+                                                  </th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {selectedOneOffServiceList.map(
+                                                  (service, index) => {
+                                                    return (
+                                                      <>
+                                                        <tr class="a-la-carte-services-review-head-row">
+                                                          <th colspan="2">
+                                                            {
+                                                              service.serviceCatName
+                                                            }
+                                                          </th>
+                                                        </tr>
+                                                        {service.servicesList.map(
+                                                          (
+                                                            subService,
+                                                            subIndex,
+                                                          ) => {
+                                                            return (
+                                                              <tr
+                                                                key={subIndex}
+                                                                className={` ${
+                                                                  subService?.isAdditionalService ===
+                                                                  true
+                                                                    ? "bg-info  text-white"
+                                                                    : ""
+                                                                }`}
+                                                              >
+                                                                {/* */}
+                                                                <td>
+                                                                  <div>
+                                                                    {
+                                                                      subService.serviceName
+                                                                    }
+                                                                  </div>
+                                                                  <div class="package-variables"></div>
+                                                                </td>
+                                                                <td className="text-right">
+                                                                  {EngagementObj.feeTypeId ===
+                                                                    1 && (
+                                                                    <>
+                                                                      {" "}
+                                                                      {formatValue(
+                                                                        subService.contractPrice,
+                                                                      )}
+                                                                    </>
+                                                                  )}
+                                                                  {EngagementObj.feeTypeId ===
+                                                                    2 && (
+                                                                    <span className="fa fa-check"></span>
+                                                                  )}
+                                                                </td>
+                                                              </tr>
+                                                            );
+                                                          },
+                                                        )}
+                                                      </>
+                                                    );
+                                                  },
+                                                )}
+                                                <tr className="head-row">
+                                                  <td className="tr-table-class font-14 text-white">
+                                                    Net Total
+                                                  </td>
+                                                  <td className="tr-table-class font-14 text-white text-right">
                                                     {" "}
+                                                    {
+                                                      Number(
+                                                        OneOffPricingInfo.OriginalPrice,
+                                                      ) <
+                                                        Number(
+                                                          OneOffPricingInfo.DiscountedPrice,
+                                                        ) ||
+                                                      (Number(
+                                                        OneOffPricingInfo.Discount,
+                                                      ) > 0 &&
+                                                        !EngagementObj.DiscountLines)
+                                                        ? formatValue(
+                                                            OneOffPricingInfo.DiscountedPrice,
+                                                          )
+                                                        : // Number(OneOffPricingInfo.DiscountedPrice)
+                                                          //     .toFixed(2)
+                                                          //     .toString()
+                                                          //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                          formatValue(
+                                                            OneOffPricingInfo.OriginalPrice,
+                                                          )
+                                                      //  Number(OneOffPricingInfo.OriginalPrice)
+                                                      //     .toFixed(2)
+                                                      //     .toString()
+                                                      //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                    }
+                                                  </td>
+                                                </tr>
+                                                {Number(
+                                                  OneOffPricingInfo.Discount,
+                                                ) > 0 &&
+                                                  EngagementObj.DiscountLines && (
+                                                    <>
+                                                      {" "}
+                                                      <tr class="head-grey-row">
+                                                        <td className="tr-table-class font-14 text-white">
+                                                          Discount
+                                                        </td>
+                                                        <td className="tr-table-class text-white text-right font-14">
+                                                          (-){" "}
+                                                          {formatValue(
+                                                            OneOffPricingInfo.Discount,
+                                                          )}
+                                                        </td>
+                                                      </tr>
+                                                      <tr class="head-row">
+                                                        <td className="tr-table-class font-14 text-white">
+                                                          Discounted Total
+                                                        </td>
+                                                        <td className="tr-table-class font-14 text-white text-right">
+                                                          {" "}
+                                                          {formatValue(
+                                                            OneOffPricingInfo.DiscountedTotal,
+                                                          )}
+                                                        </td>
+                                                      </tr>
+                                                    </>
+                                                  )}
+                                                {vatPercentage && (
+                                                  <>
                                                     <tr class="head-grey-row">
                                                       <td className="tr-table-class font-14 text-white">
-                                                        Discount
-                                                      </td>
-                                                      <td className="tr-table-class text-white text-right font-14">
-                                                        (-){" "}
-                                                        {formatValue(
-                                                          OneOffPricingInfo.Discount,
+                                                        {getTaxName(
+                                                          EngagementObj.currencyID,
                                                         )}
-                                                      </td>
-                                                    </tr>
-                                                    <tr class="head-row">
-                                                      <td className="tr-table-class font-14 text-white">
-                                                        Discounted Total
                                                       </td>
                                                       <td className="tr-table-class font-14 text-white text-right">
                                                         {" "}
                                                         {formatValue(
-                                                          OneOffPricingInfo.DiscountedTotal,
+                                                          OneOffPricingInfo.VATPrice,
+                                                        )}
+                                                      </td>
+                                                    </tr>
+                                                    <tr className="head-row">
+                                                      <td className="tr-table-class font-14 text-white">
+                                                        Grand Total
+                                                      </td>
+                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                        {" "}
+                                                        {formatValue(
+                                                          OneOffPricingInfo.GrandTotal,
                                                         )}
                                                       </td>
                                                     </tr>
                                                   </>
                                                 )}
-                                              {vatPercentage && (
-                                                <>
-                                                  <tr class="head-grey-row">
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        ) : (
+                                          <div
+                                            style={{ marginTop: "0px" }}
+                                            className="table-responsive"
+                                          >
+                                            <table className="table align-middle table-nowrap">
+                                              <thead className="table-dark text-white">
+                                                <tr className="head-row">
+                                                  {visibleFieldsCustomTemp?.serviceCategory && (
+                                                    <th
+                                                      className="tr-table-class text-white text-center"
+                                                      style={{
+                                                        width: "16.66%",
+                                                      }}
+                                                    >
+                                                      Service Category
+                                                    </th>
+                                                  )}
+                                                  {visibleFieldsCustomTemp.serviceName && (
+                                                    <th
+                                                      className="tr-table-class text-white text-center"
+                                                      style={{
+                                                        width: "16.66%",
+                                                      }}
+                                                    >
+                                                      Services
+                                                    </th>
+                                                  )}
+                                                  {visibleFieldsCustomTemp.serviceScope && (
+                                                    <th
+                                                      className="tr-table-class text-white text-center"
+                                                      style={{
+                                                        width: "16.66%",
+                                                      }}
+                                                    >
+                                                      Service Scope
+                                                    </th>
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp.fees && (
+                                                    <th
+                                                      className="tr-table-class text-white text-center"
+                                                      style={{
+                                                        width: "16.66%",
+                                                      }}
+                                                    >
+                                                      Fees (£)
+                                                    </th>
+                                                  )}
+                                                  {showOneOffVat &&
+                                                    visibleFieldsCustomTemp.vatRate && (
+                                                      <th
+                                                        className="tr-table-class text-white text-center"
+                                                        style={{
+                                                          width: "16.66%",
+                                                        }}
+                                                      >
+                                                        VAT Rate
+                                                      </th>
+                                                    )}
+                                                  {showOneOffVat &&
+                                                    visibleFieldsCustomTemp.vat && (
+                                                      <th
+                                                        className="tr-table-class text-white text-center"
+                                                        style={{
+                                                          width: "16.66%",
+                                                        }}
+                                                      >
+                                                        VAT (£)
+                                                      </th>
+                                                    )}
+                                                  {showOneOffVat &&
+                                                    visibleFieldsCustomTemp.feesIncVat && (
+                                                      <th
+                                                        className="tr-table-class text-white text-center"
+                                                        style={{
+                                                          width: "16.66%",
+                                                        }}
+                                                      >
+                                                        Fees inc VAT (£)
+                                                      </th>
+                                                    )}
+                                                </tr>
+                                              </thead>
+
+                                              <tbody>
+                                                {selectedOneOffServiceList?.map(
+                                                  (service, index) => {
+                                                    return (
+                                                      <>
+                                                        {service.servicesList.map(
+                                                          (
+                                                            subService,
+                                                            subIndex,
+                                                          ) => {
+                                                            const {
+                                                              price,
+                                                              vatRate,
+                                                              vatAmount,
+                                                              feesIncludingVat,
+                                                            } =
+                                                              calculateOneOffServiceRow(
+                                                                {
+                                                                  service:
+                                                                    subService,
+                                                                  fallbackVatRate:
+                                                                    oneOffFinalAmount.vatPercentage,
+                                                                },
+                                                              );
+                                                            const driverList =
+                                                              subService.pricingDriverList ||
+                                                              [];
+
+                                                            return (
+                                                              <tr
+                                                                key={`sub-oneoff-${index}-${subIndex}`}
+                                                              >
+                                                                {visibleFieldsCustomTemp?.serviceCategory && (
+                                                                  <td className="text-center">
+                                                                    {
+                                                                      service.serviceCatName
+                                                                    }
+                                                                  </td>
+                                                                )}
+                                                                {visibleFieldsCustomTemp.serviceName && (
+                                                                  <td className="text-center">
+                                                                    {
+                                                                      subService.serviceName
+                                                                    }
+                                                                  </td>
+                                                                )}
+                                                                {visibleFieldsCustomTemp.serviceScope && (
+                                                                  <td className="text-center">
+                                                                    {driverList.length >
+                                                                    0
+                                                                      ? driverList.map(
+                                                                          (
+                                                                            d,
+                                                                            i,
+                                                                          ) => (
+                                                                            <div
+                                                                              key={
+                                                                                i
+                                                                              }
+                                                                            >
+                                                                              {
+                                                                                d.driverName
+                                                                              }{" "}
+                                                                              ={" "}
+                                                                              {
+                                                                                d.driverValue
+                                                                              }
+                                                                              {i !==
+                                                                                driverList.length -
+                                                                                  1 &&
+                                                                                ", "}
+                                                                            </div>
+                                                                          ),
+                                                                        )
+                                                                      : "-"}
+                                                                  </td>
+                                                                )}
+                                                                {visibleFieldsCustomTemp.fees && (
+                                                                  <td className="text-center">
+                                                                    {EngagementObj.feeTypeId ===
+                                                                      1 &&
+                                                                      formatValue(
+                                                                        price,
+                                                                      )}
+                                                                    {EngagementObj.feeTypeId ===
+                                                                      2 && (
+                                                                      <span className="fa fa-check"></span>
+                                                                    )}
+                                                                  </td>
+                                                                )}
+                                                                {showOneOffVat &&
+                                                                  visibleFieldsCustomTemp.vatRate && (
+                                                                    <td className="text-center">
+                                                                      {vatRate}%
+                                                                    </td>
+                                                                  )}
+                                                                {showOneOffVat &&
+                                                                  visibleFieldsCustomTemp.vat && (
+                                                                    <td className="text-center">
+                                                                      {EngagementObj.feeTypeId ===
+                                                                        1 &&
+                                                                        formatValue(
+                                                                          vatAmount,
+                                                                        )}
+                                                                      {EngagementObj.feeTypeId ===
+                                                                        2 && (
+                                                                        <span className="fa fa-check"></span>
+                                                                      )}
+                                                                    </td>
+                                                                  )}
+                                                                {showOneOffVat &&
+                                                                  visibleFieldsCustomTemp.feesIncVat && (
+                                                                    <td className="text-center">
+                                                                      {EngagementObj.feeTypeId ===
+                                                                        1 &&
+                                                                        formatValue(
+                                                                          feesIncludingVat,
+                                                                        )}
+                                                                      {EngagementObj.feeTypeId ===
+                                                                        2 && (
+                                                                        <span className="fa fa-check"></span>
+                                                                      )}
+                                                                    </td>
+                                                                  )}
+                                                              </tr>
+                                                            );
+                                                          },
+                                                        )}
+                                                      </>
+                                                    );
+                                                  },
+                                                )}
+
+                                                {/* NET TOTAL */}
+                                                <tr className="head-row">
+                                                  {visibleFieldsCustomTemp?.serviceCategory && (
                                                     <td className="tr-table-class font-14 text-white">
-                                                      {getTaxName(
+                                                      Net Total
+                                                    </td>
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.serviceName && (
+                                                    <td></td>
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.serviceScope && (
+                                                    <td></td>
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.fees && (
+                                                    <td className="tr-table-class font-14 text-white text-right">
+                                                      {formatValue(
+                                                        oneOffFooterNetFees,
                                                         EngagementObj.currencyID,
                                                       )}
                                                     </td>
-                                                    <td className="tr-table-class font-14 text-white text-right">
-                                                      {" "}
-                                                      {formatValue(
-                                                        OneOffPricingInfo.VATPrice,
+                                                  )}
+
+                                                  {showOneOffVat &&
+                                                    visibleFieldsCustomTemp?.vatRate && (
+                                                      <td></td>
+                                                    )}
+
+                                                  {showOneOffVat &&
+                                                    visibleFieldsCustomTemp?.vat && (
+                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                        {formatValue(
+                                                          oneOffFooterNetVat,
+                                                          EngagementObj.currencyID,
+                                                        )}
+                                                      </td>
+                                                    )}
+
+                                                  {showOneOffVat &&
+                                                    visibleFieldsCustomTemp?.feesIncVat && (
+                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                        {formatValue(
+                                                          oneOffFooterNetFeesIncludingVat,
+                                                          EngagementObj.currencyID,
+                                                        )}
+                                                      </td>
+                                                    )}
+                                                </tr>
+
+                                                {/* DISCOUNT */}
+                                                {hasOneOffDiscount &&
+                                                  EngagementObj.DiscountLines && (
+                                                    <tr className="head-grey-row">
+                                                      {visibleFieldsCustomTemp?.serviceCategory && (
+                                                        <td className="tr-table-class font-14 text-white">
+                                                          Discount
+                                                        </td>
                                                       )}
-                                                    </td>
-                                                  </tr>
-                                                  <tr className="head-row">
+
+                                                      {visibleFieldsCustomTemp?.serviceName && (
+                                                        <td></td>
+                                                      )}
+
+                                                      {visibleFieldsCustomTemp?.serviceScope && (
+                                                        <td></td>
+                                                      )}
+
+                                                      {visibleFieldsCustomTemp?.fees && (
+                                                        <td className="tr-table-class font-14 text-white text-right">
+                                                          (-){" "}
+                                                          {formatValue(
+                                                            oneOffDiscountAmount,
+                                                            EngagementObj.currencyID,
+                                                          )}
+                                                        </td>
+                                                      )}
+
+                                                      {showOneOffVat &&
+                                                        visibleFieldsCustomTemp?.vatRate && (
+                                                          <td></td>
+                                                        )}
+
+                                                      {showOneOffVat &&
+                                                        visibleFieldsCustomTemp?.vat && (
+                                                          <td className="tr-table-class font-14 text-white text-right">
+                                                            (-){" "}
+                                                            {formatValue(
+                                                              oneOffVatDiscountAmount,
+                                                              EngagementObj.currencyID,
+                                                            )}
+                                                          </td>
+                                                        )}
+
+                                                      {showOneOffVat &&
+                                                        visibleFieldsCustomTemp?.feesIncVat && (
+                                                          <td className="tr-table-class font-14 text-white text-right">
+                                                            (-){" "}
+                                                            {formatValue(
+                                                              oneOffDiscountedFeesIncludingVat,
+                                                              EngagementObj.currencyID,
+                                                            )}
+                                                          </td>
+                                                        )}
+                                                    </tr>
+                                                  )}
+
+                                                {/* GRAND TOTAL */}
+                                                <tr className="head-row">
+                                                  {visibleFieldsCustomTemp?.serviceCategory && (
                                                     <td className="tr-table-class font-14 text-white">
                                                       Grand Total
                                                     </td>
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.serviceName && (
+                                                    <td></td>
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.serviceScope && (
+                                                    <td></td>
+                                                  )}
+
+                                                  {visibleFieldsCustomTemp?.fees && (
                                                     <td className="tr-table-class font-14 text-white text-right">
-                                                      {" "}
                                                       {formatValue(
-                                                        OneOffPricingInfo.GrandTotal,
+                                                        hasOneOffDiscount
+                                                          ? oneOffDiscountedNet
+                                                          : oneOffNetTotal,
+                                                        EngagementObj.currencyID,
                                                       )}
                                                     </td>
-                                                  </tr>
-                                                </>
-                                              )}
-                                            </tbody>
-                                          </table>
-                                        </div>
+                                                  )}
+
+                                                  {showOneOffVat &&
+                                                    visibleFieldsCustomTemp?.vatRate && (
+                                                      <td></td>
+                                                    )}
+
+                                                  {showOneOffVat &&
+                                                    visibleFieldsCustomTemp?.vat && (
+                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                        {formatValue(
+                                                          hasOneOffDiscount
+                                                            ? oneOffDiscountedVat
+                                                            : oneOffVatTotal,
+                                                          EngagementObj.currencyID,
+                                                        )}
+                                                      </td>
+                                                    )}
+
+                                                  {showOneOffVat &&
+                                                    visibleFieldsCustomTemp?.feesIncVat && (
+                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                        {formatValue(
+                                                          hasOneOffDiscount
+                                                            ? oneOffGrandTotal
+                                                            : oneOffNetFeesIncludingVat,
+                                                          EngagementObj.currencyID,
+                                                        )}
+                                                      </td>
+                                                    )}
+                                                </tr>
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
