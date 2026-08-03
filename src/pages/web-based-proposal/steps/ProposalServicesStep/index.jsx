@@ -12,6 +12,7 @@ import {
   getAddableCategories,
 } from "./utils/filterBySelectionState";
 import { buildSelectionsFromQuoteModel } from "./utils/buildSelectionsFromQuoteModel";
+import { validateSelectionsMap } from "./utils/validateSelectionFields";
 import {
   getRecurringServices,
   getOneOffServices,
@@ -22,8 +23,11 @@ import {
   selectOneOffServicesLoading,
   selectOneOffServicesError,
   selectServicesSelectionError,
+  selectServicesFieldErrorsVisible,
   setSelectedServiceIDs,
   setServicesSelectionError,
+  setServicesFieldErrors,
+  setServicesFieldErrorsVisible,
   setServiceSelections,
   setDefaultServiceSelections,
 } from "../../../../redux/reducer/webProposal/services";
@@ -81,6 +85,7 @@ const ServiceSelectionComponent = () => {
   const oneOffServicesError = useSelector(selectOneOffServicesError);
 
   const selectionError = useSelector(selectServicesSelectionError);
+  const fieldErrorsVisible = useSelector(selectServicesFieldErrorsVisible);
 
   const [recurringSelections, setRecurringSelections] = useState({});
   const [oneOffSelections, setOneOffSelections] = useState({});
@@ -391,89 +396,20 @@ const ServiceSelectionComponent = () => {
     Object.keys(pendingRecurringSelections).length +
     Object.keys(pendingOneOffSelections).length;
 
-  const validateSelectionFields = (service, driverValues) => {
-    const fieldErrors = {};
-
-    (service.pricingDriverList || [])
-      .filter((driver) => driver.driverVisibility)
-      .forEach((driver) => {
-        const entry = driverValues?.[driver.globalPricingDriverID];
-
-        if (driver.driverTypeID === 2) {
-          if (
-            entry?.value === "" ||
-            entry?.value === null ||
-            entry?.value === undefined
-          ) {
-            fieldErrors[driver.globalPricingDriverID] =
-              `${driver.driverName} is required.`;
-            return;
-          }
-
-          const numericValue = Number(entry.value);
-          if (Number.isNaN(numericValue)) {
-            fieldErrors[driver.globalPricingDriverID] = "Enter a valid number.";
-            return;
-          }
-
-          const quantity = driver.quantity?.[0];
-          const min =
-            quantity?.quantityFrom !== undefined
-              ? Number(quantity.quantityFrom)
-              : undefined;
-          const max =
-            quantity?.quantityTo !== undefined
-              ? Number(quantity.quantityTo)
-              : undefined;
-          if (
-            (min !== undefined && numericValue < min) ||
-            (max !== undefined && numericValue > max)
-          ) {
-            fieldErrors[driver.globalPricingDriverID] =
-              `Enter a value between ${min} and ${max}.`;
-          }
-        } else if (driver.driverTypeID === 3 || driver.driverTypeID === 4) {
-          if (entry?.value === null || entry?.value === undefined) {
-            fieldErrors[driver.globalPricingDriverID] =
-              `${driver.driverName} is required.`;
-          }
-        }
-      });
-
-    return fieldErrors;
-  };
-
   const validatePendingSelections = () => {
-    const errors = { recurring: {}, oneOff: {} };
-    let hasError = false;
+    const recurring = validateSelectionsMap(
+      pendingRecurringSelections,
+      recurringServiceByID,
+    );
+    const oneOff = validateSelectionsMap(
+      pendingOneOffSelections,
+      oneOffServiceByID,
+    );
 
-    Object.values(pendingRecurringSelections).forEach((selection) => {
-      const service = recurringServiceByID.get(selection.serviceID);
-      if (!service) return;
-      const fieldErrors = validateSelectionFields(
-        service,
-        selection.driverValues,
-      );
-      if (Object.keys(fieldErrors).length > 0) {
-        errors.recurring[selection.serviceID] = fieldErrors;
-        hasError = true;
-      }
-    });
-
-    Object.values(pendingOneOffSelections).forEach((selection) => {
-      const service = oneOffServiceByID.get(selection.serviceID);
-      if (!service) return;
-      const fieldErrors = validateSelectionFields(
-        service,
-        selection.driverValues,
-      );
-      if (Object.keys(fieldErrors).length > 0) {
-        errors.oneOff[selection.serviceID] = fieldErrors;
-        hasError = true;
-      }
-    });
-
-    return { errors, hasError };
+    return {
+      errors: { recurring: recurring.errors, oneOff: oneOff.errors },
+      hasError: recurring.hasError || oneOff.hasError,
+    };
   };
 
   const resetPendingState = () => {
@@ -532,6 +468,22 @@ const ServiceSelectionComponent = () => {
     [oneOffSelections],
   );
 
+  // Services picked directly from the main list (as opposed to through the
+  // Add Service modal) skip the modal's confirm-time validation, so a
+  // required driver field (quantity/variation/slab) can be left unset. That
+  // silently reaches the pricing API as a null driver value and comes back
+  // priced at 0/incorrect for just that service — validate the committed
+  // selections here too so the main list surfaces the same required-field
+  // errors and the step can block advancing until they're fixed.
+  const committedFieldErrors = useMemo(
+    () => ({
+      recurring: validateSelectionsMap(recurringSelections, recurringServiceByID)
+        .errors,
+      oneOff: validateSelectionsMap(oneOffSelections, oneOffServiceByID).errors,
+    }),
+    [recurringSelections, oneOffSelections, recurringServiceByID, oneOffServiceByID],
+  );
+
   useEffect(() => {
     const nextSelectedServiceIDs = [
       ...recurringSelectedList.map((selection) => selection.serviceID),
@@ -542,12 +494,20 @@ const ServiceSelectionComponent = () => {
     if (nextSelectedServiceIDs.length > 0) {
       dispatch(setServicesSelectionError(false));
     }
+    dispatch(setServicesFieldErrors(committedFieldErrors));
+    const hasFieldErrors =
+      Object.keys(committedFieldErrors.recurring).length > 0 ||
+      Object.keys(committedFieldErrors.oneOff).length > 0;
+    if (!hasFieldErrors) {
+      dispatch(setServicesFieldErrorsVisible(false));
+    }
   }, [
     dispatch,
     recurringSelectedList,
     oneOffSelectedList,
     recurringSelections,
     oneOffSelections,
+    committedFieldErrors,
   ]);
 
   const renderRecurringPanel = ({
@@ -621,6 +581,11 @@ const ServiceSelectionComponent = () => {
           Please select at least one service to continue.
         </p>
       )}
+      {fieldErrorsVisible && (
+        <p className="pss-selection-error">
+          Please complete the required fields for your selected services.
+        </p>
+      )}
       <div className="pss-columns">
         <div className="pss-list-column">
           {renderRecurringPanel({
@@ -636,6 +601,9 @@ const ServiceSelectionComponent = () => {
                 globalPricingDriverID,
                 patch,
               ),
+            fieldErrors: fieldErrorsVisible
+              ? committedFieldErrors.recurring
+              : undefined,
           })}
         </div>
 
@@ -653,6 +621,9 @@ const ServiceSelectionComponent = () => {
                 globalPricingDriverID,
                 patch,
               ),
+            fieldErrors: fieldErrorsVisible
+              ? committedFieldErrors.oneOff
+              : undefined,
           })}
         </div>
 

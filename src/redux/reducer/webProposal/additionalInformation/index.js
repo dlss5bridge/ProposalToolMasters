@@ -16,6 +16,11 @@ export {
   selectAdditionalInformationValidationVisible,
 } from "./additionalInformationSelectors";
 
-export { getAdditionalInformationFieldErrors } from "./validateAdditionalInformation";
+export {
+  getAdditionalInformationFieldErrors,
+  getVisibleAdditionalInformationItems,
+} from "./validateAdditionalInformation";
+
+export { buildAdditionalInformationDriverEntries } from "./additionalInformationPricing";
 
 export default reducer;

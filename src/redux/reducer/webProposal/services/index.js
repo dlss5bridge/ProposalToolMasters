@@ -9,6 +9,8 @@ export {
 export {
   setSelectedServiceIDs,
   setServicesSelectionError,
+  setServicesFieldErrors,
+  setServicesFieldErrorsVisible,
   setServiceSelections,
   setDefaultServiceSelections,
 } from "./servicesSlice";
@@ -22,6 +24,8 @@ export {
   selectOneOffServicesError,
   selectSelectedServiceIDs,
   selectServicesSelectionError,
+  selectServicesFieldErrors,
+  selectServicesFieldErrorsVisible,
   selectRecurringSelections,
   selectOneOffSelections,
   selectDefaultRecurringSelections,

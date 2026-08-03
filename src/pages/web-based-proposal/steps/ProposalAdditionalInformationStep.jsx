@@ -8,6 +8,7 @@ import {
   selectAdditionalInformationValidationVisible,
   setAdditionalInformationList,
   getAdditionalInformationFieldErrors,
+  getVisibleAdditionalInformationItems,
 } from "../../../redux/reducer/webProposal/additionalInformation";
 
 // driverTypeID: 2 = quantity (number), 3 = variation (select), 4 = slab (select),
@@ -32,8 +33,8 @@ export default function ProposalAdditionalInformationStep({ theme }) {
     selectAdditionalInformationValidationVisible,
   );
 
-  const visibleItems = (additionalInformationList || []).filter(
-    (item) => item.driverTypeID !== 1 && item.driverVisibility !== false,
+  const visibleItems = getVisibleAdditionalInformationItems(
+    additionalInformationList,
   );
 
   const fieldErrors = useMemo(

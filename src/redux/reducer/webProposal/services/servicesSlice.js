@@ -17,6 +17,17 @@ const initialState = {
   selectedServiceIDs: [],
   selectionError: false,
 
+  // Live map of required-driver-field errors across the currently committed
+  // selections (recurring + one-off), keyed by serviceID -> driverID ->
+  // message. Kept in sync from ProposalServicesStep so the step-advance
+  // guard (in ProposalAmendment/ProposalInputForm) can block leaving the
+  // Services step while a selected service is missing a required
+  // quantity/variation/slab value. fieldErrorsVisible mirrors the
+  // additionalInformationValidationVisible pattern: the errors are computed
+  // continuously, but only rendered inline once an advance attempt fails.
+  fieldErrors: { recurring: {}, oneOff: {} },
+  fieldErrorsVisible: false,
+
   // Full selection detail (including chosen driver values), mirrored from
   // ProposalServicesStep's local state so the Pricing Table step can build
   // the GetCalculatedServicesPriceByPackages payload without re-deriving it.
@@ -47,6 +58,12 @@ const servicesSlice = createSlice({
     },
     setServicesSelectionError(state, action) {
       state.selectionError = action.payload;
+    },
+    setServicesFieldErrors(state, action) {
+      state.fieldErrors = action.payload || { recurring: {}, oneOff: {} };
+    },
+    setServicesFieldErrorsVisible(state, action) {
+      state.fieldErrorsVisible = action.payload;
     },
     setServiceSelections(state, action) {
       state.recurringSelections = action.payload?.recurringSelections || {};
@@ -110,6 +127,8 @@ const servicesSlice = createSlice({
 export const {
   setSelectedServiceIDs,
   setServicesSelectionError,
+  setServicesFieldErrors,
+  setServicesFieldErrorsVisible,
   setServiceSelections,
   setDefaultServiceSelections,
 } = servicesSlice.actions;

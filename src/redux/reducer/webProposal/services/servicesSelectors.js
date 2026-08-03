@@ -8,6 +8,8 @@ export const selectOneOffServicesError = (state) => state.webProposalServices.on
 
 export const selectSelectedServiceIDs = (state) => state.webProposalServices.selectedServiceIDs;
 export const selectServicesSelectionError = (state) => state.webProposalServices.selectionError;
+export const selectServicesFieldErrors = (state) => state.webProposalServices.fieldErrors;
+export const selectServicesFieldErrorsVisible = (state) => state.webProposalServices.fieldErrorsVisible;
 
 export const selectRecurringSelections = (state) => state.webProposalServices.recurringSelections;
 export const selectOneOffSelections = (state) => state.webProposalServices.oneOffSelections;

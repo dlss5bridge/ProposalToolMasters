@@ -7,11 +7,14 @@ import {
 import { selectQuoteModel } from "../../../redux/reducer/webProposal";
 import {
   selectSelectedServiceIDs,
+  selectServicesFieldErrors,
   setServicesSelectionError,
+  setServicesFieldErrorsVisible,
 } from "../../../redux/reducer/webProposal/services";
 import {
   getAdditionalInformationList,
   getAdditionalInformationFieldErrors,
+  getVisibleAdditionalInformationItems,
   selectAdditionalInformationList,
   selectHasAdditionalInformation,
   setAdditionalInformationValidationVisible,
@@ -43,6 +46,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
   const activeStep = useSelector(selectActiveStep);
   const quoteModel = useSelector(selectQuoteModel);
   const selectedServiceIDs = useSelector(selectSelectedServiceIDs);
+  const servicesFieldErrors = useSelector(selectServicesFieldErrors);
   const hasAdditionalInformation = useSelector(selectHasAdditionalInformation);
   const additionalInformationList = useSelector(selectAdditionalInformationList);
 
@@ -94,6 +98,15 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     }
     dispatch(setServicesSelectionError(false));
 
+    const hasFieldErrors =
+      Object.keys(servicesFieldErrors?.recurring || {}).length > 0 ||
+      Object.keys(servicesFieldErrors?.oneOff || {}).length > 0;
+    if (hasFieldErrors) {
+      dispatch(setServicesFieldErrorsVisible(true));
+      return false;
+    }
+    dispatch(setServicesFieldErrorsVisible(false));
+
     let list = [];
     try {
       list = await dispatch(
@@ -110,8 +123,12 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       list = [];
     }
 
+    const hasVisibleAdditionalInformation =
+      getVisibleAdditionalInformationItems(list).length > 0;
     dispatch(
-      updateTotalSteps(baseStepLabels.length + (list.length > 0 ? 1 : 0)),
+      updateTotalSteps(
+        baseStepLabels.length + (hasVisibleAdditionalInformation ? 1 : 0),
+      ),
     );
 
     return true;

@@ -8,6 +8,8 @@ import {
   selectOneOffServices,
   selectRecurringSelections,
   selectOneOffSelections,
+  selectDefaultRecurringSelections,
+  selectDefaultOneOffSelections,
   selectServicesPricing,
   selectServicesPricingLoading,
   selectServicesPricingError,
@@ -15,6 +17,12 @@ import {
   selectServicesCurrencyID,
   getCalculatedServicesPriceByPackages,
 } from "../../../redux/reducer/webProposal/services";
+import {
+  selectAdditionalInformationList,
+  getAdditionalInformationFieldErrors,
+  buildAdditionalInformationDriverEntries,
+} from "../../../redux/reducer/webProposal/additionalInformation";
+import { validateSelectionsMap } from "./ProposalServicesStep/utils/validateSelectionFields";
 
 const CURRENCY_SYMBOLS = { 1: "£", 2: "€", 3: "$", 4: "₹" };
 
@@ -45,6 +53,26 @@ const groupByCategory = (items) => {
 
   return Array.from(groups.values());
 };
+
+// Reduces a selections map down to just what determines its price (which
+// services are picked and the driver values chosen for each), so selections
+// that differ only by object identity/order still compare equal.
+const normalizeSelectionsForCompare = (selections) =>
+  Object.values(selections || {})
+    .map((selection) => ({
+      serviceID: selection.serviceID,
+      driverValues: Object.fromEntries(
+        Object.entries(selection.driverValues || {}).map(([key, entry]) => [
+          key,
+          entry?.value ?? null,
+        ]),
+      ),
+    }))
+    .sort((a, b) => String(a.serviceID).localeCompare(String(b.serviceID)));
+
+const selectionsMatch = (current, defaults) =>
+  JSON.stringify(normalizeSelectionsForCompare(current)) ===
+  JSON.stringify(normalizeSelectionsForCompare(defaults));
 
 const buildServiceDefMap = (categories) => {
   const map = new Map();
@@ -119,6 +147,97 @@ const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
   });
 };
 
+const applyVat = (netTotal, vatPercentage) => {
+  const vatAmount = (netTotal * (Number(vatPercentage) || 0)) / 100;
+  return { vatAmount, grandTotal: netTotal + vatAmount };
+};
+
+// A charge type's Calculation-card figures. When the selections still match
+// the quote's hydrated defaults, the stored final amount (with whatever
+// discount it already carries) is shown as-is. Otherwise — e.g. on an
+// Amendment proposal where the client has swapped out the default services —
+// the discount to show depends on which way the new total moved relative to
+// what they were originally quoted (defaultFinalAmount):
+//   - lower total: the original discount no longer applies (it was priced
+//     against the higher default total), so the amendment's pre-agreed
+//     discount percentage is applied to the new total instead.
+//   - higher/equal total: the admin's originally agreed discount percentage
+//     still applies, even though the underlying services changed.
+// Either way a note explains why the discount shown differs from the
+// default quote's.
+const buildChargeTypeTotals = ({
+  finalAmount,
+  defaultFinalAmount,
+  liveNetTotal,
+  liveVatAmount,
+  liveGrandTotal,
+  vatPercentage,
+  amendmentDiscountPercentage,
+  adminDiscountPercentage,
+  chargeTypeLabel,
+}) => {
+  if (finalAmount) {
+    return {
+      netTotal: Number(finalAmount.netTotal) || 0,
+      discountPercentage:
+        Number(finalAmount.discountPercentageWithAllDecimal) || 0,
+      discountAmount: Number(finalAmount.discounted) || 0,
+      discountedTotal: Number(finalAmount.discountedTotal) || 0,
+      vatAmount: Number(finalAmount.vat) || 0,
+      grandTotal: Number(finalAmount.grandTotal) || 0,
+      note: null,
+    };
+  }
+
+  const defaultNetTotal = Number(defaultFinalAmount?.netTotal) || 0;
+  const hasDefault = !!defaultFinalAmount;
+
+  let discountPercentage = 0;
+  let note = null;
+
+  if (
+    hasDefault &&
+    liveNetTotal < defaultNetTotal &&
+    Number(amendmentDiscountPercentage) > 0
+  ) {
+    discountPercentage = Number(amendmentDiscountPercentage);
+    note = `Updated ${chargeTypeLabel} services total less than the originally agreed amount, so the original discount no longer applies and the ${discountPercentage}% amendment discount has been applied instead.`;
+  } else if (
+    hasDefault &&
+    liveNetTotal >= defaultNetTotal &&
+    Number(adminDiscountPercentage) > 0
+  ) {
+    discountPercentage = Number(adminDiscountPercentage);
+    note = `${chargeTypeLabel.charAt(0).toUpperCase()}${chargeTypeLabel.slice(1)} services have changed, but the originally agreed ${discountPercentage}% discount still applies.`;
+  }
+
+  if (discountPercentage <= 0) {
+    return {
+      netTotal: liveNetTotal,
+      discountPercentage: 0,
+      discountAmount: 0,
+      discountedTotal: liveNetTotal,
+      vatAmount: liveVatAmount,
+      grandTotal: liveGrandTotal,
+      note: null,
+    };
+  }
+
+  const discountAmount = (liveNetTotal * discountPercentage) / 100;
+  const discountedTotal = liveNetTotal - discountAmount;
+  const { vatAmount, grandTotal } = applyVat(discountedTotal, vatPercentage);
+
+  return {
+    netTotal: liveNetTotal,
+    discountPercentage,
+    discountAmount,
+    discountedTotal,
+    vatAmount,
+    grandTotal,
+    note,
+  };
+};
+
 // One charge type rendered as its own tinted section — an accent-colored
 // icon/title identify which charge type it is at a glance, its line items,
 // and a total row, all within a faint accent-tinted container so the two
@@ -135,10 +254,15 @@ function FeeSection({
   pricingLoading,
   formatAmount,
   netTotal,
+  discountPercentage,
+  discountAmount,
+  discountedTotal,
   vatPercentage,
   vatAmount,
   grandTotal,
+  note,
 }) {
+  const hasDiscount = Number(discountPercentage) > 0;
   return (
     <div
       className="rounded-xl border-l-4 px-4 py-3"
@@ -231,6 +355,26 @@ function FeeSection({
             {formatAmount(netTotal)}
           </span>
         </div>
+        {hasDiscount && (
+          <>
+            <div className="flex items-center justify-between text-sm">
+              <span style={{ color: theme.textSecondary }}>
+                Discount ({Number(discountPercentage)}%)
+              </span>
+              <span style={{ color: theme.textSecondary }}>
+                (-) {formatAmount(discountAmount)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span style={{ color: theme.textSecondary }}>
+                Discounted Total
+              </span>
+              <span style={{ color: theme.textPrimary }}>
+                {formatAmount(discountedTotal)}
+              </span>
+            </div>
+          </>
+        )}
         <div className="flex items-center justify-between text-sm">
           <span style={{ color: theme.textSecondary }}>
             VAT ({Number(vatPercentage) || 0}%)
@@ -249,6 +393,15 @@ function FeeSection({
           </span>
         </div>
       </div>
+
+      {note && (
+        <p
+          className="mt-2 text-xs italic"
+          style={{ color: theme.textSecondary }}
+        >
+          {note}
+        </p>
+      )}
     </div>
   );
 }
@@ -261,6 +414,13 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   const oneOffServices = useSelector(selectOneOffServices);
   const recurringSelections = useSelector(selectRecurringSelections);
   const oneOffSelections = useSelector(selectOneOffSelections);
+  const defaultRecurringSelections = useSelector(
+    selectDefaultRecurringSelections,
+  );
+  const defaultOneOffSelections = useSelector(selectDefaultOneOffSelections);
+  const additionalInformationList = useSelector(
+    selectAdditionalInformationList,
+  );
 
   const pricing = useSelector(selectServicesPricing);
   const pricingLoading = useSelector(selectServicesPricingLoading);
@@ -289,6 +449,46 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     return [...recurring, ...oneOff].sort((a, b) => a.order - b.order);
   }, [recurringSelections, oneOffSelections]);
 
+  // Services priced via a global pricing driver (captured on the separate
+  // Additional Information step, not here) need their driver value merged in
+  // too — otherwise they reach the backend with driverValue: null and price
+  // at whatever minimum/fallback the formula defaults to.
+  const additionalDriverEntries = useMemo(
+    () => buildAdditionalInformationDriverEntries(additionalInformationList),
+    [additionalInformationList],
+  );
+
+  // additionalDriverEntries carry only serviceID + the driver value — unlike
+  // every recurring/oneOff row, they have no serviceChargeTypeID/serviceCatID,
+  // so the backend can't tell which formula (recurring vs one-off) a given
+  // service's global driver value belongs to. Tag each entry with the charge
+  // type(s) of the currently selected service it matches — a service can be
+  // selected under both charge types at once, so emit one row per match.
+  const taggedAdditionalDriverEntries = useMemo(
+    () =>
+      additionalDriverEntries.flatMap((entry) => {
+        const matches = [];
+        const recurringSelection = recurringSelections?.[entry.serviceID];
+        if (recurringSelection) {
+          matches.push({
+            ...entry,
+            serviceChargeTypeID: SERVICE_CHARGE_TYPE_ID.RECURRING,
+            serviceCatID: recurringSelection.serviceCatID,
+          });
+        }
+        const oneOffSelection = oneOffSelections?.[entry.serviceID];
+        if (oneOffSelection) {
+          matches.push({
+            ...entry,
+            serviceChargeTypeID: SERVICE_CHARGE_TYPE_ID.ONE_OFF,
+            serviceCatID: oneOffSelection.serviceCatID,
+          });
+        }
+        return matches.length > 0 ? matches : [entry];
+      }),
+    [additionalDriverEntries, recurringSelections, oneOffSelections],
+  );
+
   const calculateServicesGPDList = useMemo(() => {
     const recurring = Object.values(recurringSelections || {}).flatMap(
       (selection) =>
@@ -305,13 +505,39 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
         2,
       ),
     );
-    return [...recurring, ...oneOff];
+    return [...recurring, ...oneOff, ...taggedAdditionalDriverEntries];
   }, [
     recurringSelections,
     oneOffSelections,
     recurringServiceByID,
     oneOffServiceByID,
+    taggedAdditionalDriverEntries,
   ]);
+
+  // The Services step's "Next" gate normally blocks leaving with a required
+  // driver field unset, but the step tabs let a visited step be reached
+  // directly (ProposalStepper's handleStepClick), skipping that gate. A
+  // service with a required quantity/variation/slab driver left empty would
+  // otherwise reach GetCalculatedServicesPriceByPackages as a null
+  // driverValue and break that calculation — so re-check the same
+  // requirement here, right before firing the request, regardless of how
+  // this step was reached.
+  const hasIncompleteSelections = useMemo(
+    () =>
+      validateSelectionsMap(recurringSelections, recurringServiceByID)
+        .hasError ||
+      validateSelectionsMap(oneOffSelections, oneOffServiceByID).hasError ||
+      Object.keys(
+        getAdditionalInformationFieldErrors(additionalInformationList),
+      ).length > 0,
+    [
+      recurringSelections,
+      oneOffSelections,
+      recurringServiceByID,
+      oneOffServiceByID,
+      additionalInformationList,
+    ],
+  );
 
   useEffect(() => {
     // Only recalculate when the user actually switches onto this step —
@@ -321,7 +547,8 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     if (
       !isActive ||
       !quoteModel?.organisationKeyID ||
-      calculateServicesGPDList.length === 0
+      calculateServicesGPDList.length === 0 ||
+      hasIncompleteSelections
     ) {
       return;
     }
@@ -341,6 +568,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     quoteModel?.organisationKeyID,
     quoteModel?.userKeyID,
     calculateServicesGPDList,
+    hasIncompleteSelections,
   ]);
 
   const priceByServiceID = useMemo(() => {
@@ -372,7 +600,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     [oneOffSelectedList],
   );
 
-  const recurringNetTotal = useMemo(
+  const recurringLiveNetTotal = useMemo(
     () =>
       recurringSelectedList.reduce(
         (sum, item) =>
@@ -385,7 +613,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     [recurringSelectedList, priceByServiceID],
   );
 
-  const oneOffNetTotal = useMemo(
+  const oneOffLiveNetTotal = useMemo(
     () =>
       oneOffSelectedList.reduce(
         (sum, item) =>
@@ -400,12 +628,85 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
 
   // Each charge type is billed (and VAT'd) independently, same as the
   // recurring/one-off fee tables the backend generates for the final quote.
-  const recurringVatAmount =
-    (recurringNetTotal * (Number(vatPercentage) || 0)) / 100;
-  const recurringGrandTotal = recurringNetTotal + recurringVatAmount;
+  const recurringLiveVatAmount =
+    (recurringLiveNetTotal * (Number(vatPercentage) || 0)) / 100;
+  const recurringLiveGrandTotal =
+    recurringLiveNetTotal + recurringLiveVatAmount;
 
-  const oneOffVatAmount = (oneOffNetTotal * (Number(vatPercentage) || 0)) / 100;
-  const oneOffGrandTotal = oneOffNetTotal + oneOffVatAmount;
+  const oneOffLiveVatAmount =
+    (oneOffLiveNetTotal * (Number(vatPercentage) || 0)) / 100;
+  const oneOffLiveGrandTotal = oneOffLiveNetTotal + oneOffLiveVatAmount;
+
+  // When the user hasn't added/updated any services since this proposal was
+  // loaded (selections still match the quote model's hydrated defaults), show
+  // the amounts the quote was already priced/discounted at instead of a fresh
+  // live recalculation — the stored figures may include discounts a naive
+  // net * vat% recompute wouldn't reproduce.
+  const quotationFinalAmountList = quoteModel?.quotationFinalAmountList || [];
+  const findFinalAmount = (chargeTypeID) =>
+    quotationFinalAmountList.find(
+      (item) =>
+        Number(item.serviceChargeTypeID) === chargeTypeID &&
+        !item.servicePackageID,
+    );
+
+  const recurringUnchanged = selectionsMatch(
+    recurringSelections,
+    defaultRecurringSelections,
+  );
+  const oneOffUnchanged = selectionsMatch(
+    oneOffSelections,
+    defaultOneOffSelections,
+  );
+
+  // defaultFinalAmount is the quote's originally saved pricing for this
+  // charge type — used as the "what the client was already quoted" baseline
+  // for the amendment-discount check below, regardless of whether the
+  // current selections still match it.
+  const defaultRecurringFinalAmount = findFinalAmount(
+    SERVICE_CHARGE_TYPE_ID.RECURRING,
+  );
+  const defaultOneOffFinalAmount = findFinalAmount(
+    SERVICE_CHARGE_TYPE_ID.ONE_OFF,
+  );
+
+  const recurringFinalAmount = recurringUnchanged
+    ? defaultRecurringFinalAmount
+    : null;
+  const oneOffFinalAmount = oneOffUnchanged ? defaultOneOffFinalAmount : null;
+
+  const recurringTotals = buildChargeTypeTotals({
+    finalAmount: recurringFinalAmount,
+    defaultFinalAmount: defaultRecurringFinalAmount,
+    liveNetTotal: recurringLiveNetTotal,
+    liveVatAmount: recurringLiveVatAmount,
+    liveGrandTotal: recurringLiveGrandTotal,
+    vatPercentage,
+    amendmentDiscountPercentage:
+      quoteModel?.recurringDiscountPercentageForAmendment,
+    adminDiscountPercentage: quoteModel?.recurringDiscountPercentage,
+    chargeTypeLabel: "recurring",
+  });
+
+  const oneOffTotals = buildChargeTypeTotals({
+    finalAmount: oneOffFinalAmount,
+    defaultFinalAmount: defaultOneOffFinalAmount,
+    liveNetTotal: oneOffLiveNetTotal,
+    liveVatAmount: oneOffLiveVatAmount,
+    liveGrandTotal: oneOffLiveGrandTotal,
+    vatPercentage,
+    amendmentDiscountPercentage:
+      quoteModel?.oneOffDiscountPercentageForAmendment,
+    adminDiscountPercentage: quoteModel?.oneOffDiscountPercentage,
+    chargeTypeLabel: "one-off",
+  });
+
+  const recurringVatPercentage = recurringFinalAmount
+    ? Number(recurringFinalAmount.vatPercentage) || 0
+    : Number(vatPercentage) || 0;
+  const oneOffVatPercentage = oneOffFinalAmount
+    ? Number(oneOffFinalAmount.vatPercentage) || 0
+    : Number(vatPercentage) || 0;
 
   const currencySymbol = CURRENCY_SYMBOLS[currencyID] || "£";
   const formatAmount = (value) => `${currencySymbol}${value.toFixed(2)}`;
@@ -480,8 +781,9 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
           </span>
         </div>
 
-        {/* Services — recurring and one-off each get their own accent-tinted
-            section so the two charge types are unmistakably separate */}
+        {/* Services — recurring and one-off each get their own tinted
+            section (same accent color for both, so the two share one
+            consistent theme) with a title/icon to tell them apart */}
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
           {selectedList.length === 0 ? (
             <p
@@ -504,10 +806,14 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   priceByServiceID={priceByServiceID}
                   pricingLoading={pricingLoading}
                   formatAmount={formatAmount}
-                  netTotal={recurringNetTotal}
-                  vatPercentage={vatPercentage}
-                  vatAmount={recurringVatAmount}
-                  grandTotal={recurringGrandTotal}
+                  netTotal={recurringTotals.netTotal}
+                  discountPercentage={recurringTotals.discountPercentage}
+                  discountAmount={recurringTotals.discountAmount}
+                  discountedTotal={recurringTotals.discountedTotal}
+                  vatPercentage={recurringVatPercentage}
+                  vatAmount={recurringTotals.vatAmount}
+                  grandTotal={recurringTotals.grandTotal}
+                  note={recurringTotals.note}
                 />
               )}
 
@@ -516,23 +822,35 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   theme={theme}
                   title="One-off Fees"
                   icon={Package}
-                  accent={theme.secondary}
+                  accent={theme.primary}
                   items={oneOffSelectedList}
                   categoryGroups={oneOffCategoryGroups}
                   chargeTypeID={SERVICE_CHARGE_TYPE_ID.ONE_OFF}
                   priceByServiceID={priceByServiceID}
                   pricingLoading={pricingLoading}
                   formatAmount={formatAmount}
-                  netTotal={oneOffNetTotal}
-                  vatPercentage={vatPercentage}
-                  vatAmount={oneOffVatAmount}
-                  grandTotal={oneOffGrandTotal}
+                  netTotal={oneOffTotals.netTotal}
+                  discountPercentage={oneOffTotals.discountPercentage}
+                  discountAmount={oneOffTotals.discountAmount}
+                  discountedTotal={oneOffTotals.discountedTotal}
+                  vatPercentage={oneOffVatPercentage}
+                  vatAmount={oneOffTotals.vatAmount}
+                  grandTotal={oneOffTotals.grandTotal}
+                  note={oneOffTotals.note}
                 />
               )}
             </>
           )}
 
-          {pricingError && (
+          {hasIncompleteSelections && (
+            <p className="mt-2 text-xs text-red-600">
+              One or more selected services are missing a required field
+              (quantity, variation, or slab). Go back to Services and complete
+              them to see accurate pricing.
+            </p>
+          )}
+
+          {!hasIncompleteSelections && pricingError && (
             <p className="mt-2 text-xs text-red-600">
               Failed to calculate service pricing.
             </p>

@@ -3,6 +3,10 @@ import { getAdditionalInformationList } from "./additionalInformationThunk";
 
 const initialState = {
   list: [],
+  // Snapshot of `list` as it came back from the API, before any user edits —
+  // used to tell whether the user has changed a global pricing driver value
+  // since the quote was loaded (see additionalInformationSelectors.js).
+  defaultList: [],
   listLoading: false,
   listError: null,
   validationVisible: false,
