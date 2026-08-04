@@ -84,3 +84,11 @@ body {
         margin-top: 8vh;
     }
 }
+
+/* .phone-input-country-code forces a fixed 34px control height meant for a
+   single-line country-code dropdown; the global variables field is a multi
+   select whose chips need to wrap onto multiple lines without clipping. */
+.GlobalVariablesSelect [class*="-control"] {
+    height: auto !important;
+    min-height: 34px !important;
+}

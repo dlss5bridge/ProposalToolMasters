@@ -14,7 +14,7 @@ import {
   DeclineServiceFeeInflation,
   GetDraftsAffectedByFeeInflationBatch,
 } from "../../../redux/Services/Config/ServicesApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SuccessModal from "../../../components/SuccessModal";
 import { AuthContextProvider } from "../../../AuthContext/AuthContext";
 import Footer from "../../../components/Footer";
@@ -23,8 +23,14 @@ import Utils from "../../../Middleware/Utils";
 import ConfirmModel from "../../../components/ConfirmationBox";
 import SAPredefinedChangesNotifyMessageModel from "../../../components/SAPredefinedChangesNotifyMessageModel";
 import ConfirmSAChangesModel from "../../../components/AcceptSuperAdminChangesConfirmation";
+import pricingSettingsReducer, {
+  GetAllProposalGlobalVariables,
+  selectProposalGlobalVariables,
+} from "../../../redux/reducer/pricingSettings";
 
 const Pricing_Settings = () => {
+  const auth = useSelector((state) => state?.Storage);
+  const dispatch = useDispatch();
   const moduleName = "FeeInflation";
   // A] States Declaration :
   const [activeTab, setActiveTab] = useState("PricingSetting");
@@ -50,6 +56,8 @@ const Pricing_Settings = () => {
     paymentFrequencyID: null,
     enableMasterProposalType: false,
     defaultProposalFormatID: null,
+    webProposalTypeID: null,
+    globalPricingDriverID: [],
   });
   const [ServiceFeeInflationConfig, setServiceFeeInflationConfig] = useState({
     OrganisationKeyID: null,
@@ -95,6 +103,8 @@ const Pricing_Settings = () => {
     enableMasterProposalType: false,
     defaultProposalFormatID: null,
     remainingESignatures: null,
+    webProposalTypeID: null,
+    globalPricingDriverID: [],
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [feeInflationErrorMessage, setFeeInflationErrorMessage] = useState("");
@@ -110,6 +120,15 @@ const Pricing_Settings = () => {
   const common = useSelector((state) => state.Storage); //Getting Logged Users Details From Persist Storage of redux hooks
   const currencySymbol = getCurrencySymbol(common.currency);
   const [isFormChanged, setIsFormChanged] = useState(false);
+  //========================redux state===============================
+  const globalVariables = useSelector(selectProposalGlobalVariables);
+
+  //===================useEffects====================================
+  //fetch all global variables list
+  useEffect(() => {
+    dispatch(GetAllProposalGlobalVariables(auth?.organisationKeyID));
+  }, [dispatch, auth?.organisationKeyID]);
+
   // B] Initial useEffect : Will call when Add/Update button click from list page
   useEffect(() => {
     setTopbar("block");
@@ -123,7 +142,7 @@ const Pricing_Settings = () => {
 
   const getProposalFormatOptions = () => {
     if (PrevPricingSettingObj.remainingESignatures !== true) {
-      return Utils.PreviewSelection.filter((x) => x.value === 2);
+      return Utils.PreviewSelection.filter((x) => x.value === 3);
     }
     return Utils.PreviewSelection;
   };
@@ -161,6 +180,8 @@ const Pricing_Settings = () => {
             enableMasterProposalType: ModelData.enableMasterProposalType,
             defaultProposalFormatID: ModelData.defaultProposalFormatID,
             remainingESignatures: ModelData.remainingESignatures,
+            webProposalTypeID: ModelData?.webProposalTypeID,
+            globalPricingDriverID: ModelData?.globalPricingDriverID,
           });
           setPrevPricingSettingObj({
             ...pricingSettingObj,
@@ -176,6 +197,8 @@ const Pricing_Settings = () => {
             enableMasterProposalType: ModelData.enableMasterProposalType,
             defaultProposalFormatID: ModelData.defaultProposalFormatID,
             remainingESignatures: ModelData.remainingESignatures,
+            webProposalTypeID: ModelData?.webProposalTypeID,
+            globalPricingDriverID: ModelData?.globalPricingDriverID,
           });
         }
       } else {
@@ -380,7 +403,11 @@ const Pricing_Settings = () => {
       pricingSettingObj.enableMasterProposalType ==
         PrevPricingSettingObj.enableMasterProposalType &&
       pricingSettingObj.defaultProposalFormatID ==
-        PrevPricingSettingObj.defaultProposalFormatID
+        PrevPricingSettingObj.defaultProposalFormatID &&
+      pricingSettingObj.webProposalTypeID ==
+        PrevPricingSettingObj.webProposalTypeID &&
+      pricingSettingObj.globalPricingDriverID ==
+        PrevPricingSettingObj.globalPricingDriverID
     ) {
       SetPrevError(true);
       return false;
@@ -429,6 +456,8 @@ const Pricing_Settings = () => {
       enableMasterProposalType:
         pricingSettingObj.enableMasterProposalType || false,
       defaultProposalFormatID: pricingSettingObj.defaultProposalFormatID,
+      webProposalTypeID: pricingSettingObj?.webProposalTypeID,
+      globalPricingDriverID: pricingSettingObj?.globalPricingDriverID,
     };
 
     setErrorMessage("");
@@ -862,12 +891,69 @@ const Pricing_Settings = () => {
                                 setPricingSettingObj({
                                   ...pricingSettingObj,
                                   defaultProposalFormatID: selectedOption.value,
+                                  webProposalTypeID: null,
+                                  globalPricingDriverID: [],
                                 });
                               }}
                             />
                           </div>
+
+                          {pricingSettingObj?.defaultProposalFormatID ===
+                            3 && (
+                            <div class="fieldset col-12">
+                              <label class=" fieldset-label pe-2">
+                                Proposal Types
+                              </label>
+                              <Select
+                                className="phone-input-country-code selectDropDown Drop-down-width pt-2"
+                                options={Utils?.webBasedProposalTypes}
+                                value={Utils.webBasedProposalTypes.find(
+                                  (x) =>
+                                    x.value ===
+                                    pricingSettingObj?.webProposalTypeID,
+                                )}
+                                onChange={(selectedOption) => {
+                                  setPricingSettingObj({
+                                    ...pricingSettingObj,
+                                    webProposalTypeID: selectedOption.value,
+                                    globalPricingDriverID: [],
+                                  });
+                                }}
+                              />
+                            </div>
+                          )}
+
+                          {(pricingSettingObj?.webProposalTypeID == 2 ||
+                            pricingSettingObj?.webProposalTypeID == 3) && (
+                            <div className="fieldset col-12">
+                              <label className="fieldset-label pe-2">
+                                Global {proposalName} Variables
+                              </label>
+
+                              <Select
+                                isMulti
+                                className="phone-input-country-code selectDropDown Drop-down-width pt-2 GlobalVariablesSelect"
+                                options={globalVariables}
+                                value={globalVariables.filter((option) =>
+                                  pricingSettingObj.globalPricingDriverID?.includes(
+                                    option.value,
+                                  ),
+                                )}
+                                onChange={(selectedOptions) => {
+                                  setPricingSettingObj({
+                                    ...pricingSettingObj,
+                                    globalPricingDriverID:
+                                      selectedOptions?.map(
+                                        (item) => item.value,
+                                      ) || [],
+                                  });
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
+
                       <div class="fieldset col-6">
                         <label class=" fieldset-label pe-2">
                           Enable {masterProposalType}
