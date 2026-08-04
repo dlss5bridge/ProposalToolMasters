@@ -687,6 +687,8 @@ const Engagement_Letter = () => {
       const data = await ArchiveContract(
         modelRequestData.contractKeyID,
         common.userKeyID,
+        modelRequestData.Action === "ArchiveContract" ? true
+        : modelRequestData.Action === "UnarchiveContract" ? false : null
       );
       if (data?.data?.statusCode === 200) {
         setLoader(false);
@@ -2704,6 +2706,36 @@ const Engagement_Letter = () => {
                                                                 </li>
                                                               )}
 
+                                                              {/* Unarchive */}
+                                                              {engagement.isArchived && (
+                                                                <li>
+                                                                  <a
+                                                                    class="dropdown-item"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#ConfirmModel"
+                                                                    onClick={() =>
+                                                                      setModelRequestData(
+                                                                        {
+                                                                          ...modelRequestData,
+                                                                          Action:
+                                                                            "UnarchiveContract",
+                                                                          refId:
+                                                                            engagement.prefix,
+                                                                          contractKeyID:
+                                                                            engagement.contractKeyID,
+                                                                        },
+                                                                      )
+                                                                    }
+                                                                  >
+                                                                    <i class="bi-archive-fill"></i>{" "}
+                                                                    Unarchive{" "}
+                                                                    {
+                                                                      EngagementName
+                                                                    }
+                                                                  </a>
+                                                                </li>
+                                                              )}
+
                                                               {/* invoice button  */}
                                                               {engagement.statusName ==
                                                                 "Signed" && (
@@ -3742,6 +3774,7 @@ const Engagement_Letter = () => {
                                   ? HandleDeleteDraftContractData
                                   : modelRequestData.Action ===
                                       "ArchiveContract"
+                                      || modelRequestData.Action === "UnarchiveContract"
                                     ? ArchiveContractData
                                     : modelRequestData.Action === "Copy"
                                       ? CopyContractData
@@ -3772,7 +3805,7 @@ const Engagement_Letter = () => {
                                         "ArchiveContract"
                                       ? EngagementName
                                       : modelRequestData.Action ===
-                                          "ArchiveContract"
+                                          "UnarchiveContract"
                                         ? EngagementName
                                         : modelRequestData.Action ===
                                             "Create Invoice"

@@ -14,7 +14,7 @@ import {
   DeclineServiceFeeInflation,
   GetDraftsAffectedByFeeInflationBatch,
 } from "../../../redux/Services/Config/ServicesApi";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import SuccessModal from "../../../components/SuccessModal";
 import { AuthContextProvider } from "../../../AuthContext/AuthContext";
 import Footer from "../../../components/Footer";
@@ -23,14 +23,8 @@ import Utils from "../../../Middleware/Utils";
 import ConfirmModel from "../../../components/ConfirmationBox";
 import SAPredefinedChangesNotifyMessageModel from "../../../components/SAPredefinedChangesNotifyMessageModel";
 import ConfirmSAChangesModel from "../../../components/AcceptSuperAdminChangesConfirmation";
-import {
-  GetAllProposalGlobalVariables,
-  selectProposalGlobalVariables,
-} from "../../../redux/reducer/pricingSettings";
 
 const Pricing_Settings = () => {
-  const auth = useSelector((state) => state?.Storage);
-  const dispatch = useDispatch();
   const moduleName = "FeeInflation";
   // A] States Declaration :
   const [activeTab, setActiveTab] = useState("PricingSetting");
@@ -56,8 +50,6 @@ const Pricing_Settings = () => {
     paymentFrequencyID: null,
     enableMasterProposalType: false,
     defaultProposalFormatID: null,
-    webProposalTypeID: null,
-    globalPricingDriverID: [],
   });
   const [ServiceFeeInflationConfig, setServiceFeeInflationConfig] = useState({
     OrganisationKeyID: null,
@@ -86,6 +78,14 @@ const Pricing_Settings = () => {
   //   Payment_Frequency: 2 // Example initial value, adjust as needed
   // };
 
+  useEffect(() => {
+    if (pricingSettingObj.paymentFrequencyID !== null) {
+      const foundFrequency = Utils.Payment_Frequency.find(
+        (item) => item.value === pricingSettingObj.paymentFrequencyID,
+      );
+      setSelectedFrequency(foundFrequency);
+    }
+  }, [pricingSettingObj.paymentFrequencyID]);
   const [PrevPricingSettingObj, setPrevPricingSettingObj] = useState({
     userKeyID: null,
     minOneOffPriceForQC: "",
@@ -95,8 +95,6 @@ const Pricing_Settings = () => {
     enableMasterProposalType: false,
     defaultProposalFormatID: null,
     remainingESignatures: null,
-    webProposalTypeID: null,
-    globalPricingDriverID: [],
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [feeInflationErrorMessage, setFeeInflationErrorMessage] = useState("");
@@ -112,15 +110,6 @@ const Pricing_Settings = () => {
   const common = useSelector((state) => state.Storage); //Getting Logged Users Details From Persist Storage of redux hooks
   const currencySymbol = getCurrencySymbol(common.currency);
   const [isFormChanged, setIsFormChanged] = useState(false);
-  //========================redux state===============================
-  const globalVariables = useSelector(selectProposalGlobalVariables);
-
-  //===================useEffects====================================
-  //fetch all global variables list
-  useEffect(() => {
-    dispatch(GetAllProposalGlobalVariables(auth?.organisationKeyID));
-  }, [dispatch, auth?.organisationKeyID]);
-
   // B] Initial useEffect : Will call when Add/Update button click from list page
   useEffect(() => {
     setTopbar("block");
@@ -131,17 +120,10 @@ const Pricing_Settings = () => {
       GetPricingSettingModelData(common.organisationKeyID);
     }
   }, [common.organisationKeyID]);
-  useEffect(() => {
-    if (pricingSettingObj.paymentFrequencyID !== null) {
-      const foundFrequency = Utils.Payment_Frequency.find(
-        (item) => item.value === pricingSettingObj.paymentFrequencyID,
-      );
-      setSelectedFrequency(foundFrequency);
-    }
-  }, [pricingSettingObj.paymentFrequencyID]);
+
   const getProposalFormatOptions = () => {
     if (PrevPricingSettingObj.remainingESignatures !== true) {
-      return Utils.PreviewSelection.filter((x) => x.value === 3); //TODO:change to 3 after web based developement
+      return Utils.PreviewSelection.filter((x) => x.value === 2);
     }
     return Utils.PreviewSelection;
   };
@@ -161,7 +143,6 @@ const Pricing_Settings = () => {
     }
     try {
       const data = await GetPricingSettingModel(id);
-
       if (data?.data?.statusCode === 200) {
         if (data?.data?.responseData?.data) {
           const ModelData = data?.data?.responseData?.data;
@@ -180,8 +161,6 @@ const Pricing_Settings = () => {
             enableMasterProposalType: ModelData.enableMasterProposalType,
             defaultProposalFormatID: ModelData.defaultProposalFormatID,
             remainingESignatures: ModelData.remainingESignatures,
-            webProposalTypeID: ModelData?.webProposalTypeID,
-            globalPricingDriverID: ModelData?.globalPricingDriverID,
           });
           setPrevPricingSettingObj({
             ...pricingSettingObj,
@@ -197,8 +176,6 @@ const Pricing_Settings = () => {
             enableMasterProposalType: ModelData.enableMasterProposalType,
             defaultProposalFormatID: ModelData.defaultProposalFormatID,
             remainingESignatures: ModelData.remainingESignatures,
-            webProposalTypeID: ModelData?.webProposalTypeID,
-            globalPricingDriverID: ModelData?.globalPricingDriverID,
           });
         }
       } else {
@@ -255,23 +232,35 @@ const Pricing_Settings = () => {
 
   // Submit Service Fee Inflation rules
   const SubmitServiceFeeInflation = async () => {
-    setFeeInflationErrorMessage("");
+    setServiceFeeInflationConfig({
+      ...ServiceFeeInflationConfig,
+      SelectionError: "",
+    });
     if (
       !ServiceFeeInflationConfig.SelectedServices ||
       ServiceFeeInflationConfig.SelectedServices.length === 0
     ) {
-      setFeeInflationErrorMessage(
-        "Please select one or more services to configure.",
-      );
+      setServiceFeeInflationConfig({
+        ...ServiceFeeInflationConfig,
+        SelectionError: "Please select one or more services to configure.",
+      });
+      return;
+    }
+    if (!ServiceFeeInflationConfig.InflationRule.operator) {
+      setServiceFeeInflationConfig({
+        ...ServiceFeeInflationConfig,
+        SelectionError: "Please choose an operator.",
+      });
       return;
     }
     if (
-      !ServiceFeeInflationConfig.InflationRule.operator ||
+      ServiceFeeInflationConfig.InflationRule.operator &&
       ServiceFeeInflationConfig.InflationRule.value === null
     ) {
-      setFeeInflationErrorMessage(
-        "Please choose an operator and enter a value for the rule.",
-      );
+      setServiceFeeInflationConfig({
+        ...ServiceFeeInflationConfig,
+        SelectionError: "Please enter a value.",
+      });
       return;
     }
 
@@ -371,7 +360,6 @@ const Pricing_Settings = () => {
       setLoader(false);
     }
   };
-
   // 2) Add Update Button Click Function
   const PricingSettingAddUpdateBtnClicked = () => {
     if (
@@ -392,13 +380,8 @@ const Pricing_Settings = () => {
       pricingSettingObj.enableMasterProposalType ==
         PrevPricingSettingObj.enableMasterProposalType &&
       pricingSettingObj.defaultProposalFormatID ==
-        PrevPricingSettingObj.defaultProposalFormatID &&
-      pricingSettingObj.webProposalTypeID ==
-        PrevPricingSettingObj.webProposalTypeID &&
-      pricingSettingObj.globalPricingDriverID ==
-        PrevPricingSettingObj.globalPricingDriverID
+        PrevPricingSettingObj.defaultProposalFormatID
     ) {
-      debugger;
       SetPrevError(true);
       return false;
     }
@@ -446,8 +429,6 @@ const Pricing_Settings = () => {
       enableMasterProposalType:
         pricingSettingObj.enableMasterProposalType || false,
       defaultProposalFormatID: pricingSettingObj.defaultProposalFormatID,
-      webProposalTypeID: pricingSettingObj?.webProposalTypeID,
-      globalPricingDriverID: pricingSettingObj?.globalPricingDriverID,
     };
 
     setErrorMessage("");
@@ -490,6 +471,16 @@ const Pricing_Settings = () => {
       if (common.organisationKeyID !== null) {
         GetPricingSettingModelData(common.organisationKeyID);
       }
+      setServiceFeeInflationConfig({
+        ServiceFeeInflationList: [],
+        HasExistingConfig: false,
+        SelectionError: "",
+        SelectedServices: [],
+        InflationRule: {
+          operator: null,
+          value: null,
+        },
+      });
     } else if (tab === "FeeInflation") {
       try {
         const data = await GetServiceFeeInflationConfigData(
@@ -877,83 +868,6 @@ const Pricing_Settings = () => {
                           </div>
                         </div>
                       </div>
-
-                      <div class="fieldset col-6">
-                        <label class=" fieldset-label pe-2">
-                          Default Proposal Format
-                        </label>
-                        <Select
-                          className="phone-input-country-code selectDropDown Drop-down-width pt-2"
-                          options={getProposalFormatOptions()}
-                          value={Utils.PreviewSelection.find(
-                            (x) =>
-                              x.value ===
-                              pricingSettingObj.defaultProposalFormatID,
-                          )}
-                          // isDisabled={PrevPricingSettingObj.defaultProposalFormatID === 2}
-                          onChange={(selectedOption) => {
-                            setPricingSettingObj({
-                              ...pricingSettingObj,
-                              defaultProposalFormatID: selectedOption.value,
-                              webProposalTypeID: null,
-                              globalPricingDriverID: [],
-                            });
-                          }}
-                        />
-                      </div>
-
-                      {pricingSettingObj?.defaultProposalFormatID === 3 && (
-                        <div class="fieldset col-6">
-                          <label class=" fieldset-label pe-2">
-                            Proposal Types
-                          </label>
-                          <Select
-                            className="phone-input-country-code selectDropDown Drop-down-width pt-2"
-                            options={Utils?.webBasedProposalTypes}
-                            value={Utils.webBasedProposalTypes.find(
-                              (x) =>
-                                x.value ===
-                                pricingSettingObj?.webProposalTypeID,
-                            )}
-                            onChange={(selectedOption) => {
-                              setPricingSettingObj({
-                                ...pricingSettingObj,
-                                webProposalTypeID: selectedOption.value,
-                                globalPricingDriverID: [],
-                              });
-                            }}
-                          />
-                        </div>
-                      )}
-
-                      {(pricingSettingObj?.webProposalTypeID == 2 ||
-                        pricingSettingObj?.webProposalTypeID == 3) && (
-                        <div className="fieldset col-6">
-                          <label className="fieldset-label pe-2">
-                            Global {proposalName} Variables
-                          </label>
-
-                          <Select
-                            isMulti
-                            className="phone-input-country-code selectDropDown Drop-down-width pt-2"
-                            options={globalVariables}
-                            value={globalVariables.filter((option) =>
-                              pricingSettingObj.globalPricingDriverID?.includes(
-                                option.value,
-                              ),
-                            )}
-                            onChange={(selectedOptions) => {
-                              setPricingSettingObj({
-                                ...pricingSettingObj,
-                                globalPricingDriverID:
-                                  selectedOptions?.map((item) => item.value) ||
-                                  [],
-                              });
-                            }}
-                          />
-                        </div>
-                      )}
-
                       <div class="fieldset col-6">
                         <label class=" fieldset-label pe-2">
                           Enable {masterProposalType}
@@ -1078,6 +992,13 @@ const Pricing_Settings = () => {
                         ? selected.map((s) => s.data)
                         : [],
                       SelectionError: "",
+                      InflationRule:
+                        selected && selected.length > 0
+                          ? prev.InflationRule
+                          : {
+                              operator: null,
+                              value: null,
+                            },
                     }));
                   }}
                   formatOptionLabel={(option) => (
@@ -1093,12 +1014,14 @@ const Pricing_Settings = () => {
                   isClearable
                   placeholder="Search and select services..."
                 />
+                {ServiceFeeInflationConfig.SelectedServices.length === 0 &&
+                  ServiceFeeInflationConfig.SelectionError && (
+                    <label className="validation">
+                      {ServiceFeeInflationConfig.SelectionError}
+                    </label>
+                  )}
               </div>
-              {ServiceFeeInflationConfig.SelectionError && (
-                <label className="validation">
-                  {ServiceFeeInflationConfig.SelectionError}
-                </label>
-              )}
+              {/* <label className="validation">{feeInflationErrorMessage}</label> */}
             </div>
 
             {/* ── Inflation Rule Config ── */}
@@ -1134,6 +1057,7 @@ const Pricing_Settings = () => {
                               operator: op.symbol,
                               value: null,
                             },
+                            SelectionError: "",
                           })
                         }
                       >
@@ -1143,10 +1067,16 @@ const Pricing_Settings = () => {
                     ))}
                   </div>
                 </div>
+                {!ServiceFeeInflationConfig.InflationRule.operator &&
+                  ServiceFeeInflationConfig.SelectionError && (
+                    <label className="validation">
+                      {ServiceFeeInflationConfig.SelectionError}
+                    </label>
+                  )}
 
                 {/* Value Input */}
                 {ServiceFeeInflationConfig.InflationRule.operator && (
-                  <div className="col-md-4 col-12 mb-3">
+                  <div className="col-md-4 mb-3">
                     <label className="form-label">
                       {ServiceFeeInflationConfig.InflationRule.operator ===
                         "+" ||
@@ -1205,6 +1135,7 @@ const Pricing_Settings = () => {
                           InflationRule: {
                             ...ServiceFeeInflationConfig.InflationRule,
                             value,
+                            SelectionError: "",
                           },
                         });
                       }}
@@ -1225,6 +1156,13 @@ const Pricing_Settings = () => {
                           `Price × ${(1 - ServiceFeeInflationConfig.InflationRule.value / 100).toFixed(2)}`}
                       </small>
                     )}
+                    {ServiceFeeInflationConfig.InflationRule.operator &&
+                      ServiceFeeInflationConfig.InflationRule.value === null &&
+                      ServiceFeeInflationConfig.SelectionError && (
+                        <label className="validation">
+                          {ServiceFeeInflationConfig.SelectionError}
+                        </label>
+                      )}
                   </div>
                 )}
               </div>
@@ -1237,7 +1175,7 @@ const Pricing_Settings = () => {
                   <button
                     style={{
                       fontSize: "14px",
-                      marginTop: "10px",
+                      marginTop: "5px",
                       marginRight: "25px",
                     }}
                     className="btn btn-primary create-item-btn"
@@ -1264,7 +1202,6 @@ const Pricing_Settings = () => {
           </button>
         )} */}
                 </div>
-                <label className="validation">{feeInflationErrorMessage}</label>
               </>
             )}
 

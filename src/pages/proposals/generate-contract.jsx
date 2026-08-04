@@ -2100,6 +2100,7 @@ function AcceptInvitation() {
       },
       body: JSON.stringify({
         userId: common.userKeyID,
+        moduleName: "Contract",
       }),
     })
       .then((response) => response.json())

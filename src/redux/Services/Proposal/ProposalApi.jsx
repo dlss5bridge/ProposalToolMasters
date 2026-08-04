@@ -212,9 +212,9 @@ export const DeleteSingleApiQuote = async (params) => {
   return res;
 };
 
-export const ArchiveQuotation = async (QuoteKeyID, UserKeyID) => {
+export const ArchiveQuotation = async (QuoteKeyID, UserKeyID, IsArchived) => {
   const res = await postApiWithAuthenticated(
-    `${ProposalBaseUrlQuote}/ArchiveQuotation?QuoteKeyID=${QuoteKeyID}&UserKeyID=${UserKeyID}`,
+    `${ProposalBaseUrlQuote}/ArchiveQuotation?QuoteKeyID=${QuoteKeyID}&UserKeyID=${UserKeyID}&IsArchived=${IsArchived}`,
   );
   return res;
 };

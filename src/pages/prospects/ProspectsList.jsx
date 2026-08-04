@@ -228,6 +228,33 @@ const Prospects = () => {
       : null;
     return toDate instanceof Date && !isNaN(toDate) ? toDate : null;
   };
+  
+  const formatDecimalInput = (val, decimalPlaces) => {
+    // Remove anything that isn't a digit or a dot
+    val = val.replace(/[^0-9.]/g, "");
+
+    if (val.startsWith(".")) {
+      val = val.replace(".", "");
+    }
+
+    // Allow only one decimal point
+    const parts = val.split(".");
+    if (parts.length > 2) {
+      val = parts[0] + "." + parts.slice(1).join("");
+    }
+
+    if (decimalPlaces === 0) {
+      val = val.replace(/\./g, "");
+    } else {
+      // Restrict digits after the decimal point to decimalPlaces
+      const [intPart, decPart] = val.split(".");
+      if (decPart !== undefined) {
+        val = intPart + "." + decPart.slice(0, decimalPlaces);
+      }
+    }
+
+    return val;
+  };
 
   const handleView = (item) => {};
 
@@ -475,36 +502,71 @@ const Prospects = () => {
       }));
 
       const initializeVariable = (variable) => {
+        const hasExistingValue =
+          variable.value !== null &&
+          variable.value !== undefined &&
+          variable.value !== "";
+
         if (variable.dataType == 4 && variable.slab) {
           const hasOtherSlab = variable.slab.some(
             (item) => item.slabTypeID === 2,
           );
 
-          const matchedSlab = variable.slab.find((item) => {
-            if (item.slabTypeID === 2) return false;
-            const label = `${formatNumber(item.slabFrom, item.decimalPlaces ?? 2)} - ${formatNumber(item.slabTo, item.decimalPlaces ?? 2)}`;
-            return label === variable.value;
-          });
+          if (hasExistingValue) {
+            const matchedSlab = variable.slab.find((item) => {
+              if (item.slabTypeID === 2) return false;
+              const label = `${formatNumber(item.slabFrom, item.decimalPlaces ?? 2)} - ${formatNumber(item.slabTo, item.decimalPlaces ?? 2)}`;
+              return label === variable.value;
+            });
 
-          if (matchedSlab) {
+            if (matchedSlab) {
+              return { ...variable, isOther: false, otherValue: "" };
+            }
+
+            const isOther = hasOtherSlab && !!variable.value;
             return {
               ...variable,
-              isOther: false,
+              isOther,
+              otherValue: isOther ? variable.value : "",
+              value: isOther ? "Other" : variable.value,
+            };
+          }
+
+          // default slab fallback
+          const defaultSlab = variable.slab.find((item) => item.isDefault);
+
+          if (!defaultSlab) {
+            return { ...variable, isOther: false, otherValue: "" };
+          }
+
+          if (defaultSlab.slabTypeID === 2) {
+            return {
+              ...variable,
+              value: "Other",
+              isOther: true,
               otherValue: "",
             };
           }
 
-          // Only treat as "Other" if an Other slab actually exists
-          const isOther = hasOtherSlab && !!variable.value;
+          const label = `${formatNumber(defaultSlab.slabFrom, defaultSlab.decimalPlaces ?? 2)} - ${formatNumber(defaultSlab.slabTo, defaultSlab.decimalPlaces ?? 2)}`;
+          return { ...variable, value: label, isOther: false, otherValue: "" };
+        }
+
+        if (variable.dataType == 3 && variable.variation) {
+          if (hasExistingValue) return variable;
+
+          const defaultVariation = variable.variation.find(
+            (item) => item.isDefault,
+          );
           return {
             ...variable,
-            isOther,
-            otherValue: isOther ? variable.value : "",
-            value: isOther ? "Other" : variable.value,
+            value: defaultVariation ? defaultVariation.variationName : "",
           };
         }
+
         return variable;
       };
+
       let variables = formatted.map((variable) => initializeVariable(variable));
       console.log(variables);
       setProspectVariables(variables);
@@ -515,6 +577,7 @@ const Prospects = () => {
     }
   };
 
+  
   // 2) On Click Client Edit Button
   const ClientEditBtnClicked = (prospect) => {
     setModelRequestData({
@@ -786,6 +849,8 @@ const Prospects = () => {
       getClientsListData(1);
     }
   };
+ 
+
   const ApplyFilter = () => {
     if (
       (businessNatureID !== null && businessNatureID !== "") ||
@@ -2383,27 +2448,15 @@ const Prospects = () => {
                                                             ""
                                                           }
                                                           onChange={(e) => {
-                                                            let val =
-                                                              e.target.value;
+                                                            let val = e.target.value;
+                                                            val = formatDecimalInput(val, variable.slab?.decimalPlaces ?? 2);
 
-                                                            // allow numbers
-                                                            val = val.replace(
-                                                              /[^0-9]/g,
-                                                              "",
-                                                            );
-
-                                                            setProspectVariables(
-                                                              (prev) =>
-                                                                prev.map((v) =>
-                                                                  v.globalVariableID ===
-                                                                  variable.globalVariableID
-                                                                    ? {
-                                                                        ...v,
-                                                                        otherValue:
-                                                                          val,
-                                                                      }
-                                                                    : v,
-                                                                ),
+                                                            setProspectVariables((prev) =>
+                                                              prev.map((v) =>
+                                                                v.globalVariableID === variable.globalVariableID
+                                                                  ? { ...v, otherValue: val }
+                                                                  : v,
+                                                              ),
                                                             );
                                                           }}
                                                           placeholder="Enter Value"
@@ -2447,23 +2500,15 @@ const Prospects = () => {
                                                                 ""
                                                               }
                                                               onChange={(e) => {
-                                                                const val =
-                                                                  e.target
-                                                                    .value;
+                                                                let val = e.target.value;
+                                                                val = formatDecimalInput(val, variable.slab?.decimalPlaces ?? 2);
 
-                                                                setProspectVariables(
-                                                                  (prev) =>
-                                                                    prev.map(
-                                                                      (v) =>
-                                                                        v.globalVariableID ===
-                                                                        variable.globalVariableID
-                                                                          ? {
-                                                                              ...v,
-                                                                              otherValue:
-                                                                                val,
-                                                                            }
-                                                                          : v,
-                                                                    ),
+                                                                setProspectVariables((prev) =>
+                                                                  prev.map((v) =>
+                                                                    v.globalVariableID === variable.globalVariableID
+                                                                      ? { ...v, otherValue: val }
+                                                                      : v,
+                                                                  ),
                                                                 );
                                                               }}
                                                               className="input-text mt-2"

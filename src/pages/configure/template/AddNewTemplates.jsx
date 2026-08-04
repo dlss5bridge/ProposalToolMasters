@@ -138,6 +138,7 @@ function Add_New_Templates(props) {
     clientBusinessTypeID: null,
     clientBusinessTypeIDs: [],
     orgBusinessTypeID: common.businessTypeID,
+    orgBusinessTypeIDs: [],
     isPredefined: null,
     fontFamilyID: null,
     watermarkImage: null,
@@ -324,7 +325,8 @@ function Add_New_Templates(props) {
       templateTypeID: null,
       clientBusinessTypeID: null,
       clientBusinessTypeIDs: null,
-      orgBusinessTypeID: null,
+      // orgBusinessTypeID: null,
+      orgBusinessTypeIDs: [],
       isPredefined: null,
       fontFamilyID: null,
       professionTypeList: [],
@@ -661,6 +663,7 @@ function Add_New_Templates(props) {
             clientBusinessTypeID: ModelData.clientBusinessTypeID,
             clientBusinessTypeIDs: ModelData.clientBusinessTypeIDs,
             orgBusinessTypeID: ModelData.orgBusinessTypeID,
+            orgBusinessTypeIDs: ModelData.orgBusinessTypeIDs,
             isPredefined: ModelData.isPredefined,
             fontFamilyID: ModelData.fontFamilyID,
             watermarkImage: ModelData.watermarkImage,
@@ -834,15 +837,11 @@ function Add_New_Templates(props) {
       // TemplateObj.clientBusinessTypeID === "" ||
       TemplateObj.clientBusinessTypeIDs.length === 0 ||
       (common.organisationKeyID === null &&
-        (TemplateObj.orgBusinessTypeID === "" ||
-          TemplateObj.orgBusinessTypeID === null ||
-          TemplateObj.orgBusinessTypeID === undefined))
+        (TemplateObj.orgBusinessTypeIDs.length === 0))
     ) {
       if (
         common.organisationKeyID === null &&
-        (TemplateObj.orgBusinessTypeID === "" ||
-          TemplateObj.orgBusinessTypeID === null ||
-          TemplateObj.orgBusinessTypeID === undefined)
+        (TemplateObj.orgBusinessTypeIDs.length === 0)
       ) {
         scrollUpDownByElementID("OrganisationBusinessDiv");
       } else if (
@@ -1112,8 +1111,8 @@ function Add_New_Templates(props) {
       }
     } else if (
       (common.roleTypeId === USER_ROLE_TYPE.SuperAdmin &&
-        TemplateObj.orgBusinessTypeID === null) ||
-      TemplateObj.orgBusinessTypeID === ""
+        TemplateObj.orgBusinessTypeIDs.length === 0) ||
+      TemplateObj.orgBusinessTypeIDs === ""
     ) {
       setRequireErrorMessage(true);
       return false; // Return false or handle your error logic here if needed.
@@ -1233,6 +1232,7 @@ function Add_New_Templates(props) {
       clientBusinessTypeID: TemplateObj.clientBusinessTypeID,
       clientBusinessTypeIDs: TemplateObj.clientBusinessTypeIDs,
       orgBusinessTypeID: TemplateObj.orgBusinessTypeID,
+      orgBusinessTypeIDs: TemplateObj.orgBusinessTypeIDs,
       isPredefined: common.roleTypeId === USER_ROLE_TYPE.SuperAdmin ? 1 : 0,
       isDefault: TemplateObj.isDefault,
       //form level params : will change according to module
@@ -1433,7 +1433,7 @@ function Add_New_Templates(props) {
         // templateName: "",
         clientBusinessTypeID: null,
         // clientBusinessTypeIDs: [],
-        orgBusinessTypeID: common.businessTypeID,
+        // orgBusinessTypeID: common.businessTypeID,
         isPredefined: null,
       });
       setTemplateElementList([]);
@@ -1487,9 +1487,15 @@ function Add_New_Templates(props) {
     TemplateObj.clientBusinessTypeIDs?.includes(businessType.value),
   );
 
-  const orgBusinessTypeFilter = BusinessTypeLookupList?.filter(
-    (businessType) => businessType.value == TemplateObj.orgBusinessTypeID,
+  let orgBusinessTypeFilter = BusinessTypeLookupList?.filter((businessType) => 
+    TemplateObj.orgBusinessTypeIDs?.includes(businessType.value),
   );
+
+  if (!orgBusinessTypeFilter?.length) {
+    orgBusinessTypeFilter = BusinessTypeLookupList?.filter(
+      (businessType) => businessType.value === TemplateObj.orgBusinessTypeID,
+    );
+  }
   const IsActiveFilter = Utils.IS_default.find(
     (item) => TemplateObj.isDefault == item.value,
   );
@@ -2008,19 +2014,18 @@ function Add_New_Templates(props) {
                         <div className="col-lg-9">
                           <div className="mb-1 input-group">
                             <Select
+                              isMulti
                               className="user-role-select"
                               options={BusinessTypeLookupList.slice(1, 6)}
                               value={orgBusinessTypeFilter}
-                              onChange={(e) =>
+                              onChange={(selected) =>
                                 setTemplateObj({
                                   ...TemplateObj,
-                                  orgBusinessTypeID: e.value,
+                                  orgBusinessTypeIDs: (selected || []).map((s) => s.value),
                                 })
                               }
                             />
-                            {requireErrorMessage &&
-                            (TemplateObj.orgBusinessTypeID === "" ||
-                              TemplateObj.orgBusinessTypeID === null) ? (
+                            {requireErrorMessage && TemplateObj.orgBusinessTypeIDs.length === 0 ? (
                               <label className="validation">
                                 {ERROR_MESSAGES}
                               </label>
@@ -2552,7 +2557,7 @@ function Add_New_Templates(props) {
                             ClintType={TemplateObj?.originalBusinessTypeIDs}
                             businessTypeId={
                               common.organisationKeyID === null
-                                ? TemplateObj.orgBusinessTypeID
+                                ? orgBusinessTypeFilter
                                 : common.businessTypeID
                             }
                           />

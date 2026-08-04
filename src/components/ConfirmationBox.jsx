@@ -105,6 +105,7 @@ function ConfirmModel({
                 ></lord-icon>
               )}
               {(modelRequestData.Action === "Archive" ||
+                modelRequestData.Action === "Unarchive" ||
                 modelRequestData.Action === "ArchiveLinkedELs") && (
                 <lord-icon
                   src="https://cdn.lordicon.com/xhdhjyqy.json"
@@ -122,6 +123,14 @@ function ConfirmModel({
                 ></lord-icon>
               )}
               {modelRequestData.Action === "ArchiveContract" && (
+                <lord-icon
+                  src="https://cdn.lordicon.com/xhdhjyqy.json"
+                  trigger="loop"
+                  colors="primary:#6c757d"
+                  style={{ width: "60px", height: "60px" }}
+                ></lord-icon>
+              )}
+              {modelRequestData.Action === "UnarchiveContract" && (
                 <lord-icon
                   src="https://cdn.lordicon.com/xhdhjyqy.json"
                   trigger="loop"
@@ -237,14 +246,14 @@ function ConfirmModel({
                 )}
                 {modelRequestData.Action === "Archive" && (
                   <span class="text-muted mb-0">
-                    Are you sure you want to archive this record?
+                    Are you sure you want to Archive this record?
                   </span>
                 )}
                 {modelRequestData.Action === "ArchiveLinkedELs" &&
                   modelRequestData.contracts?.length > 0 && (
                     <>
                       <p className="text-muted mb-1">
-                        Archiving this record would also archive all linked{" "}
+                        Archiving this record would also Archive all linked{" "}
                         {EngagementName}:
                       </p>
                       <ul>
@@ -254,6 +263,11 @@ function ConfirmModel({
                       </ul>
                     </>
                   )}
+                {modelRequestData.Action === "Unarchive" && (
+                  <span class="text-muted mb-0">
+                    Are you sure you want to Unarchive this record?
+                  </span>
+                )}
                 {modelRequestData.Action === "DeleteContract" && (
                   <span class="text-muted mb-0">
                     Are you sure you want to delete this record?
@@ -261,7 +275,12 @@ function ConfirmModel({
                 )}
                 {modelRequestData.Action === "ArchiveContract" && (
                   <span class="text-muted mb-0">
-                    Are you sure you want to archive this record?
+                    Are you sure you want to Archive this record?
+                  </span>
+                )}
+                {modelRequestData.Action === "UnarchiveContract" && (
+                  <span class="text-muted mb-0">
+                    Are you sure you want to Unarchive this record?
                   </span>
                 )}
                 {modelRequestData.Action === "Void" && (
@@ -573,7 +592,11 @@ function ConfirmModel({
                 modelRequestData.Action === "PaymentStatus" ||
                 modelRequestData.Action === "Delete" ||
                 modelRequestData.Action === "DeleteContract" ||
+                modelRequestData.Action === "Archive" ||
+                modelRequestData.Action === "ArchiveLinkedELs" ||
+                modelRequestData.Action === "Unarchive" ||
                 modelRequestData.Action === "ArchiveContract" ||
+                modelRequestData.Action === "UnarchiveContract" ||
                 modelRequestData.Action === "Void" ||
                 modelRequestData.Action == "PracticeWarning" ||
                 modelRequestData.Action === "2FaStatusChange" ||
@@ -618,6 +641,18 @@ function ConfirmModel({
                   )}
                   {modelRequestData.Action === "ArchiveContract" && (
                     <span>Yes, Archive It!</span>
+                  )}
+                  {modelRequestData.Action === "Archive" && (
+                    <span>Yes, Archive It!</span>
+                  )}
+                  {modelRequestData.Action === "Unarchive" && (
+                    <span>Yes, Unarchive It!</span>
+                  )}
+                  {modelRequestData.Action === "ArchiveLinkedELs" && (
+                    <span>Yes, Archive It!</span>
+                  )}
+                  {modelRequestData.Action === "UnarchiveContract" && (
+                    <span>Yes, Unarchive It!</span>
                   )}
                   {modelRequestData.Action === "Void" && (
                     <span>Yes, Void It!</span>

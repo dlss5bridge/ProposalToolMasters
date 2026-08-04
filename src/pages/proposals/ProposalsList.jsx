@@ -1277,7 +1277,9 @@ const Proposals = () => {
       setLoader(true);
       const data = await ArchiveQuotation(
         modelRequestData.quoteKeyID,
-        common.userKeyID
+        common.userKeyID,
+        modelRequestData.Action === "Archive" || modelRequestData.Action === "ArchiveLinkedELs" ? true
+        : modelRequestData.Action === "Unarchive" ? false : null
       );
       if(data?.data?.statusCode === 200) {
         setLoader(false);
@@ -2701,7 +2703,7 @@ const Proposals = () => {
                                                               {/* </Tooltip> */}
                                                             </li>
                                                           )}
-                                                          {/* {item?.isArchived && (
+                                                          {item?.isArchived && (
                                                             <li>
                                                               <a
                                                                 class="dropdown-item"
@@ -2711,8 +2713,7 @@ const Proposals = () => {
                                                                   setModelRequestData(
                                                                     {
                                                                       ...modelRequestData,
-                                                                      Action: item?.contracts?.length === 0
-                                                                      ? "Archive" : "ArchiveLinkedELs",
+                                                                      Action: "Unarchive",
                                                                       RefId:
                                                                         item.prefix,
                                                                       quoteKeyID:
@@ -2737,7 +2738,7 @@ const Proposals = () => {
                                                                 {proposalName}
                                                               </a>
                                                             </li>
-                                                          )} */}
+                                                          )}
 
                                                           {(
                                                               item.statusID === statusID.Draft ||
@@ -3309,7 +3310,8 @@ const Proposals = () => {
                                       },
                                       true,
                                     )
-                                  : modelRequestData.Action === "Archive" || modelRequestData.Action === "ArchiveLinkedELs" ? ArchiveQuotationData
+                                  : modelRequestData.Action === "Archive" || modelRequestData.Action === "Unarchive"
+                                  || modelRequestData.Action === "ArchiveLinkedELs" ? ArchiveQuotationData
                                 : DeleteQuotationData
                     }
                   />
@@ -3330,6 +3332,7 @@ const Proposals = () => {
                             : modelRequestData.Action === "Resend"
                               ? proposalName
                               : modelRequestData.Action === "Archive"
+                              || modelRequestData.Action === "Unarchive"
                                 ? proposalName
                                 : modelRequestData.Action === "ArchiveLinkedELs"
                                   ? `${proposalName} and all the linked ${EngagementName} have been archived successfully`

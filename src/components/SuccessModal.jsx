@@ -178,6 +178,15 @@ const SuccessModal = (props) => {
                   {props.modelAction === "ArchiveContract"
                     ? `${props.message} has been archived successfully!`
                     : null}
+                  {props.modelAction === "Unarchive"
+                    ? `${props.message} has been Unarchived successfully!`
+                    : null}
+                  {props.modelAction === "UnarchiveContract"
+                    ? `${props.message} has been Unarchived successfully!`
+                    : null}
+                  {props.modelAction === "ArchiveLinkedELs"
+                    ? `${props.message}`
+                    : null}
                   {props.modelAction === "Copy" ? `${props.message}` : null}
                   {props.modelAction === "Void" ? `${props.message}` : null}
                   {props.modelAction === "EnableApiIntegration"

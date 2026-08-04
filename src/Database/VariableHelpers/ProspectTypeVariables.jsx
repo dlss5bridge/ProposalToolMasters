@@ -102,6 +102,7 @@ export const useProspectTypeVariables = () => {
   const [globalVarNames, setGlobalVarNames] = useState([]);
 
   useEffect(() => {
+    if(!common.organisationKeyID) return;
     const fetchGlobalVariables = async () => {
       try {
         const data = await GetGlobalProspectVariables(common.organisationKeyID);
