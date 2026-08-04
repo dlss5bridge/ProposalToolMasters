@@ -3586,7 +3586,7 @@ const AuthContext = ({ children }) => {
       }
     });
 
-    return replacedArray;
+    return { replacedArray, pricingVariables: ResultTotalVariablesWithValues };
   }
 
   // const replaceUrlInHtml = (htmlContent) => {
