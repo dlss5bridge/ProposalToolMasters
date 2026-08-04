@@ -173,12 +173,11 @@ export default function ProposalAdditionalInformationStep({ theme }) {
             <Typography
               sx={{ mt: 0.5, fontSize: 14, color: theme.textSecondary }}
             >
-              Provide the additional details required for the selected
-              services.
+              Provide the additional details required for the selected services.
             </Typography>
           </div>
 
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             {visibleItems.map((item) => {
               const errorMessage = validationVisible
                 ? fieldErrors[item.globalPricingDriverID]

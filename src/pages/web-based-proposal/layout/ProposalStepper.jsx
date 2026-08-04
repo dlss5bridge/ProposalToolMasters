@@ -51,10 +51,24 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
   const isFirstStep = activeStep === 0;
   const isLastStep = activeStep === totalSteps - 1;
 
-  const handleStepClick = (index) => {
-    if (index <= maxVisitedStep) {
-      dispatch(handleGoToStep(index));
+  const handleStepClick = async (index) => {
+    if (index === activeStep || index > maxVisitedStep || isAdvancing) return;
+
+    // Jumping ahead from the step label must be validated the same way the
+    // Next button is — otherwise a user can clear a required selection (e.g.
+    // Services) on the current step and skip straight past it via the label.
+    if (index > activeStep && onNext) {
+      setIsAdvancing(true);
+      let canProceed;
+      try {
+        canProceed = await onNext(activeStep);
+      } finally {
+        setIsAdvancing(false);
+      }
+      if (canProceed === false) return;
     }
+
+    dispatch(handleGoToStep(index));
   };
 
   const handleNext = async () => {
@@ -96,7 +110,7 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
         {steps.map((step, index) => {
           const active = index === activeStep;
           const completed = index < maxVisitedStep;
-          const clickable = index <= maxVisitedStep;
+          const clickable = index <= maxVisitedStep && !isAdvancing;
 
           return (
             <div
