@@ -22182,7 +22182,13 @@ const Add_Update_Proposal = (props) => {
         MergePdfUrl === "" ||
         MergePdfUrl === undefined ||
         ProposalObject.ProposalFormate === null ||
-        ProposalObject.ProposalFormate === undefined
+        ProposalObject.ProposalFormate === undefined ||
+        (ProposalObject.ProposalFormate === 3 &&
+          (ProposalObject.webProposalTypeID === null ||
+            ProposalObject.webProposalTypeID === undefined)) ||
+        ((ProposalObject.webProposalTypeID === 2 ||
+          ProposalObject.webProposalTypeID === 3) &&
+          !ProposalObject.globalPricingDriverID?.length)
       ) {
         setRequireMessage(true);
         setLoader(false);
@@ -25317,6 +25323,7 @@ const Add_Update_Proposal = (props) => {
                     feeTypeId={ProposalObject.feeTypeId}
                     pricingSettingObj={pricingSettingObj}
                     globalVariables={globalVariables}
+                    isCreateMode={modelAction === "Add"}
                     selectedRecurringServiceList={selectedRecurringServiceList}
                     selectedOneOffServiceList={selectedOneOffServiceList}
                     templateElementList={templateElementList}

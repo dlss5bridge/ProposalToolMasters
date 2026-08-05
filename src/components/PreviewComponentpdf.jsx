@@ -160,7 +160,14 @@ export default function PreviewComponentPdf(props) {
   }, [isPopUpVisible, props?.ProposalObject?.ProposalFormate]);
 
   useEffect(() => {
-    if (props?.pricingSettingObj?.defaultProposalFormatID != null) {
+    // Defaults sourced from Pricing Settings should only seed a brand-new
+    // proposal. On update, GetProposalModel already returns the proposal's
+    // saved format/type/variables, so applying the org defaults here would
+    // clobber the values that were just loaded.
+    if (
+      props.isCreateMode &&
+      props?.pricingSettingObj?.defaultProposalFormatID != null
+    ) {
       const defaultWebProposalTypeID =
         props.pricingSettingObj.defaultProposalFormatID === 3
           ? props.pricingSettingObj.webProposalTypeID
@@ -175,7 +182,7 @@ export default function PreviewComponentPdf(props) {
             : prev.globalPricingDriverID,
       }));
     }
-  }, [props.pricingSettingObj]);
+  }, [props.isCreateMode, props.pricingSettingObj]);
 
   const handleFormate = (selectedOption) => {
     props.setProposalObject({
@@ -12119,16 +12126,21 @@ ${
                 onChange={handleFormate}
                 value={ProposalFormatValue}
               />
-              {props.requireMessage && (
-                <span className="validation">{ERROR_MESSAGES}</span>
-              )}
+              {props.requireMessage &&
+                (props.ProposalObject?.ProposalFormate === null ||
+                  props.ProposalObject?.ProposalFormate === undefined) && (
+                  <span className="validation">{ERROR_MESSAGES}</span>
+                )}
             </div>
 
             {props.ProposalObject?.ProposalFormate === 3 && (
               <>
                 {/* Proposal Types Label */}
                 <div className="col-lg-2 col-md-2 col-sm-6 d-flex align-items-center mt-4">
-                  <label className="form-label">Proposal Types</label>
+                  <label className="form-label">
+                    Proposal Types
+                    <span className="text-danger">*</span>
+                  </label>
                 </div>
 
                 {/* Proposal Types Select */}
@@ -12138,7 +12150,8 @@ ${
                     className="phone-input-country-code selectDropDown"
                     options={Utils?.webBasedProposalTypes}
                     value={Utils.webBasedProposalTypes.find(
-                      (x) => x.value === props.ProposalObject?.webProposalTypeID,
+                      (x) =>
+                        x.value === props.ProposalObject?.webProposalTypeID,
                     )}
                     onChange={(selectedOption) => {
                       props.setProposalObject({
@@ -12148,6 +12161,12 @@ ${
                       });
                     }}
                   />
+                  {props.requireMessage &&
+                    (props.ProposalObject?.webProposalTypeID === null ||
+                      props.ProposalObject?.webProposalTypeID ===
+                        undefined) && (
+                      <span className="validation">{ERROR_MESSAGES}</span>
+                    )}
                 </div>
               </>
             )}
@@ -12159,6 +12178,7 @@ ${
                 <div className="col-lg-2 col-md-2 col-sm-6 d-flex align-items-center mt-4">
                   <label className="form-label">
                     Global {proposalName} Variables
+                    <span className="text-danger">*</span>
                   </label>
                 </div>
 
@@ -12182,6 +12202,10 @@ ${
                       });
                     }}
                   />
+                  {props.requireMessage &&
+                    !props.ProposalObject.globalPricingDriverID?.length && (
+                      <span className="validation">{ERROR_MESSAGES}</span>
+                    )}
                 </div>
               </>
             )}
