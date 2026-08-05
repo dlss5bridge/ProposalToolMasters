@@ -16297,6 +16297,8 @@ const Add_Update_Proposal = (props) => {
     PaymentFrequency: null,
     enableMasterProposalType: null,
     defaultProposalFormatID: null,
+    webProposalTypeID: null,
+    globalPricingDriverID: [],
     remainingESignatures: null,
   });
   const [modelRequestData, setModelRequestData] = useState({
@@ -24183,6 +24185,8 @@ const Add_Update_Proposal = (props) => {
             PaymentFrequency: ModelData.paymentFrequencyID,
             enableMasterProposalType: ModelData.enableMasterProposalType,
             defaultProposalFormatID: ModelData.defaultProposalFormatID,
+            webProposalTypeID: ModelData.webProposalTypeID,
+            globalPricingDriverID: ModelData.globalPricingDriverID || [],
             remainingESignatures: ModelData.remainingESignatures,
           });
 

@@ -161,9 +161,18 @@ export default function PreviewComponentPdf(props) {
 
   useEffect(() => {
     if (props?.pricingSettingObj?.defaultProposalFormatID != null) {
+      const defaultWebProposalTypeID =
+        props.pricingSettingObj.defaultProposalFormatID === 3
+          ? props.pricingSettingObj.webProposalTypeID
+          : null;
       props.setProposalObject((prev) => ({
         ...prev,
-        ProposalFormate: props?.pricingSettingObj.defaultProposalFormatID,
+        ProposalFormate: props.pricingSettingObj.defaultProposalFormatID,
+        webProposalTypeID: defaultWebProposalTypeID ?? prev.webProposalTypeID,
+        globalPricingDriverID:
+          defaultWebProposalTypeID === 2 || defaultWebProposalTypeID === 3
+            ? props.pricingSettingObj.globalPricingDriverID || []
+            : prev.globalPricingDriverID,
       }));
     }
   }, [props.pricingSettingObj]);
