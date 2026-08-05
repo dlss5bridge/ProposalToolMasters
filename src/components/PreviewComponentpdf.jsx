@@ -12114,6 +12114,68 @@ ${
                 <span className="validation">{ERROR_MESSAGES}</span>
               )}
             </div>
+
+            {props.ProposalObject?.ProposalFormate === 3 && (
+              <>
+                {/* Proposal Types Label */}
+                <div className="col-lg-2 col-md-2 col-sm-6 d-flex align-items-center mt-4">
+                  <label className="form-label">Proposal Types</label>
+                </div>
+
+                {/* Proposal Types Select */}
+                <div className="col-lg-4 col-md-4 col-sm-6 d-flex align-items-center mt-4">
+                  <Select
+                    menuPosition="auto"
+                    className="phone-input-country-code selectDropDown"
+                    options={Utils?.webBasedProposalTypes}
+                    value={Utils.webBasedProposalTypes.find(
+                      (x) => x.value === props.ProposalObject?.webProposalTypeID,
+                    )}
+                    onChange={(selectedOption) => {
+                      props.setProposalObject({
+                        ...props.ProposalObject,
+                        webProposalTypeID: selectedOption.value,
+                        globalPricingDriverID: [],
+                      });
+                    }}
+                  />
+                </div>
+              </>
+            )}
+
+            {(props.ProposalObject?.webProposalTypeID == 2 ||
+              props.ProposalObject?.webProposalTypeID == 3) && (
+              <>
+                {/* Global Variables Label */}
+                <div className="col-lg-2 col-md-2 col-sm-6 d-flex align-items-center mt-4">
+                  <label className="form-label">
+                    Global {proposalName} Variables
+                  </label>
+                </div>
+
+                {/* Global Variables Select */}
+                <div className="col-lg-4 col-md-4 col-sm-6 d-flex align-items-center mt-4">
+                  <Select
+                    isMulti
+                    menuPosition="auto"
+                    className="phone-input-country-code selectDropDown GlobalVariablesSelect"
+                    options={props.globalVariables}
+                    value={props.globalVariables?.filter((option) =>
+                      props.ProposalObject.globalPricingDriverID?.includes(
+                        option.value,
+                      ),
+                    )}
+                    onChange={(selectedOptions) => {
+                      props.setProposalObject({
+                        ...props.ProposalObject,
+                        globalPricingDriverID:
+                          selectedOptions?.map((item) => item.value) || [],
+                      });
+                    }}
+                  />
+                </div>
+              </>
+            )}
             {props.ProposalObject.ProposalFormate === 1 && (
               <>
                 {/* Payment Gateway Label */}

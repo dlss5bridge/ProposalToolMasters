@@ -17,7 +17,11 @@ import {
   GetServicesList,
 } from "../../redux/Services/Config/ServicesApi";
 import { GetQuoteTypeLookupList } from "../../redux/Services/Master/QuoteTypeLookupList";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  GetAllProposalGlobalVariables,
+  selectProposalGlobalVariables,
+} from "../../redux/reducer/pricingSettings";
 import {
   ChangeDefaultPaymentGatewaysTypes,
   fieldToIdMap,
@@ -16144,6 +16148,8 @@ const Add_Update_Proposal = (props) => {
   });
   const [ClientTypeLookupList, setClientTypeLookupList] = useState([]);
   const common = useSelector((state) => state.Storage);
+  const dispatch = useDispatch();
+  const globalVariables = useSelector(selectProposalGlobalVariables);
   // const [serviceCheckbox, setServiceCheckbox] = useState([]);
   // const [disabledCheckboxes, setDisabledCheckboxes] = useState([]);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
@@ -16311,6 +16317,8 @@ const Add_Update_Proposal = (props) => {
     clientID: null,
     templateID: null,
     ProposalFormate: 2,
+    webProposalTypeID: null,
+    globalPricingDriverID: [],
     paymentGatewayID: null,
     recurringHtmlContent: null,
     oneOffHtmlContent: null,
@@ -16336,6 +16344,10 @@ const Add_Update_Proposal = (props) => {
     GetOrganisationInformationModelData();
     GetProposalLookupListData();
   }, []);
+
+  useEffect(() => {
+    dispatch(GetAllProposalGlobalVariables(common?.organisationKeyID));
+  }, [dispatch, common?.organisationKeyID]);
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 600);
@@ -21569,6 +21581,8 @@ const Add_Update_Proposal = (props) => {
             feeTypeId: ModelData.feesInQuoteID,
             paymentGatewayID: ModelData.paymentGatewayID,
             ProposalFormate: ModelData.quoteFormatID || 2,
+            webProposalTypeID: ModelData?.webProposalTypeID,
+            globalPricingDriverID: ModelData?.globalPricingDriverID || [],
             DiscountLines:
               ModelData.feesInQuoteID === 1
                 ? true
@@ -22726,6 +22740,8 @@ const Add_Update_Proposal = (props) => {
       quotePDFUrl: MergePdfUrl || null,
       documentCode: DocumentCode || null,
       quoteFormatID: ProposalObject.ProposalFormate || null,
+      webProposalTypeID: ProposalObject.webProposalTypeID || null,
+      globalPricingDriverID: ProposalObject.globalPricingDriverID || [],
       recurringHtmlContent: ProposalObject.recurringHtmlContent || null,
       oneOffHtmlContent: ProposalObject.oneOffHtmlContent || null,
       customizedEmailContent: ProposalObject.customizedEmailContent || null,
@@ -25296,6 +25312,7 @@ const Add_Update_Proposal = (props) => {
                     currencySymbol={currencySymbol}
                     feeTypeId={ProposalObject.feeTypeId}
                     pricingSettingObj={pricingSettingObj}
+                    globalVariables={globalVariables}
                     selectedRecurringServiceList={selectedRecurringServiceList}
                     selectedOneOffServiceList={selectedOneOffServiceList}
                     templateElementList={templateElementList}
