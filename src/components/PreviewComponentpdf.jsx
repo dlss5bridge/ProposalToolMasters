@@ -35,6 +35,7 @@ import {
   calculateCustomServiceFooter,
   calculateCustomServiceRow,
   decimalValue,
+  hasCalculationValue,
   truncateMoney,
 } from "../Middleware/helpers";
 export default function PreviewComponentPdf(props) {
@@ -10595,7 +10596,7 @@ ${
                       : props.selectedTemplateID === 6
                         ? `<div style="padding-left: 40px; padding-right: 40px; font-family:${fontFamily}; page-break-inside: avoid; break-inside: avoid;">
   <p style="font-family:${fontFamily}; color:${newColorCode}; font-size: 20px; margin-top: 15px;">
-    Recurring Fees (${getPaymentFrequencyLabel()})'
+    Recurring Fees (${getPaymentFrequencyLabel()})
   </p>
 
   <table style="font-family:${fontFamily}; border-collapse: collapse; width: 100%; margin-top: -15px; table-layout: fixed;">
@@ -10644,21 +10645,30 @@ ${
 
         ${serviceCat.servicesList
           .map((subService) => {
-            const priceExact = decimalValue(subService.price);
+            const rawPrice = hasCalculationValue(subService?.price)
+              ? subService.price
+              : hasCalculationValue(subService?.quotationPriceWithAllDecimal)
+                ? subService.quotationPriceWithAllDecimal
+                : hasCalculationValue(subService?.quotationPrice)
+                  ? subService.quotationPrice
+                  : 0;
+
+            const priceExact = decimalValue(rawPrice);
 
             const vatRateExact = decimalValue(
-              subService.service_vat_percentage ?? props.vatPercentage,
+              subService?.service_vat_percentage ??
+                subService?.serviceVatPercentage ??
+                subService?.vatPercentage ??
+                props.vatPercentage ??
+                0,
             );
 
             const vatExact = priceExact.mul(vatRateExact).div(100);
-
             const feesIncVatExact = priceExact.plus(vatExact);
 
-            // Round only for display.
             const rowFees = truncateMoney(priceExact);
             const rowVat = truncateMoney(vatExact);
             const rowFeesIncVat = truncateMoney(feesIncVatExact);
-
             const rowVatRate = vatRateExact.toNumber();
 
             const driverList = subService.pricingDriverList || [];
@@ -11254,28 +11264,31 @@ ${
 
         ${serviceCat.servicesList
           .map((subService) => {
-            const priceExact = decimalValue(subService.price);
+            const rawPrice = hasCalculationValue(subService?.price)
+              ? subService.price
+              : hasCalculationValue(subService?.quotationPriceWithAllDecimal)
+                ? subService.quotationPriceWithAllDecimal
+                : hasCalculationValue(subService?.quotationPrice)
+                  ? subService.quotationPrice
+                  : 0;
+
+            const priceExact = decimalValue(rawPrice);
 
             const vatRateExact = decimalValue(
-              subService.service_vat_percentage ??
-                props.vatPercentage ??
+              subService?.service_vat_percentage ??
+                subService?.serviceVatPercentage ??
+                subService?.vatPercentage ??
                 props.vatPercentage ??
                 0,
             );
 
             const vatExact = priceExact.mul(vatRateExact).div(100);
+            const feesIncVatExact = priceExact.plus(vatExact);
 
-            const totalExact = priceExact.plus(vatExact);
-
-            /*
-             * Truncate only for display.
-             * Footer calculation continues to use full precision.
-             */
-            const price = truncateMoney(priceExact);
-            const vat = truncateMoney(vatExact);
-            const total = truncateMoney(totalExact);
-
-            const vatRate = vatRateExact.toNumber();
+            const rowFees = truncateMoney(priceExact);
+            const rowVat = truncateMoney(vatExact);
+            const rowFeesIncVat = truncateMoney(feesIncVatExact);
+            const rowVatRate = vatRateExact.toNumber();
 
             const driverList = subService.pricingDriverList || [];
 
@@ -11328,7 +11341,7 @@ ${
                     ? `<td style="border: 1px solid #dddddd; padding: 8px; width: 150px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word; text-align: right;">
                         ${
                           props.ProposalObject.feeTypeId === 1
-                            ? props.formatValue(price, props.currencyID)
+                            ? props.formatValue(rowFees, props.currencyID)
                             : "&#10003;"
                         }
                       </td>`
@@ -11337,7 +11350,7 @@ ${
                 ${
                   props.vatPercentage !== null &&
                   props.visibleFieldsCustomTemp.vatRate
-                    ? `<td style="border: 1px solid #dddddd; width: 150px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word; text-align: right; padding: 8px;">${vatRate.toFixed(2)}%</td>`
+                    ? `<td style="border: 1px solid #dddddd; width: 150px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word; text-align: right; padding: 8px;">${rowVatRate.toFixed(2)}%</td>`
                     : ""
                 }
                 ${
@@ -11346,7 +11359,7 @@ ${
                     ? `<td style="border: 1px solid #dddddd; width: 150px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word; text-align: right; padding: 8px;">
                         ${
                           props.ProposalObject.feeTypeId === 1
-                            ? props.formatValue(vat, props.currencyID)
+                            ? props.formatValue(rowVat, props.currencyID)
                             : "&#10003;"
                         }
                       </td>`
@@ -11358,7 +11371,7 @@ ${
                     ? `<td style="border: 1px solid #dddddd; width: 150px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word; text-align: right; padding: 8px;">
                         ${
                           props.ProposalObject.feeTypeId === 1
-                            ? props.formatValue(total, props.currencyID)
+                            ? props.formatValue(rowFeesIncVat, props.currencyID)
                             : "&#10003;"
                         }
                       </td>`

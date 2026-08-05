@@ -81,54 +81,88 @@ export const calculateVatCents = (amountCents, vatPercentage) => {
  */
 export const calculateCustomRecurringFooter = ({
   serviceGroups = [],
-  discountedPrice = 0,
+  discountedPrice = null,
+  discountPercentage = null,
+  discountAmount = null,
   fallbackVatPercentage = 0,
 }) => {
   const rows = serviceGroups.flatMap((category) =>
-    (category.servicesList || []).map((service) => {
-      const fees = decimalValue(service.price);
+    (category?.servicesList || []).map((service) => {
+      /*
+       * Normal proposal/EL flow may provide `price`.
+       * Proposal-generated EL flow may provide quotation price fields.
+       */
+      const rawFeesValue = hasCalculationValue(service?.price)
+        ? service.price
+        : hasCalculationValue(service?.quotationPriceWithAllDecimal)
+          ? service.quotationPriceWithAllDecimal
+          : hasCalculationValue(service?.quotationPrice)
+            ? service.quotationPrice
+            : 0;
 
-      const vatRate = decimalValue(
-        service.service_vat_percentage ?? fallbackVatPercentage,
-      );
+      const feesExact = decimalValue(rawFeesValue);
 
-      // Do not round here.
-      const vat = fees.mul(vatRate).div(100);
+      const rawVatPercentage =
+        service?.service_vat_percentage ??
+        service?.serviceVatPercentage ??
+        service?.vatPercentage ??
+        fallbackVatPercentage ??
+        0;
+
+      const vatRateExact = decimalValue(rawVatPercentage);
+
+      const vatExact = feesExact.mul(vatRateExact).div(100);
 
       return {
-        fees,
-        vat,
-        vatRate,
+        feesExact,
+        vatExact,
       };
     }),
   );
 
   /*
-   * Constant original values.
-   * Full service precision is retained until the final result.
+   * Original totals from all service rows.
    */
   const netFeesExact = rows.reduce(
-    (total, row) => total.plus(row.fees),
+    (total, row) => total.plus(row.feesExact),
     new Decimal(0),
   );
 
   const netVatExact = rows.reduce(
-    (total, row) => total.plus(row.vat),
+    (total, row) => total.plus(row.vatExact),
     new Decimal(0),
   );
 
   const netFeesIncVatExact = netFeesExact.plus(netVatExact);
 
   /*
-   * Discounted fees entered or calculated by the user.
+   * Resolve the final discounted fees.
+   *
+   * Priority:
+   * 1. Discounted price
+   * 2. Discount percentage
+   * 3. Absolute discount amount
+   * 4. No discount
    */
-  const discountedFeesExact = decimalValue(discountedPrice);
+  let discountedFeesExact = netFeesExact;
+
+  if (hasCalculationValue(discountedPrice)) {
+    discountedFeesExact = decimalValue(discountedPrice);
+  } else if (hasCalculationValue(discountPercentage)) {
+    const discountPercentageExact = decimalValue(discountPercentage);
+
+    const discountFactorExact = new Decimal(1).minus(
+      discountPercentageExact.div(100),
+    );
+
+    discountedFeesExact = netFeesExact.mul(discountFactorExact);
+  } else if (hasCalculationValue(discountAmount)) {
+    discountedFeesExact = netFeesExact.minus(decimalValue(discountAmount));
+  }
 
   /*
-   * Calculate VAT using the effective VAT ratio.
-   *
-   * This supports multiple VAT rates and avoids distributing and
-   * rounding the discount individually across every service.
+   * Use the effective VAT ratio so different service VAT rates
+   * continue to work correctly after the discount.
    */
   const effectiveVatRatio = netFeesExact.isZero()
     ? new Decimal(0)
@@ -140,8 +174,7 @@ export const calculateCustomRecurringFooter = ({
     discountedFeesExact.plus(discountedVatExact);
 
   /*
-   * Discounts are calculated from the exact values,
-   * not from already-rounded footer amounts.
+   * Discount amounts.
    */
   const discountFeesExact = netFeesExact.minus(discountedFeesExact);
 
@@ -152,20 +185,23 @@ export const calculateCustomRecurringFooter = ({
   );
 
   return {
-    // Net Total row — remains constant
+    // Net Total
     netFees: truncateMoney(netFeesExact),
     netVat: truncateMoney(netVatExact),
     netFeesIncVat: truncateMoney(netFeesIncVatExact),
 
-    // Discount row
+    // Discount
     discountFees: truncateMoney(discountFeesExact),
     discountVat: truncateMoney(discountVatExact),
     discountFeesIncVat: truncateMoney(discountFeesIncVatExact),
 
-    // Grand Total row
+    // Grand Total / Discounted Total
     discountedFees: truncateMoney(discountedFeesExact),
     discountedVat: truncateMoney(discountedVatExact),
     discountedFeesIncVat: truncateMoney(discountedFeesIncVatExact),
+
+    hasDiscount: discountFeesExact.greaterThan(0),
+    hasPriceIncrease: discountFeesExact.lessThan(0),
   };
 };
 
@@ -176,7 +212,15 @@ export const calculateCustomOneOffFooter = ({
 }) => {
   const rows = serviceGroups.flatMap((category) =>
     (category.servicesList || []).map((service) => {
-      const feesExact = decimalValue(service.price);
+      const rawFeesValue = hasCalculationValue(service?.price)
+        ? service.price
+        : hasCalculationValue(service?.quotationPriceWithAllDecimal)
+          ? service.quotationPriceWithAllDecimal
+          : hasCalculationValue(service?.quotationPrice)
+            ? service.quotationPrice
+            : 0;
+
+      const feesExact = decimalValue(rawFeesValue);
 
       const vatRateExact = decimalValue(
         service.service_vat_percentage ?? fallbackVatPercentage,
@@ -748,14 +792,29 @@ export const calculateCustomServiceRow = ({
   service,
   fallbackVatPercentage = 0,
 }) => {
-  const feesExact = decimalValue(service?.price);
+  /*
+   * Normal EL normally contains `price`.
+   * Proposal-generated EL may contain only quotation price fields.
+   */
+  const rawFeesValue = hasCalculationValue(service?.price)
+    ? service.price
+    : hasCalculationValue(service?.quotationPriceWithAllDecimal)
+      ? service.quotationPriceWithAllDecimal
+      : hasCalculationValue(service?.quotationPrice)
+        ? service.quotationPrice
+        : 0;
 
-  const vatRateExact = decimalValue(
-    service?.service_vat_percentage ?? fallbackVatPercentage,
-  );
+  const feesExact = decimalValue(rawFeesValue);
+
+  const rawVatPercentage =
+    service?.service_vat_percentage ??
+    service?.serviceVatPercentage ??
+    service?.vatPercentage ??
+    fallbackVatPercentage;
+
+  const vatRateExact = decimalValue(rawVatPercentage);
 
   const vatExact = feesExact.mul(vatRateExact).div(100);
-
   const feesIncVatExact = feesExact.plus(vatExact);
 
   return {

@@ -315,6 +315,9 @@ const BasicInformationComponent = (props) => {
                           props.setFooterImage(selectedTemplate.footerImage);
                           props.setHeaderHeight(selectedTemplate.headerHeight);
                           props.setFooterHeight(selectedTemplate.footerHeight);
+                          props.setOrientationID(
+                            selectedTemplate?.orientationID,
+                          );
                           props.setFontFamily(
                             props.getFontNameById(
                               selectedTemplate.fontFamilyID,
@@ -322,6 +325,9 @@ const BasicInformationComponent = (props) => {
                           );
                           props.setShowSeparatorLines(
                             selectedTemplate.showSeparatorLines,
+                          );
+                          props.updateVisibleFieldsFromIds(
+                            selectedTemplate.pricingTableColumnIDs,
                           );
                           props.setServiceDescriptionObj((prev) => ({
                             ...prev,
@@ -2108,7 +2114,6 @@ const ReviewServicesComponent = (props) => {
     [
       props.visibleFieldsCustomTemp?.serviceCategory,
       props.visibleFieldsCustomTemp?.serviceName,
-      props.visibleFieldsCustomTemp?.serviceScope,
     ].filter(Boolean).length || 1;
 
   const oneOffEngagementServiceFooter = calculateCustomServiceFooter({
@@ -2132,7 +2137,6 @@ const ReviewServicesComponent = (props) => {
     [
       props.visibleFieldsCustomTemp?.serviceCategory,
       props.visibleFieldsCustomTemp?.serviceName,
-      props.visibleFieldsCustomTemp?.serviceScope,
     ].filter(Boolean).length || 1;
 
   return (
@@ -2953,7 +2957,7 @@ const ReviewServicesComponent = (props) => {
                                             {/* SERVICE CATEGORY */}
                                             {props.visibleFieldsCustomTemp
                                               ?.serviceCategory && (
-                                              <td className="text-center">
+                                              <td className="text-left">
                                                 {service.serviceCatName}
                                               </td>
                                             )}
@@ -2961,60 +2965,8 @@ const ReviewServicesComponent = (props) => {
                                             {/* SERVICE NAME */}
                                             {props.visibleFieldsCustomTemp
                                               ?.serviceName && (
-                                              <td className="text-center">
+                                              <td className="text-left">
                                                 {subService.serviceName}
-                                              </td>
-                                            )}
-
-                                            {/* SERVICE SCOPE */}
-                                            {props.visibleFieldsCustomTemp
-                                              ?.serviceScope && (
-                                              <td className="text-center">
-                                                {driverList.length > 0
-                                                  ? driverList.map(
-                                                      (driver, driverIndex) => {
-                                                        const matchedVariation =
-                                                          Array.isArray(
-                                                            driver?.variation,
-                                                          )
-                                                            ? driver.variation.find(
-                                                                (variation) =>
-                                                                  Number(
-                                                                    variation.variationValue,
-                                                                  ) ===
-                                                                    Number(
-                                                                      driver.driverValue,
-                                                                    ) ||
-                                                                  Number(
-                                                                    variation.variationID,
-                                                                  ) ===
-                                                                    Number(
-                                                                      driver.variationID,
-                                                                    ),
-                                                              )
-                                                            : null;
-
-                                                        const displayedValue =
-                                                          matchedVariation
-                                                            ? matchedVariation.variationName
-                                                            : driver?.driverValue;
-
-                                                        return (
-                                                          <div
-                                                            key={`recurring-engagement-driver-${categoryIndex}-${serviceIndex}-${driverIndex}`}
-                                                          >
-                                                            {driver.driverName}{" "}
-                                                            = {displayedValue}
-                                                            {driverIndex !==
-                                                            driverList.length -
-                                                              1
-                                                              ? "; "
-                                                              : ""}
-                                                          </div>
-                                                        );
-                                                      },
-                                                    )
-                                                  : "-"}
                                               </td>
                                             )}
 
@@ -3086,6 +3038,58 @@ const ReviewServicesComponent = (props) => {
                                                   )}
                                                 </td>
                                               )}
+
+                                            {/* SERVICE SCOPE */}
+                                            {props.visibleFieldsCustomTemp
+                                              ?.serviceScope && (
+                                              <td className="text-left">
+                                                {driverList.length > 0
+                                                  ? driverList.map(
+                                                      (driver, driverIndex) => {
+                                                        const matchedVariation =
+                                                          Array.isArray(
+                                                            driver?.variation,
+                                                          )
+                                                            ? driver.variation.find(
+                                                                (variation) =>
+                                                                  Number(
+                                                                    variation.variationValue,
+                                                                  ) ===
+                                                                    Number(
+                                                                      driver.driverValue,
+                                                                    ) ||
+                                                                  Number(
+                                                                    variation.variationID,
+                                                                  ) ===
+                                                                    Number(
+                                                                      driver.variationID,
+                                                                    ),
+                                                              )
+                                                            : null;
+
+                                                        const displayedValue =
+                                                          matchedVariation
+                                                            ? matchedVariation.variationName
+                                                            : driver?.driverValue;
+
+                                                        return (
+                                                          <div
+                                                            key={`recurring-engagement-driver-${categoryIndex}-${serviceIndex}-${driverIndex}`}
+                                                          >
+                                                            {driver.driverName}{" "}
+                                                            = {displayedValue}
+                                                            {driverIndex !==
+                                                            driverList.length -
+                                                              1
+                                                              ? "; "
+                                                              : ""}
+                                                          </div>
+                                                        );
+                                                      },
+                                                    )
+                                                  : "-"}
+                                              </td>
+                                            )}
                                           </tr>
                                         );
                                       },
@@ -3094,7 +3098,6 @@ const ReviewServicesComponent = (props) => {
                                 ),
                               )}
 
-                              {/* === NET TOTAL ROW === */}
                               {/* NET TOTAL */}
                               <tr className="head-row">
                                 <td
@@ -3104,6 +3107,7 @@ const ReviewServicesComponent = (props) => {
                                   Net Total
                                 </td>
 
+                                {/* FEES */}
                                 {props.visibleFieldsCustomTemp?.fees && (
                                   <td className="tr-table-class text-white text-center">
                                     {props.formatValue(
@@ -3115,11 +3119,13 @@ const ReviewServicesComponent = (props) => {
                                   </td>
                                 )}
 
+                                {/* VAT RATE */}
                                 {hasRecurringEngagementVAT &&
                                   props.visibleFieldsCustomTemp?.vatRate && (
-                                    <td className="tr-table-class text-white"></td>
+                                    <td className="tr-table-class text-white text-center"></td>
                                   )}
 
+                                {/* VAT */}
                                 {hasRecurringEngagementVAT &&
                                   props.visibleFieldsCustomTemp?.vat && (
                                     <td className="tr-table-class text-white text-center">
@@ -3132,6 +3138,7 @@ const ReviewServicesComponent = (props) => {
                                     </td>
                                   )}
 
+                                {/* FEES INCLUDING VAT */}
                                 {hasRecurringEngagementVAT &&
                                   props.visibleFieldsCustomTemp?.feesIncVat && (
                                     <td className="tr-table-class text-white text-center">
@@ -3143,6 +3150,12 @@ const ReviewServicesComponent = (props) => {
                                       )}
                                     </td>
                                   )}
+
+                                {/* SERVICE SCOPE — LAST COLUMN */}
+                                {props.visibleFieldsCustomTemp
+                                  ?.serviceScope && (
+                                  <td className="tr-table-class text-white"></td>
+                                )}
                               </tr>
 
                               {/* DISCOUNT */}
@@ -3155,6 +3168,7 @@ const ReviewServicesComponent = (props) => {
                                     Discount
                                   </td>
 
+                                  {/* FEES */}
                                   {props.visibleFieldsCustomTemp?.fees && (
                                     <td className="tr-table-class font-14 text-white text-center">
                                       (-){" "}
@@ -3165,11 +3179,13 @@ const ReviewServicesComponent = (props) => {
                                     </td>
                                   )}
 
+                                  {/* VAT RATE */}
                                   {hasRecurringEngagementVAT &&
                                     props.visibleFieldsCustomTemp?.vatRate && (
-                                      <td></td>
+                                      <td className="tr-table-class text-white text-center"></td>
                                     )}
 
+                                  {/* VAT */}
                                   {hasRecurringEngagementVAT &&
                                     props.visibleFieldsCustomTemp?.vat && (
                                       <td className="tr-table-class text-white text-center">
@@ -3181,6 +3197,7 @@ const ReviewServicesComponent = (props) => {
                                       </td>
                                     )}
 
+                                  {/* FEES INCLUDING VAT */}
                                   {hasRecurringEngagementVAT &&
                                     props.visibleFieldsCustomTemp
                                       ?.feesIncVat && (
@@ -3192,6 +3209,12 @@ const ReviewServicesComponent = (props) => {
                                         )}
                                       </td>
                                     )}
+
+                                  {/* SERVICE SCOPE — LAST COLUMN */}
+                                  {props.visibleFieldsCustomTemp
+                                    ?.serviceScope && (
+                                    <td className="tr-table-class text-white"></td>
+                                  )}
                                 </tr>
                               )}
 
@@ -3207,6 +3230,7 @@ const ReviewServicesComponent = (props) => {
                                       : "Discounted Total"}
                                   </td>
 
+                                  {/* FEES */}
                                   {props.visibleFieldsCustomTemp?.fees && (
                                     <td className="tr-table-class font-14 text-white text-center">
                                       {props.formatValue(
@@ -3216,11 +3240,13 @@ const ReviewServicesComponent = (props) => {
                                     </td>
                                   )}
 
+                                  {/* VAT RATE */}
                                   {hasRecurringEngagementVAT &&
                                     props.visibleFieldsCustomTemp?.vatRate && (
-                                      <td></td>
+                                      <td className="tr-table-class text-white text-center"></td>
                                     )}
 
+                                  {/* VAT */}
                                   {hasRecurringEngagementVAT &&
                                     props.visibleFieldsCustomTemp?.vat && (
                                       <td className="tr-table-class font-14 text-white text-center">
@@ -3231,6 +3257,7 @@ const ReviewServicesComponent = (props) => {
                                       </td>
                                     )}
 
+                                  {/* FEES INCLUDING VAT */}
                                   {hasRecurringEngagementVAT &&
                                     props.visibleFieldsCustomTemp
                                       ?.feesIncVat && (
@@ -3241,6 +3268,12 @@ const ReviewServicesComponent = (props) => {
                                         )}
                                       </td>
                                     )}
+
+                                  {/* SERVICE SCOPE — LAST COLUMN */}
+                                  {props.visibleFieldsCustomTemp
+                                    ?.serviceScope && (
+                                    <td className="tr-table-class text-white"></td>
+                                  )}
                                 </tr>
                               )}
                             </tbody>
@@ -3784,13 +3817,6 @@ const ReviewServicesComponent = (props) => {
                                   </th>
                                 )}
 
-                                {props.visibleFieldsCustomTemp
-                                  ?.serviceScope && (
-                                  <th className="tr-table-class text-white text-center">
-                                    Service Scope
-                                  </th>
-                                )}
-
                                 {props.visibleFieldsCustomTemp?.fees && (
                                   <th className="tr-table-class text-white text-center">
                                     Fees ({props.currencySymbol})
@@ -3818,6 +3844,13 @@ const ReviewServicesComponent = (props) => {
                                       {props.currencySymbol})
                                     </th>
                                   )}
+
+                                {props.visibleFieldsCustomTemp
+                                  ?.serviceScope && (
+                                  <th className="tr-table-class text-white text-center">
+                                    Service Scope
+                                  </th>
+                                )}
                               </tr>
                             </thead>
 
@@ -3864,7 +3897,7 @@ const ReviewServicesComponent = (props) => {
                                             {/* SERVICE CATEGORY */}
                                             {props.visibleFieldsCustomTemp
                                               ?.serviceCategory && (
-                                              <td className="text-center">
+                                              <td className="text-left">
                                                 {service.serviceCatName}
                                               </td>
                                             )}
@@ -3872,60 +3905,8 @@ const ReviewServicesComponent = (props) => {
                                             {/* SERVICE NAME */}
                                             {props.visibleFieldsCustomTemp
                                               ?.serviceName && (
-                                              <td className="text-center">
+                                              <td className="text-left">
                                                 {subService.serviceName}
-                                              </td>
-                                            )}
-
-                                            {/* SERVICE SCOPE */}
-                                            {props.visibleFieldsCustomTemp
-                                              ?.serviceScope && (
-                                              <td className="text-center">
-                                                {driverList.length > 0
-                                                  ? driverList.map(
-                                                      (driver, driverIndex) => {
-                                                        const matchedVariation =
-                                                          Array.isArray(
-                                                            driver?.variation,
-                                                          )
-                                                            ? driver.variation.find(
-                                                                (variation) =>
-                                                                  Number(
-                                                                    variation.variationValue,
-                                                                  ) ===
-                                                                    Number(
-                                                                      driver.driverValue,
-                                                                    ) ||
-                                                                  Number(
-                                                                    variation.variationID,
-                                                                  ) ===
-                                                                    Number(
-                                                                      driver.variationID,
-                                                                    ),
-                                                              )
-                                                            : null;
-
-                                                        const displayedValue =
-                                                          matchedVariation
-                                                            ? matchedVariation.variationName
-                                                            : driver?.driverValue;
-
-                                                        return (
-                                                          <div
-                                                            key={`oneoff-engagement-driver-${categoryIndex}-${serviceIndex}-${driverIndex}`}
-                                                          >
-                                                            {driver.driverName}{" "}
-                                                            = {displayedValue}
-                                                            {driverIndex !==
-                                                            driverList.length -
-                                                              1
-                                                              ? "; "
-                                                              : ""}
-                                                          </div>
-                                                        );
-                                                      },
-                                                    )
-                                                  : "-"}
                                               </td>
                                             )}
 
@@ -3997,6 +3978,58 @@ const ReviewServicesComponent = (props) => {
                                                   )}
                                                 </td>
                                               )}
+
+                                            {/* SERVICE SCOPE */}
+                                            {props.visibleFieldsCustomTemp
+                                              ?.serviceScope && (
+                                              <td className="text-left">
+                                                {driverList.length > 0
+                                                  ? driverList.map(
+                                                      (driver, driverIndex) => {
+                                                        const matchedVariation =
+                                                          Array.isArray(
+                                                            driver?.variation,
+                                                          )
+                                                            ? driver.variation.find(
+                                                                (variation) =>
+                                                                  Number(
+                                                                    variation.variationValue,
+                                                                  ) ===
+                                                                    Number(
+                                                                      driver.driverValue,
+                                                                    ) ||
+                                                                  Number(
+                                                                    variation.variationID,
+                                                                  ) ===
+                                                                    Number(
+                                                                      driver.variationID,
+                                                                    ),
+                                                              )
+                                                            : null;
+
+                                                        const displayedValue =
+                                                          matchedVariation
+                                                            ? matchedVariation.variationName
+                                                            : driver?.driverValue;
+
+                                                        return (
+                                                          <div
+                                                            key={`oneoff-engagement-driver-${categoryIndex}-${serviceIndex}-${driverIndex}`}
+                                                          >
+                                                            {driver.driverName}{" "}
+                                                            = {displayedValue}
+                                                            {driverIndex !==
+                                                            driverList.length -
+                                                              1
+                                                              ? "; "
+                                                              : ""}
+                                                          </div>
+                                                        );
+                                                      },
+                                                    )
+                                                  : "-"}
+                                              </td>
+                                            )}
                                           </tr>
                                         );
                                       },
@@ -4005,7 +4038,6 @@ const ReviewServicesComponent = (props) => {
                                 ),
                               )}
 
-                              {/* NET TOTAL ROW */}
                               {/* NET TOTAL */}
                               <tr className="head-row">
                                 <td
@@ -4015,6 +4047,7 @@ const ReviewServicesComponent = (props) => {
                                   Net Total
                                 </td>
 
+                                {/* FEES */}
                                 {props.visibleFieldsCustomTemp?.fees && (
                                   <td className="tr-table-class text-white text-center">
                                     {props.formatValue(
@@ -4026,11 +4059,13 @@ const ReviewServicesComponent = (props) => {
                                   </td>
                                 )}
 
+                                {/* VAT RATE */}
                                 {hasOneOffEngagementVAT &&
                                   props.visibleFieldsCustomTemp?.vatRate && (
-                                    <td className="tr-table-class text-white"></td>
+                                    <td className="tr-table-class text-white text-center"></td>
                                   )}
 
+                                {/* VAT */}
                                 {hasOneOffEngagementVAT &&
                                   props.visibleFieldsCustomTemp?.vat && (
                                     <td className="tr-table-class text-white text-center">
@@ -4043,6 +4078,7 @@ const ReviewServicesComponent = (props) => {
                                     </td>
                                   )}
 
+                                {/* FEES INCLUDING VAT */}
                                 {hasOneOffEngagementVAT &&
                                   props.visibleFieldsCustomTemp?.feesIncVat && (
                                     <td className="tr-table-class text-white text-center">
@@ -4054,6 +4090,12 @@ const ReviewServicesComponent = (props) => {
                                       )}
                                     </td>
                                   )}
+
+                                {/* SERVICE SCOPE — ALWAYS LAST */}
+                                {props.visibleFieldsCustomTemp
+                                  ?.serviceScope && (
+                                  <td className="tr-table-class text-white"></td>
+                                )}
                               </tr>
 
                               {/* DISCOUNT */}
@@ -4066,8 +4108,9 @@ const ReviewServicesComponent = (props) => {
                                     Discount
                                   </td>
 
+                                  {/* FEES */}
                                   {props.visibleFieldsCustomTemp?.fees && (
-                                    <td className="tr-table-class text-white text-center">
+                                    <td className="tr-table-class font-14 text-white text-center">
                                       (-){" "}
                                       {props.formatValue(
                                         oneOffEngagementServiceFooter.discount,
@@ -4076,11 +4119,13 @@ const ReviewServicesComponent = (props) => {
                                     </td>
                                   )}
 
+                                  {/* VAT RATE */}
                                   {hasOneOffEngagementVAT &&
                                     props.visibleFieldsCustomTemp?.vatRate && (
-                                      <td></td>
+                                      <td className="tr-table-class text-white text-center"></td>
                                     )}
 
+                                  {/* VAT */}
                                   {hasOneOffEngagementVAT &&
                                     props.visibleFieldsCustomTemp?.vat && (
                                       <td className="tr-table-class text-white text-center">
@@ -4092,6 +4137,7 @@ const ReviewServicesComponent = (props) => {
                                       </td>
                                     )}
 
+                                  {/* FEES INCLUDING VAT */}
                                   {hasOneOffEngagementVAT &&
                                     props.visibleFieldsCustomTemp
                                       ?.feesIncVat && (
@@ -4103,6 +4149,12 @@ const ReviewServicesComponent = (props) => {
                                         )}
                                       </td>
                                     )}
+
+                                  {/* SERVICE SCOPE — ALWAYS LAST */}
+                                  {props.visibleFieldsCustomTemp
+                                    ?.serviceScope && (
+                                    <td className="tr-table-class text-white"></td>
+                                  )}
                                 </tr>
                               )}
 
@@ -4118,6 +4170,7 @@ const ReviewServicesComponent = (props) => {
                                       : "Discounted Total"}
                                   </td>
 
+                                  {/* FEES */}
                                   {props.visibleFieldsCustomTemp?.fees && (
                                     <td className="tr-table-class font-14 text-white text-center">
                                       {props.formatValue(
@@ -4127,11 +4180,13 @@ const ReviewServicesComponent = (props) => {
                                     </td>
                                   )}
 
+                                  {/* VAT RATE */}
                                   {hasOneOffEngagementVAT &&
                                     props.visibleFieldsCustomTemp?.vatRate && (
-                                      <td></td>
+                                      <td className="tr-table-class text-white text-center"></td>
                                     )}
 
+                                  {/* VAT */}
                                   {hasOneOffEngagementVAT &&
                                     props.visibleFieldsCustomTemp?.vat && (
                                       <td className="tr-table-class font-14 text-white text-center">
@@ -4142,6 +4197,7 @@ const ReviewServicesComponent = (props) => {
                                       </td>
                                     )}
 
+                                  {/* FEES INCLUDING VAT */}
                                   {hasOneOffEngagementVAT &&
                                     props.visibleFieldsCustomTemp
                                       ?.feesIncVat && (
@@ -4152,6 +4208,12 @@ const ReviewServicesComponent = (props) => {
                                         )}
                                       </td>
                                     )}
+
+                                  {/* SERVICE SCOPE — ALWAYS LAST */}
+                                  {props.visibleFieldsCustomTemp
+                                    ?.serviceScope && (
+                                    <td className="tr-table-class text-white"></td>
+                                  )}
                                 </tr>
                               )}
                             </tbody>
@@ -9611,6 +9673,7 @@ const Add_Update_Engagement_Letter = () => {
   const [isModalOpen, setISModalOpen] = useState(false);
   const [selectedPackagesList, setSelectedPackagesList] = useState([]);
   const location = useLocation();
+  const [pricingTableColumnIDs, setPricingTableColumnIDs] = useState("");
   const [openSuccessModal, setOpenSuccessModal] = React.useState(false);
   const [showSelectTemplateModal, setShowSelectTemplateModal] = useState(false);
   const [selectedTemplateID, setSelectedTemplateID] = useState(0);
@@ -9647,6 +9710,7 @@ const Add_Update_Engagement_Letter = () => {
   const [headerFooterLastPage, setHeaderFooterLastPage] = useState(false);
   const [fontFamily, setFontFamily] = useState("");
   const [watermarkImage, setWatermarkImage] = useState("");
+  const [orientationID, setOrientationID] = useState(null);
   const [headerContent, setHeaderContent] = useState(null);
   const [footerContent, setFooterContent] = useState(null);
   const [showSeparatorLines, setShowSeparatorLines] = useState(null);
@@ -9904,6 +9968,7 @@ const Add_Update_Engagement_Letter = () => {
     paymentGatewayID: null,
     Payment_Frequency: null,
     moduleName: "Contract",
+    pricingTableColumnIDs: null,
   });
   // useEffect(() => {
   //   console.log(
@@ -10871,6 +10936,9 @@ const Add_Update_Engagement_Letter = () => {
           headerHeight: item.headerHeight,
           footerHeight: item.footerHeight,
           showSeparatorLines: Boolean(item.showSeparatorLines),
+          pricingTableColumnIDs: item.pricingTableColumnIDs
+            ? item.pricingTableColumnIDs
+            : "",
           mainHeadingSD: item.mainHeadingSD,
           recurringOnGoingHeadingSD: item.recurringOnGoingHeadingSD,
           oneOffAdhocHeadingSD: item.oneOffAdhocHeadingSD,
@@ -11049,6 +11117,9 @@ const Add_Update_Engagement_Letter = () => {
                 QuoteId?.quoteID == undefined ? QuoteId : QuoteId?.quoteID,
               templateKeyID: isSelectedDefault[0]?.templateKeyID,
               templateID: isSelectedDefault[0]?.templateID,
+              pricingTableColumnIDs: isSelectedDefault[0]?.pricingTableColumnIDs
+                ? isSelectedDefault[0]?.pricingTableColumnIDs
+                : "",
             });
 
             if (isSelectedDefault[0]?.pricingTableColumnIDs !== null) {
@@ -11157,7 +11228,62 @@ const Add_Update_Engagement_Letter = () => {
           setFooterImage(isSelectedDefault[0].footerImage);
           setHeaderHeight(isSelectedDefault[0].headerHeight);
           setFooterHeight(isSelectedDefault[0].footerHeight);
+          setOrientationID(isSelectedDefault[0].orientationID);
           setShowSeparatorLines(isSelectedDefault[0]?.showSeparatorLines);
+          setPricingTableColumnIDs(
+            isSelectedDefault[0]?.pricingTableColumnIDs
+              ? isSelectedDefault[0]?.pricingTableColumnIDs
+              : "",
+          );
+          if (isSelectedDefault[0]?.pricingTableColumnIDs !== null) {
+            setSelectedTemplateID(6);
+            setSelectedTemplateIDOneOff(6);
+            updateVisibleFieldsFromIds(
+              isSelectedDefault[0]?.pricingTableColumnIDs,
+            );
+            setServiceDescriptionObj((prev) => ({
+              ...prev,
+              mainHeading: isSelectedDefault[0]?.mainHeadingSD,
+              recurringOnGoingHeading:
+                isSelectedDefault[0]?.recurringOnGoingHeadingSD,
+              oneOffAdhocHeading: isSelectedDefault[0]?.oneOffAdhocHeadingSD,
+              mainHeadingFontSize: isSelectedDefault[0]?.mainHeadingFontSizeSD,
+              recurringOnGoingHeadingFontSize:
+                isSelectedDefault[0]?.recurringOnGoingHeadingFontSizeSD,
+              oneOffAdhocFontSize: isSelectedDefault[0]?.oneOffAdhocFontSizeSD,
+              mainHeadingIsBold: isSelectedDefault[0]?.mainHeadingIsBoldSD,
+              mainHeadingIsItalic: isSelectedDefault[0]?.mainHeadingIsItalicSD,
+              recurringOnGoingHeadingIsBold:
+                isSelectedDefault[0]?.recurringOnGoingHeadingIsBoldSD,
+              recurringOnGoingHeadingIsItalic:
+                isSelectedDefault[0]?.recurringOnGoingHeadingIsItalicSD,
+              oneOffAdhocHeadingIsBold:
+                isSelectedDefault[0]?.oneOffAdhocHeadingIsBoldSD,
+              oneOffAdhocHeadingIsItalic:
+                isSelectedDefault[0]?.oneOffAdhocHeadingIsItalicSD,
+            }));
+            setStatementOfFactsObj((prev) => ({
+              ...prev,
+              mainHeading: isSelectedDefault[0]?.mainHeadingSOF,
+              recurringOnGoingHeading:
+                isSelectedDefault[0]?.recurringOnGoingHeadingSOF,
+              oneOffAdhocHeading: isSelectedDefault[0]?.oneOffAdhocHeadingSOF,
+              mainHeadingFontSize: isSelectedDefault[0]?.mainHeadingFontSizeSOF,
+              recurringOnGoingHeadingFontSize:
+                isSelectedDefault[0]?.recurringOnGoingHeadingFontSizeSOF,
+              oneOffAdhocFontSize: isSelectedDefault[0]?.oneOffAdhocFontSizeSOF,
+              mainHeadingIsBold: isSelectedDefault[0]?.mainHeadingIsBoldSOF,
+              mainHeadingIsItalic: isSelectedDefault[0]?.mainHeadingIsItalicSOF,
+              recurringOnGoingHeadingIsBold:
+                isSelectedDefault[0]?.recurringOnGoingHeadingIsBoldSOF,
+              recurringOnGoingHeadingIsItalic:
+                isSelectedDefault[0]?.recurringOnGoingHeadingIsItalicSOF,
+              oneOffAdhocHeadingIsBold:
+                isSelectedDefault[0]?.oneOffAdhocHeadingIsBoldSOF,
+              oneOffAdhocHeadingIsItalic:
+                isSelectedDefault[0]?.oneOffAdhocHeadingIsItalicSOF,
+            }));
+          }
           setServiceDescriptionObj((prev) => ({
             ...prev,
             mainHeading: isSelectedDefault[0]?.mainHeadingSD,
@@ -16005,7 +16131,7 @@ const Add_Update_Engagement_Letter = () => {
       "CustomizeTemplate",
     );
     const isGlobalCustomTemplate =
-      selectedTemplateID === 6 || selectedTemplateIDOneOff === 6;
+      selectedTemplateID === 0 || selectedTemplateIDOneOff === 0;
     // const updatedTemplateList = await updateTemplateList(
     //   engagementObj.customizedEmailContent,
     //   "CustomizeTemplate"
@@ -16021,8 +16147,8 @@ const Add_Update_Engagement_Letter = () => {
       contractKeyID: engagementObj.contractKeyID,
       documentCode: DocumentCode || null,
       pricingTableColumnIDs: isGlobalCustomTemplate
-        ? getVisibleFieldIds()
-        : null,
+        ? null
+        : getVisibleFieldIds(),
       sourceID: engagementObj.selectSourceId, //1	From Scratch, 2	From Quote
       clientID: engagementObj.ClientID,
       TabName: moduleName,
@@ -17014,7 +17140,43 @@ const Add_Update_Engagement_Letter = () => {
                 footerImage: item.footerImage,
                 headerHeight: item.headerHeight,
                 footerHeight: item.footerHeight,
+                watermarkImage: item.watermarkImage,
+                orientationID: item.orientationID,
                 showSeparatorLines: Boolean(item.showSeparatorLines),
+                pricingTableColumnIDs: item.pricingTableColumnIDs
+                  ? item.pricingTableColumnIDs
+                  : "",
+                mainHeadingSD: item.mainHeadingSD,
+                recurringOnGoingHeadingSD: item.recurringOnGoingHeadingSD,
+                oneOffAdhocHeadingSD: item.oneOffAdhocHeadingSD,
+                mainHeadingFontSizeSD: item.mainHeadingFontSizeSD,
+                recurringOnGoingHeadingFontSizeSD:
+                  item.recurringOnGoingHeadingFontSizeSD,
+                oneOffAdhocFontSizeSD: item.oneOffAdhocFontSizeSD,
+                mainHeadingIsBoldSD: item.mainHeadingIsBoldSD,
+                mainHeadingIsItalicSD: item.mainHeadingIsItalicSD,
+                recurringOnGoingHeadingIsBoldSD:
+                  item.recurringOnGoingHeadingIsBoldSD,
+                recurringOnGoingHeadingIsItalicSD:
+                  item.recurringOnGoingHeadingIsItalicSD,
+                oneOffAdhocHeadingIsBoldSD: item.oneOffAdhocHeadingIsBoldSD,
+                oneOffAdhocHeadingIsItalicSD: item.oneOffAdhocHeadingIsItalicSD,
+                mainHeadingSOF: item.mainHeadingSOF,
+                recurringOnGoingHeadingSOF: item.recurringOnGoingHeadingSOF,
+                oneOffAdhocHeadingSOF: item.oneOffAdhocHeadingSOF,
+                mainHeadingFontSizeSOF: item.mainHeadingFontSizeSOF,
+                recurringOnGoingHeadingFontSizeSOF:
+                  item.recurringOnGoingHeadingFontSizeSOF,
+                oneOffAdhocFontSizeSOF: item.oneOffAdhocFontSizeSOF,
+                mainHeadingIsBoldSOF: item.mainHeadingIsBoldSOF,
+                mainHeadingIsItalicSOF: item.mainHeadingIsItalicSOF,
+                recurringOnGoingHeadingIsBoldSOF:
+                  item.recurringOnGoingHeadingIsBoldSOF,
+                recurringOnGoingHeadingIsItalicSOF:
+                  item.recurringOnGoingHeadingIsItalicSOF,
+                oneOffAdhocHeadingIsBoldSOF: item.oneOffAdhocHeadingIsBoldSOF,
+                oneOffAdhocHeadingIsItalicSOF:
+                  item.oneOffAdhocHeadingIsItalicSOF,
               }));
               setTemplateLookUpOptions(TemplateOption);
             }
@@ -17041,7 +17203,43 @@ const Add_Update_Engagement_Letter = () => {
                 footerImage: item.footerImage,
                 headerHeight: item.headerHeight,
                 footerHeight: item.footerHeight,
+                watermarkImage: item.watermarkImage,
+                orientationID: item.orientationID,
                 showSeparatorLines: Boolean(item.showSeparatorLines),
+                pricingTableColumnIDs: item.pricingTableColumnIDs
+                  ? item.pricingTableColumnIDs
+                  : "",
+                mainHeadingSD: item.mainHeadingSD,
+                recurringOnGoingHeadingSD: item.recurringOnGoingHeadingSD,
+                oneOffAdhocHeadingSD: item.oneOffAdhocHeadingSD,
+                mainHeadingFontSizeSD: item.mainHeadingFontSizeSD,
+                recurringOnGoingHeadingFontSizeSD:
+                  item.recurringOnGoingHeadingFontSizeSD,
+                oneOffAdhocFontSizeSD: item.oneOffAdhocFontSizeSD,
+                mainHeadingIsBoldSD: item.mainHeadingIsBoldSD,
+                mainHeadingIsItalicSD: item.mainHeadingIsItalicSD,
+                recurringOnGoingHeadingIsBoldSD:
+                  item.recurringOnGoingHeadingIsBoldSD,
+                recurringOnGoingHeadingIsItalicSD:
+                  item.recurringOnGoingHeadingIsItalicSD,
+                oneOffAdhocHeadingIsBoldSD: item.oneOffAdhocHeadingIsBoldSD,
+                oneOffAdhocHeadingIsItalicSD: item.oneOffAdhocHeadingIsItalicSD,
+                mainHeadingSOF: item.mainHeadingSOF,
+                recurringOnGoingHeadingSOF: item.recurringOnGoingHeadingSOF,
+                oneOffAdhocHeadingSOF: item.oneOffAdhocHeadingSOF,
+                mainHeadingFontSizeSOF: item.mainHeadingFontSizeSOF,
+                recurringOnGoingHeadingFontSizeSOF:
+                  item.recurringOnGoingHeadingFontSizeSOF,
+                oneOffAdhocFontSizeSOF: item.oneOffAdhocFontSizeSOF,
+                mainHeadingIsBoldSOF: item.mainHeadingIsBoldSOF,
+                mainHeadingIsItalicSOF: item.mainHeadingIsItalicSOF,
+                recurringOnGoingHeadingIsBoldSOF:
+                  item.recurringOnGoingHeadingIsBoldSOF,
+                recurringOnGoingHeadingIsItalicSOF:
+                  item.recurringOnGoingHeadingIsItalicSOF,
+                oneOffAdhocHeadingIsBoldSOF: item.oneOffAdhocHeadingIsBoldSOF,
+                oneOffAdhocHeadingIsItalicSOF:
+                  item.oneOffAdhocHeadingIsItalicSOF,
               }));
               setTemplateLookUpOptions(TemplateOption);
             }
@@ -17054,6 +17252,7 @@ const Add_Update_Engagement_Letter = () => {
             TemplateOption.find(
               (item) => item.templateID === ModelData.templateID,
             ) || TemplateOption[0];
+          console.log(TemplateValue);
           setFontFamily(getFontNameById(TemplateValue.fontFamilyID));
           setHeaderContent(TemplateValue.headerContent);
           setFooterContent(TemplateValue.footerContent);
@@ -17061,6 +17260,8 @@ const Add_Update_Engagement_Letter = () => {
           setFooterImage(TemplateValue.footerImage);
           setHeaderHeight(TemplateValue.headerHeight);
           setFooterHeight(TemplateValue.footerHeight);
+          setWatermarkImage(TemplateValue.watermarkImage);
+          setOrientationID(TemplateValue.orientationID);
           setLoader(true);
           setContractFinalPackageAmountList(ModelData.contractFinalAmountList);
           setEngagementObj({
@@ -17087,7 +17288,61 @@ const Add_Update_Engagement_Letter = () => {
             feeTypeId: ModelData.feesInQuoteID,
             Payment_Frequency: ModelData.paymentFrequencyID,
             paymentGatewayID: ModelData.paymentGatewayID,
+            statusID: ModelData.statusID,
           });
+          // If contract has saved column IDs, it means user used a custom table template.
+          // Prefer persisted selection over the template's default columns.
+          const resolvedPricingTableColumnIDs =
+            typeof ModelData?.pricingTableColumnIDs === "string" &&
+            ModelData.pricingTableColumnIDs.trim() !== ""
+              ? ModelData.pricingTableColumnIDs
+              : TemplateValue?.pricingTableColumnIDs;
+
+          setPricingTableColumnIDs(
+            typeof resolvedPricingTableColumnIDs === "string"
+              ? resolvedPricingTableColumnIDs
+              : "",
+          );
+          updateVisibleFieldsFromIds(resolvedPricingTableColumnIDs);
+          setServiceDescriptionObj((prev) => ({
+            ...prev,
+            mainHeading: TemplateValue?.mainHeadingSD,
+            recurringOnGoingHeading: TemplateValue?.recurringOnGoingHeadingSD,
+            oneOffAdhocHeading: TemplateValue?.oneOffAdhocHeadingSD,
+            mainHeadingFontSize: TemplateValue?.mainHeadingFontSizeSD,
+            recurringOnGoingHeadingFontSize:
+              TemplateValue?.recurringOnGoingHeadingFontSizeSD,
+            oneOffAdhocFontSize: TemplateValue?.oneOffAdhocFontSizeSD,
+            mainHeadingIsBold: TemplateValue?.mainHeadingIsBoldSD,
+            mainHeadingIsItalic: TemplateValue?.mainHeadingIsItalicSD,
+            recurringOnGoingHeadingIsBold:
+              TemplateValue?.recurringOnGoingHeadingIsBoldSD,
+            recurringOnGoingHeadingIsItalic:
+              TemplateValue?.recurringOnGoingHeadingIsItalicSD,
+            oneOffAdhocHeadingIsBold: TemplateValue?.oneOffAdhocHeadingIsBoldSD,
+            oneOffAdhocHeadingIsItalic:
+              TemplateValue?.oneOffAdhocHeadingIsItalicSD,
+          }));
+          setStatementOfFactsObj((prev) => ({
+            ...prev,
+            mainHeading: TemplateValue?.mainHeadingSOF,
+            recurringOnGoingHeading: TemplateValue?.recurringOnGoingHeadingSOF,
+            oneOffAdhocHeading: TemplateValue?.oneOffAdhocHeadingSOF,
+            mainHeadingFontSize: TemplateValue?.mainHeadingFontSizeSOF,
+            recurringOnGoingHeadingFontSize:
+              TemplateValue?.recurringOnGoingHeadingFontSizeSOF,
+            oneOffAdhocFontSize: TemplateValue?.oneOffAdhocFontSizeSOF,
+            mainHeadingIsBold: TemplateValue?.mainHeadingIsBoldSOF,
+            mainHeadingIsItalic: TemplateValue?.mainHeadingIsItalicSOF,
+            recurringOnGoingHeadingIsBold:
+              TemplateValue?.recurringOnGoingHeadingIsBoldSOF,
+            recurringOnGoingHeadingIsItalic:
+              TemplateValue?.recurringOnGoingHeadingIsItalicSOF,
+            oneOffAdhocHeadingIsBold:
+              TemplateValue?.oneOffAdhocHeadingIsBoldSOF,
+            oneOffAdhocHeadingIsItalic:
+              TemplateValue?.oneOffAdhocHeadingIsItalicSOF,
+          }));
 
           // if (ModelData.contractSignatorieList.length === 0) {
           //   setLoader(true);
@@ -17290,36 +17545,87 @@ const Add_Update_Engagement_Letter = () => {
           const recArrayWithPriceCopy = selectedServices.map((category) => ({
             serviceCatID: category.serviceCatID,
             serviceCatName: category.serviceCatName,
-            servicesList: category.servicesList.map((service) => {
-              let quotationPrice = Number(
-                service.quotationPriceWithAllDecimal,
-              ).toFixed(2);
-              let quotationPriceWithAllDecimal = Number(
-                service.quotationPriceWithAllDecimal,
-              ).toFixed(2);
 
+            servicesList: category.servicesList.map((service) => {
+              const originalQuotationPrice = Number(
+                service.quotationPriceWithAllDecimal ??
+                  service.quotationPrice ??
+                  0,
+              );
+
+              let yearlyPrice = originalQuotationPrice;
+
+              /*
+               * The proposal API may return the amount according to its
+               * selected payment frequency. Convert it back to yearly first.
+               */
               switch (recurringOneOffPrice.paymentFrequencyID) {
-                case 4:
-                  quotationPrice *= 12;
-                  quotationPriceWithAllDecimal *= 12;
+                case Payment_Frequency.Monthly:
+                  yearlyPrice = originalQuotationPrice * 12;
                   break;
-                case 3:
-                  quotationPrice *= 4;
-                  quotationPriceWithAllDecimal *= 4;
+
+                case Payment_Frequency.Quarterly:
+                  yearlyPrice = originalQuotationPrice * 4;
                   break;
-                case 2:
-                  quotationPrice *= 2;
-                  quotationPriceWithAllDecimal *= 2;
+
+                case Payment_Frequency.HalfYearly:
+                  yearlyPrice = originalQuotationPrice * 2;
                   break;
-                case 1:
+
+                case Payment_Frequency.Yearly:
                 default:
+                  yearlyPrice = originalQuotationPrice;
+                  break;
+              }
+
+              let currentFrequencyPrice = yearlyPrice;
+
+              /*
+               * Set the value based on the payment frequency selected
+               * in the engagement letter.
+               */
+              switch (engagementObj.Payment_Frequency) {
+                case Payment_Frequency.Monthly:
+                  currentFrequencyPrice = yearlyPrice / 12;
+                  break;
+
+                case Payment_Frequency.Quarterly:
+                  currentFrequencyPrice = yearlyPrice / 4;
+                  break;
+
+                case Payment_Frequency.HalfYearly:
+                  currentFrequencyPrice = yearlyPrice / 2;
+                  break;
+
+                case Payment_Frequency.Yearly:
+                default:
+                  currentFrequencyPrice = yearlyPrice;
                   break;
               }
 
               return {
                 ...service,
-                quotationPrice,
-                quotationPriceWithAllDecimal,
+
+                /*
+                 * Required by calculateCustomServiceRow and
+                 * calculateCustomServiceFooter.
+                 */
+                price: currentFrequencyPrice,
+
+                /*
+                 * Required by the existing default table.
+                 */
+                quotationPrice: currentFrequencyPrice.toFixed(2),
+
+                /*
+                 * Preserve calculation precision.
+                 */
+                quotationPriceWithAllDecimal: currentFrequencyPrice,
+
+                /*
+                 * Yearly base price used when payment frequency changes.
+                 */
+                originalServicePrice: yearlyPrice,
               };
             }),
           }));
@@ -17531,33 +17837,87 @@ const Add_Update_Engagement_Letter = () => {
           const recArrayWithPriceCopy = selectedServices.map((category) => ({
             serviceCatID: category.serviceCatID,
             serviceCatName: category.serviceCatName,
-            servicesList: category.servicesList.map((service) => {
-              let quotationPrice = service.quotationPriceWithAllDecimal;
-              let quotationPriceWithAllDecimal =
-                service.quotationPriceWithAllDecimal;
 
+            servicesList: category.servicesList.map((service) => {
+              const originalQuotationPrice = Number(
+                service.quotationPriceWithAllDecimal ??
+                  service.quotationPrice ??
+                  0,
+              );
+
+              let yearlyPrice = originalQuotationPrice;
+
+              /*
+               * The proposal API may return the amount according to its
+               * selected payment frequency. Convert it back to yearly first.
+               */
               switch (recurringOneOffPrice.paymentFrequencyID) {
-                case 4:
-                  quotationPrice *= 12;
-                  quotationPriceWithAllDecimal *= 12;
+                case Payment_Frequency.Monthly:
+                  yearlyPrice = originalQuotationPrice * 12;
                   break;
-                case 3:
-                  quotationPrice *= 4;
-                  quotationPriceWithAllDecimal *= 4;
+
+                case Payment_Frequency.Quarterly:
+                  yearlyPrice = originalQuotationPrice * 4;
                   break;
-                case 2:
-                  quotationPrice *= 2;
-                  quotationPriceWithAllDecimal *= 2;
+
+                case Payment_Frequency.HalfYearly:
+                  yearlyPrice = originalQuotationPrice * 2;
                   break;
-                case 1:
+
+                case Payment_Frequency.Yearly:
                 default:
+                  yearlyPrice = originalQuotationPrice;
+                  break;
+              }
+
+              let currentFrequencyPrice = yearlyPrice;
+
+              /*
+               * Set the value based on the payment frequency selected
+               * in the engagement letter.
+               */
+              switch (engagementObj.Payment_Frequency) {
+                case Payment_Frequency.Monthly:
+                  currentFrequencyPrice = yearlyPrice / 12;
+                  break;
+
+                case Payment_Frequency.Quarterly:
+                  currentFrequencyPrice = yearlyPrice / 4;
+                  break;
+
+                case Payment_Frequency.HalfYearly:
+                  currentFrequencyPrice = yearlyPrice / 2;
+                  break;
+
+                case Payment_Frequency.Yearly:
+                default:
+                  currentFrequencyPrice = yearlyPrice;
                   break;
               }
 
               return {
                 ...service,
-                quotationPrice,
-                quotationPriceWithAllDecimal,
+
+                /*
+                 * Required by calculateCustomServiceRow and
+                 * calculateCustomServiceFooter.
+                 */
+                price: currentFrequencyPrice,
+
+                /*
+                 * Required by the existing default table.
+                 */
+                quotationPrice: currentFrequencyPrice.toFixed(2),
+
+                /*
+                 * Preserve calculation precision.
+                 */
+                quotationPriceWithAllDecimal: currentFrequencyPrice,
+
+                /*
+                 * Yearly base price used when payment frequency changes.
+                 */
+                originalServicePrice: yearlyPrice,
               };
             }),
           }));
@@ -18330,6 +18690,8 @@ const Add_Update_Engagement_Letter = () => {
                   setShowSeparatorLines={setShowSeparatorLines}
                   setStatementOfFactsObj={setStatementOfFactsObj}
                   setServiceDescriptionObj={setServiceDescriptionObj}
+                  updateVisibleFieldsFromIds={updateVisibleFieldsFromIds}
+                  setOrientationID={setOrientationID}
                 />
               )}
               {activeTab === EngagementLetterHeader.SelectServices && (

@@ -1406,6 +1406,8 @@ const View_Engagement_Latter = () => {
       ? oneOffGrandTotal
       : oneOffNetFeesIncludingVat;
 
+  console.log("recurringServiceCategories", recurringServiceCategories);
+
   return (
     <div className="container">
       {/* <div class="main-content"> */}
