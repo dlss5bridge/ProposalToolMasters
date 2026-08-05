@@ -1,3 +1,7 @@
+import { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import Select from "react-select";
 import {
   Box,
   Button,
@@ -8,20 +12,202 @@ import {
   Typography,
 } from "@mui/material";
 
+import { selectQuoteModel } from "../../../redux/reducer/webProposal";
+import {
+  getInputFieldsList,
+  selectInputFieldsList,
+  selectInputFieldsListLoading,
+  selectInputFieldsListError,
+  selectInputFieldsValidationVisible,
+  setInputFieldsList,
+  setInputFieldsValidationVisible,
+  getVisibleInputFieldsItems,
+  getInputFieldsFieldErrors,
+} from "../../../redux/reducer/webProposal/inputFields";
+
+// driverTypeID: 2 = quantity (number), 3 = variation (select), 4 = slab (select),
+// 5 = free text, 6 = date. Same convention used across the web-proposal steps
+// (see ProposalAdditionalInformationStep / PricingDriverField).
+const updateItem = (list, globalPricingDriverID, patch) =>
+  list.map((item) =>
+    item.globalPricingDriverID === globalPricingDriverID
+      ? { ...item, ...patch }
+      : item,
+  );
+
+const getTextFieldSx = (theme) => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "10px",
+    backgroundColor: "#fff",
+
+    "& fieldset": {
+      borderColor: theme.border,
+    },
+
+    "&:hover fieldset": {
+      borderColor: theme.primary,
+    },
+
+    "&.Mui-focused fieldset": {
+      borderColor: theme.primary,
+      borderWidth: 2,
+    },
+  },
+});
+
+const getSelectStyles = (theme, hasError) => ({
+  control: (base) => ({
+    ...base,
+    minHeight: 40,
+    borderRadius: "10px",
+    borderColor: hasError ? "#dc2626" : theme.border,
+    "&:hover": {
+      borderColor: hasError ? "#dc2626" : theme.primary,
+    },
+  }),
+  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+});
+
 export default function ProposalInputFieldsStep({ theme }) {
-  // Dummy API response
-  const fields = [
-    { id: 1, label: "Client Name" },
-    { id: 2, label: "Contact Person" },
-    { id: 3, label: "Email" },
-    // { id: 4, label: "Phone" },
-    // { id: 5, label: "Company" },
-    // { id: 6, label: "GST Number" },
-    // { id: 7, label: "Address" },
-    // { id: 8, label: "City" },
-  ];
+  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const quoteKeyID = searchParams.get("QuoteKeyID");
+
+  const quoteModel = useSelector(selectQuoteModel);
+  const inputFieldsList = useSelector(selectInputFieldsList);
+  const listLoading = useSelector(selectInputFieldsListLoading);
+  const listError = useSelector(selectInputFieldsListError);
+  const validationVisible = useSelector(selectInputFieldsValidationVisible);
+
+  useEffect(() => {
+    if (quoteKeyID) {
+      dispatch(getInputFieldsList(quoteKeyID));
+    }
+  }, [dispatch, quoteKeyID]);
+
+  const allowedDriverIDs = quoteModel?.globalPricingDriverID;
+
+  const fields = useMemo(
+    () => getVisibleInputFieldsItems(inputFieldsList, allowedDriverIDs),
+    [inputFieldsList, allowedDriverIDs],
+  );
+
+  const fieldErrors = useMemo(
+    () => getInputFieldsFieldErrors(inputFieldsList, allowedDriverIDs),
+    [inputFieldsList, allowedDriverIDs],
+  );
 
   const isTwoColumn = fields.length > 4;
+
+  const handleChange = (globalPricingDriverID, patch) => {
+    dispatch(
+      setInputFieldsList(
+        updateItem(inputFieldsList, globalPricingDriverID, patch),
+      ),
+    );
+  };
+
+  const handleSubmit = () => {
+    dispatch(setInputFieldsValidationVisible(true));
+  };
+
+  const renderField = (field, errorMessage) => {
+    const hasError = Boolean(errorMessage);
+
+    if (field.driverTypeID === 2) {
+      const quantity = field.quantity?.[0];
+
+      return (
+        <TextField
+          fullWidth
+          size="small"
+          type="number"
+          value={field.driverValue ?? ""}
+          error={hasError}
+          inputProps={{
+            min: quantity?.quantityFrom ?? undefined,
+            max: quantity?.quantityTo ?? undefined,
+          }}
+          onChange={(e) =>
+            handleChange(field.globalPricingDriverID, {
+              driverValue: e.target.value,
+            })
+          }
+          placeholder={`Enter ${field.driverName}`}
+          sx={getTextFieldSx(theme)}
+        />
+      );
+    }
+
+    if (field.driverTypeID === 3 || field.driverTypeID === 4) {
+      const isSlab = field.driverTypeID === 4;
+      const source = isSlab ? field.slab : field.variation;
+      const options = (source || []).map((option) => ({
+        value: isSlab ? option.slabID : option.variationID,
+        label: isSlab
+          ? option.slabTypeName || `${option.slabFrom} - ${option.slabTo}`
+          : option.variationName,
+      }));
+      const selected =
+        options.find((option) => option.value === field.driverValue) || null;
+
+      return (
+        <Select
+          options={options}
+          value={selected}
+          onChange={(option) =>
+            handleChange(field.globalPricingDriverID, {
+              driverValue: option?.value ?? null,
+            })
+          }
+          menuPortalTarget={document.body}
+          placeholder={`Select ${field.driverName}`}
+          styles={getSelectStyles(theme, hasError)}
+        />
+      );
+    }
+
+    if (field.driverTypeID === 5) {
+      const textBlock = field.text?.[0] ?? {};
+
+      return (
+        <TextField
+          fullWidth
+          size="small"
+          value={field.enteredText ?? ""}
+          error={hasError}
+          inputProps={{ maxLength: textBlock.textLength || 100 }}
+          onChange={(e) =>
+            handleChange(field.globalPricingDriverID, {
+              enteredText: e.target.value,
+            })
+          }
+          placeholder={`Enter ${field.driverName}`}
+          sx={getTextFieldSx(theme)}
+        />
+      );
+    }
+
+    if (field.driverTypeID === 6) {
+      return (
+        <TextField
+          fullWidth
+          size="small"
+          type="date"
+          value={field.enteredDate ?? ""}
+          error={hasError}
+          onChange={(e) =>
+            handleChange(field.globalPricingDriverID, {
+              enteredDate: e.target.value,
+            })
+          }
+          sx={getTextFieldSx(theme)}
+        />
+      );
+    }
+
+    return null;
+  };
 
   return (
     <Box className="h-full overflow-auto bg-white p-2 lg:p-4">
@@ -72,53 +258,68 @@ export default function ProposalInputFieldsStep({ theme }) {
           </div>
 
           {/* Fields */}
-          <Grid container spacing={3}>
-            {fields.map((field) => (
-              <Grid key={field.id} item xs={12} md={isTwoColumn ? 6 : 12}>
-                <div
-                  className="flex flex-col gap-2"
-                  style={{
-                    maxWidth: isTwoColumn ? "100%" : 420,
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: theme.textPrimary,
-                    }}
+          {listLoading ? (
+            <Typography sx={{ fontSize: 14, color: theme.textSecondary }}>
+              Loading input fields...
+            </Typography>
+          ) : listError ? (
+            <Typography sx={{ fontSize: 14, color: "#dc2626" }}>
+              Failed to load input fields.
+            </Typography>
+          ) : (
+            <Grid container spacing={3}>
+              {fields.map((field) => {
+                const errorMessage = validationVisible
+                  ? fieldErrors[field.globalPricingDriverID]
+                  : null;
+
+                return (
+                  <Grid
+                    key={field.globalPricingDriverID}
+                    item
+                    xs={12}
+                    md={isTwoColumn ? 6 : 12}
                   >
-                    {field.label}
+                    <div
+                      className="flex flex-col gap-2"
+                      style={{
+                        maxWidth: isTwoColumn ? "100%" : 420,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: theme.textPrimary,
+                        }}
+                      >
+                        {field.driverName}
+                        <Box component="span" sx={{ color: "#dc2626", ml: 0.25 }}>
+                          *
+                        </Box>
+                      </Typography>
+
+                      {renderField(field, errorMessage)}
+
+                      {errorMessage && (
+                        <Typography sx={{ fontSize: 12, color: "#dc2626" }}>
+                          {errorMessage}
+                        </Typography>
+                      )}
+                    </div>
+                  </Grid>
+                );
+              })}
+
+              {fields.length === 0 && (
+                <Grid item xs={12}>
+                  <Typography sx={{ fontSize: 14, color: theme.textSecondary }}>
+                    No input fields required.
                   </Typography>
-
-                  <TextField
-                    fullWidth
-                    size="small"
-                    placeholder={`Enter ${field.label}`}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "10px",
-                        backgroundColor: "#fff",
-
-                        "& fieldset": {
-                          borderColor: theme.border,
-                        },
-
-                        "&:hover fieldset": {
-                          borderColor: theme.primary,
-                        },
-
-                        "&.Mui-focused fieldset": {
-                          borderColor: theme.primary,
-                          borderWidth: 2,
-                        },
-                      },
-                    }}
-                  />
-                </div>
-              </Grid>
-            ))}
-          </Grid>
+                </Grid>
+              )}
+            </Grid>
+          )}
 
           {/* Buttons */}
           <div
@@ -144,6 +345,7 @@ export default function ProposalInputFieldsStep({ theme }) {
             <Button
               variant="contained"
               className="!rounded-lg !px-6 !normal-case"
+              onClick={handleSubmit}
               sx={{
                 minWidth: 120,
                 backgroundColor: theme.primary,

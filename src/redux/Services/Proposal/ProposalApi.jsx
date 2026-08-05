@@ -61,6 +61,18 @@ export const GetProposalModelWithoutToken = async (id) => {
   );
   return res;
 };
+
+// Lookup list of all global pricing driver variables available for the web
+// proposal's Input Fields step. Runs outside the authenticated app, so no
+// token (mirrors GetProposalModelWithoutToken).
+export const GetGlobalProspectVariablesByPricingSettingsForWebProposal = async (
+  id,
+) => {
+  const res = await getList(
+    `${ProposalBaseUrlQuote}/GetGlobalProspectVariablesByPricingSettingsForWebProposal?QuoteKeyID=${id}`,
+  );
+  return res;
+};
 //AddUpdate Service Category Callback function
 export const AddUpdateProposal = async (url, params) => {
   const res = await postApiWithAuthenticated(

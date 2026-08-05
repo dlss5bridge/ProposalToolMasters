@@ -12,6 +12,7 @@ import stepperReducer from "../reducer/webProposal/stepper/stepperSlice";
 import webProposalServicesReducer from "../reducer/webProposal/services";
 import webProposalReducer from "../reducer/webProposal";
 import webProposalAdditionalInformationReducer from "../reducer/webProposal/additionalInformation";
+import webProposalInputFieldsReducer from "../reducer/webProposal/inputFields";
 
 const persistConfig = { key: "Proposal Tool", version: 1, storage };
 const authPersistConfig = {
@@ -35,5 +36,6 @@ export const store = configureStore({
     webProposalServices: webProposalServicesReducer,
     webProposal: webProposalReducer,
     webProposalAdditionalInformation: webProposalAdditionalInformationReducer,
+    webProposalInputFields: webProposalInputFieldsReducer,
   },
 });
