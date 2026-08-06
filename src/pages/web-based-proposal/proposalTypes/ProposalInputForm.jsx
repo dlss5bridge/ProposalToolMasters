@@ -29,7 +29,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       </div>
 
       <div
-        className="flex flex-1 overflow-hidden"
+        className="flex flex-1 gap-3 overflow-hidden"
         style={{
           backgroundColor: theme.background,
         }}
@@ -37,7 +37,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
         {/* Sidebar only for the PDF step */}
         {activeStep === 0 && (
           <aside
-            className="hidden lg:flex lg:w-1/3 border-r p-5"
+            className="hidden lg:flex lg:w-64 lg:flex-shrink-0 border-r p-3"
             style={{
               backgroundColor: theme.background,
               borderColor: theme.border,

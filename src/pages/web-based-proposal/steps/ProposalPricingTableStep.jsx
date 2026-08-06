@@ -734,7 +734,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
 
   return (
     <div
-      className="flex h-full justify-center overflow-hidden p-5"
+      className="flex h-full justify-center overflow-hidden p-3"
       style={{ backgroundColor: theme.background }}
     >
       <div

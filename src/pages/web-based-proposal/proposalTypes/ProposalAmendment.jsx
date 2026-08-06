@@ -160,7 +160,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       </div>
 
       <div
-        className="flex flex-1 overflow-hidden"
+        className="flex flex-1 gap-3 overflow-hidden"
         style={{
           backgroundColor: theme.background,
         }}
@@ -168,7 +168,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         {/* Sidebar shown for the PDF step and the Pricing Table step */}
         {(activeStep === 0 || activeStep === PRICING_STEP_INDEX) && (
           <aside
-            className="hidden lg:flex lg:w-1/3 border-r p-5"
+            className="hidden lg:flex lg:w-64 lg:flex-shrink-0 border-r p-3"
             style={{
               backgroundColor: theme.background,
               borderColor: theme.border,

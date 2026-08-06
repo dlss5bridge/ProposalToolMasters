@@ -3,7 +3,7 @@ import PdfViewer from "../pdf/PdfViewer";
 export default function ProposalPdfStep({ theme }) {
   return (
     <div
-      className="h-full p-5"
+      className="h-full p-3"
       style={{
         backgroundColor: theme.background,
       }}

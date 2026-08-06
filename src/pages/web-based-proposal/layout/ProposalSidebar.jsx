@@ -10,10 +10,10 @@ export default function ProposalSidebar({
   const logoUrl = proposal?.themeSettings?.logoUrl;
   return (
     <aside>
-      <div className="p-6">
+      <div className="p-3">
         {/* Organization Card */}
         <div
-          className="rounded-2xl p-6 text-center"
+          className="rounded-2xl p-4 text-center"
           style={{
             background: `${theme.primary}10`,
             border: `1px solid ${theme.border}`,
@@ -26,7 +26,7 @@ export default function ProposalSidebar({
                 "https://master.proposal.outbooks.com/static/media/logo-outbooks-proposal.9ab4fff35da097dcf552.webp"
               }
               alt="Company Logo"
-              className="h-24 w-24 rounded-xl border bg-blue-900 object-contain p-2 shadow-sm"
+              className="h-16 w-16 rounded-xl border bg-blue-900 object-contain p-1.5 shadow-sm"
               style={{
                 borderColor: theme.border,
               }}
@@ -34,7 +34,7 @@ export default function ProposalSidebar({
           </div>
 
           <h2
-            className="mt-5 text-lg font-semibold"
+            className="mt-3 text-base font-semibold"
             style={{
               color: theme.textPrimary,
             }}
@@ -43,7 +43,7 @@ export default function ProposalSidebar({
           </h2>
 
           <p
-            className="mt-2 text-sm leading-6"
+            className="mt-1.5 text-sm leading-6"
             style={{
               color: theme.textSecondary,
             }}

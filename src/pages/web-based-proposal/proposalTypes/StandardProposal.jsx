@@ -12,7 +12,7 @@ export default function StandardProposal({ proposal, theme }) {
       </div>
 
       <div
-        className="flex h-full overflow-hidden"
+        className="flex h-full gap-3 overflow-hidden"
         style={{
           backgroundColor: theme.background,
         }}
@@ -22,10 +22,11 @@ export default function StandardProposal({ proposal, theme }) {
           className="
         hidden
         lg:flex
-        lg:w-1/3
+        lg:w-64
+        lg:flex-shrink-0
         overflow-y-auto
         border-r
-        p-5
+        p-3
       "
           style={{
             backgroundColor: theme.background,
@@ -39,9 +40,9 @@ export default function StandardProposal({ proposal, theme }) {
         <main
           className="
         w-full
-        lg:w-2/3
+        flex-1
         overflow-hidden
-        p-5
+        p-3
       "
           style={{
             backgroundColor: theme.background,
