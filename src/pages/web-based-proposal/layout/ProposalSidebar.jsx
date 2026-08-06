@@ -7,6 +7,7 @@ export default function ProposalSidebar({
   const organisationDescription =
     proposal?.themeSettings?.organisationDescription;
   const organisationName = proposal?.themeSettings?.tradingBusinessName;
+  const logoUrl = proposal?.themeSettings?.logoUrl;
   return (
     <aside>
       <div className="p-6">
@@ -20,7 +21,10 @@ export default function ProposalSidebar({
         >
           <div className="flex justify-center">
             <img
-              src="https://master.proposal.outbooks.com/static/media/logo-outbooks-proposal.9ab4fff35da097dcf552.webp"
+              src={
+                logoUrl ||
+                "https://master.proposal.outbooks.com/static/media/logo-outbooks-proposal.9ab4fff35da097dcf552.webp"
+              }
               alt="Company Logo"
               className="h-24 w-24 rounded-xl border bg-blue-900 object-contain p-2 shadow-sm"
               style={{
