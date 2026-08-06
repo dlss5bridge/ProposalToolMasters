@@ -86,7 +86,7 @@ const Update_Practice_Details = () => {
   const [modelAction, setModelAction] = useState("Update");
   const [isChecked, setIsChecked] = useState(false);
   const [addressUpdatedDatetime, setAddressUpdatedDatetime] = useState(
-    Date.now()
+    Date.now(),
   );
   const today = new Date();
   const minDate = new Date(1970, 0, 1);
@@ -147,6 +147,9 @@ const Update_Practice_Details = () => {
     countryCodeID: null,
     AffiliatedAcBodyName: null,
     webOfAffiliatedAccount: null,
+    webBasedQuoteBackgroundColor: "white",
+    fontFamilyID: 2,
+    organisationDescription: null,
   });
   const [companyForm, setCompanyForm] = useState({
     companyID: 0,
@@ -482,7 +485,7 @@ const Update_Practice_Details = () => {
   const GetOrganisationInformationModelData = async () => {
     setLoader(true);
     const response = await GetOrganisationInformationModel(
-      common.organisationKeyID
+      common.organisationKeyID,
     );
     if (response) {
       if (response?.data?.statusCode === 200) {
@@ -547,6 +550,11 @@ const Update_Practice_Details = () => {
             ModelData.otherInformation.affiliatedAccountingBodyName,
           webOfAffiliatedAccount:
             ModelData.otherInformation.affiliatedAccountingBodyWebsite,
+          webBasedQuoteBackgroundColor:
+            ModelData.otherInformation.webBasedQuoteBackgroundColor || "white",
+          fontFamilyID: ModelData.otherInformation.fontFamilyID || 2,
+          organisationDescription:
+            ModelData.otherInformation.organisationDescription,
         });
         if (ModelData.otherInformation.preferredCurrencyId === 1) {
           setTaxName("VAT");
@@ -577,7 +585,7 @@ const Update_Practice_Details = () => {
         let officerArray = [];
         ModelData.officersList.forEach((item) => {
           const PhoneSelectedValue = CountryList.find(
-            (countryCode) => item.countryCodeID == countryCode.value
+            (countryCode) => item.countryCodeID == countryCode.value,
           );
 
           let officerObj = {
@@ -641,7 +649,7 @@ const Update_Practice_Details = () => {
 
         setCompanyForm(companyObj);
         const fullAddress = concatenateFullAddress(
-          ModelData.companyDetails?.companyAddress
+          ModelData.companyDetails?.companyAddress,
         );
         setConcatenatedRegisterAddress(fullAddress);
         let CorrespondenceOrResidentialAddress = [];
@@ -653,7 +661,7 @@ const Update_Practice_Details = () => {
               officersFullAddress: fullAddressConcatenation,
             };
             CorrespondenceOrResidentialAddress.push(
-              CorrespondenceOrResidentialAddressObj
+              CorrespondenceOrResidentialAddressObj,
             );
           } else {
             CorrespondenceOrResidentialAddress.push({
@@ -664,7 +672,7 @@ const Update_Practice_Details = () => {
         setConcatenatedResidentialAddress(CorrespondenceOrResidentialAddress);
         if (ModelData.organisationAddress) {
           const fullAddress = concatenateFullAddress(
-            ModelData.organisationAddress
+            ModelData.organisationAddress,
           );
           setConcatenatedTradingAddress(fullAddress);
         }
@@ -718,9 +726,9 @@ const Update_Practice_Details = () => {
     const addPart = (part) => (part ? `${part}, ` : "");
 
     let concatenatedAddress = `${addPart(
-      address?.addressLine1?.replace(",", " ")
+      address?.addressLine1?.replace(",", " "),
     )}${addPart(address?.addressLine2)}${addPart(address?.locality)}${addPart(
-      address?.region
+      address?.region,
     )}${addPart(address?.country || address?.countryName)}${
       address?.postcode || ""
     }`;
@@ -759,7 +767,7 @@ const Update_Practice_Details = () => {
       basicInfo.businessTypeID === CLIENT_TYPES.Company
     ) {
       authorizedRecords = officersForm.filter(
-        (item) => item.isAuthorisedSignatory === true
+        (item) => item.isAuthorisedSignatory === true,
       );
       setAuthorityCount(authorizedRecords.length);
     }
@@ -1014,6 +1022,10 @@ const Update_Practice_Details = () => {
               businessTagline: otherInfo.businessTagline,
               affiliatedAccountingBodyName: otherInfo.AffiliatedAcBodyName,
               affiliatedAccountingBodyWebsite: otherInfo.webOfAffiliatedAccount,
+              webBasedQuoteBackgroundColor:
+                otherInfo.webBasedQuoteBackgroundColor,
+              fontFamilyID: otherInfo.fontFamilyID,
+              organisationDescription: otherInfo.organisationDescription,
             },
             professionTypeList: basicInfo.professionTypeList,
           };
@@ -1211,6 +1223,10 @@ const Update_Practice_Details = () => {
               businessTagline: otherInfo.businessTagline,
               affiliatedAccountingBodyName: otherInfo.AffiliatedAcBodyName,
               affiliatedAccountingBodyWebsite: otherInfo.webOfAffiliatedAccount,
+              webBasedQuoteBackgroundColor:
+                otherInfo.webBasedQuoteBackgroundColor,
+              fontFamilyID: otherInfo.fontFamilyID,
+              organisationDescription: otherInfo.organisationDescription,
             },
           };
 
@@ -1256,7 +1272,7 @@ const Update_Practice_Details = () => {
             Signature.set("file", basicInfo.signatoryImage); // Append the file itself
             uploadSignatureResponse = await AddUpdateSignature(
               ModuleKeyID,
-              Signature
+              Signature,
             );
           }
           if (basicInfo.signatoryImage === null) {
@@ -1324,7 +1340,7 @@ const Update_Practice_Details = () => {
         const CompanyDetails = data?.data?.responseData;
         const address = CompanyDetails.registered_office_address;
         const selected_Country = countryLookupList.filter(
-          (c) => c.countryName == address.country
+          (c) => c.countryName == address.country,
         )[0];
         const company_Address = {
           addressId: companyForm?.companyAddress.addressId,
@@ -1395,7 +1411,7 @@ const Update_Practice_Details = () => {
             officersFullAddress: null,
           };
           CorrespondenceOrResidentialAddress.push(
-            CorrespondenceOrResidentialAddressObj
+            CorrespondenceOrResidentialAddressObj,
           );
         } else {
           CompanyOfficer.forEach((officer) => {
@@ -1411,7 +1427,7 @@ const Update_Practice_Details = () => {
               officerLastName = officerLastName?.substring(0, 29);
             }
             const selected_Country = countryLookupList.filter(
-              (c) => c.countryName == officer?.address.country
+              (c) => c.countryName == officer?.address.country,
             )[0];
 
             let officerAddress = {
@@ -1456,7 +1472,7 @@ const Update_Practice_Details = () => {
               officersFullAddress: fullAddressConcatenation,
             };
             CorrespondenceOrResidentialAddress.push(
-              CorrespondenceOrResidentialAddressObj
+              CorrespondenceOrResidentialAddressObj,
             );
           });
         }
@@ -1544,6 +1560,9 @@ const Update_Practice_Details = () => {
       countryCodeID: 9,
       AffiliatedAcBodyName: "",
       webOfAffiliatedAccount: "",
+      webBasedQuoteBackgroundColor: "white",
+      fontFamilyID: 2,
+      organisationDescription: "",
     });
     setOfficers([
       {
@@ -1644,10 +1663,17 @@ const Update_Practice_Details = () => {
   };
 
   const VATRegFilter = Utils.VAT_Registered.find(
-    (item) => otherInfo.VATReg == item.value
+    (item) => otherInfo.VATReg == item.value,
   );
   const ContactFilter = countryCodes.find(
-    (item) => otherInfo.countryCodeID == item.value
+    (item) => otherInfo.countryCodeID == item.value,
+  );
+  const FontFamilyLookupList = Utils.FontFamily.map((font) => ({
+    value: font.value,
+    label: font.label,
+  }));
+  const FontFamilyValue = FontFamilyLookupList?.find(
+    (font) => font.value === otherInfo.fontFamilyID || null,
   );
 
   const handleImageUpload = (image) => {
@@ -1697,7 +1723,7 @@ const Update_Practice_Details = () => {
     dispatch(
       updateState({
         enableEL: otherInfo.enableEL,
-      })
+      }),
     );
     navigate("/");
     window.location.reload(true);
@@ -1721,7 +1747,7 @@ const Update_Practice_Details = () => {
     for (let i = 0; i < officersForm.length; i++) {
       // Find the country code based on the countryCodeID in officersForm
       let phoneValue = countryCodes.find(
-        (item) => officersForm[i]?.countryCodeID === item.value
+        (item) => officersForm[i]?.countryCodeID === item.value,
       );
 
       // If a matching country code is found, add it to the value array
@@ -1741,11 +1767,11 @@ const Update_Practice_Details = () => {
   };
 
   const currencyFilter = currencyType.find(
-    (item) => otherInfo.preferredCurrency == item.value
+    (item) => otherInfo.preferredCurrency == item.value,
   );
 
   const IncorporatedValue = incorporatedInList.filter(
-    (item) => companyForm?.incInID == item.value
+    (item) => companyForm?.incInID == item.value,
   );
 
   function formatDate(dateString) {
@@ -1796,27 +1822,29 @@ const Update_Practice_Details = () => {
 
   return (
     <>
-    <div className="container-fluid">
-      {/* <div class="main-content"> */}
+      <div className="container-fluid">
+        {/* <div class="main-content"> */}
         <div class="services page-background">
-              <div class="col-lg-12">
-                <div class="card">
-                  {/* end card header  */}
-                  <div class="card-body mb-2">
-                    <div id="customerList" style={{ marginTop: "3rem" }}>
-                      <div class="bg-light border-bottom px-2">
-                        <div className="container">
-                          <div className="row">
-                            <div className="col-md-12 p-0 ">
-                <div class="page-title-cls">Update Practice Details</div>
+          <div class="col-lg-12">
+            <div class="card">
+              {/* end card header  */}
+              <div class="card-body mb-2">
+                <div id="customerList" style={{ marginTop: "3rem" }}>
+                  <div class="bg-light border-bottom px-2">
+                    <div className="container">
+                      <div className="row">
+                        <div className="col-md-12 p-0 ">
+                          <div class="page-title-cls">
+                            Update Practice Details
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            </div>
-            </div>
-            </div>
-            </div>
-            </div>
-            </div>
+          </div>
           {/* </div> */}
           <div class="container mt-5 col-xl-8">
             <div class="row mb-100">
@@ -1905,7 +1933,7 @@ const Update_Practice_Details = () => {
                                           // Validation: Check if the trimmed value is either alphanumeric or only alphabet but not only numeric
                                           const isValidName =
                                             /^[a-zA-Z0-9\s,.!?"':;&()-_`]+(?:[a-zA-Z0-9\s,.!?"':;&()-_`]+)*$/.test(
-                                              trimmedValue
+                                              trimmedValue,
                                             ) && !/^\d+$/.test(trimmedValue);
 
                                           if (
@@ -2200,7 +2228,7 @@ const Update_Practice_Details = () => {
                                         className="input-text"
                                         placeholder="Incorporation Date"
                                         value={formatDate(
-                                          companyForm.incorporationDate
+                                          companyForm.incorporationDate,
                                         )}
                                         onChange={(e) =>
                                           setCompanyForm({
@@ -2297,7 +2325,7 @@ const Update_Practice_Details = () => {
                                           // Validation: Check if the trimmed value is either alphanumeric or only alphabet but not only numeric
                                           const isValidName =
                                             /^[a-zA-Z0-9\s,.!?"':;&()-_`]+(?:[a-zA-Z0-9\s,.!?"':;&()-_`]+)*$/.test(
-                                              trimmedValue
+                                              trimmedValue,
                                             ) && !/^\d+$/.test(trimmedValue);
 
                                           if (
@@ -2828,7 +2856,7 @@ const Update_Practice_Details = () => {
                                     </span>
                                   ) : requireErrorMessage &&
                                     !isValidPhoneNumber(
-                                      otherInfo.contactPhone
+                                      otherInfo.contactPhone,
                                     ) ? (
                                     <span className="validation">
                                       {" "}
@@ -3082,6 +3110,64 @@ const Update_Practice_Details = () => {
                             <div class="col-lg-12">
                               <div class="row mb-3">
                                 <div class="col-md-3 col-sm-12 text-start text-md-end">
+                                  <label class="form-label">Font Family</label>
+                                </div>
+                                <div class="col-md-9 col-sm-12">
+                                  <Select
+                                    className="user-role-select"
+                                    options={FontFamilyLookupList}
+                                    value={FontFamilyValue}
+                                    getOptionLabel={(e) => (
+                                      <span style={{ fontFamily: e.label }}>
+                                        {e.label}
+                                      </span>
+                                    )}
+                                    onChange={(e) =>
+                                      setOtherInfo({
+                                        ...otherInfo,
+                                        fontFamilyID: e.value,
+                                      })
+                                    }
+                                    styles={{
+                                      option: (provided, state) => ({
+                                        ...provided,
+                                        cursor: "pointer",
+                                      }),
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-12">
+                              <div class="row mb-3">
+                                <div class="col-md-3 col-sm-12 text-start text-md-end">
+                                  <label class="form-label">
+                                    Web Based Background Color
+                                  </label>
+                                </div>
+                                <div class="col-md-9 col-sm-12">
+                                  <input
+                                    type="color"
+                                    class="form-control height"
+                                    title="Choose your color"
+                                    value={
+                                      otherInfo.webBasedQuoteBackgroundColor
+                                    }
+                                    onChange={(e) =>
+                                      setOtherInfo({
+                                        ...otherInfo,
+                                        webBasedQuoteBackgroundColor:
+                                          e.target.value,
+                                      })
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                              <div class="row mb-3">
+                                <div class="col-md-3 col-sm-12 text-start text-md-end">
                                   <label class="form-label">Brand Color</label>
                                 </div>
                                 <div class="col-md-9 col-sm-12">
@@ -3098,6 +3184,30 @@ const Update_Practice_Details = () => {
                                       })
                                     }
                                   />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-12">
+                              <div class="row mb-3">
+                                <div class="col-md-3 col-sm-12 text-start text-md-end">
+                                  <label class="form-label">
+                                    Organisation Description
+                                  </label>
+                                </div>
+                                <div class="col-md-9 col-sm-12">
+                                  <textarea
+                                    style={{ padding: "5px" }}
+                                    class="input-text"
+                                    placeholder="Organisation Description"
+                                    maxLength={250}
+                                    value={otherInfo.organisationDescription}
+                                    onChange={(e) =>
+                                      setOtherInfo({
+                                        ...otherInfo,
+                                        organisationDescription: e.target.value,
+                                      })
+                                    }
+                                  ></textarea>
                                 </div>
                               </div>
                             </div>
@@ -3210,7 +3320,7 @@ const Update_Practice_Details = () => {
                                       // Remove all spaces and dots
                                       const cleanedValue = inputValue.replace(
                                         /[.\s]/g,
-                                        ""
+                                        "",
                                       );
                                       // Reject input if it starts with a digit
                                       if (/\d/.test(cleanedValue)) {
@@ -3223,7 +3333,7 @@ const Update_Practice_Details = () => {
                                       OnOfficerChange(
                                         index,
                                         "firstName",
-                                        capitalizedValue
+                                        capitalizedValue,
                                       );
                                     }}
                                     maxLength={20}
@@ -3269,7 +3379,7 @@ const Update_Practice_Details = () => {
                                       // Remove all spaces and dots
                                       const cleanedValue = inputValue.replace(
                                         /[.\s]/g,
-                                        ""
+                                        "",
                                       );
 
                                       // Reject input if it starts with a digit
@@ -3284,7 +3394,7 @@ const Update_Practice_Details = () => {
                                       OnOfficerChange(
                                         index,
                                         "lastName",
-                                        capitalizedValue
+                                        capitalizedValue,
                                       );
                                     }}
                                   />
@@ -3314,7 +3424,7 @@ const Update_Practice_Details = () => {
                                       onChange={(e) => {
                                         handleOfficerPhoneSelectedValue(
                                           e,
-                                          index
+                                          index,
                                         );
                                       }}
                                     />
@@ -3333,7 +3443,7 @@ const Update_Practice_Details = () => {
                                           OnOfficerChange(
                                             index,
                                             "phoneNo",
-                                            sanitizedInput
+                                            sanitizedInput,
                                           );
                                         }}
                                       />
@@ -3351,7 +3461,7 @@ const Update_Practice_Details = () => {
                                     </span>
                                   ) : requireErrorMessage &&
                                     !isValidPhoneNumber(
-                                      officersForm[index].phoneNo
+                                      officersForm[index].phoneNo,
                                     ) ? (
                                     <span className="validation">
                                       {" "}
@@ -3393,7 +3503,7 @@ const Update_Practice_Details = () => {
                                         OnOfficerChange(
                                           index,
                                           "emailID",
-                                          correctedValue
+                                          correctedValue,
                                         );
                                         return;
                                       }
@@ -3402,7 +3512,7 @@ const Update_Practice_Details = () => {
                                       OnOfficerChange(
                                         index,
                                         "emailID",
-                                        enteredValue
+                                        enteredValue,
                                       );
                                     }}
                                   />
@@ -3414,7 +3524,7 @@ const Update_Practice_Details = () => {
                                       </span>
                                     ) : (
                                       !isValidEmail(
-                                        officersForm[index].emailID
+                                        officersForm[index].emailID,
                                       ) && (
                                         <span className="validation">
                                           Invalid email pattern
@@ -3448,7 +3558,7 @@ const Update_Practice_Details = () => {
                                       setAddressPopUpTitle("Practice Address");
                                       handleOpenRegisterOfficeAddressPopup(
                                         e,
-                                        index
+                                        index,
                                       );
                                     }}
                                     autoComplete="off"
@@ -3573,7 +3683,7 @@ const Update_Practice_Details = () => {
                                       OnOfficerChange(
                                         index,
                                         "firstName",
-                                        capitalizedValue
+                                        capitalizedValue,
                                       );
                                     }}
                                     maxLength={20}
@@ -3623,7 +3733,7 @@ const Update_Practice_Details = () => {
                                       OnOfficerChange(
                                         index,
                                         "lastName",
-                                        capitalizedValue
+                                        capitalizedValue,
                                       );
                                     }}
                                     maxLength={20}
@@ -3656,7 +3766,7 @@ const Update_Practice_Details = () => {
                                       onChange={(e) =>
                                         handleOfficerPhoneSelectedValue(
                                           e,
-                                          index
+                                          index,
                                         )
                                       }
                                     />
@@ -3679,7 +3789,7 @@ const Update_Practice_Details = () => {
                                           OnOfficerChange(
                                             index,
                                             "phoneNo",
-                                            sanitizedInput
+                                            sanitizedInput,
                                           );
                                         }}
                                       />
@@ -3697,7 +3807,7 @@ const Update_Practice_Details = () => {
                                     </span>
                                   ) : requireErrorMessage &&
                                     !isValidPhoneNumber(
-                                      officersForm[index].phoneNo
+                                      officersForm[index].phoneNo,
                                     ) ? (
                                     <span className="validation">
                                       {" "}
@@ -3740,7 +3850,7 @@ const Update_Practice_Details = () => {
                                         OnOfficerChange(
                                           index,
                                           "emailID",
-                                          correctedValue
+                                          correctedValue,
                                         );
                                         return;
                                       }
@@ -3749,7 +3859,7 @@ const Update_Practice_Details = () => {
                                       OnOfficerChange(
                                         index,
                                         "emailID",
-                                        enteredValue
+                                        enteredValue,
                                       );
                                     }}
                                   />
@@ -3761,7 +3871,7 @@ const Update_Practice_Details = () => {
                                       </span>
                                     ) : (
                                       !isValidEmail(
-                                        officersForm[index].emailID
+                                        officersForm[index].emailID,
                                       ) && (
                                         <span className="validation">
                                           Invalid email pattern
@@ -3793,11 +3903,11 @@ const Update_Practice_Details = () => {
                                     onMouseDown={(e) => {
                                       e.preventDefault();
                                       setAddressPopUpTitle(
-                                        "Residential Address"
+                                        "Residential Address",
                                       );
                                       handleOpenRegisterOfficeAddressPopup(
                                         e,
-                                        index
+                                        index,
                                       );
                                     }}
                                   />
@@ -3885,7 +3995,8 @@ const Update_Practice_Details = () => {
                                   <div className="col-lg-12 text-right">
                                     <span className="validation">
                                       {" "}
-                                      At least 1 authorised officer is required.{" "}
+                                      At least 1 authorised officer is
+                                      required.{" "}
                                     </span>
                                   </div>
                                 </div>
@@ -3924,7 +4035,7 @@ const Update_Practice_Details = () => {
                                       // Remove all spaces and dots
                                       const cleanedValue = inputValue.replace(
                                         /[.\s]/g,
-                                        ""
+                                        "",
                                       );
 
                                       // Reject input if it starts with a digit
@@ -3938,7 +4049,7 @@ const Update_Practice_Details = () => {
                                       OnOfficerChange(
                                         index,
                                         "firstName",
-                                        capitalizedValue
+                                        capitalizedValue,
                                       );
                                     }}
                                     maxLength={20}
@@ -3984,7 +4095,7 @@ const Update_Practice_Details = () => {
                                       // Remove all spaces and dots
                                       const cleanedValue = inputValue.replace(
                                         /[.\s]/g,
-                                        ""
+                                        "",
                                       );
 
                                       // Reject input if it starts with a digit
@@ -3999,7 +4110,7 @@ const Update_Practice_Details = () => {
                                       OnOfficerChange(
                                         index,
                                         "lastName",
-                                        capitalizedValue
+                                        capitalizedValue,
                                       );
                                     }}
                                     maxLength={20}
@@ -4036,7 +4147,7 @@ const Update_Practice_Details = () => {
                                         index,
                                         "officerRole",
                                         e.target.value.charAt(0).toUpperCase() +
-                                          e.target.value.slice(1).toLowerCase()
+                                          e.target.value.slice(1).toLowerCase(),
                                       )
                                     }
                                   />
@@ -4104,7 +4215,7 @@ const Update_Practice_Details = () => {
                                       onChange={(e) => {
                                         handleOfficerPhoneSelectedValue(
                                           e,
-                                          index
+                                          index,
                                         );
                                       }}
                                     />
@@ -4141,7 +4252,7 @@ const Update_Practice_Details = () => {
                                           OnOfficerChange(
                                             index,
                                             "phoneNo",
-                                            updatedPhoneNo
+                                            updatedPhoneNo,
                                           );
                                         }}
                                       />
@@ -4152,7 +4263,7 @@ const Update_Practice_Details = () => {
                                     officersForm[index].phoneNo !== "" &&
                                     officersForm[index].phoneNo !== undefined &&
                                     !isValidPhoneNumber(
-                                      officersForm[index].phoneNo
+                                      officersForm[index].phoneNo,
                                     ) && (
                                       <span className="validation">
                                         {" "}
@@ -4189,7 +4300,7 @@ const Update_Practice_Details = () => {
                                         OnOfficerChange(
                                           index,
                                           "emailID",
-                                          correctedValue
+                                          correctedValue,
                                         );
                                         return;
                                       }
@@ -4198,7 +4309,7 @@ const Update_Practice_Details = () => {
                                       OnOfficerChange(
                                         index,
                                         "emailID",
-                                        enteredValue
+                                        enteredValue,
                                       );
                                     }}
                                   />
@@ -4210,7 +4321,7 @@ const Update_Practice_Details = () => {
                                       </span>
                                     ) : (
                                       !isValidEmail(
-                                        officersForm[index].emailID
+                                        officersForm[index].emailID,
                                       ) && (
                                         <span className="validation">
                                           Invalid email pattern
@@ -4242,11 +4353,11 @@ const Update_Practice_Details = () => {
                                     onMouseDown={(e) => {
                                       e.preventDefault();
                                       setAddressPopUpTitle(
-                                        "Correspondence Address"
+                                        "Correspondence Address",
                                       );
                                       handleOpenRegisterOfficeAddressPopup(
                                         e,
-                                        index
+                                        index,
                                       );
                                     }}
                                     autoComplete="off"
@@ -4283,23 +4394,23 @@ const Update_Practice_Details = () => {
                         </div>
                       </div>
                     )}
-                  <span
-                    style={{ display: "flex", justifyContent: "center" }}
-                    className="validation"
-                  >
-                    {errorMessage}
-                  </span>
-                  <div class="separator"></div>
-                  <div className="col-lg-12 text-center mt-3">
-                    <button
-                      onClick={() => {
-                        AddUpdateClickedPracticeDetails();
-                      }}
-                      className="btn btn-md create-item-btn update-practice"
+                    <span
+                      style={{ display: "flex", justifyContent: "center" }}
+                      className="validation"
                     >
-                      <span> Update Practice Details</span>
-                    </button>
-                  </div>
+                      {errorMessage}
+                    </span>
+                    <div class="separator"></div>
+                    <div className="col-lg-12 text-center mt-3">
+                      <button
+                        onClick={() => {
+                          AddUpdateClickedPracticeDetails();
+                        }}
+                        className="btn btn-md create-item-btn update-practice"
+                      >
+                        <span> Update Practice Details</span>
+                      </button>
+                    </div>
                   </div>
                   {/* end card  */}
                 </div>
@@ -4367,13 +4478,12 @@ const Update_Practice_Details = () => {
             instructions={instructions}
             // alertMessage={alertMessage} // Pass alert message to InstructionModal
           />
-        {/* End Page-content */}
-        </div>              
-        
+          {/* End Page-content */}
+        </div>
 
-      {/* end back-to-top */}
-    </div>
-    <Footer />
+        {/* end back-to-top */}
+      </div>
+      <Footer />
     </>
   );
 };

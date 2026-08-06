@@ -2453,6 +2453,13 @@ const OtherInformation = (props) => {
   const PhoneValue = props.countryCodes.find(
     (item) => props.otherInfo.countryCodeID?.value == item.value,
   );
+  const FontFamilyLookupList = Utils.FontFamily.map((font) => ({
+    value: font.value,
+    label: font.label,
+  }));
+  const FontFamilyValue = FontFamilyLookupList?.find(
+    (font) => font.value === props.otherInfo.fontFamilyID || null,
+  );
   const isValidWebUrl = (web) => {
     // Regular expression for a basic URL validation
     const urlRegex =
@@ -2802,6 +2809,60 @@ const OtherInformation = (props) => {
                   </div>
                 </div>
               </div>
+
+              <div className="row fieldset ">
+                <div class="col-md-3 col-sm-12 text-start text-md-end">
+                  <label class="fieldset-label required">Font Family</label>
+                </div>
+                <div className="col-md-9 col-sm-12">
+                  <div className="input-group">
+                    <Select
+                      className="user-role-select"
+                      options={FontFamilyLookupList}
+                      value={FontFamilyValue}
+                      getOptionLabel={(e) => (
+                        <span style={{ fontFamily: e.label }}>{e.label}</span>
+                      )}
+                      onChange={(e) =>
+                        props.setOtherInfo({
+                          ...props.otherInfo,
+                          fontFamilyID: e.value,
+                        })
+                      }
+                      styles={{
+                        option: (provided, state) => ({
+                          ...provided,
+                          cursor: "pointer",
+                        }),
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="row fieldset ">
+                <div class="col-md-3 col-sm-12 text-start text-md-end">
+                  <label class="fieldset-label required">
+                    Web Based Background Color
+                  </label>
+                </div>
+                <div className="col-md-9 col-sm-12">
+                  <div className="input-group">
+                    <input
+                      type="color"
+                      class="form-control height"
+                      title="Choose your color"
+                      value={props.otherInfo.webBasedQuoteBackgroundColor}
+                      onChange={(e) =>
+                        props.setOtherInfo({
+                          ...props.otherInfo,
+                          webBasedQuoteBackgroundColor: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="row fieldset ">
                 <div class="col-md-3 col-sm-12 text-start text-md-end">
                   <label class="fieldset-label required">Brand Color</label>
@@ -2829,6 +2890,35 @@ const OtherInformation = (props) => {
                                 ) : (
                                     ""
                                 )} */}
+                </div>
+              </div>
+              <div className="row fieldset ">
+                <div class="col-md-3 col-sm-12 text-start text-md-end">
+                  <label class="fieldset-label required">
+                    Organisation Description
+                  </label>
+                </div>
+                <div className="col-md-9 col-sm-12">
+                  <div className="input-group">
+                    <textarea
+                      style={{ padding: "5px" }}
+                      class="input-text"
+                      placeholder="Organisation Description"
+                      maxLength={250}
+                      value={props.otherInfo.organisationDescription}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        const trimmedValue = inputValue.trimLeft();
+                        const capitalizedValue =
+                          trimmedValue.charAt(0).toUpperCase() +
+                          trimmedValue.slice(1);
+                        props.setOtherInfo({
+                          ...props.otherInfo,
+                          organisationDescription: capitalizedValue,
+                        });
+                      }}
+                    ></textarea>
+                  </div>
                 </div>
               </div>
               <div className="row fieldset ">
@@ -3406,6 +3496,9 @@ const Create_practice_details = () => {
     countryCodeID: { value: 9, label: "+44" },
     AffiliatedAcBodyName: null,
     webOfAffiliatedAccount: null,
+    webBasedQuoteBackgroundColor: "white",
+    fontFamilyID: 2,
+    organisationDescription: null,
   });
   const [companyForm, setCompanyForm] = useState({
     companyID: null,
@@ -3718,6 +3811,9 @@ const Create_practice_details = () => {
         affiliatedAccountingBodyName: otherInfo.AffiliatedAcBodyName,
         affiliatedAccountingBodyWebsite: otherInfo.webOfAffiliatedAccount,
         countryCode: otherInfo.countryCode?.label,
+        webBasedQuoteBackgroundColor: otherInfo.webBasedQuoteBackgroundColor,
+        fontFamilyID: otherInfo.fontFamilyID,
+        organisationDescription: otherInfo.organisationDescription,
       },
       professionTypeList: basicInfo.professionTypeList,
     };
@@ -4064,6 +4160,9 @@ const Create_practice_details = () => {
       countryCodeID: { value: 9, label: "+44" },
       AffiliatedAcBodyName: null,
       webOfAffiliatedAccount: null,
+      webBasedQuoteBackgroundColor: "white",
+      fontFamilyID: 2,
+      organisationDescription: null,
     });
     setOfficers([
       {
