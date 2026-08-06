@@ -16455,8 +16455,9 @@ const Add_Update_Proposal = (props) => {
     if (location.state?.quoteKeyID !== null) {
       GetProposalModalData(location.state?.quoteKeyID);
       setIsBack(true);
-      GetRecurringServiceListData();
-      GetOneOffServiceListData();
+      loadServiceLists();
+      // GetRecurringServiceListData();
+      // GetOneOffServiceListData();
     }
   }, [location.state]);
 
@@ -20142,9 +20143,25 @@ const Add_Update_Proposal = (props) => {
     }
   };
 
+  // load both recurring and one-off services together
+  const loadServiceLists = async () => {
+    debugger;
+    setLoader(true);
+    try {
+      await Promise.all([
+        GetRecurringServiceListData(),
+        GetOneOffServiceListData(),
+      ]);
+    } catch (e) {
+      setErrorMessage("Failed to load services");
+    } finally {
+      setLoader(false);
+    }
+  };
+
   //Get Recurring Service List Data
   const GetRecurringServiceListData = async (professionTypeId) => {
-    setLoader(true);
+    // setLoader(true);
     try {
       const data = await GetPackageServicesList({
         userKeyID: common.userKeyID,
@@ -20163,7 +20180,7 @@ const Add_Update_Proposal = (props) => {
       });
       if (data) {
         if (data?.data?.statusCode === 200) {
-          setLoader(false);
+          // setLoader(false);
           if (data?.data?.responseData?.data) {
             let PackageServiceListData = data.data.responseData.data;
 
@@ -20275,15 +20292,15 @@ const Add_Update_Proposal = (props) => {
             await setRecurringServiceList(PackageServiceListData);
           }
         } else {
-          setLoader(false);
+          // setLoader(false);
           setErrorMessage(data?.data?.errorMessage);
         }
       } else {
-        setLoader(false);
+        // setLoader(false);
         setErrorMessage(data?.data?.errorMessage);
       }
     } catch (error) {
-      setLoader(false);
+      // setLoader(false);
 
       console.log(error);
     }
@@ -20291,7 +20308,7 @@ const Add_Update_Proposal = (props) => {
 
   //Get One-Off Service List
   const GetOneOffServiceListData = async (professionTypeId) => {
-    setLoader(true);
+    // setLoader(true);
     try {
       const data = await GetPackageServicesList({
         userKeyID: common.userKeyID,
@@ -20309,7 +20326,7 @@ const Add_Update_Proposal = (props) => {
         SourceID: null, //For Contract
       });
       if (data) {
-        setLoader(false);
+        // setLoader(false);
         if (data?.data?.statusCode === 200) {
           if (data?.data?.responseData?.data) {
             let PackageServiceListData = data.data.responseData.data;
@@ -20421,14 +20438,14 @@ const Add_Update_Proposal = (props) => {
             await setOneOffServiceList(PackageServiceListData);
           }
         } else {
-          setLoader(false);
+          // setLoader(false);
           setErrorMessage(data?.data?.errorMessage);
         }
       } else {
-        setLoader(false);
+        // setLoader(false);
       }
     } catch (error) {
-      setLoader(false);
+      // setLoader(false);
       console.log(error);
     }
   };
@@ -23140,8 +23157,9 @@ const Add_Update_Proposal = (props) => {
           setShowValidationForMax(false);
           setActiveTab(5);
         } else {
-          GetRecurringServiceListData();
-          GetOneOffServiceListData();
+          loadServiceLists();
+          // GetRecurringServiceListData();
+          // GetOneOffServiceListData();
 
           setIsValidForm({
             ...isValidForm,
@@ -23472,8 +23490,9 @@ const Add_Update_Proposal = (props) => {
         return;
       } else {
         if (ProposalObject.selectedProposalTypeValue === 1) {
-          GetRecurringServiceListData();
-          GetOneOffServiceListData();
+          // GetRecurringServiceListData();
+          // GetOneOffServiceListData();
+          loadServiceLists();
 
           setIsValidForm({
             ...isValidForm,

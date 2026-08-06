@@ -10477,9 +10477,25 @@ const Add_Update_Engagement_Letter = () => {
     }
   };
 
+  // load both recurring and one-off lists
+  const loadServiceLists = async () => {
+    debugger;
+    setLoader(true);
+    try {
+      await Promise.all([
+        GetRecurringServiceListData(),
+        GetOneOffServiceListData(),
+      ]);
+    } catch (e) {
+      setErrorMessage("Failed to load services");
+    } finally {
+      setLoader(false);
+    }
+  };
+
   //3) Get Select service Charge type api  call
   const GetRecurringServiceListData = async () => {
-    setLoader(true);
+    // setLoader(true);
 
     try {
       const data = await GetPackageServicesList({
@@ -10502,7 +10518,7 @@ const Add_Update_Engagement_Letter = () => {
       });
       if (data) {
         if (data?.data?.statusCode === 200) {
-          setLoader(false);
+          // setLoader(false);
           if (data?.data?.responseData?.data) {
             let PackageServiceListData = data.data.responseData.data;
 
@@ -10631,22 +10647,22 @@ const Add_Update_Engagement_Letter = () => {
             await setRecurringServiceList(PackageServiceListData);
           }
         } else {
-          setLoader(false);
+          // setLoader(false);
           setErrorMessage(data?.data?.errorMessage);
         }
       } else {
-        setLoader(false);
+        // setLoader(false);
         setErrorMessage(data?.data?.errorMessage);
       }
     } catch (error) {
-      setLoader(false);
+      // setLoader(false);
       console.log(error);
     }
   };
 
   //4) Get Select service Charge type api  call
   const GetOneOffServiceListData = async () => {
-    setLoader(true);
+    // setLoader(true);
     try {
       const data = await GetPackageServicesList({
         userKeyID: common.userKeyID,
@@ -10667,7 +10683,7 @@ const Add_Update_Engagement_Letter = () => {
         QuoteKeyID: engagementObj.quoteID,
       });
       if (data) {
-        setLoader(false);
+        // setLoader(false);
         if (data?.data?.statusCode === 200) {
           if (data?.data?.responseData?.data) {
             let PackageServiceListData = data.data.responseData.data;
@@ -10793,11 +10809,11 @@ const Add_Update_Engagement_Letter = () => {
             await setOneOffServiceList(PackageServiceListData);
           }
         } else {
-          setLoader(false);
+          // setLoader(false);
           setErrorMessage(data?.data?.errorMessage);
         }
       } else {
-        setLoader(false);
+        // setLoader(false);
       }
     } catch (error) {
       console.log(error);
@@ -14502,8 +14518,9 @@ const Add_Update_Engagement_Letter = () => {
             ) {
               GetPaymentGatewayModelData(common.organisationKeyID);
             }
-            await GetRecurringServiceListData();
-            await GetOneOffServiceListData();
+            loadServiceLists();
+            // await GetRecurringServiceListData();
+            // await GetOneOffServiceListData();
             setIsValidForm({
               ...isValidForm,
               BasicForm: true,
@@ -14518,8 +14535,9 @@ const Add_Update_Engagement_Letter = () => {
             ) {
               GetPaymentGatewayModelData(common.organisationKeyID);
             }
-            await GetRecurringServiceListData();
-            await GetOneOffServiceListData();
+            loadServiceLists();
+            // await GetRecurringServiceListData();
+            // await GetOneOffServiceListData();
             setIsValidForm({
               ...isValidForm,
               BasicForm: true,
@@ -16508,9 +16526,9 @@ const Add_Update_Engagement_Letter = () => {
   };
 
   //21) Select Client From lookup list
-  const handleChangeClient = (e) => {
+  const handleChangeClient = async (e) => {
     DisableTabOnChange();
-    GetTemplateLookupListData(e, null);
+    await GetTemplateLookupListData(e, null);
     if (
       engagementObj.selectSourceId === 3 ||
       engagementObj.selectSourceId === 4

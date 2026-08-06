@@ -256,16 +256,21 @@ function Predefined_Global_Pricing_Drivers() {
               });
               $("#" + "ConfirmModel").modal("hide");
               $("#" + "RecordsAvailablePopupModel").modal("show");
-              GetGlobalPricingDriverListData(currentPage);
+              GetGlobalPricingDriverListData(currentPage, null, null, null, modelRequestData.addedFor);
             } else {
-              GetGlobalPricingDriverListData(currentPage);
+              setModelRequestData({
+                ...modelRequestData,
+                Action: null,
+                gloalPricingDriverKeyID: null,
+              });
+              GetGlobalPricingDriverListData(currentPage, null, null, null, modelRequestData.addedFor);
               setOpenSuccessModal(true);
             }
           } else {
             setErrorMessage(response?.response?.data?.errorMessage);
             setOpenErrorModal(true);
           }
-          GetGlobalPricingDriverListData(currentPage);
+          GetGlobalPricingDriverListData(currentPage, null, null, null, modelRequestData.addedFor);
         }
       } catch (error) {
         console.log(error);
@@ -295,16 +300,16 @@ function Predefined_Global_Pricing_Drivers() {
               });
               $("#" + "ConfirmModel").modal("hide");
               $("#" + "RecordsAvailablePopupModel").modal("show");
-              GetGlobalPricingDriverListData(currentPage);
+              GetGlobalPricingDriverListData(currentPage, null, null, null, modelRequestData.addedFor);
             } else {
-              GetGlobalPricingDriverListData(currentPage);
+              GetGlobalPricingDriverListData(currentPage, null, null, null, modelRequestData.addedFor);
               setOpenSuccessModal(true);
             }
           } else {
             setErrorMessage(response?.response?.data?.errorMessage);
             setOpenErrorModal(true);
           }
-          GetGlobalPricingDriverListData(currentPage);
+          GetGlobalPricingDriverListData(currentPage, null, null, null, modelRequestData.addedFor);
         }
       } catch (error) {
         console.log(error);
@@ -453,12 +458,16 @@ function Predefined_Global_Pricing_Drivers() {
         );
         setModelRequestData({
           ...modelRequestData,
+          Action: null,
           addedFor: "GlobalProspect"
         });
       } catch (error) {
         setLoader(false);
         console.log(error);
         setErrorMessage(true);
+      }
+      finally {
+        setLoader(false);
       }
     }
   };

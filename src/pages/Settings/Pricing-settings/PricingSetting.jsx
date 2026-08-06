@@ -38,6 +38,7 @@ const Pricing_Settings = () => {
   const [isAddUpdateActionDone, setIsAddUpdateActionDone] = useState(false);
   const [dismissModal, setDismissModal] = useState(null);
   const [prevError, SetPrevError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [openSuccessModal, setOpenSuccessModal] = React.useState(false);
   const [selectedFrequency, setSelectedFrequency] = useState(
     Utils.Payment_Frequency[0],
@@ -415,13 +416,26 @@ const Pricing_Settings = () => {
 
     // Validation Checks for Min. Reccuring prices
     const priceLadder = [
-      { label: "Monthly", value: pricingSettingObj.minMonthlyPriceForQC },
-      { label: "Quarterly", value: pricingSettingObj.minQuarterlyPriceForQC },
       {
+        key: "minMonthlyPriceForQC",
+        label: "Monthly",
+        value: pricingSettingObj.minMonthlyPriceForQC,
+      },
+      {
+        key: "minQuarterlyPriceForQC",
+        label: "Quarterly",
+        value: pricingSettingObj.minQuarterlyPriceForQC,
+      },
+      {
+        key: "minHalfYearlyPriceForQC",
         label: "Half-Yearly",
         value: pricingSettingObj.minHalfYearlyPriceForQC,
       },
-      { label: "Yearly", value: pricingSettingObj.minYearlyPriceForQC },
+      {
+        key: "minYearlyPriceForQC",
+        label: "Yearly",
+        value: pricingSettingObj.minYearlyPriceForQC,
+      },
     ].filter(
       (x) =>
         x.value !== "" &&
@@ -430,14 +444,22 @@ const Pricing_Settings = () => {
         !isNaN(Number(x.value)),
     );
 
+    let hasError = false;
+    const newFieldErrors = {};
+
     for (let i = 1; i < priceLadder.length; i++) {
       if (Number(priceLadder[i].value) <= Number(priceLadder[i - 1].value)) {
-        SetPrevError(false);
-        setErrorMessage(
-          `Min. ${priceLadder[i].label} price must be higher than Min. ${priceLadder[i - 1].label} price.`,
-        );
-        return false;
+        newFieldErrors[priceLadder[i].key] =
+          `Must be higher than Min. ${priceLadder[i - 1].label} price.`;
+        hasError = true;
       }
+    }
+
+    setFieldErrors(newFieldErrors);
+
+    if (hasError) {
+      SetPrevError(false);
+      return false;
     }
 
     const ApiRequest_ParamsObj = {
@@ -460,6 +482,7 @@ const Pricing_Settings = () => {
       globalPricingDriverID: pricingSettingObj?.globalPricingDriverID,
     };
 
+    setFieldErrors({});
     setErrorMessage("");
     AddUpdatePricingSettingData(ApiRequest_ParamsObj);
   };
@@ -670,6 +693,10 @@ const Pricing_Settings = () => {
                                       )}.${decimalPart.slice(0, 2)}`
                                     : integerPart.slice(0, 12);
 
+                                setFieldErrors((prev) => ({
+                                  ...prev,
+                                  minMonthlyPriceForQC: "",
+                                }));
                                 setRequireErrorMessage(false);
                                 setPricingSettingObj({
                                   ...pricingSettingObj,
@@ -677,6 +704,11 @@ const Pricing_Settings = () => {
                                 });
                               }}
                             />
+                            {fieldErrors.minMonthlyPriceForQC && (
+                              <label className="validation">
+                                {fieldErrors.minMonthlyPriceForQC}
+                              </label>
+                            )}
                           </div>
 
                           <div class="fieldset col-12 col-md-12 col-sm-12">
@@ -713,6 +745,10 @@ const Pricing_Settings = () => {
                                       )}.${decimalPart.slice(0, 2)}`
                                     : integerPart.slice(0, 12);
 
+                                setFieldErrors((prev) => ({
+                                  ...prev,
+                                  minQuarterlyPriceForQC: "",
+                                }));
                                 setRequireErrorMessage(false);
                                 setPricingSettingObj({
                                   ...pricingSettingObj,
@@ -720,6 +756,11 @@ const Pricing_Settings = () => {
                                 });
                               }}
                             />
+                            {fieldErrors.minQuarterlyPriceForQC && (
+                              <label className="validation">
+                                {fieldErrors.minQuarterlyPriceForQC}
+                              </label>
+                            )}
                           </div>
 
                           <div class="fieldset col-12 col-md-12 col-sm-12">
@@ -756,6 +797,10 @@ const Pricing_Settings = () => {
                                       )}.${decimalPart.slice(0, 2)}`
                                     : integerPart.slice(0, 12);
 
+                                setFieldErrors((prev) => ({
+                                  ...prev,
+                                  minHalfYearlyPriceForQC: "",
+                                }));
                                 setRequireErrorMessage(false);
                                 setPricingSettingObj({
                                   ...pricingSettingObj,
@@ -763,6 +808,11 @@ const Pricing_Settings = () => {
                                 });
                               }}
                             />
+                            {fieldErrors.minHalfYearlyPriceForQC && (
+                              <label className="validation">
+                                {fieldErrors.minHalfYearlyPriceForQC}
+                              </label>
+                            )}
                           </div>
 
                           <div class="fieldset col-12 col-md-12 col-sm-12">
@@ -799,6 +849,10 @@ const Pricing_Settings = () => {
                                       )}.${decimalPart.slice(0, 2)}`
                                     : integerPart.slice(0, 12);
 
+                                setFieldErrors((prev) => ({
+                                  ...prev,
+                                  minYearlyPriceForQC: "",
+                                }));
                                 setRequireErrorMessage(false);
                                 setPricingSettingObj({
                                   ...pricingSettingObj,
@@ -806,6 +860,11 @@ const Pricing_Settings = () => {
                                 });
                               }}
                             />
+                            {fieldErrors.minYearlyPriceForQC && (
+                              <label className="validation">
+                                {fieldErrors.minYearlyPriceForQC}
+                              </label>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -861,7 +920,7 @@ const Pricing_Settings = () => {
                           {/* Select  */}
                           <div class="fieldset col-12">
                             <label class="fieldset-label table-content-font PricingSetting-Proposal">
-                              Payment Frequency
+                              Default Payment Frequency
                             </label>
                           </div>
                           <div class="col-lg-12 fieldset input-group">
@@ -898,8 +957,7 @@ const Pricing_Settings = () => {
                             />
                           </div>
 
-                          {pricingSettingObj?.defaultProposalFormatID ===
-                            3 && (
+                          {pricingSettingObj?.defaultProposalFormatID === 3 && (
                             <div class="fieldset col-12">
                               <label class=" fieldset-label pe-2">
                                 Proposal Types
