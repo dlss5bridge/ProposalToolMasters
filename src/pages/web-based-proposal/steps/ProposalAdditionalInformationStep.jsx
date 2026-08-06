@@ -152,17 +152,34 @@ export default function ProposalAdditionalInformationStep({ theme }) {
   };
 
   return (
-    <Box className="h-full overflow-auto bg-white p-2 lg:p-4">
+    <Box
+      className="h-full overflow-hidden p-2 lg:p-4"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+      }}
+      style={{ backgroundColor: theme.background }}
+    >
+      {/* height: 100% (align-items defaults to stretch, so this fills the
+          Box's full height) instead of a content-sized card floating in a
+          sea of empty themed background - the field list scrolls inside
+          CardContent if it's taller than the available space. */}
       <Card
         elevation={0}
         className="rounded-2xl"
         sx={{
           width: { xs: "100%", sm: "100%", md: "78%", lg: "58%", xl: "50%" },
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
           border: `1px solid ${theme.border}`,
           boxShadow: "0 12px 30px rgba(15,23,42,.06)",
         }}
       >
-        <CardContent className="!p-8">
+        <CardContent
+          className="!p-8"
+          sx={{ flex: 1, overflowY: "auto" }}
+        >
           <div className="mb-8">
             <Typography
               variant="h5"

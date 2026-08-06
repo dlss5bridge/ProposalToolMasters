@@ -210,7 +210,14 @@ export default function ProposalInputFieldsStep({ theme }) {
   };
 
   return (
-    <Box className="h-full overflow-auto bg-white p-2 lg:p-4">
+    <Box
+      className="h-full overflow-hidden p-2 lg:p-4"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+      }}
+      style={{ backgroundColor: theme.background }}
+    >
       <Card
         elevation={0}
         className="rounded-2xl"
@@ -294,7 +301,10 @@ export default function ProposalInputFieldsStep({ theme }) {
                         }}
                       >
                         {field.driverName}
-                        <Box component="span" sx={{ color: "#dc2626", ml: 0.25 }}>
+                        <Box
+                          component="span"
+                          sx={{ color: "#dc2626", ml: 0.25 }}
+                        >
                           *
                         </Box>
                       </Typography>
