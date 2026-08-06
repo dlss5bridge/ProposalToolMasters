@@ -1,9 +1,12 @@
+import Utils from "../../../Middleware/Utils";
+
 // Default ("dummy") color theme used until GetQuoteModel returns a brandColor.
 export const DEFAULT_PROPOSAL_THEME = {
   // Layout
   background: "#F8FAFC",
   surface: "#FFFFFF",
   border: "#E2E8F0",
+  fontFamily: "inherit",
 
   // Brand
   primary: "#00BFFF",
@@ -82,21 +85,43 @@ const deriveThemeFromBrandColor = (brandColor) => {
   };
 };
 
+// GetOrganisationThemeSettings returns fontFamilyID, an ID into the same
+// font lookup used by the template editor's font picker (Utils.FontFamily),
+// not a usable CSS font-family string.
+const getFontFamilyFromID = (fontFamilyID) => {
+  const font = Utils.FontFamily.find((item) => item.value === fontFamilyID);
+  return font?.label || null;
+};
+
 // Resolves the active theme for a proposal: uses quoteModel.brandColor (from
 // GetQuoteModel) when present and valid, otherwise falls back to the default
-// theme above.
-export const getProposalTheme = (quoteModel) => {
+// theme above. GetOrganisationThemeSettings's backgroundColor/fontFamily, when
+// present, are then layered on top and apply to all web proposal types.
+export const getProposalTheme = (quoteModel, themeSettings) => {
   const brandColor = quoteModel?.brandColor;
-  if (isValidHexColor(brandColor)) {
-    return deriveThemeFromBrandColor(brandColor);
+  const baseTheme = isValidHexColor(brandColor)
+    ? deriveThemeFromBrandColor(brandColor)
+    : DEFAULT_PROPOSAL_THEME;
+
+  const background = themeSettings?.webBasedQuoteBackgroundColor;
+  const fontFamily = getFontFamilyFromID(themeSettings?.fontFamilyID);
+
+  if (!isValidHexColor(background) && !fontFamily) {
+    return baseTheme;
   }
-  return DEFAULT_PROPOSAL_THEME;
+
+  return {
+    ...baseTheme,
+    ...(isValidHexColor(background) && { background: background.trim().toUpperCase() }),
+    ...(fontFamily && { fontFamily }),
+  };
 };
 
 const THEME_KEY_TO_CSS_VAR = {
   background: "--wp-background",
   surface: "--wp-surface",
   border: "--wp-border",
+  fontFamily: "--wp-font-family",
   primary: "--wp-primary",
   secondary: "--wp-secondary",
   headerBackground: "--wp-header-bg",

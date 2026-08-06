@@ -9,6 +9,7 @@
   --wp-background: #f8fafc;
   --wp-surface: #ffffff;
   --wp-border: #e2e8f0;
+  --wp-font-family: inherit;
 
   --wp-primary: #00bfff;
   --wp-secondary: #00192d;
@@ -35,4 +36,23 @@
   --wp-pdf-bg: #eef2f7;
 
   --wp-completed-step-bg: #10b981;
+}
+
+/*
+ * The global admin-template stylesheet (public/assets/css/app.min.css) forces
+ * every h1-h6 to Roboto with `!important`:
+ *   .h1,.h2,.h3,.h4,.h5,.h6,body,h1,h2,h3,h4,h5,h6,td{font-family:Roboto,...!important}
+ * That beats both plain inheritance and MUI's own (non-important) styles, so
+ * headings/titles here (including MUI Typography variants, which render as
+ * real h1-h6 tags) need a scoped `!important` of their own. The added class
+ * selector gives this a higher specificity than the global rule, so it wins
+ * outright regardless of stylesheet order.
+ */
+.wp-proposal-root h1,
+.wp-proposal-root h2,
+.wp-proposal-root h3,
+.wp-proposal-root h4,
+.wp-proposal-root h5,
+.wp-proposal-root h6 {
+  font-family: var(--wp-font-family, inherit) !important;
 }

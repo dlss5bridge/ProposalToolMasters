@@ -59,6 +59,10 @@ const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
               ...base,
               borderColor: errorMessage ? "#f87171" : base.borderColor,
             }),
+            // Add Service renders this inside an MUI Modal (z-index 1300+).
+            // Without this, the portalled options list uses react-select's
+            // default z-index of 1 and renders behind the modal, invisible.
+            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
           }}
         />
         {errorMessage && <p className="pss-field-error">{errorMessage}</p>}

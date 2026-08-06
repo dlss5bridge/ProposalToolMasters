@@ -9,9 +9,11 @@ import { getProposalTheme } from "./theme/proposalTheme";
 import "./theme/proposalTheme.css";
 import {
   getQuoteModel,
+  getOrganisationThemeSettings,
   selectQuoteModel,
   selectQuoteModelLoading,
   selectQuoteModelError,
+  selectThemeSettings,
 } from "../../redux/reducer/webProposal";
 
 const WEB_PROPOSAL_TYPE_ID = {
@@ -28,14 +30,20 @@ export default function WebBasedProposal() {
   const quoteModel = useSelector(selectQuoteModel);
   const loading = useSelector(selectQuoteModelLoading);
   const error = useSelector(selectQuoteModelError);
+  const themeSettings = useSelector(selectThemeSettings);
 
   // Uses quoteModel.brandColor (from GetQuoteModel) when present, otherwise
-  // falls back to the default theme.
-  const theme = useMemo(() => getProposalTheme(quoteModel), [quoteModel]);
+  // falls back to the default theme. GetOrganisationThemeSettings's
+  // background color/font family are then layered on top.
+  const theme = useMemo(
+    () => getProposalTheme(quoteModel, themeSettings),
+    [quoteModel, themeSettings],
+  );
 
   useEffect(() => {
     if (quoteKeyID) {
       dispatch(getQuoteModel(quoteKeyID));
+      dispatch(getOrganisationThemeSettings(quoteKeyID));
     }
   }, [dispatch, quoteKeyID]);
 
@@ -58,6 +66,7 @@ export default function WebBasedProposal() {
     showSidebar: false,
 
     theme,
+    themeSettings,
   };
 
   switch (quoteModel.webProposalTypeID || 3) {

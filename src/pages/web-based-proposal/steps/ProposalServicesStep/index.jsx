@@ -70,7 +70,7 @@ const buildInitialDriverValues = (service) => {
   return values;
 };
 
-const ServiceSelectionComponent = () => {
+const ServiceSelectionComponent = ({ theme }) => {
   const dispatch = useDispatch();
 
   const { userKeyID, organisationKeyID, quoteKeyID, clientID, quoteTypeID } =
@@ -645,7 +645,10 @@ const ServiceSelectionComponent = () => {
       </div>
 
       <Modal open={isAddServiceModalOpen} onClose={handleCloseAddServiceModal}>
-        <Box className="pss-modal-box">
+        {/* Modal content is portalled to document.body, outside ProposalLayout's
+            DOM subtree, so it can't inherit fontFamily via normal CSS cascade
+            from there - set it directly on this root instead. */}
+        <Box className="pss-modal-box" sx={{ fontFamily: theme?.fontFamily }}>
           <div className="pss-modal-header">
             <h2 className="pss-modal-title">Add Service</h2>
             <button

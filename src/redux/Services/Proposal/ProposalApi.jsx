@@ -62,6 +62,16 @@ export const GetProposalModelWithoutToken = async (id) => {
   return res;
 };
 
+// Background color, font family and organisation description used to theme
+// the web proposal's stepper screens. Runs outside the authenticated app, so
+// no token (mirrors GetProposalModelWithoutToken).
+export const GetOrganisationThemeSettings = async (id) => {
+  const res = await getList(
+    `${ProposalBaseUrlQuote}/GetOrganisationThemeSettings?QuoteKeyID=${id}`,
+  );
+  return res;
+};
+
 // Lookup list of all global pricing driver variables available for the web
 // proposal's Input Fields step. Runs outside the authenticated app, so no
 // token (mirrors GetProposalModelWithoutToken).

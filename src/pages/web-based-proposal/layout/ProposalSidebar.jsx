@@ -1,4 +1,12 @@
-export default function ProposalSidebar({ theme, width = 320, children }) {
+export default function ProposalSidebar({
+  theme,
+  width = 320,
+  proposal,
+  children,
+}) {
+  const organisationDescription =
+    proposal?.themeSettings?.organisationDescription;
+  const organisationName = proposal?.themeSettings?.tradingBusinessName;
   return (
     <aside>
       <div className="p-6">
@@ -27,7 +35,7 @@ export default function ProposalSidebar({ theme, width = 320, children }) {
               color: theme.textPrimary,
             }}
           >
-            Wow Solutions Pvt. Ltd.
+            {organisationName || "Outbooks"}
           </h2>
 
           <p
@@ -36,7 +44,7 @@ export default function ProposalSidebar({ theme, width = 320, children }) {
               color: theme.textSecondary,
             }}
           >
-            Accounting & Financial Services
+            {organisationDescription || "Accounting & Financial Services"}
           </p>
         </div>
 

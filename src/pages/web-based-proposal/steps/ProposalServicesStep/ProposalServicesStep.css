@@ -373,6 +373,23 @@
   overflow: hidden;
 }
 
+/*
+ * MUI's Modal portals this box to document.body, outside .wp-proposal-root's
+ * DOM subtree, so it can't inherit the theme font-family and isn't reached by
+ * .wp-proposal-root's heading override either. The inline fontFamily set on
+ * this box (via sx, see index.jsx) supplies the value; this pulls it into the
+ * modal's own h1-h6 with enough specificity + !important to beat the global
+ * app.min.css rule that force-sets every heading to Roboto.
+ */
+.pss-modal-box h1,
+.pss-modal-box h2,
+.pss-modal-box h3,
+.pss-modal-box h4,
+.pss-modal-box h5,
+.pss-modal-box h6 {
+  font-family: inherit !important;
+}
+
 .pss-modal-header {
   display: flex;
   align-items: center;
