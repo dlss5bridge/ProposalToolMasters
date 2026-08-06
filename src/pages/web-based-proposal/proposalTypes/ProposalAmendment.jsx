@@ -45,7 +45,12 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   // up front from its position here plus whether Additional Information gets
   // spliced in after Services — needed below to tell the Pricing Table step
   // when it becomes the active step.
-  const BASE_STEP_LABELS = ["Proposal", "Services", "Pricing Table", "Input Fields"];
+  const BASE_STEP_LABELS = [
+    "Proposal",
+    "Services",
+    "Pricing Table",
+    "Input Fields",
+  ];
   const SERVICES_STEP_INDEX = BASE_STEP_LABELS.indexOf("Services");
   const PRICING_STEP_INDEX =
     BASE_STEP_LABELS.indexOf("Pricing Table") +
@@ -168,7 +173,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         {/* Sidebar shown for the PDF step and the Pricing Table step */}
         {(activeStep === 0 || activeStep === PRICING_STEP_INDEX) && (
           <aside
-            className="hidden lg:flex lg:w-64 lg:flex-shrink-0 border-r p-3"
+            className="hidden lg:flex lg:w-80 lg:flex-shrink-0 overflow-y-auto border-r"
             style={{
               backgroundColor: theme.background,
               borderColor: theme.border,

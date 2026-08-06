@@ -37,7 +37,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
         {/* Sidebar only for the PDF step */}
         {activeStep === 0 && (
           <aside
-            className="hidden lg:flex lg:w-64 lg:flex-shrink-0 border-r p-3"
+            className="hidden lg:flex lg:w-80 lg:flex-shrink-0 overflow-y-auto border-r"
             style={{
               backgroundColor: theme.background,
               borderColor: theme.border,

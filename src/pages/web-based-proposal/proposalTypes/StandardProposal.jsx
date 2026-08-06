@@ -22,11 +22,10 @@ export default function StandardProposal({ proposal, theme }) {
           className="
         hidden
         lg:flex
-        lg:w-64
+        lg:w-80
         lg:flex-shrink-0
         overflow-y-auto
         border-r
-        p-3
       "
           style={{
             backgroundColor: theme.background,
@@ -48,7 +47,9 @@ export default function StandardProposal({ proposal, theme }) {
             backgroundColor: theme.background,
           }}
         >
-          <div className="mx-auto h-full">
+          {/* w-[90%] (not centered) leaves a consistent 10% gap on the right
+              at every viewport width, instead of a fixed pixel margin. */}
+          <div className="h-full w-[90%]">
             <div
               className="
             flex

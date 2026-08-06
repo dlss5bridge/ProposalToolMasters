@@ -734,11 +734,13 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
 
   return (
     <div
-      className="flex h-full justify-center overflow-hidden p-3"
+      className="flex h-full overflow-hidden p-3"
       style={{ backgroundColor: theme.background }}
     >
+      {/* w-[90%] (not centered) leaves a consistent 10% gap on the right at
+          every viewport width, matching the PDF step's card width. */}
       <div
-        className="flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-2xl border bg-white shadow-lg"
+        className="flex h-full w-[90%] flex-col overflow-hidden rounded-2xl border bg-white shadow-lg"
         style={{ borderColor: theme.border }}
       >
         <div

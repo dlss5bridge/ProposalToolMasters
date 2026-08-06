@@ -8,8 +8,10 @@ export default function ProposalPdfStep({ theme }) {
         backgroundColor: theme.background,
       }}
     >
+      {/* w-[90%] (not centered) leaves a consistent 10% gap on the right at
+          every viewport width, instead of a fixed pixel margin. */}
       <div
-        className="flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-lg"
+        className="flex h-full w-[90%] flex-col overflow-hidden rounded-2xl border bg-white shadow-lg"
         style={{
           borderColor: theme.border,
         }}
