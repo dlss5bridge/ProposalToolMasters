@@ -15,6 +15,10 @@ import {
   selectQuoteModelError,
   selectThemeSettings,
 } from "../../redux/reducer/webProposal";
+import {
+  getInputFieldsList,
+  selectInputFieldsListLoading,
+} from "../../redux/reducer/webProposal/inputFields";
 
 const WEB_PROPOSAL_TYPE_ID = {
   STANDARD: 1,
@@ -31,6 +35,7 @@ export default function WebBasedProposal() {
   const loading = useSelector(selectQuoteModelLoading);
   const error = useSelector(selectQuoteModelError);
   const themeSettings = useSelector(selectThemeSettings);
+  const inputFieldsLoading = useSelector(selectInputFieldsListLoading);
 
   // Uses quoteModel.brandColor (from GetQuoteModel) when present, otherwise
   // falls back to the default theme. GetOrganisationThemeSettings's
@@ -44,6 +49,7 @@ export default function WebBasedProposal() {
     if (quoteKeyID) {
       dispatch(getQuoteModel(quoteKeyID));
       dispatch(getOrganisationThemeSettings(quoteKeyID));
+      dispatch(getInputFieldsList(quoteKeyID));
     }
   }, [dispatch, quoteKeyID]);
 
@@ -51,7 +57,10 @@ export default function WebBasedProposal() {
     return <div>Missing QuoteKeyID.</div>;
   }
 
-  if (loading || (!quoteModel && !error)) {
+  // Input fields are fetched here (not inside ProposalInputFieldsStep) so
+  // selectHasInputFields is already resolved by the time the proposal-type
+  // components decide whether to include the "Input Fields" step at all.
+  if (loading || inputFieldsLoading || (!quoteModel && !error)) {
     return <div>Loading proposal...</div>;
   }
 

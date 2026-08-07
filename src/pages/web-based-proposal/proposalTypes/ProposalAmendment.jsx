@@ -28,6 +28,7 @@ import {
   selectHasAdditionalInformation,
   setAdditionalInformationValidationVisible,
 } from "../../../redux/reducer/webProposal/additionalInformation";
+import { selectHasInputFields } from "../../../redux/reducer/webProposal/inputFields";
 import { Services } from "../steps/ProposalServicesStep/data/data";
 
 export default function ProposalAmendment({ theme, proposal, services }) {
@@ -37,6 +38,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const selectedServiceIDs = useSelector(selectSelectedServiceIDs);
   const servicesFieldErrors = useSelector(selectServicesFieldErrors);
   const hasAdditionalInformation = useSelector(selectHasAdditionalInformation);
+  const hasInputFields = useSelector(selectHasInputFields);
   const additionalInformationList = useSelector(
     selectAdditionalInformationList,
   );
@@ -75,10 +77,14 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       ),
     },
 
-    {
-      label: "Input Fields",
-      component: <ProposalInputFieldsStep theme={theme} />,
-    },
+    ...(hasInputFields
+      ? [
+          {
+            label: "Input Fields",
+            component: <ProposalInputFieldsStep theme={theme} />,
+          },
+        ]
+      : []),
   ];
 
   const steps = hasAdditionalInformation

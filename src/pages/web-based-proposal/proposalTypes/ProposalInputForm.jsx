@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 
 import { selectActiveStep } from "../../../redux/reducer/webProposal/stepper";
+import { selectHasInputFields } from "../../../redux/reducer/webProposal/inputFields";
 import ProposalLayout from "../layout/ProposalLayout";
 import ProposalHeader from "../layout/ProposalHeader";
 import ProposalFooter from "../layout/ProposalFooter";
@@ -12,10 +13,18 @@ import ProposalInputFieldsStep from "../steps/ProposalInputFieldsStep";
 
 export default function StandardProposalWithInputs({ proposal, theme }) {
   const activeStep = useSelector(selectActiveStep);
+  const hasInputFields = useSelector(selectHasInputFields);
 
   const steps = [
     { label: "Proposal", component: <ProposalPdfStep theme={theme} /> },
-    { label: "Input Fields", component: <ProposalInputFieldsStep theme={theme} /> },
+    ...(hasInputFields
+      ? [
+          {
+            label: "Input Fields",
+            component: <ProposalInputFieldsStep theme={theme} />,
+          },
+        ]
+      : []),
   ];
 
   const stepLabels = steps.map((step) => step.label);

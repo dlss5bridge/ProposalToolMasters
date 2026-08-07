@@ -13,6 +13,7 @@ export {
   selectInputFieldsListLoading,
   selectInputFieldsListError,
   selectInputFieldsValidationVisible,
+  selectHasInputFields,
 } from "./inputFieldsSelectors";
 
 export {
