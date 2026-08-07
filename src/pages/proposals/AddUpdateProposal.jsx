@@ -22202,10 +22202,7 @@ const Add_Update_Proposal = (props) => {
         ProposalObject.ProposalFormate === undefined ||
         (ProposalObject.ProposalFormate === 3 &&
           (ProposalObject.webProposalTypeID === null ||
-            ProposalObject.webProposalTypeID === undefined)) ||
-        ((ProposalObject.webProposalTypeID === 2 ||
-          ProposalObject.webProposalTypeID === 3) &&
-          !ProposalObject.globalPricingDriverID?.length)
+            ProposalObject.webProposalTypeID === undefined))
       ) {
         setRequireMessage(true);
         setLoader(false);

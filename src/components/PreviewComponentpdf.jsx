@@ -12191,7 +12191,6 @@ ${
                 <div className="col-lg-2 col-md-2 col-sm-6 d-flex align-items-center mt-4">
                   <label className="form-label">
                     Global {proposalName} Variables
-                    <span className="text-danger">*</span>
                   </label>
                 </div>
 
@@ -12215,10 +12214,6 @@ ${
                       });
                     }}
                   />
-                  {props.requireMessage &&
-                    !props.ProposalObject.globalPricingDriverID?.length && (
-                      <span className="validation">{ERROR_MESSAGES}</span>
-                    )}
                 </div>
               </>
             )}
