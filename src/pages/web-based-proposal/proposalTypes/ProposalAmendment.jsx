@@ -31,7 +31,12 @@ import {
   selectHasAdditionalInformation,
   setAdditionalInformationValidationVisible,
 } from "../../../redux/reducer/webProposal/additionalInformation";
-import { selectHasInputFields } from "../../../redux/reducer/webProposal/inputFields";
+import {
+  selectHasInputFields,
+  selectInputFieldsList,
+  getInputFieldsFieldErrors,
+  setInputFieldsValidationVisible,
+} from "../../../redux/reducer/webProposal/inputFields";
 import { Services } from "../steps/ProposalServicesStep/data/data";
 
 export default function ProposalAmendment({ theme, proposal, services }) {
@@ -45,6 +50,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const additionalInformationList = useSelector(
     selectAdditionalInformationList,
   );
+  const inputFieldsList = useSelector(selectInputFieldsList);
 
   // Base step order is fixed, so the final index of any step can be derived
   // up front from its position here plus whether Additional Information gets
@@ -59,6 +65,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const SERVICES_STEP_INDEX = BASE_STEP_LABELS.indexOf("Services");
   const PRICING_STEP_INDEX =
     BASE_STEP_LABELS.indexOf("Pricing Table") +
+    (hasAdditionalInformation ? 1 : 0);
+  const INPUT_FIELDS_STEP_INDEX =
+    BASE_STEP_LABELS.indexOf("Input Fields") +
     (hasAdditionalInformation ? 1 : 0);
 
   // Single source of truth pairing each step's label with its component, so
@@ -107,6 +116,19 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const ADDITIONAL_INFO_STEP_INDEX = SERVICES_STEP_INDEX + 1;
 
   const handleBeforeNextStep = async (currentStepIndex) => {
+    if (hasInputFields && currentStepIndex === INPUT_FIELDS_STEP_INDEX) {
+      const fieldErrors = getInputFieldsFieldErrors(
+        inputFieldsList,
+        quoteModel?.globalPricingDriverID,
+      );
+      if (Object.keys(fieldErrors).length > 0) {
+        dispatch(setInputFieldsValidationVisible(true));
+        return false;
+      }
+      dispatch(setInputFieldsValidationVisible(false));
+      return true;
+    }
+
     if (
       hasAdditionalInformation &&
       currentStepIndex === ADDITIONAL_INFO_STEP_INDEX

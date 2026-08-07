@@ -1,7 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectActiveStep } from "../../../redux/reducer/webProposal/stepper";
-import { selectHasInputFields } from "../../../redux/reducer/webProposal/inputFields";
+import {
+  selectHasInputFields,
+  selectInputFieldsList,
+  getInputFieldsFieldErrors,
+  setInputFieldsValidationVisible,
+} from "../../../redux/reducer/webProposal/inputFields";
 import {
   selectQuoteModel,
   saveProposalInputFields,
@@ -20,6 +25,27 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
   const activeStep = useSelector(selectActiveStep);
   const hasInputFields = useSelector(selectHasInputFields);
   const quoteModel = useSelector(selectQuoteModel);
+  const inputFieldsList = useSelector(selectInputFieldsList);
+
+  // Input Fields, when present, is always the step right after Proposal.
+  const INPUT_FIELDS_STEP_INDEX = 1;
+
+  const handleBeforeNextStep = (currentStepIndex) => {
+    if (!hasInputFields || currentStepIndex !== INPUT_FIELDS_STEP_INDEX) {
+      return true;
+    }
+
+    const fieldErrors = getInputFieldsFieldErrors(
+      inputFieldsList,
+      quoteModel?.globalPricingDriverID,
+    );
+    if (Object.keys(fieldErrors).length > 0) {
+      dispatch(setInputFieldsValidationVisible(true));
+      return false;
+    }
+    dispatch(setInputFieldsValidationVisible(false));
+    return true;
+  };
 
   // Placeholder endpoint until the real "Save" API is ready — see
   // SaveWebProposalInputFields in ProposalApi.jsx.
@@ -100,6 +126,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
         <ProposalStepper
           theme={theme}
           steps={stepLabels}
+          onNext={handleBeforeNextStep}
           onFinish={handleSave}
           finishLabel="Save"
         />

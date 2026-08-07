@@ -100,6 +100,12 @@ export default function ProposalStepper({
     if (!onFinish) return;
     setIsAdvancing(true);
     try {
+      // The last step's own validation (e.g. required Input Fields) must run
+      // before finishing, same as it would before advancing to a next step.
+      if (onNext) {
+        const canProceed = await onNext(activeStep);
+        if (canProceed === false) return;
+      }
       await onFinish(activeStep);
     } finally {
       setIsAdvancing(false);
