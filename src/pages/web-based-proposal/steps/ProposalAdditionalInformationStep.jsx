@@ -177,7 +177,7 @@ export default function ProposalAdditionalInformationStep({ theme }) {
         }}
       >
         <CardContent
-          className="!p-8"
+          className="!p-4 sm:!p-8"
           sx={{ flex: 1, overflowY: "auto" }}
         >
           <div className="mb-8">

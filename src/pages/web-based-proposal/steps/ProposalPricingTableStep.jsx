@@ -734,13 +734,14 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
 
   return (
     <div
-      className="flex h-full overflow-hidden p-3"
+      className="flex h-full overflow-hidden p-1.5 sm:p-3"
       style={{ backgroundColor: theme.background }}
     >
-      {/* w-[90%] (not centered) leaves a consistent 10% gap on the right at
-          every viewport width, matching the PDF step's card width. */}
+      {/* Full width on mobile so the card isn't squeezed into 90% of an
+          already-small viewport. From lg up, w-[90%] (not centered) leaves a
+          consistent 10% gap on the right, matching the PDF step's card width. */}
       <div
-        className="flex h-full w-[90%] flex-col overflow-hidden rounded-2xl border bg-white shadow-lg"
+        className="flex h-full w-full flex-col overflow-hidden rounded-xl border bg-white shadow-lg sm:rounded-2xl lg:w-[90%]"
         style={{ borderColor: theme.border }}
       >
         <div
@@ -750,28 +751,28 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
 
         {/* Header — polished but compact, always visible, never scrolls */}
         <div
-          className="flex flex-shrink-0 items-center justify-between border-b px-5 py-3.5"
+          className="flex flex-shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-3 sm:px-5 sm:py-3.5"
           style={{
             background: `linear-gradient(to right, ${theme.primary}14, ${theme.primary}00)`,
             borderColor: theme.border,
           }}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <span
               className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
               style={{ backgroundColor: theme.primary }}
             >
               {clientName.charAt(0).toUpperCase()}
             </span>
-            <div>
+            <div className="min-w-0">
               <h2
-                className="text-base font-semibold leading-tight"
+                className="truncate text-base font-semibold leading-tight"
                 style={{ color: theme.textPrimary }}
               >
                 {clientName}
               </h2>
               <p
-                className="text-xs leading-tight"
+                className="truncate text-xs leading-tight"
                 style={{ color: theme.textSecondary }}
               >
                 Prepared by {organisationName} &middot; {preparedOn}
@@ -779,7 +780,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
             </div>
           </div>
           <span
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+            className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
             style={{
               backgroundColor: `${theme.completedStepBackground}1A`,
               color: theme.completedStepBackground,
@@ -796,7 +797,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
         {/* Services — recurring and one-off each get their own tinted
             section (same accent color for both, so the two share one
             consistent theme) with a title/icon to tell them apart */}
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-3 py-4 sm:px-6 sm:py-5">
           {selectedList.length === 0 ? (
             <p
               className="py-6 text-center text-sm"

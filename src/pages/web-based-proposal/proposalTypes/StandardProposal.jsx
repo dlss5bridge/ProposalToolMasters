@@ -8,7 +8,11 @@ export default function StandardProposal({ proposal, theme }) {
     <ProposalLayout theme={theme}>
       {/* Mobile Header */}
       <div className="block lg:hidden">
-        <ProposalHeader theme={theme} title={proposal.title} />
+        <ProposalHeader
+          theme={theme}
+          title={proposal.title}
+          logo={proposal.themeSettings?.logoUrl}
+        />
       </div>
 
       <div
@@ -41,25 +45,29 @@ export default function StandardProposal({ proposal, theme }) {
         w-full
         flex-1
         overflow-hidden
-        p-3
+        p-1.5
+        sm:p-3
       "
           style={{
             backgroundColor: theme.background,
           }}
         >
-          {/* w-[90%] (not centered) leaves a consistent 10% gap on the right
-              at every viewport width, instead of a fixed pixel margin. */}
-          <div className="h-full w-[90%]">
+          {/* Full width on mobile so the PDF frame isn't squeezed into 90% of
+              an already-small viewport. From lg up, w-[90%] (not centered)
+              leaves a consistent 10% gap on the right instead of a fixed
+              pixel margin. */}
+          <div className="h-full w-full lg:w-[90%]">
             <div
               className="
             flex
             h-full
             flex-col
             overflow-hidden
-            rounded-2xl
+            rounded-xl
             border
             bg-white
             shadow-lg
+            sm:rounded-2xl
           "
               style={{
                 borderColor: theme.border,

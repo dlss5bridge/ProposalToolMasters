@@ -86,7 +86,7 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
   };
 
   return (
-    <div className="grid grid-cols-[90px_1fr_90px] items-center gap-4">
+    <div className="grid grid-cols-[44px_1fr_44px] items-center gap-2 sm:grid-cols-[90px_1fr_90px] sm:gap-4">
       {/* Back Button */}
       <button
         onClick={() => dispatch(handlePreviousStep())}
@@ -99,14 +99,14 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
         }}
       >
         <ChevronLeft size={16} />
-        Back
+        <span className="hidden sm:inline">Back</span>
       </button>
 
       {/* Steps */}
       {/* Center — a single horizontally scrollable row at every breakpoint, so
           steps that don't fit the available width stay reachable and clickable
           instead of being clipped or collapsed into a non-interactive summary. */}
-      <div className="hide-scrollbar flex min-w-0 items-center gap-5 overflow-x-auto scroll-smooth px-1 py-1 lg:justify-center">
+      <div className="hide-scrollbar flex min-w-0 items-center gap-3 overflow-x-auto scroll-smooth px-1 py-1 sm:gap-5 lg:justify-center">
         {steps.map((step, index) => {
           const active = index === activeStep;
           const completed = index < maxVisitedStep;
@@ -174,8 +174,14 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
           <Loader2 size={16} className="animate-spin" />
         ) : (
           <>
-            {isLastStep ? "Finish" : "Next"}
-            {!isLastStep && <ChevronRight size={16} />}
+            <span className="hidden sm:inline">
+              {isLastStep ? "Finish" : "Next"}
+            </span>
+            {isLastStep ? (
+              <Check size={16} className="sm:hidden" />
+            ) : (
+              <ChevronRight size={16} />
+            )}
           </>
         )}
       </button>

@@ -235,12 +235,17 @@ export default function ProposalInputFieldsStep({ theme }) {
                 sm: "100%",
                 md: 520,
               },
-
+          maxHeight: "100%",
+          display: "flex",
+          flexDirection: "column",
           border: `1px solid ${theme.border}`,
           boxShadow: "0 12px 30px rgba(15,23,42,.06)",
         }}
       >
-        <CardContent className="!p-8">
+        <CardContent
+          className="!p-4 sm:!p-8"
+          sx={{ overflowY: "auto" }}
+        >
           {/* Heading */}
           <div className="mb-8">
             <Typography

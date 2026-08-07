@@ -23,6 +23,11 @@ export default function ProposalLayout({
       <div
         className="wp-proposal-root flex h-screen flex-col overflow-hidden"
         style={{
+          // Mobile browsers (esp. iOS Safari) resize the viewport as chrome
+          // (address bar) shows/hides, so h-screen (100vh) can clip content
+          // or leave a gap. 100dvh tracks the *actual* visible viewport;
+          // browsers that don't support it ignore this and keep h-screen.
+          height: "100dvh",
           background: theme.background,
           fontFamily: theme.fontFamily,
           ...getProposalThemeCssVars(theme),

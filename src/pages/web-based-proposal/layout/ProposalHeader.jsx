@@ -10,15 +10,19 @@ export default function ProposalHeader({
         borderBottom: `1px solid ${theme.border}`,
       }}
     >
-      <div className="flex h-full items-center justify-between px-5">
+      <div className="flex h-full items-center justify-between gap-3 px-3 sm:px-5">
         {/* Left */}
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           {logo && (
-            <img src={logo} alt="Logo" className="h-7 w-auto object-contain" />
+            <img
+              src={logo}
+              alt="Logo"
+              className="h-6 w-auto flex-shrink-0 object-contain sm:h-7"
+            />
           )}
 
           <h1
-            className="text-[15px] font-semibold"
+            className="truncate text-[13px] font-semibold sm:text-[15px]"
             style={{
               color: theme.textPrimary,
             }}

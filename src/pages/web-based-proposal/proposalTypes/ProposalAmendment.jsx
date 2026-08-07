@@ -161,7 +161,11 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     <ProposalLayout theme={theme}>
       {/* Mobile Header */}
       <div className="block lg:hidden">
-        <ProposalHeader theme={theme} title={proposal.title} />
+        <ProposalHeader
+          theme={theme}
+          title={proposal.title}
+          logo={proposal.themeSettings?.logoUrl}
+        />
       </div>
 
       <div
