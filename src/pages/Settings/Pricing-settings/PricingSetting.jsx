@@ -876,6 +876,24 @@ const Pricing_Settings = () => {
                               </label>
                             )}
                           </div>
+
+                          <div class="fieldset col-12">
+                            <label class=" fieldset-label pe-2">
+                              Enable {masterProposalType}
+                            </label>
+                            <input
+                              type="checkbox"
+                              className="check check_tick"
+                              style={{ verticalAlign: "middle" }}
+                              checked={pricingSettingObj.enableMasterProposalType}
+                              onChange={(e) => {
+                                setPricingSettingObj({
+                                  ...pricingSettingObj,
+                                  enableMasterProposalType: e.target.checked,
+                                });
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -1041,24 +1059,6 @@ const Pricing_Settings = () => {
                             />
                           </div>
                         </div>
-                      </div>
-
-                      <div class="fieldset col-6">
-                        <label class=" fieldset-label pe-2">
-                          Enable {masterProposalType}
-                        </label>
-                        <input
-                          type="checkbox"
-                          className="check check_tick"
-                          style={{ verticalAlign: "middle" }}
-                          checked={pricingSettingObj.enableMasterProposalType}
-                          onChange={(e) => {
-                            setPricingSettingObj({
-                              ...pricingSettingObj,
-                              enableMasterProposalType: e.target.checked,
-                            });
-                          }}
-                        />
                       </div>
 
                       <div className="text-center">
