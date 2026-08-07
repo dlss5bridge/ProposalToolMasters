@@ -59,6 +59,7 @@ const Pricing_Settings = () => {
     defaultProposalFormatID: null,
     webProposalTypeID: null,
     globalPricingDriverID: [],
+    isCollectPaymentBeforeProposalAmendment: false,
   });
   const [ServiceFeeInflationConfig, setServiceFeeInflationConfig] = useState({
     OrganisationKeyID: null,
@@ -106,6 +107,7 @@ const Pricing_Settings = () => {
     remainingESignatures: null,
     webProposalTypeID: null,
     globalPricingDriverID: [],
+    isCollectPaymentBeforeProposalAmendment: false,
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [feeInflationErrorMessage, setFeeInflationErrorMessage] = useState("");
@@ -183,6 +185,8 @@ const Pricing_Settings = () => {
             remainingESignatures: ModelData.remainingESignatures,
             webProposalTypeID: ModelData?.webProposalTypeID,
             globalPricingDriverID: ModelData?.globalPricingDriverID,
+            isCollectPaymentBeforeProposalAmendment:
+              ModelData?.isCollectPaymentBeforeProposalAmendment || false,
           });
           setPrevPricingSettingObj({
             ...pricingSettingObj,
@@ -200,6 +204,8 @@ const Pricing_Settings = () => {
             remainingESignatures: ModelData.remainingESignatures,
             webProposalTypeID: ModelData?.webProposalTypeID,
             globalPricingDriverID: ModelData?.globalPricingDriverID,
+            isCollectPaymentBeforeProposalAmendment:
+              ModelData?.isCollectPaymentBeforeProposalAmendment || false,
           });
         }
       } else {
@@ -408,7 +414,9 @@ const Pricing_Settings = () => {
       pricingSettingObj.webProposalTypeID ==
         PrevPricingSettingObj.webProposalTypeID &&
       pricingSettingObj.globalPricingDriverID ==
-        PrevPricingSettingObj.globalPricingDriverID
+        PrevPricingSettingObj.globalPricingDriverID &&
+      pricingSettingObj.isCollectPaymentBeforeProposalAmendment ==
+        PrevPricingSettingObj.isCollectPaymentBeforeProposalAmendment
     ) {
       SetPrevError(true);
       return false;
@@ -480,6 +488,8 @@ const Pricing_Settings = () => {
       defaultProposalFormatID: pricingSettingObj.defaultProposalFormatID,
       webProposalTypeID: pricingSettingObj?.webProposalTypeID,
       globalPricingDriverID: pricingSettingObj?.globalPricingDriverID,
+      isCollectPaymentBeforeProposalAmendment:
+        pricingSettingObj?.isCollectPaymentBeforeProposalAmendment || false,
     };
 
     setFieldErrors({});
@@ -1009,6 +1019,27 @@ const Pricing_Settings = () => {
                               />
                             </div>
                           )}
+
+                          <div class="fieldset col-12">
+                            <label class=" fieldset-label pe-2">
+                              Collect Amendment Payment
+                            </label>
+                            <input
+                              type="checkbox"
+                              className="check check_tick"
+                              style={{ verticalAlign: "middle" }}
+                              checked={
+                                pricingSettingObj.isCollectPaymentBeforeProposalAmendment
+                              }
+                              onChange={(e) => {
+                                setPricingSettingObj({
+                                  ...pricingSettingObj,
+                                  isCollectPaymentBeforeProposalAmendment:
+                                    e.target.checked,
+                                });
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
 
