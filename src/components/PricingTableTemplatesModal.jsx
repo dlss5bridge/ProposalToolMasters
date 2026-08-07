@@ -12557,7 +12557,7 @@ const PricingTableTemplatesModal = ({
                         serviceTypeID ===
                         servicePackageTypeID.OneOffServiceTypeID
                       ) {
-                        setSelectedTemplateIDOneOff(templates[6].id);
+                        setSelectedTemplateID(templates[6].id);
                       } else if (
                         serviceTypeID ===
                         servicePackageTypeID.RecurringPackageTypeID
@@ -12567,7 +12567,7 @@ const PricingTableTemplatesModal = ({
                         serviceTypeID ===
                         servicePackageTypeID.OneOffPackageTypeID
                       ) {
-                        setSelectedTemplateIDOneOff(templates[6].id);
+                        setSelectedTemplateID(templates[6].id);
                       }
                     }}
                   />

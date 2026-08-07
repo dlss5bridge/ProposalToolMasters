@@ -10603,37 +10603,37 @@ ${
     <tr style="background-color:${newColorCode};">
       ${
         props.visibleFieldsCustomTemp.serviceCategory
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Service Category</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Service Category</th>`
           : ""
       }
       ${
         props.visibleFieldsCustomTemp.serviceName
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Services</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Services</th>`
           : ""
       }
       ${
         props.visibleFieldsCustomTemp.serviceScope
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Service Scope</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Service Scope</th>`
           : ""
       }
       ${
         props.visibleFieldsCustomTemp.fees
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Fees (${props.currencySymbol})</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Fees (${props.currencySymbol})</th>`
           : ""
       }
       ${
         props.vatPercentage !== null && props.visibleFieldsCustomTemp.vatRate
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">${props.taxName} Rate</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">${props.taxName} Rate</th>`
           : ""
       }
       ${
         props.vatPercentage !== null && props.visibleFieldsCustomTemp.vat
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">${props.taxName} (${props.currencySymbol})</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">${props.taxName} (${props.currencySymbol})</th>`
           : ""
       }
       ${
         props.vatPercentage !== null && props.visibleFieldsCustomTemp.feesIncVat
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Fees inc ${props.taxName} (${props.currencySymbol})</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Fees inc ${props.taxName} (${props.currencySymbol})</th>`
           : ""
       }
     </tr>
@@ -11223,37 +11223,37 @@ ${
     <tr style="background-color:${newColorCode};">
       ${
         props.visibleFieldsCustomTemp.serviceCategory
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Service Category</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Service Category</th>`
           : ""
       }
       ${
         props.visibleFieldsCustomTemp.serviceName
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Services</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Services</th>`
           : ""
       }
       ${
         props.visibleFieldsCustomTemp.serviceScope
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Service scope</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Service scope</th>`
           : ""
       }
       ${
         props.visibleFieldsCustomTemp.fees
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Fees (${props.currencySymbol})</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Fees (${props.currencySymbol})</th>`
           : ""
       }
       ${
         props.vatPercentage !== null && props.visibleFieldsCustomTemp.vatRate
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">${props.taxName} Rate</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">${props.taxName} Rate</th>`
           : ""
       }
       ${
         props.vatPercentage !== null && props.visibleFieldsCustomTemp.vat
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">${props.taxName} (${props.currencySymbol})</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">${props.taxName} (${props.currencySymbol})</th>`
           : ""
       }
       ${
         props.vatPercentage !== null && props.visibleFieldsCustomTemp.feesIncVat
-          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 18px;">Fees inc ${props.taxName} (${props.currencySymbol})</th>`
+          ? `<th style="border: 1px solid #dddddd; text-align: center; padding: 8px; color: white; font-size: 14px;">Fees inc ${props.taxName} (${props.currencySymbol})</th>`
           : ""
       }
     </tr>

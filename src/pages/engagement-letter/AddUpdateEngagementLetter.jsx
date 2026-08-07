@@ -2889,7 +2889,7 @@ const ReviewServicesComponent = (props) => {
                                     Fees ({props.currencySymbol})
                                   </th>
                                 )}
-                                {props.vatPercentage !== 0 &&
+                                {props.vatPercentage !== null &&
                                   props.visibleFieldsCustomTemp.vatRate && (
                                     <th
                                       className="tr-table-class text-white text-center"
@@ -2898,7 +2898,7 @@ const ReviewServicesComponent = (props) => {
                                       {props.taxName} Rate
                                     </th>
                                   )}
-                                {props.vatPercentage !== 0 &&
+                                {props.vatPercentage !== null &&
                                   props.visibleFieldsCustomTemp.vat && (
                                     <th
                                       className="tr-table-class text-white text-center"
@@ -2907,7 +2907,7 @@ const ReviewServicesComponent = (props) => {
                                       {props.taxName} ({props.currencySymbol})
                                     </th>
                                   )}
-                                {props.vatPercentage !== 0 &&
+                                {props.vatPercentage !== null &&
                                   props.visibleFieldsCustomTemp.feesIncVat && (
                                     <th
                                       className="tr-table-class text-white text-center"
@@ -10076,7 +10076,7 @@ const Add_Update_Engagement_Letter = () => {
     (item) => item.organisationKeyID === common.organisationKeyID,
   );
 
-  // console.log("storedOrg", storedOrg);
+  console.log("storedOrg", storedOrg);
   // Remember, here the opposite sign is used for the vatStatus because, in the backend they have stored opposite. If the org is vat reg then they have stored false else true.
 
   const isVatEnabledForOrg =
@@ -10135,6 +10135,7 @@ const Add_Update_Engagement_Letter = () => {
   };
 
   useEffect(() => {
+    debugger;
     if (isVatEnabledForOrg) return;
     setVisibleFieldsCustomTemp((prev) => ({
       ...prev,
@@ -16144,12 +16145,13 @@ const Add_Update_Engagement_Letter = () => {
       }
     }
 
+    debugger;
+
     const updatedTemplateList = await updateTemplateList(
       engagementObj.customizedEmailContent,
       "CustomizeTemplate",
     );
-    const isGlobalCustomTemplate =
-      selectedTemplateID === 0 || selectedTemplateIDOneOff === 0;
+    const isGlobalCustomTemplate = selectedTemplateID === 0;
     // const updatedTemplateList = await updateTemplateList(
     //   engagementObj.customizedEmailContent,
     //   "CustomizeTemplate"

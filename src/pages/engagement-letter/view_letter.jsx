@@ -2301,7 +2301,7 @@ const View_Engagement_Latter = () => {
 
                                                   {showRecurringVat &&
                                                     visibleFieldsCustomTemp?.vat && (
-                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                      <td className="tr-table-class font-14 text-white text-center">
                                                         {formatValue(
                                                           recurringNetRowValues.vat,
                                                           EngagementObj.currencyID,
@@ -2311,7 +2311,7 @@ const View_Engagement_Latter = () => {
 
                                                   {showRecurringVat &&
                                                     visibleFieldsCustomTemp?.feesIncVat && (
-                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                      <td className="tr-table-class font-14 text-white text-center">
                                                         {formatValue(
                                                           recurringNetRowValues.feesIncVAT,
                                                           EngagementObj.currencyID,
@@ -2352,7 +2352,7 @@ const View_Engagement_Latter = () => {
 
                                                       {showRecurringVat &&
                                                         visibleFieldsCustomTemp?.vat && (
-                                                          <td className="tr-table-class font-14 text-white text-right">
+                                                          <td className="tr-table-class font-14 text-white text-center">
                                                             (-){" "}
                                                             {formatValue(
                                                               recurringFooterTotals.vatDiscount,
@@ -2363,7 +2363,7 @@ const View_Engagement_Latter = () => {
 
                                                       {showRecurringVat &&
                                                         visibleFieldsCustomTemp?.feesIncVat && (
-                                                          <td className="tr-table-class font-14 text-white text-right">
+                                                          <td className="tr-table-class font-14 text-white text-center">
                                                             (-){" "}
                                                             {formatValue(
                                                               recurringFooterTotals.discountIncludingVAT,
@@ -2405,7 +2405,7 @@ const View_Engagement_Latter = () => {
 
                                                   {showRecurringVat &&
                                                     visibleFieldsCustomTemp?.vat && (
-                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                      <td className="tr-table-class font-14 text-white text-center">
                                                         {formatValue(
                                                           recurringFooterTotals.finalVAT,
                                                           EngagementObj.currencyID,
@@ -2415,7 +2415,7 @@ const View_Engagement_Latter = () => {
 
                                                   {showRecurringVat &&
                                                     visibleFieldsCustomTemp?.feesIncVat && (
-                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                      <td className="tr-table-class font-14 text-white text-center">
                                                         {formatValue(
                                                           recurringFooterTotals.grandTotal,
                                                           EngagementObj.currencyID,
@@ -2963,7 +2963,7 @@ const View_Engagement_Latter = () => {
 
                                                   {showOneOffVat &&
                                                     visibleFieldsCustomTemp?.vat && (
-                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                      <td className="tr-table-class font-14 text-white text-center">
                                                         {formatValue(
                                                           oneOffFooterNetVat,
                                                           EngagementObj.currencyID,
@@ -2973,7 +2973,7 @@ const View_Engagement_Latter = () => {
 
                                                   {showOneOffVat &&
                                                     visibleFieldsCustomTemp?.feesIncVat && (
-                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                      <td className="tr-table-class font-14 text-white text-center">
                                                         {formatValue(
                                                           oneOffFooterNetFeesIncludingVat,
                                                           EngagementObj.currencyID,
@@ -3017,7 +3017,7 @@ const View_Engagement_Latter = () => {
 
                                                       {showOneOffVat &&
                                                         visibleFieldsCustomTemp?.vat && (
-                                                          <td className="tr-table-class font-14 text-white text-right">
+                                                          <td className="tr-table-class font-14 text-white text-center">
                                                             (-){" "}
                                                             {formatValue(
                                                               oneOffVatDiscountAmount,
@@ -3028,7 +3028,7 @@ const View_Engagement_Latter = () => {
 
                                                       {showOneOffVat &&
                                                         visibleFieldsCustomTemp?.feesIncVat && (
-                                                          <td className="tr-table-class font-14 text-white text-right">
+                                                          <td className="tr-table-class font-14 text-white text-center">
                                                             (-){" "}
                                                             {formatValue(
                                                               oneOffDiscountedFeesIncludingVat,
@@ -3056,7 +3056,7 @@ const View_Engagement_Latter = () => {
                                                   )}
 
                                                   {visibleFieldsCustomTemp?.fees && (
-                                                    <td className="tr-table-class font-14 text-white text-right">
+                                                    <td className="tr-table-class font-14 text-white text-center">
                                                       {formatValue(
                                                         hasOneOffDiscount
                                                           ? oneOffDiscountedNet
@@ -3073,7 +3073,7 @@ const View_Engagement_Latter = () => {
 
                                                   {showOneOffVat &&
                                                     visibleFieldsCustomTemp?.vat && (
-                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                      <td className="tr-table-class font-14 text-white text-center">
                                                         {formatValue(
                                                           hasOneOffDiscount
                                                             ? oneOffDiscountedVat
@@ -3085,7 +3085,7 @@ const View_Engagement_Latter = () => {
 
                                                   {showOneOffVat &&
                                                     visibleFieldsCustomTemp?.feesIncVat && (
-                                                      <td className="tr-table-class font-14 text-white text-right">
+                                                      <td className="tr-table-class font-14 text-white text-center">
                                                         {formatValue(
                                                           hasOneOffDiscount
                                                             ? oneOffGrandTotal
