@@ -13,7 +13,10 @@ import {
   selectActiveStep,
   updateTotalSteps,
 } from "../../../redux/reducer/webProposal/stepper";
-import { selectQuoteModel } from "../../../redux/reducer/webProposal";
+import {
+  selectQuoteModel,
+  amendProposal,
+} from "../../../redux/reducer/webProposal";
 import {
   selectSelectedServiceIDs,
   selectServicesFieldErrors,
@@ -163,6 +166,18 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     return true;
   };
 
+  // Placeholder endpoint until the real "Amend Proposal" API is ready — see
+  // AmendWebProposal in ProposalApi.jsx.
+  const handleAmendProposal = async () => {
+    try {
+      await dispatch(
+        amendProposal({ quoteKeyID: quoteModel?.quoteKeyID }),
+      ).unwrap();
+    } catch (err) {
+      // Endpoint is a placeholder for now, so failures are expected.
+    }
+  };
+
   return (
     <ProposalLayout theme={theme}>
       {/* Mobile Header */}
@@ -216,6 +231,8 @@ export default function ProposalAmendment({ theme, proposal, services }) {
           theme={theme}
           steps={stepLabels}
           onNext={handleBeforeNextStep}
+          onFinish={handleAmendProposal}
+          finishLabel="Amend Proposal"
         />
       </ProposalFooter>
     </ProposalLayout>

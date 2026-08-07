@@ -1,9 +1,33 @@
+import { useState } from "react";
+import { Check, Loader2 } from "lucide-react";
+import { useDispatch } from "react-redux";
+
 import ProposalHeader from "../layout/ProposalHeader";
 import ProposalLayout from "../layout/ProposalLayout";
+import ProposalFooter from "../layout/ProposalFooter";
 import ProposalSidebar from "../layout/ProposalSidebar";
 import PdfViewer from "../pdf/PdfViewer";
+import { acceptProposal } from "../../../redux/reducer/webProposal";
 
 export default function StandardProposal({ proposal, theme }) {
+  const dispatch = useDispatch();
+  const [isAccepting, setIsAccepting] = useState(false);
+
+  // Placeholder endpoint until the real "Accept" API is ready — see
+  // AcceptWebProposal in ProposalApi.jsx.
+  const handleAccept = async () => {
+    setIsAccepting(true);
+    try {
+      await dispatch(
+        acceptProposal({ quoteKeyID: proposal.quoteModel?.quoteKeyID }),
+      ).unwrap();
+    } catch (err) {
+      // Endpoint is a placeholder for now, so failures are expected.
+    } finally {
+      setIsAccepting(false);
+    }
+  };
+
   return (
     <ProposalLayout theme={theme}>
       {/* Mobile Header */}
@@ -16,7 +40,7 @@ export default function StandardProposal({ proposal, theme }) {
       </div>
 
       <div
-        className="flex h-full gap-3 overflow-hidden"
+        className="flex flex-1 gap-3 overflow-hidden"
         style={{
           backgroundColor: theme.background,
         }}
@@ -89,6 +113,28 @@ export default function StandardProposal({ proposal, theme }) {
           </div>
         </main>
       </div>
+
+      <ProposalFooter theme={theme}>
+        <div className="flex justify-end">
+          <button
+            onClick={handleAccept}
+            disabled={isAccepting}
+            className="flex h-9 items-center justify-center gap-1 rounded-md px-4 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-40"
+            style={{
+              backgroundColor: theme.primary,
+            }}
+          >
+            {isAccepting ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <>
+                Accept
+                <Check size={16} />
+              </>
+            )}
+          </button>
+        </div>
+      </ProposalFooter>
     </ProposalLayout>
   );
 }

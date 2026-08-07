@@ -189,6 +189,33 @@ export const GenerateContractFromProposal = async (params) => {
   return res;
 };
 
+// Web Proposal final-step actions (Amend / Save / Accept). Runs outside the
+// authenticated app, so no token (mirrors GetProposalModelWithoutToken).
+// Endpoints are placeholders until the real ones are ready.
+export const AmendWebProposal = async (params) => {
+  const res = await postApi(
+    `${ProposalBaseUrlQuote}/AmendWebProposal`,
+    params,
+  );
+  return res;
+};
+
+export const SaveWebProposalInputFields = async (params) => {
+  const res = await postApi(
+    `${ProposalBaseUrlQuote}/SaveWebProposalInputFields`,
+    params,
+  );
+  return res;
+};
+
+export const AcceptWebProposal = async (params) => {
+  const res = await postApi(
+    `${ProposalBaseUrlQuote}/AcceptWebProposal`,
+    params,
+  );
+  return res;
+};
+
 export const GetContractDetailsForSignEasyList = async (GetContractKeyID) => {
   const res = await getList(
     // `${TemplateBaseUrl}/GetMasterTemplateDetailsWithVariableValues?TemplateKeyID=${params.TemplateKeyID}&ClientKeyID=${params.clientID}`

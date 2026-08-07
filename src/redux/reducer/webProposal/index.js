@@ -1,6 +1,12 @@
 import reducer from "./webProposalSlice";
 
-export { getQuoteModel, getOrganisationThemeSettings } from "./webProposalThunk";
+export {
+  getQuoteModel,
+  getOrganisationThemeSettings,
+  amendProposal,
+  saveProposalInputFields,
+  acceptProposal,
+} from "./webProposalThunk";
 
 export {
   selectQuoteModel,

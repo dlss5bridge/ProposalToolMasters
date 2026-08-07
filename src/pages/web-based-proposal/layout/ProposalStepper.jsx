@@ -17,7 +17,18 @@ import {
 // `onNext`, if provided, is called with the current step index before the
 // stepper advances. It may run async work (e.g. fetching data that decides
 // whether a step should be inserted) and return `false` to block advancing.
-export default function ProposalStepper({ theme, steps = [], onNext }) {
+//
+// `onFinish`, if provided, is called instead of advancing once the last step
+// is reached — the button switches from "Next" to `finishLabel` and becomes
+// clickable. Without an `onFinish` handler the last-step button stays
+// disabled, since there'd be nothing for it to do.
+export default function ProposalStepper({
+  theme,
+  steps = [],
+  onNext,
+  onFinish,
+  finishLabel = "Finish",
+}) {
   const dispatch = useDispatch();
 
   const activeStep = useSelector(selectActiveStep);
@@ -85,8 +96,44 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
     dispatch(handleNextStep());
   };
 
+  const handleFinish = async () => {
+    if (!onFinish) return;
+    setIsAdvancing(true);
+    try {
+      await onFinish(activeStep);
+    } finally {
+      setIsAdvancing(false);
+    }
+  };
+
+  // A single-step flow has nothing to step between — the back button and
+  // step row would just be dead chrome, so show only the finish action.
+  if (steps.length <= 1) {
+    return (
+      <div className="flex justify-end">
+        <button
+          onClick={handleFinish}
+          disabled={isAdvancing || !onFinish}
+          className="flex h-9 items-center justify-center gap-1 whitespace-nowrap rounded-md px-4 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-40"
+          style={{
+            backgroundColor: theme.primary,
+          }}
+        >
+          {isAdvancing ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <>
+              {finishLabel}
+              <Check size={16} />
+            </>
+          )}
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-[44px_1fr_44px] items-center gap-2 sm:grid-cols-[90px_1fr_90px] sm:gap-4">
+    <div className="grid grid-cols-[44px_1fr_minmax(44px,auto)] items-center gap-2 sm:grid-cols-[90px_1fr_minmax(90px,auto)] sm:gap-4">
       {/* Back Button */}
       <button
         onClick={() => dispatch(handlePreviousStep())}
@@ -161,11 +208,11 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
         })}
       </div>
 
-      {/* Next Button */}
+      {/* Next / Finish Button */}
       <button
-        onClick={handleNext}
-        disabled={isLastStep || isAdvancing}
-        className="flex h-9 items-center justify-center gap-1 rounded-md text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-40"
+        onClick={isLastStep ? handleFinish : handleNext}
+        disabled={isAdvancing || (isLastStep && !onFinish)}
+        className="flex h-9 items-center justify-center gap-1 whitespace-nowrap rounded-md px-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-40 sm:px-4"
         style={{
           backgroundColor: theme.primary,
         }}
@@ -175,7 +222,7 @@ export default function ProposalStepper({ theme, steps = [], onNext }) {
         ) : (
           <>
             <span className="hidden sm:inline">
-              {isLastStep ? "Finish" : "Next"}
+              {isLastStep ? finishLabel : "Next"}
             </span>
             {isLastStep ? (
               <Check size={16} className="sm:hidden" />
