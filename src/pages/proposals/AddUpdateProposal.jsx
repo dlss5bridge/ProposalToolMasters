@@ -5945,6 +5945,24 @@ const ReviewPackagesComponent = (props) => {
         return "Unknown";
     }
   };
+
+  // Prevent discounting a package's price below its configured min price (recurringMinPrice/oneOffMinPrice)
+  const getPackageMinPriceValidationMessage = (minPrice, discountedTotal) => {
+    if (!props.requireMessage) return null;
+    const min = Number(minPrice);
+    if (minPrice === null || minPrice === undefined || isNaN(min) || min <= 0)
+      return null;
+    const total = Number(discountedTotal);
+    if (isNaN(total)) return null;
+    if (total < min) {
+      return (
+        <span className="validation">
+          {`The discounted price cannot be less than ${props.currencySymbol}${min.toFixed(2)}`}
+        </span>
+      );
+    }
+    return null;
+  };
   // Recurring Service-Pricing Table Formate For E-mail.
 
   const [RecurringPackagesTable, setRecurringPackagesTable] = useState(
@@ -11549,6 +11567,11 @@ const ReviewPackagesComponent = (props) => {
                               props.RecurringPricingInfo
                                 .DiscountPercentagePackageOne,
                             )}
+                            {getPackageMinPriceValidationMessage(
+                              props.selectedPackagesList[0]?.recurringMinPrice,
+                              props.RecurringPricingInfo
+                                .packageOneDisCountedTotal,
+                            )}
                           </>
                         )}
                       </div>
@@ -11987,6 +12010,12 @@ const ReviewPackagesComponent = (props) => {
                                         props.RecurringPricingInfo
                                           .DiscountPercentagePackageOne,
                                       )}
+                                      {getPackageMinPriceValidationMessage(
+                                        props.selectedPackagesList[0]
+                                          ?.recurringMinPrice,
+                                        props.RecurringPricingInfo
+                                          .packageOneDisCountedTotal,
+                                      )}
                                     </div>
                                   </div>
                                 </td>
@@ -12029,6 +12058,12 @@ const ReviewPackagesComponent = (props) => {
                                             .maxDiscountForQC,
                                           props.RecurringPricingInfo
                                             .DiscountPercentagePackageTwo,
+                                        )}
+                                        {getPackageMinPriceValidationMessage(
+                                          props.selectedPackagesList[1]
+                                            ?.recurringMinPrice,
+                                          props.RecurringPricingInfo
+                                            .packageTwoDisCountedTotal,
                                         )}
                                       </div>
                                     </div>
@@ -12075,6 +12110,12 @@ const ReviewPackagesComponent = (props) => {
                                             .maxDiscountForQC,
                                           props.RecurringPricingInfo
                                             .DiscountPercentagePackageThree,
+                                        )}
+                                        {getPackageMinPriceValidationMessage(
+                                          props.selectedPackagesList[2]
+                                            ?.recurringMinPrice,
+                                          props.RecurringPricingInfo
+                                            .packageThreeDisCountedTotal,
                                         )}
                                       </div>
                                     </div>
@@ -13371,6 +13412,12 @@ const ReviewPackagesComponent = (props) => {
                                         props.RecurringPricingInfo
                                           .DiscountPercentagePackageOne,
                                       )}
+                                      {getPackageMinPriceValidationMessage(
+                                        props.selectedPackagesList[0]
+                                          ?.recurringMinPrice,
+                                        props.RecurringPricingInfo
+                                          .packageOneDisCountedTotal,
+                                      )}
                                     </div>
                                   </div>
                                 </td>
@@ -13430,6 +13477,12 @@ const ReviewPackagesComponent = (props) => {
                                               .maxDiscountForQC,
                                             props.RecurringPricingInfo
                                               .DiscountPercentagePackageTwo,
+                                          )}
+                                          {getPackageMinPriceValidationMessage(
+                                            props.selectedPackagesList[1]
+                                              ?.recurringMinPrice,
+                                            props.RecurringPricingInfo
+                                              .packageTwoDisCountedTotal,
                                           )}
                                         </div>
                                       </div>
@@ -13492,6 +13545,12 @@ const ReviewPackagesComponent = (props) => {
                                               .maxDiscountForQC,
                                             props.RecurringPricingInfo
                                               .DiscountPercentagePackageThree,
+                                          )}
+                                          {getPackageMinPriceValidationMessage(
+                                            props.selectedPackagesList[2]
+                                              ?.recurringMinPrice,
+                                            props.RecurringPricingInfo
+                                              .packageThreeDisCountedTotal,
                                           )}
                                         </div>
                                       </div>
@@ -13741,6 +13800,11 @@ const ReviewPackagesComponent = (props) => {
                               props.pricingSettingObj.maxDiscountForQC,
                               props.OneOffPricingInfo
                                 .DiscountPercentagePackageOne,
+                            )}
+                            {getPackageMinPriceValidationMessage(
+                              props.selectedPackagesList[0]?.oneOffMinPrice,
+                              props.OneOffPricingInfo
+                                .packageOneDisCountedTotal,
                             )}
                           </>
                         )}{" "}
@@ -14159,6 +14223,12 @@ const ReviewPackagesComponent = (props) => {
                                         props.OneOffPricingInfo
                                           .DiscountPercentagePackageOne,
                                       )}
+                                      {getPackageMinPriceValidationMessage(
+                                        props.selectedPackagesList[0]
+                                          ?.oneOffMinPrice,
+                                        props.OneOffPricingInfo
+                                          .packageOneDisCountedTotal,
+                                      )}
                                     </div>
                                   </div>
                                 </td>
@@ -14203,6 +14273,12 @@ const ReviewPackagesComponent = (props) => {
                                             .maxDiscountForQC,
                                           props.OneOffPricingInfo
                                             .DiscountPercentagePackageTwo,
+                                        )}
+                                        {getPackageMinPriceValidationMessage(
+                                          props.selectedPackagesList[1]
+                                            ?.oneOffMinPrice,
+                                          props.OneOffPricingInfo
+                                            .packageTwoDisCountedTotal,
                                         )}
                                       </div>
                                     </div>
@@ -14249,6 +14325,12 @@ const ReviewPackagesComponent = (props) => {
                                             .maxDiscountForQC,
                                           props.OneOffPricingInfo
                                             .DiscountPercentagePackageThree,
+                                        )}
+                                        {getPackageMinPriceValidationMessage(
+                                          props.selectedPackagesList[2]
+                                            ?.oneOffMinPrice,
+                                          props.OneOffPricingInfo
+                                            .packageThreeDisCountedTotal,
                                         )}
                                       </div>
                                     </div>
@@ -15539,6 +15621,12 @@ const ReviewPackagesComponent = (props) => {
                                         props.OneOffPricingInfo
                                           .DiscountPercentagePackageOne,
                                       )}
+                                      {getPackageMinPriceValidationMessage(
+                                        props.selectedPackagesList[0]
+                                          ?.oneOffMinPrice,
+                                        props.OneOffPricingInfo
+                                          .packageOneDisCountedTotal,
+                                      )}
                                     </div>
                                   </div>
                                 </td>
@@ -15598,6 +15686,12 @@ const ReviewPackagesComponent = (props) => {
                                               .maxDiscountForQC,
                                             props.OneOffPricingInfo
                                               .DiscountPercentagePackageTwo,
+                                          )}
+                                          {getPackageMinPriceValidationMessage(
+                                            props.selectedPackagesList[1]
+                                              ?.oneOffMinPrice,
+                                            props.OneOffPricingInfo
+                                              .packageTwoDisCountedTotal,
                                           )}
                                         </div>
                                       </div>
@@ -15660,6 +15754,12 @@ const ReviewPackagesComponent = (props) => {
                                               .maxDiscountForQC,
                                             props.OneOffPricingInfo
                                               .DiscountPercentagePackageThree,
+                                          )}
+                                          {getPackageMinPriceValidationMessage(
+                                            props.selectedPackagesList[2]
+                                              ?.oneOffMinPrice,
+                                            props.OneOffPricingInfo
+                                              .packageThreeDisCountedTotal,
                                           )}
                                         </div>
                                       </div>
@@ -21764,6 +21864,32 @@ const Add_Update_Proposal = (props) => {
       ) {
         return true;
       }
+
+      // Discount cannot bring a package's price below its configured recurring min price
+      const packages = selectedPackagesList || [];
+      const packageOneMinPrice = Number(packages[0]?.recurringMinPrice);
+      const packageTwoMinPrice = Number(packages[1]?.recurringMinPrice);
+      const packageThreeMinPrice = Number(packages[2]?.recurringMinPrice);
+
+      if (
+        (packages[0] &&
+          !isNaN(packageOneMinPrice) &&
+          packageOneMinPrice > 0 &&
+          Number(RecurringPricingInfo.packageOneDisCountedTotal) <
+            packageOneMinPrice) ||
+        (packages[1] &&
+          !isNaN(packageTwoMinPrice) &&
+          packageTwoMinPrice > 0 &&
+          Number(RecurringPricingInfo.packageTwoDisCountedTotal) <
+            packageTwoMinPrice) ||
+        (packages[2] &&
+          !isNaN(packageThreeMinPrice) &&
+          packageThreeMinPrice > 0 &&
+          Number(RecurringPricingInfo.packageThreeDisCountedTotal) <
+            packageThreeMinPrice)
+      ) {
+        return true;
+      }
     }
 
     // All validations passed
@@ -21868,6 +21994,32 @@ const Add_Update_Proposal = (props) => {
           DiscountPercentagePackageTwo > 100 ||
           DiscountPercentagePackageThree < -999.0 ||
           DiscountPercentagePackageThree > 100)
+      ) {
+        return true;
+      }
+
+      // Discount cannot bring a package's price below its configured one-off min price
+      const packages = selectedPackagesList || [];
+      const packageOneMinPrice = Number(packages[0]?.oneOffMinPrice);
+      const packageTwoMinPrice = Number(packages[1]?.oneOffMinPrice);
+      const packageThreeMinPrice = Number(packages[2]?.oneOffMinPrice);
+
+      if (
+        (packages[0] &&
+          !isNaN(packageOneMinPrice) &&
+          packageOneMinPrice > 0 &&
+          Number(OneOffPricingInfo.packageOneDisCountedTotal) <
+            packageOneMinPrice) ||
+        (packages[1] &&
+          !isNaN(packageTwoMinPrice) &&
+          packageTwoMinPrice > 0 &&
+          Number(OneOffPricingInfo.packageTwoDisCountedTotal) <
+            packageTwoMinPrice) ||
+        (packages[2] &&
+          !isNaN(packageThreeMinPrice) &&
+          packageThreeMinPrice > 0 &&
+          Number(OneOffPricingInfo.packageThreeDisCountedTotal) <
+            packageThreeMinPrice)
       ) {
         return true;
       }
