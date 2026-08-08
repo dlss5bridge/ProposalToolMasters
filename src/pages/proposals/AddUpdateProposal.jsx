@@ -68,6 +68,7 @@ import ViewPlan from "../../components/ViewPlan";
 import ErrorModel from "../../components/ErrorModel";
 import { GetPaymentGatewayModel } from "../../redux/Services/Setting/PaymentGatewayApi";
 import RecordsAvailablePopupModel from "../../components/RecordsAvailablePopupModel";
+import AmendmentDiscountModal from "../../components/AmendmentDiscountModal";
 import EditableCell from "../../components/EditableCell";
 import Text_Editor from "../../components/Text_Editor";
 import EmailFailurePopUP from "../../components/EmailFailurePopUp";
@@ -16120,6 +16121,13 @@ const Add_Update_Proposal = (props) => {
     updateTemplateList,
   } = useContext(AuthContextProvider);
   const [openErrorModal, setOpenErrorModal] = useState(false);
+  const [showAmendmentDiscountModal, setShowAmendmentDiscountModal] =
+    useState(false);
+  const [amendmentDiscountValues, setAmendmentDiscountValues] = useState({
+    recurringDiscountPercentageForAmendment: "",
+    oneOffDiscountPercentageForAmendment: "",
+  });
+  const [pendingAmendmentSubmit, setPendingAmendmentSubmit] = useState(null);
   // const [updatePackage, setIsUpdatePackage] = useState(true);
   const [RecurringPackagesTable, setRecurringPackagesTable] = useState(null);
   const [OneOffPackagesTable, setOneOffPackagesTable] = useState(null);
@@ -22040,6 +22048,65 @@ const Add_Update_Proposal = (props) => {
     return false;
   }
 
+  // Sends the built quote payload to AddUpdateQuote, routing through the
+  // Engagement Letter template check first when applicable.
+  const submitQuoteRequest = async (paramsObj, statusId) => {
+    if (
+      ProposalObject.ProposalFormate === 1 &&
+      common.enableEL === 1 &&
+      statusId == 2
+    ) {
+      const AvailableTemplate = await TemplateAvailableData(
+        common.organisationKeyID,
+        ProposalObject.clientID,
+      );
+      if (AvailableTemplate.data?.statusCode == 200) {
+        const templateKeyID = AvailableTemplate.data.responseData.templateKeyID;
+        if (templateKeyID == null) {
+          setLoader(false);
+          setErrorMessage(
+            `No default template found.At least one ${EngagementName} template must be defaulted.`,
+          );
+          setOpenErrorModal(true);
+        } else {
+          setLoader(true);
+          AddUpdateQuat(paramsObj, statusId);
+        }
+      } else {
+        setLoader(false);
+      }
+    } else {
+      setLoader(true);
+      AddUpdateQuat(paramsObj, statusId);
+    }
+  };
+
+  const handleConfirmAmendmentDiscount = async () => {
+    if (!pendingAmendmentSubmit) return;
+    const updatedParams = {
+      ...pendingAmendmentSubmit.paramsObj,
+      recurringDiscountPercentageForAmendment: pendingAmendmentSubmit.showRecurring
+        ? amendmentDiscountValues.recurringDiscountPercentageForAmendment ||
+          null
+        : null,
+      oneOffDiscountPercentageForAmendment: pendingAmendmentSubmit.showOneOff
+        ? amendmentDiscountValues.oneOffDiscountPercentageForAmendment || null
+        : null,
+    };
+    setShowAmendmentDiscountModal(false);
+    setRequireMessage(false);
+    setLoader(true);
+    await submitQuoteRequest(updatedParams, pendingAmendmentSubmit.statusId);
+    setPendingAmendmentSubmit(null);
+    setTopbar("block");
+  };
+
+  const handleCancelAmendmentDiscount = () => {
+    setShowAmendmentDiscountModal(false);
+    setPendingAmendmentSubmit(null);
+    setLoader(false);
+  };
+
   // Handle Save As A Draft Proposal
   const handleSaveAsDraft = async (activeTab, moduleName, StatusId) => {
     let SelectedService = [];
@@ -22916,6 +22983,8 @@ const Add_Update_Proposal = (props) => {
       quoteFormatID: ProposalObject.ProposalFormate || null,
       webProposalTypeID: ProposalObject.webProposalTypeID || null,
       globalPricingDriverID: ProposalObject.globalPricingDriverID || [],
+      recurringDiscountPercentageForAmendment: null,
+      oneOffDiscountPercentageForAmendment: null,
       recurringHtmlContent: ProposalObject.recurringHtmlContent || null,
       oneOffHtmlContent: ProposalObject.oneOffHtmlContent || null,
       customizedEmailContent: ProposalObject.customizedEmailContent || null,
@@ -22933,40 +23002,43 @@ const Add_Update_Proposal = (props) => {
         quoteAdditionalServicesInPackages.selectedServicesList,
       ServiceMappingWithPackagesList: ServiceMappingWithPackagesList,
     };
+
+    // Proposal Amendment proposals need an explicit amendment discount
+    // entered before submitting, whenever a discount was applied to the
+    // recurring and/or one-off services actually selected on this proposal.
+    const hasRecurringDiscountForAmendment =
+      ApiRequest_ParamsObj.recurringDiscountPercentage !== null &&
+      Number(ApiRequest_ParamsObj.recurringDiscountPercentage) !== 0;
+    const hasOneOffDiscountForAmendment =
+      ApiRequest_ParamsObj.oneOffDiscountPercentage !== null &&
+      Number(ApiRequest_ParamsObj.oneOffDiscountPercentage) !== 0;
+
+    if (
+      StatusId === 2 &&
+      ProposalObject.ProposalFormate === 3 &&
+      ProposalObject.webProposalTypeID === 3 &&
+      (hasRecurringDiscountForAmendment || hasOneOffDiscountForAmendment)
+    ) {
+      setPendingAmendmentSubmit({
+        paramsObj: ApiRequest_ParamsObj,
+        statusId: StatusId,
+        showRecurring: hasRecurringDiscountForAmendment,
+        showOneOff: hasOneOffDiscountForAmendment,
+      });
+      setAmendmentDiscountValues({
+        recurringDiscountPercentageForAmendment: "",
+        oneOffDiscountPercentageForAmendment: "",
+      });
+      setShowAmendmentDiscountModal(true);
+      setLoader(false);
+      return;
+    }
+
     setRequireMessage(false);
     console.log(ApiRequest_ParamsObj, "ApiRequest_ParamsObj");
 
     setLoader(true);
-
-    if (
-      ProposalObject.ProposalFormate === 1 &&
-      common.enableEL === 1 &&
-      StatusId == 2
-    ) {
-      const AvailableTemplate = await TemplateAvailableData(
-        common.organisationKeyID,
-        ProposalObject.clientID,
-      );
-      if (AvailableTemplate.data?.statusCode == 200) {
-        const TemplateID = AvailableTemplate.data.totalCount;
-        const templateKeyID = AvailableTemplate.data.responseData.templateKeyID;
-        if (templateKeyID == null) {
-          setLoader(false);
-          setErrorMessage(
-            `No default template found.At least one ${EngagementName} template must be defaulted.`,
-          );
-          setOpenErrorModal(true);
-        } else {
-          setLoader(true);
-          AddUpdateQuat(ApiRequest_ParamsObj, StatusId);
-        }
-      } else {
-        setLoader(false);
-      }
-    } else {
-      setLoader(true);
-      AddUpdateQuat(ApiRequest_ParamsObj, StatusId);
-    }
+    await submitQuoteRequest(ApiRequest_ParamsObj, StatusId);
     setTopbar("block");
   };
 
@@ -25578,6 +25650,31 @@ const Add_Update_Proposal = (props) => {
           openErrorModal={openErrorModal}
           openSuccessModal={openSuccessModal}
           modelRequestData={modelRequestData}
+        />
+        <AmendmentDiscountModal
+          open={showAmendmentDiscountModal}
+          handleClose={handleCancelAmendmentDiscount}
+          handleConfirm={handleConfirmAmendmentDiscount}
+          showRecurring={pendingAmendmentSubmit?.showRecurring}
+          showOneOff={pendingAmendmentSubmit?.showOneOff}
+          recurringDiscountPercentageForAmendment={
+            amendmentDiscountValues.recurringDiscountPercentageForAmendment
+          }
+          oneOffDiscountPercentageForAmendment={
+            amendmentDiscountValues.oneOffDiscountPercentageForAmendment
+          }
+          onRecurringChange={(value) =>
+            setAmendmentDiscountValues((prev) => ({
+              ...prev,
+              recurringDiscountPercentageForAmendment: value,
+            }))
+          }
+          onOneOffChange={(value) =>
+            setAmendmentDiscountValues((prev) => ({
+              ...prev,
+              oneOffDiscountPercentageForAmendment: value,
+            }))
+          }
         />
         <SuccessModal
           handleClose={handleClose}
