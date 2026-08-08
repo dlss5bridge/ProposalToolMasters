@@ -189,6 +189,12 @@ export default function PreviewComponentPdf(props) {
     props.setProposalObject({
       ...props.ProposalObject,
       ProposalFormate: selectedOption.value,
+      webProposalTypeID:
+        selectedOption.value === 3 ? props.ProposalObject.webProposalTypeID : null,
+      globalPricingDriverID:
+        selectedOption.value === 3
+          ? props.ProposalObject.globalPricingDriverID
+          : [],
     });
     props.setRequireMessage(false);
   };
@@ -12184,8 +12190,9 @@ ${
               </>
             )}
 
-            {(props.ProposalObject?.webProposalTypeID == 2 ||
-              props.ProposalObject?.webProposalTypeID == 3) && (
+            {props.ProposalObject?.ProposalFormate === 3 &&
+              (props.ProposalObject?.webProposalTypeID == 2 ||
+                props.ProposalObject?.webProposalTypeID == 3) && (
               <>
                 {/* Global Variables Label */}
                 <div className="col-lg-2 col-md-2 col-sm-6 d-flex align-items-center mt-4">
