@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProposalFooter from "../layout/ProposalFooter";
 import ProposalHeader from "../layout/ProposalHeader";
@@ -37,7 +38,7 @@ import {
   getInputFieldsFieldErrors,
   setInputFieldsValidationVisible,
 } from "../../../redux/reducer/webProposal/inputFields";
-import { Services } from "../steps/ProposalServicesStep/data/data";
+import { QUOTE_TYPE_ID } from "../../../Middleware/enums";
 
 export default function ProposalAmendment({ theme, proposal, services }) {
   const dispatch = useDispatch();
@@ -52,33 +53,49 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   );
   const inputFieldsList = useSelector(selectInputFieldsList);
 
+  // Package proposals ship with the admin's fixed default services and give
+  // the client no service picker at all — the Services step is dropped from
+  // the stepper entirely (see isPackageType below).
+  const isPackageType = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
+
+  // Package proposals still show Additional Information (read-only — see
+  // readOnly prop below) even though Services is skipped entirely, so the
+  // client can see the values their pricing is based on.
+  const additionalInfoStepInserted = hasAdditionalInformation;
+
   // Base step order is fixed, so the final index of any step can be derived
   // up front from its position here plus whether Additional Information gets
   // spliced in after Services — needed below to tell the Pricing Table step
   // when it becomes the active step.
-  const BASE_STEP_LABELS = [
-    "Proposal",
-    "Services",
-    "Pricing Table",
-    "Input Fields",
-  ];
+  const BASE_STEP_LABELS = isPackageType
+    ? ["Proposal", "Pricing Table", "Input Fields"]
+    : ["Proposal", "Services", "Pricing Table", "Input Fields"];
   const SERVICES_STEP_INDEX = BASE_STEP_LABELS.indexOf("Services");
+  // Additional Information normally follows Services; Package proposals have
+  // no Services step, so it slots in right after Proposal instead.
+  const ADDITIONAL_INFO_INSERT_INDEX = isPackageType
+    ? 1
+    : SERVICES_STEP_INDEX + 1;
   const PRICING_STEP_INDEX =
     BASE_STEP_LABELS.indexOf("Pricing Table") +
-    (hasAdditionalInformation ? 1 : 0);
+    (additionalInfoStepInserted ? 1 : 0);
   const INPUT_FIELDS_STEP_INDEX =
     BASE_STEP_LABELS.indexOf("Input Fields") +
-    (hasAdditionalInformation ? 1 : 0);
+    (additionalInfoStepInserted ? 1 : 0);
 
   // Single source of truth pairing each step's label with its component, so
   // the two can never drift out of sync (steps not yet built get a `null`
   // component but still reserve their place in the flow).
   const baseSteps = [
     { label: "Proposal", component: <ProposalPdfStep theme={theme} /> },
-    {
-      label: "Services",
-      component: <ProposalServicesStep theme={theme} Services={Services} />,
-    },
+    ...(isPackageType
+      ? []
+      : [
+          {
+            label: "Services",
+            component: <ProposalServicesStep theme={theme} />,
+          },
+        ]),
     {
       label: "Pricing Table",
       component: (
@@ -99,21 +116,52 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       : []),
   ];
 
-  const steps = hasAdditionalInformation
+  const steps = additionalInfoStepInserted
     ? [
-        ...baseSteps.slice(0, SERVICES_STEP_INDEX + 1),
+        ...baseSteps.slice(0, ADDITIONAL_INFO_INSERT_INDEX),
         {
           label: "Additional Information",
-          component: <ProposalAdditionalInformationStep theme={theme} />,
+          component: (
+            <ProposalAdditionalInformationStep
+              theme={theme}
+              readOnly={isPackageType}
+            />
+          ),
         },
-        ...baseSteps.slice(SERVICES_STEP_INDEX + 1),
+        ...baseSteps.slice(ADDITIONAL_INFO_INSERT_INDEX),
       ]
     : baseSteps;
 
   const stepLabels = steps.map((step) => step.label);
   const stepComponents = steps.map((step) => step.component);
 
-  const ADDITIONAL_INFO_STEP_INDEX = SERVICES_STEP_INDEX + 1;
+  const ADDITIONAL_INFO_STEP_INDEX = ADDITIONAL_INFO_INSERT_INDEX;
+
+  // For every other proposal type this fetch happens when the client clicks
+  // Next out of the Services step (see the SERVICES_STEP_INDEX branch of
+  // handleBeforeNextStep below). Package proposals have no Services step to
+  // leave, so without this neither the (read-only) Additional Information
+  // step nor the Pricing Table would ever learn a selected service's global
+  // pricing driver value — those services would reach
+  // GetCalculatedServicesPriceByPackages with no driver row at all and come
+  // back unpriced.
+  const additionalInfoFetchedRef = useRef(false);
+  useEffect(() => {
+    if (!isPackageType) return;
+    if (additionalInfoFetchedRef.current) return;
+    if (!quoteModel?.quoteKeyID || selectedServiceIDs.length === 0) return;
+
+    additionalInfoFetchedRef.current = true;
+    dispatch(
+      getAdditionalInformationList({
+        organisationKeyID: quoteModel?.organisationKeyID,
+        userKeyID: quoteModel?.userKeyID,
+        quoteKeyID: quoteModel?.quoteKeyID,
+        clientID: quoteModel?.clientID,
+        servicesIDs: selectedServiceIDs,
+      }),
+    );
+  }, [isPackageType, quoteModel, selectedServiceIDs, dispatch]);
 
   const handleBeforeNextStep = async (currentStepIndex) => {
     if (hasInputFields && currentStepIndex === INPUT_FIELDS_STEP_INDEX) {
@@ -133,6 +181,11 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       hasAdditionalInformation &&
       currentStepIndex === ADDITIONAL_INFO_STEP_INDEX
     ) {
+      // Package proposals show this step read-only (see readOnly prop above)
+      // — the client has no way to fix a missing/invalid field, so don't
+      // block them on one.
+      if (isPackageType) return true;
+
       const fieldErrors = getAdditionalInformationFieldErrors(
         additionalInformationList,
       );
@@ -237,6 +290,17 @@ export default function ProposalAmendment({ theme, proposal, services }) {
             backgroundColor: theme.background,
           }}
         >
+          {/* Package proposals skip the Services step entirely (no service
+              picker is ever shown), but the Pricing Table still needs the
+              admin's default selections hydrated into redux — so the step
+              stays mounted here, permanently hidden, purely to run its
+              data-fetch/hydration effects in the background. */}
+          {isPackageType && (
+            <div className="hidden">
+              <ProposalServicesStep theme={theme} />
+            </div>
+          )}
+
           {stepComponents.map((component, index) => (
             <div
               key={index}

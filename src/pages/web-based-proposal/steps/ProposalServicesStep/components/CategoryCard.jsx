@@ -44,11 +44,20 @@ const CategoryCard = ({
         <div className="pss-category-body">
           {category.servicesList.map((service) => {
             const isSelected = Boolean(selections[service.serviceID]);
-            const disabledReason = service.isDisabled
-              ? "Unavailable"
-              : crossSelections[service.serviceID]
-                ? `Already selected in ${crossLabel}`
-                : null;
+            const isLocked = Boolean(selections[service.serviceID]?.locked);
+            // isLocked is checked first: the backend may also flag an
+            // admin-selected default service as isDisabled (e.g. to keep it
+            // out of the catalog's own toggle logic), but the client-facing
+            // message should always explain *why* — that it's part of the
+            // package by default — rather than the generic "Unavailable"
+            // that's meant for services not offered at all.
+            const disabledReason = isLocked
+              ? "Included by default"
+              : service.isDisabled
+                ? "Unavailable"
+                : crossSelections[service.serviceID]
+                  ? `Already selected in ${crossLabel}`
+                  : null;
 
             return (
               <ServiceRow

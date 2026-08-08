@@ -24,6 +24,7 @@ const additionalInformationSlice = createSlice({
     },
     clearAdditionalInformationList(state) {
       state.list = [];
+      state.defaultList = [];
       state.listError = null;
       state.validationVisible = false;
     },
@@ -37,6 +38,7 @@ const additionalInformationSlice = createSlice({
       .addCase(getAdditionalInformationList.fulfilled, (state, action) => {
         state.listLoading = false;
         state.list = action.payload;
+        state.defaultList = action.payload;
       })
       .addCase(getAdditionalInformationList.rejected, (state, action) => {
         state.listLoading = false;

@@ -11,7 +11,14 @@ const SERVICE_CHARGE_TYPE_ID = {
 // no redux/local-storage auth state), so all identity values are sourced
 // from the GetQuoteModel API response (webProposal.quoteModel) instead.
 const buildServicesPayload = (
-  { organisationKeyID, userKeyID, quoteKeyID, clientID, quoteTypeID },
+  {
+    organisationKeyID,
+    userKeyID,
+    quoteKeyID,
+    clientID,
+    quoteTypeID,
+    servicePackageIDs,
+  },
   serviceChargeTypeID,
 ) => ({
   organisationKeyID,
@@ -24,7 +31,7 @@ const buildServicesPayload = (
   ProfessionTypeIDs: null,
   BusinessTypeIDs: null,
   BusinessNatureIDs: null,
-  ServicePackageIDs: [],
+  ServicePackageIDs: servicePackageIDs || [],
   QuoteKeyID: null,
   SourceID: null,
 });

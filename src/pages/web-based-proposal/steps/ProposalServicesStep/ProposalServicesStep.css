@@ -608,6 +608,12 @@
   color: #6b7280;
 }
 
+.pss-sidebar-item-locked {
+  cursor: default;
+  opacity: 1;
+  color: #9ca3af;
+}
+
 .pss-sidebar-item-drivers {
   margin: 0.25rem 0 0;
   padding: 0;

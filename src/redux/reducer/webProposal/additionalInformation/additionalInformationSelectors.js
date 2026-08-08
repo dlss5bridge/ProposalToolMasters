@@ -3,6 +3,9 @@ import { getVisibleAdditionalInformationItems } from "./validateAdditionalInform
 export const selectAdditionalInformationList = (state) =>
   state.webProposalAdditionalInformation.list;
 
+export const selectDefaultAdditionalInformationList = (state) =>
+  state.webProposalAdditionalInformation.defaultList;
+
 export const selectAdditionalInformationListLoading = (state) =>
   state.webProposalAdditionalInformation.listLoading;
 

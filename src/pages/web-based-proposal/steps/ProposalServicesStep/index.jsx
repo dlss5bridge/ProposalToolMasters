@@ -33,6 +33,7 @@ import {
 } from "../../../../redux/reducer/webProposal/services";
 import "./ProposalServicesStep.css";
 import { selectQuoteModel } from "../../../../redux/reducer/webProposal";
+import { QUOTE_TYPE_ID } from "../../../../Middleware/enums";
 
 const buildInitialDriverValues = (service) => {
   const values = {};
@@ -73,8 +74,14 @@ const buildInitialDriverValues = (service) => {
 const ServiceSelectionComponent = ({ theme }) => {
   const dispatch = useDispatch();
 
-  const { userKeyID, organisationKeyID, quoteKeyID, clientID, quoteTypeID } =
-    useSelector(selectQuoteModel) || {};
+  const {
+    userKeyID,
+    organisationKeyID,
+    quoteKeyID,
+    clientID,
+    quoteTypeID,
+    servicePackageID,
+  } = useSelector(selectQuoteModel) || {};
 
   const recurringServices = useSelector(selectRecurringServices);
   const recurringServicesLoading = useSelector(selectRecurringServicesLoading);
@@ -86,6 +93,11 @@ const ServiceSelectionComponent = ({ theme }) => {
 
   const selectionError = useSelector(selectServicesSelectionError);
   const fieldErrorsVisible = useSelector(selectServicesFieldErrorsVisible);
+
+  // Custom Package proposals start from the admin's default service picks,
+  // which the client can add to but not remove — Package/Service proposals
+  // have no such restriction.
+  const isCustomPackage = quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
 
   const [recurringSelections, setRecurringSelections] = useState({});
   const [oneOffSelections, setOneOffSelections] = useState({});
@@ -116,6 +128,7 @@ const ServiceSelectionComponent = ({ theme }) => {
       quoteKeyID,
       clientID,
       quoteTypeID,
+      servicePackageIDs: servicePackageID || [],
     };
 
     dispatch(getRecurringServices(quoteIdentity));
@@ -127,6 +140,7 @@ const ServiceSelectionComponent = ({ theme }) => {
     quoteKeyID,
     clientID,
     quoteTypeID,
+    servicePackageID,
   ]);
 
   useEffect(() => {
@@ -140,12 +154,28 @@ const ServiceSelectionComponent = ({ theme }) => {
       nextOrder,
     } = buildSelectionsFromQuoteModel(recurringServices, oneOffServices);
 
-    setRecurringSelections(hydratedRecurring);
-    setOneOffSelections(hydratedOneOff);
+    // Mark the admin's default picks as locked so toggleService/removeSelection
+    // can refuse to remove them, while anything the client adds afterwards
+    // (never going through this hydration path) stays removable.
+    const lockIfCustomPackage = (selections) =>
+      isCustomPackage
+        ? Object.fromEntries(
+            Object.entries(selections).map(([serviceID, selection]) => [
+              serviceID,
+              { ...selection, locked: true },
+            ]),
+          )
+        : selections;
+
+    const lockedRecurring = lockIfCustomPackage(hydratedRecurring);
+    const lockedOneOff = lockIfCustomPackage(hydratedOneOff);
+
+    setRecurringSelections(lockedRecurring);
+    setOneOffSelections(lockedOneOff);
     dispatch(
       setDefaultServiceSelections({
-        recurringSelections: hydratedRecurring,
-        oneOffSelections: hydratedOneOff,
+        recurringSelections: lockedRecurring,
+        oneOffSelections: lockedOneOff,
       }),
     );
     orderRef.current = nextOrder;
@@ -179,6 +209,7 @@ const ServiceSelectionComponent = ({ theme }) => {
     oneOffServices,
     recurringServicesLoading,
     oneOffServicesLoading,
+    isCustomPackage,
   ]);
 
   const toggleService = (listType, category, service) => {
@@ -186,11 +217,16 @@ const ServiceSelectionComponent = ({ theme }) => {
       listType === "recurring" ? setRecurringSelections : setOneOffSelections;
 
     setSelections((prev) => {
-      const next = { ...prev };
-      if (next[service.serviceID]) {
+      if (prev[service.serviceID]) {
+        if (prev[service.serviceID].locked) return prev;
+        const next = { ...prev };
         delete next[service.serviceID];
-      } else {
-        next[service.serviceID] = {
+        return next;
+      }
+
+      return {
+        ...prev,
+        [service.serviceID]: {
           listType,
           serviceID: service.serviceID,
           serviceName: service.serviceName,
@@ -198,9 +234,8 @@ const ServiceSelectionComponent = ({ theme }) => {
           serviceCatID: category.serviceCatID,
           driverValues: buildInitialDriverValues(service),
           order: orderRef.current++,
-        };
-      }
-      return next;
+        },
+      };
     });
   };
 
@@ -236,6 +271,7 @@ const ServiceSelectionComponent = ({ theme }) => {
       listType === "recurring" ? setRecurringSelections : setOneOffSelections;
 
     setSelections((prev) => {
+      if (prev[serviceID]?.locked) return prev;
       const next = { ...prev };
       delete next[serviceID];
       return next;

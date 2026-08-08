@@ -117,3 +117,33 @@ export const buildAdditionalInformationDriverEntries = (list) =>
 
       return base;
     });
+
+// Whether the price-relevant part of the Additional Information list has
+// changed since it was fetched — i.e. the same comparison
+// ProposalPricingTableStep's selectionsMatch does for per-service driver
+// values, but for the separate global-pricing-driver list. Compares the
+// *resolved* driverValue (via buildAdditionalInformationDriverEntries)
+// rather than the raw list, so an edit only counts as a change if it
+// actually affects price (e.g. re-selecting the same variation doesn't).
+export const additionalInformationEntriesMatch = (listA, listB) => {
+  const normalize = (list) =>
+    JSON.stringify(
+      buildAdditionalInformationDriverEntries(list)
+        .map((entry) => ({
+          serviceID: entry.serviceID,
+          globalPricingDriverID: entry.globalPricingDriverID,
+          driverValue: entry.driverValue,
+          variationID: entry.variationID,
+          slabID: entry.slabID,
+          textID: entry.textID,
+          dateID: entry.dateID,
+        }))
+        .sort((a, b) =>
+          `${a.serviceID}_${a.globalPricingDriverID}`.localeCompare(
+            `${b.serviceID}_${b.globalPricingDriverID}`,
+          ),
+        ),
+    );
+
+  return normalize(listA) === normalize(listB);
+};

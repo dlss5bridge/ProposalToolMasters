@@ -24,7 +24,10 @@ const updateItem = (list, globalPricingDriverID, patch) =>
 // web-proposal steps (see ProposalInputFieldsStep).
 const FIELD_MAX_WIDTH = 420;
 
-export default function ProposalAdditionalInformationStep({ theme }) {
+export default function ProposalAdditionalInformationStep({
+  theme,
+  readOnly = false,
+}) {
   const dispatch = useDispatch();
   const additionalInformationList = useSelector(
     selectAdditionalInformationList,
@@ -43,6 +46,7 @@ export default function ProposalAdditionalInformationStep({ theme }) {
   );
 
   const handleChange = (globalPricingDriverID, patch) => {
+    if (readOnly) return;
     dispatch(
       setAdditionalInformationList(
         updateItem(additionalInformationList, globalPricingDriverID, patch),
@@ -54,7 +58,7 @@ export default function ProposalAdditionalInformationStep({ theme }) {
     const hasError = Boolean(errorMessage);
     const inputClassName = `w-full rounded-lg border px-3 py-2 text-sm${
       hasError ? " border-red-500" : ""
-    }`;
+    }${readOnly ? " cursor-not-allowed opacity-60" : ""}`;
     const inputStyle = { borderColor: hasError ? "#dc2626" : theme.border };
 
     if (item.driverTypeID === 2) {
@@ -66,6 +70,7 @@ export default function ProposalAdditionalInformationStep({ theme }) {
           value={item.driverValue ?? ""}
           min={quantity?.quantityFrom ?? undefined}
           max={quantity?.quantityTo ?? undefined}
+          disabled={readOnly}
           onChange={(e) =>
             handleChange(item.globalPricingDriverID, {
               driverValue: e.target.value,
@@ -94,6 +99,7 @@ export default function ProposalAdditionalInformationStep({ theme }) {
         <Select
           options={options}
           value={selected}
+          isDisabled={readOnly}
           onChange={(option) => {
             handleChange(item.globalPricingDriverID, {
               driverValue: option?.value ?? null,
@@ -120,6 +126,7 @@ export default function ProposalAdditionalInformationStep({ theme }) {
           type="text"
           value={item.enteredText ?? ""}
           maxLength={textBlock.textLength || 100}
+          disabled={readOnly}
           onChange={(e) =>
             handleChange(item.globalPricingDriverID, {
               enteredText: e.target.value,
@@ -137,6 +144,7 @@ export default function ProposalAdditionalInformationStep({ theme }) {
         <input
           type="date"
           value={item.enteredDate ?? ""}
+          disabled={readOnly}
           onChange={(e) =>
             handleChange(item.globalPricingDriverID, {
               enteredDate: e.target.value,
@@ -190,7 +198,9 @@ export default function ProposalAdditionalInformationStep({ theme }) {
             <Typography
               sx={{ mt: 0.5, fontSize: 14, color: theme.textSecondary }}
             >
-              Provide the additional details required for the selected services.
+              {readOnly
+                ? "These values were set when your proposal was prepared and can't be changed."
+                : "Provide the additional details required for the selected services."}
             </Typography>
           </div>
 
@@ -214,9 +224,11 @@ export default function ProposalAdditionalInformationStep({ theme }) {
                     }}
                   >
                     {item.driverName}
-                    <Box component="span" sx={{ color: "#dc2626", ml: 0.25 }}>
-                      *
-                    </Box>
+                    {!readOnly && (
+                      <Box component="span" sx={{ color: "#dc2626", ml: 0.25 }}>
+                        *
+                      </Box>
+                    )}
                   </Typography>
 
                   {renderField(item, errorMessage)}

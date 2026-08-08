@@ -244,6 +244,17 @@ export const servicePackageTypeID = {
   OneOffPackageTypeID: 4,
 };
 
+// Mirrors AddUpdateProposal.jsx's selectedProposalTypeValue / quoteTypeID:
+// 1 = Packaged (Customizable) - a fixed set of default services the admin
+// picked, but the client can still add more; 2 = Packaged (Standard) - the
+// admin's package as-is, no client customization; 3 = Custom (Single) - a
+// fully open service selection (the original web-proposal flow).
+export const QUOTE_TYPE_ID = {
+  CustomPackage: 1,
+  Package: 2,
+  Service: 3,
+};
+
 export const VATUpdateTypeID = {
   UpdateAllVAT: 1,
   UpdateDefaultVATOnly: 2,

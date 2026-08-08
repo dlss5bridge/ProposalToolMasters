@@ -10,6 +10,7 @@ export {
 
 export {
   selectAdditionalInformationList,
+  selectDefaultAdditionalInformationList,
   selectAdditionalInformationListLoading,
   selectAdditionalInformationListError,
   selectHasAdditionalInformation,
@@ -21,6 +22,9 @@ export {
   getVisibleAdditionalInformationItems,
 } from "./validateAdditionalInformation";
 
-export { buildAdditionalInformationDriverEntries } from "./additionalInformationPricing";
+export {
+  buildAdditionalInformationDriverEntries,
+  additionalInformationEntriesMatch,
+} from "./additionalInformationPricing";
 
 export default reducer;

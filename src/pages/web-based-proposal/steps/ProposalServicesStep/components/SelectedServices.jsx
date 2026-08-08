@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ClipboardList, RotateCw, FileStack, X } from "lucide-react";
+import { ClipboardList, RotateCw, FileStack, X, Lock } from "lucide-react";
 
 const PREVIEW_LIMIT = 5;
 
@@ -29,13 +29,22 @@ const SelectedGroup = ({ label, icon: Icon, items, onRemove }) => {
                 <p className="pss-sidebar-item-name">{item.serviceName}</p>
                 <p className="pss-sidebar-item-category">{item.categoryName}</p>
               </div>
-              <button
-                type="button"
-                onClick={() => onRemove(item.listType, item.serviceID)}
-                className="pss-sidebar-item-remove"
-              >
-                <X size={13} />
-              </button>
+              {item.locked ? (
+                <span
+                  className="pss-sidebar-item-remove pss-sidebar-item-locked"
+                  title="Included by default"
+                >
+                  <Lock size={13} />
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onRemove(item.listType, item.serviceID)}
+                  className="pss-sidebar-item-remove"
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
 
             {getDriverSummary(item.driverValues).length > 0 && (
