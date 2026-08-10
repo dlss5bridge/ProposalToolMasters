@@ -382,7 +382,13 @@ const PricingTableTemplatesModal = ({
 
   const customRecurringFooter = calculateCustomRecurringFooter({
     serviceGroups: selectedRecurringServiceList,
+
+    originalPrice: RecurringPricingInfo.OriginalPrice,
+
     discountedPrice: RecurringPricingInfo.DiscountedPrice,
+
+    discountPercentage: RecurringPricingInfo.DefaultDiscount,
+
     fallbackVatPercentage: vatPercentage,
   });
 
@@ -9645,21 +9651,27 @@ const PricingTableTemplatesModal = ({
                   {visibleFieldsCustomTemp?.serviceCategory && <td></td>}
                   {visibleFieldsCustomTemp.fees && (
                     <td className="tr-table-class text-white text-center">
-                      {formatValue(customRecurringFooter.netFees, currencyID)}
+                      {formatValue(
+                        customRecurringFooter.displayNetFees,
+                        currencyID,
+                      )}
                     </td>
                   )}
                   {vatPercentage !== null &&
                     visibleFieldsCustomTemp.vatRate && <td></td>}
                   {vatPercentage !== null && visibleFieldsCustomTemp.vat && (
                     <td className="tr-table-class text-white text-right">
-                      {formatValue(customRecurringFooter.netVat, currencyID)}
+                      {formatValue(
+                        customRecurringFooter.displayNetVat,
+                        currencyID,
+                      )}
                     </td>
                   )}
                   {vatPercentage !== null &&
                     visibleFieldsCustomTemp.feesIncVat && (
                       <td className="tr-table-class text-white text-right">
                         {formatValue(
-                          customRecurringFooter.netFeesIncVat,
+                          customRecurringFooter.displayNetFeesIncVat,
                           currencyID,
                         )}
                       </td>

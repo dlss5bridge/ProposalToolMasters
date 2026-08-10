@@ -457,30 +457,92 @@ function AcceptInvitation() {
     const netTotal = Number(totals?.netTotal) || 0;
     const discounted = Number(totals?.discounted) || 0;
     const discountedTotal = Number(totals?.discountedTotal) || 0;
-    const vatDiscounted = Number(totals?.vat) || 0; // API returns discount-adjusted VAT
+    const vatDiscounted = Number(totals?.vat) || 0;
     const grandTotal = Number(totals?.grandTotal) || 0;
 
-    const discountApplies = discounted > 0;
+    console.log("CUSTOM RECURRING CONTRACT TOTALS", {
+      heading,
+      totals,
+
+      netTotal,
+      discounted,
+      discountedTotal,
+      vatDiscounted,
+      grandTotal,
+
+      discPct: Number(totals?.discountPercentageWithAllDecimal),
+
+      showDiscountLine: ShowDiscountLine,
+    });
+
+    const discPct = Number(totals?.discountPercentageWithAllDecimal) || 0;
+
+    const discountFactor = 1 - discPct / 100;
+
+    /*
+     * Positive discount:
+     *   1000 → 900
+     *
+     * Negative discount / price increase:
+     *   1000 → 2000
+     */
+    const hasPriceIncrease = discPct < 0 || discountedTotal > netTotal;
+
+    const hasPositiveDiscount =
+      !hasPriceIncrease && (discPct > 0 || discounted > 0);
+
     const showDiscountLines = !!ShowDiscountLine;
 
-    // Derive pre-discount VAT (static VAT) from discount % when available.
-    // This matches how template-6 email tables show Net Total VAT as pre-discount VAT,
-    // and Discount VAT as the difference.
-    const discPct = Number(totals?.discountPercentageWithAllDecimal) || 0;
-    const discountFactor = 1 - discPct / 100;
+    /*
+     * totals.vat contains VAT calculated on the final
+     * discounted / increased amount.
+     *
+     * Recover original VAT when a percentage exists.
+     */
     const vatStatic =
-      discountApplies && discPct > 0 && discountFactor > 0
+      discPct !== 0 && discountFactor > 0
         ? vatDiscounted / discountFactor
         : vatDiscounted;
+
     const vatDiscount = vatStatic - vatDiscounted;
 
-    // Net Total row: if we hide discount lines, show discounted totals directly (same behavior as email tables).
-    const netFeesToShow =
-      discountApplies && !showDiscountLines ? discountedTotal : netTotal;
-    const netVatToShow =
-      discountApplies && !showDiscountLines ? vatDiscounted : vatStatic;
+    /*
+     * Same behaviour as the custom recurring table:
+     *
+     * Positive discount + discount lines:
+     *   Net Total = original
+     *
+     * Positive discount + hidden discount lines:
+     *   Net Total = discounted
+     *
+     * Negative discount:
+     *   Net Total = increased final amount
+     */
+    const netFeesToShow = hasPriceIncrease
+      ? discountedTotal
+      : hasPositiveDiscount && !showDiscountLines
+        ? discountedTotal
+        : netTotal;
+
+    const netVatToShow = hasPriceIncrease
+      ? vatDiscounted
+      : hasPositiveDiscount && !showDiscountLines
+        ? vatDiscounted
+        : vatStatic;
+
     const netFeesIncVatToShow =
       netFeesToShow + (isVatPresent ? netVatToShow : 0);
+
+    console.log("CUSTOM RECURRING CONTRACT DISPLAY", {
+      hasPriceIncrease,
+      hasPositiveDiscount,
+
+      netFeesToShow,
+      netVatToShow,
+      netFeesIncVatToShow,
+
+      isVatPresent,
+    });
 
     const footerRows = [
       // Net Total (always)
@@ -493,7 +555,7 @@ function AcceptInvitation() {
       }),
 
       // Discount row (only when discount applies and we show discount lines)
-      discountApplies && showDiscountLines
+      hasPositiveDiscount && showDiscountLines
         ? renderFooterRow("Discount", "#DCDCDC", {
             fees: `(-) ${formatValue(discounted, currencyID)}`,
             vat: isVatPresent
@@ -508,7 +570,7 @@ function AcceptInvitation() {
       // Final row after discount lines:
       // - VAT org: Grand Total
       // - Non-VAT org: Discounted Total
-      discountApplies && showDiscountLines
+      hasPositiveDiscount && showDiscountLines
         ? isVatPresent
           ? renderFooterRow("Grand Total", "#808080", {
               fees: formatValue(discountedTotal, currencyID),

@@ -483,6 +483,7 @@ const TopbarClone = () => {
               ? []
               : organisationData?.professionTypeLists,
           enableEL: organisationData?.enableEL,
+          currencyID: organisationData?.currencyID,
         }),
       );
 
@@ -968,6 +969,7 @@ const TopbarClone = () => {
               professionTypeLists: organisationData.professionTypeLists,
               organisationCount: OrganisationListData.length,
               enableEL: organisationData.enableEL,
+              currencyID: organisationData.currencyID,
             }),
           );
         }
@@ -1075,6 +1077,7 @@ const TopbarClone = () => {
                     ? []
                     : organisationData.professionTypeLists,
                 enableEL: organisationData.enableEL,
+                currencyID: organisationData.currencyID,
               }),
             );
           } else if (

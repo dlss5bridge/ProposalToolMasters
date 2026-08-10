@@ -71,11 +71,13 @@ function Add_New_Templates(props) {
     scrollUptoCurrentPosition,
     HtmlToPlainText,
     hasActionAccess,
+    getCurrencySymbol,
   } = useContext(AuthContextProvider);
   const navigate = useNavigate();
   const TemplateDivContainerRef = useRef(null);
   const common = useSelector((state) => state.Storage); //Getting Logged Users Details From Persist Storage of redux hooks
   const location = useLocation();
+  const currencySymbol = getCurrencySymbol(common.currencyID);
   const [templateElementList, setTemplateElementList] = useState([]);
 
   const [TemplatePdfLookupListList, setTemplatePdfLookupListList] = useState(
@@ -1683,7 +1685,7 @@ function Add_New_Templates(props) {
                     className="tr-table-class text-white text-center"
                     style={{ width: "16.66%" }}
                   >
-                    Fees (£)
+                    Fees ({currencySymbol})
                   </th>
                 )}
                 {isVatEnabledForOrg &&
@@ -1703,7 +1705,7 @@ function Add_New_Templates(props) {
                       className="tr-table-class text-white text-center"
                       style={{ width: "16.66%" }}
                     >
-                      VAT (£)
+                      VAT ({currencySymbol})
                     </th>
                   )}
                 {isVatEnabledForOrg &&
@@ -1731,7 +1733,7 @@ function Add_New_Templates(props) {
                   <td className="text-center">Test scope=4</td>
                 )}
                 {visibleFieldsCustomTemp.fees && (
-                  <td className="text-center">$500</td>
+                  <td className="text-center">{currencySymbol}500</td>
                 )}
                 {isVatEnabledForOrg &&
                   vatPercentage &&
@@ -1741,12 +1743,12 @@ function Add_New_Templates(props) {
                 {isVatEnabledForOrg &&
                   vatPercentage &&
                   visibleFieldsCustomTemp.vat && (
-                    <td className="text-center">$100</td>
+                    <td className="text-center">{currencySymbol}100</td>
                   )}
                 {isVatEnabledForOrg &&
                   vatPercentage &&
                   visibleFieldsCustomTemp.feesIncVat && (
-                    <td className="text-center">$600</td>
+                    <td className="text-center">{currencySymbol}600</td>
                   )}
               </tr>
 

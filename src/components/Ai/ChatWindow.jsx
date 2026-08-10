@@ -83,8 +83,8 @@ const ShimmerText = memo(({ children }) => (
 ShimmerText.displayName = "ShimmerText";
 
 export default function ChatWindow({ organisationKeyID, token }) {
-  const CHAT_API_URL = `https://aiagent-v2.caelum.ai/api/chat?organisation_key_id=${organisationKeyID}`;
-  const TRANSCRIBE_API_ENDPOINT = `https://aiagent-v2.caelum.ai/api/transcribe?organisation_key_id=${organisationKeyID}`;
+  const CHAT_API_URL = `https://ai-agents.proposal.outbooks.com/api/chat?organisation_key_id=${organisationKeyID}`;
+  const TRANSCRIBE_API_ENDPOINT = `https://ai-agents.proposal.outbooks.com/api/transcribe?organisation_key_id=${organisationKeyID}`;
 
   const {
     messages,

@@ -2104,6 +2104,11 @@ const ReviewServicesComponent = (props) => {
     fallbackVatPercentage: props.vatPercentage || 0,
   });
 
+  const useRecurringEngagementFinalAsNet =
+    recurringEngagementServiceFooter.hasPriceIncrease ||
+    (recurringEngagementServiceFooter.hasPositiveDiscount &&
+      !props.engagementObj?.DiscountLines);
+
   const hasRecurringEngagementVAT = Number(props.vatPercentage || 0) > 0;
 
   const showRecurringEngagementDiscount =
@@ -2126,6 +2131,11 @@ const ReviewServicesComponent = (props) => {
 
     fallbackVatPercentage: props.vatPercentage || 0,
   });
+
+  const useOneOffEngagementFinalAsNet =
+    oneOffEngagementServiceFooter.hasPriceIncrease ||
+    (oneOffEngagementServiceFooter.hasPositiveDiscount &&
+      !props.engagementObj?.DiscountLines);
 
   const hasOneOffEngagementVAT = Number(props.vatPercentage || 0) > 0;
 
@@ -3111,9 +3121,9 @@ const ReviewServicesComponent = (props) => {
                                 {props.visibleFieldsCustomTemp?.fees && (
                                   <td className="tr-table-class text-white text-center">
                                     {props.formatValue(
-                                      props.engagementObj?.DiscountLines
-                                        ? recurringEngagementServiceFooter.net
-                                        : recurringEngagementServiceFooter.finalNet,
+                                      useRecurringEngagementFinalAsNet
+                                        ? recurringEngagementServiceFooter.finalNet
+                                        : recurringEngagementServiceFooter.net,
                                       props.currencyID,
                                     )}
                                   </td>
@@ -3130,9 +3140,9 @@ const ReviewServicesComponent = (props) => {
                                   props.visibleFieldsCustomTemp?.vat && (
                                     <td className="tr-table-class text-white text-center">
                                       {props.formatValue(
-                                        props.engagementObj?.DiscountLines
-                                          ? recurringEngagementServiceFooter.vat
-                                          : recurringEngagementServiceFooter.finalVat,
+                                        useRecurringEngagementFinalAsNet
+                                          ? recurringEngagementServiceFooter.finalVat
+                                          : recurringEngagementServiceFooter.vat,
                                         props.currencyID,
                                       )}
                                     </td>
@@ -3143,9 +3153,9 @@ const ReviewServicesComponent = (props) => {
                                   props.visibleFieldsCustomTemp?.feesIncVat && (
                                     <td className="tr-table-class text-white text-center">
                                       {props.formatValue(
-                                        props.engagementObj?.DiscountLines
-                                          ? recurringEngagementServiceFooter.feesIncVat
-                                          : recurringEngagementServiceFooter.finalFeesIncVat,
+                                        useRecurringEngagementFinalAsNet
+                                          ? recurringEngagementServiceFooter.finalFeesIncVat
+                                          : recurringEngagementServiceFooter.feesIncVat,
                                         props.currencyID,
                                       )}
                                     </td>
@@ -4051,9 +4061,9 @@ const ReviewServicesComponent = (props) => {
                                 {props.visibleFieldsCustomTemp?.fees && (
                                   <td className="tr-table-class text-white text-center">
                                     {props.formatValue(
-                                      props.engagementObj?.DiscountLines
-                                        ? oneOffEngagementServiceFooter.net
-                                        : oneOffEngagementServiceFooter.finalNet,
+                                      useOneOffEngagementFinalAsNet
+                                        ? oneOffEngagementServiceFooter.finalNet
+                                        : oneOffEngagementServiceFooter.net,
                                       props.currencyID,
                                     )}
                                   </td>
@@ -4070,9 +4080,10 @@ const ReviewServicesComponent = (props) => {
                                   props.visibleFieldsCustomTemp?.vat && (
                                     <td className="tr-table-class text-white text-center">
                                       {props.formatValue(
-                                        props.engagementObj?.DiscountLines
-                                          ? oneOffEngagementServiceFooter.vat
-                                          : oneOffEngagementServiceFooter.finalVat,
+                                        useOneOffEngagementFinalAsNet
+                                          ? oneOffEngagementServiceFooter.finalVat
+                                          : oneOffEngagementServiceFooter.vat,
+
                                         props.currencyID,
                                       )}
                                     </td>
@@ -4083,9 +4094,10 @@ const ReviewServicesComponent = (props) => {
                                   props.visibleFieldsCustomTemp?.feesIncVat && (
                                     <td className="tr-table-class text-white text-center">
                                       {props.formatValue(
-                                        props.engagementObj?.DiscountLines
-                                          ? oneOffEngagementServiceFooter.feesIncVat
-                                          : oneOffEngagementServiceFooter.finalFeesIncVat,
+                                        useOneOffEngagementFinalAsNet
+                                          ? oneOffEngagementServiceFooter.finalFeesIncVat
+                                          : oneOffEngagementServiceFooter.feesIncVat,
+
                                         props.currencyID,
                                       )}
                                     </td>

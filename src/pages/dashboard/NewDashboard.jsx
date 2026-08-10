@@ -87,7 +87,7 @@ const NewDashboard = () => {
     setDashboardCountListLoader,
     setDashboardActivityLogLoader,
     loader,
-    GetOnlyDate
+    GetOnlyDate,
   } = useContext(AuthContextProvider);
   let getActivityLogListApiCallCount = 0;
   let getOrganisationLookupListApiCallCount = 0;
@@ -411,7 +411,7 @@ const NewDashboard = () => {
             "Drafted On Date",
             "Sent On Date",
             "Accepted On Date",
-            "Declined On Date"
+            "Declined On Date",
           ];
           baseRowsProposal.push(proposalHeader);
           baseRowsProposal.push([]);
@@ -452,7 +452,11 @@ const NewDashboard = () => {
                 // new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(item.oneOffPrice || 0),
                 formatValue(item.oneOffPrice, 1),
                 label,
-                item.lastUpdatedOn || item.acceptDeclineDate || item.sentOn || item.createdOn || "-",
+                item.lastUpdatedOn ||
+                  item.acceptDeclineDate ||
+                  item.sentOn ||
+                  item.createdOn ||
+                  "-",
                 item.createdOn || "-",
                 item.statusID !== 1 && item.statusID !== 3 ? item.sentOn : "-",
                 item.statusID === 6 ? item.acceptDeclineDate : "-",
@@ -480,7 +484,7 @@ const NewDashboard = () => {
               "Viewed On Date",
               "Signed On Date",
               "Declined On Date",
-              "Void On Date"
+              "Void On Date",
             ];
             baseRowsContract.push(contractHeader);
             baseRowsContract.push([]);
@@ -517,16 +521,21 @@ const NewDashboard = () => {
                   formatValue(item.recurringPrice, 1),
                   formatValue(item.oneOffPrice, 1),
                   label,
-                  item.lastUpdatedOn ? item.lastUpdatedOn
+                  item.lastUpdatedOn
+                    ? item.lastUpdatedOn
                     : item.statusID === 5
                       ? GetOnlyDate(item.signedOn)
-                        : item.declinedOn ?? item.viewedOn ?? item.sentOn ?? item.createdOn ?? "-",
+                      : (item.declinedOn ??
+                        item.viewedOn ??
+                        item.sentOn ??
+                        item.createdOn ??
+                        "-"),
                   item.createdOn || "-",
                   item.sentOn || "-",
                   item.viewedOn || "-",
                   item.statusID === 5 ? GetOnlyDate(item.signedOn) : "-",
                   item.statusID === 7 ? item.declinedOn : "-",
-                  item.statusID === 8 ? item.lastUpdatedOn : "-"
+                  item.statusID === 8 ? item.lastUpdatedOn : "-",
                 ]);
                 baseRowsContract.push(...dataRows);
               });
@@ -659,6 +668,13 @@ const NewDashboard = () => {
             setLoader(false);
           }
           if (response?.data?.responseData?.currencyID) {
+            dispatch(
+              updateState({
+                currency: getCurrencySymbol(
+                  response?.data?.responseData?.currencyID,
+                ),
+              }),
+            );
             const currency = response?.data?.responseData?.currencyID;
             setCurrencyID(currency);
           } else {
@@ -1009,6 +1025,8 @@ const NewDashboard = () => {
               professionTypeLists: organisationData.professionTypeLists,
               organisationCount: OrganisationListData.length,
               enableEL: organisationData.enableEL,
+              currencyID: organisationData.currencyID,
+              currency: getCurrencySymbol(organisationData.currencyID),
             }),
           );
         }
@@ -1469,7 +1487,7 @@ const NewDashboard = () => {
                             </div>
                           </div>
 
-                          {/* Proposal Accepted */} 
+                          {/* Proposal Accepted */}
                           <div
                             className={`col-xl-3 col-lg-3 col-md-3 col-sm-12 dashboard-box 
                                     ${common.organisationKeyID !== null ? "cursor-pointer" : ""}`}
@@ -1627,11 +1645,11 @@ const NewDashboard = () => {
                           )}
                         </>
                       )}
-                    {/* </div> */}
-                    {/* proposal end  */}
+                      {/* </div> */}
+                      {/* proposal end  */}
 
-                    {/* engagement start */}
-                    {/* <div className="row"> */}
+                      {/* engagement start */}
+                      {/* <div className="row"> */}
                       {(common.enableEL == 1 || common.enableEL == null) &&
                         (userAccessData.Admin_Engagement_Latter_CanView ||
                           common.organisationKeyID == null) && (
@@ -1815,7 +1833,10 @@ const NewDashboard = () => {
                               className={`col-xl-3 col-lg-3 col-md-3 col-sm-12 dashboard-box 
                                     ${common.organisationKeyID !== null ? "cursor-pointer" : ""}`}
                               onClick={() =>
-                                GetHandleChangeFilter("Viewed", statusID.Awaiting_Signature)
+                                GetHandleChangeFilter(
+                                  "Viewed",
+                                  statusID.Awaiting_Signature,
+                                )
                               }
                             >
                               <div
@@ -1841,7 +1862,8 @@ const NewDashboard = () => {
                                     {EngagementName} Viewed
                                   </h6>
                                   <p className="stat-subtitle fw-bold">
-                                    Total: {dashboardCount?.contractAwaitingSignature}
+                                    Total:{" "}
+                                    {dashboardCount?.contractAwaitingSignature}
                                   </p>
                                 </div>
                               </div>
@@ -1923,8 +1945,8 @@ const NewDashboard = () => {
                             </div>
                           </>
                         )}
-                    {/* </div> */}
-                  </div>
+                      {/* </div> */}
+                    </div>
                   </div>
                   {(userAccessData.Admin_Activity_Log_CanView ||
                     common.organisationKeyID == null) && (

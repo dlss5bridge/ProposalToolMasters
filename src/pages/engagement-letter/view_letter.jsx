@@ -1165,7 +1165,7 @@ const View_Engagement_Latter = () => {
 
     const vatDiscount = hasValue(finalAmount?.vatDiscount)
       ? roundCurrency(finalAmount.vatDiscount)
-      : roundCurrency(Math.max(0, netVAT - finalVAT));
+      : roundCurrency(netVAT - finalVAT);
 
     const netFeesIncVAT = hasValue(finalAmount?.netFeesIncVAT)
       ? roundCurrency(finalAmount.netFeesIncVAT)
@@ -1179,18 +1179,43 @@ const View_Engagement_Latter = () => {
       ? roundCurrency(finalAmount.discountedFeesIncVAT)
       : grandTotal;
 
+    const discountPercentage = hasValue(
+      finalAmount?.discountPercentageWithAllDecimal,
+    )
+      ? toNumber(finalAmount.discountPercentageWithAllDecimal)
+      : hasValue(finalAmount?.discountPercentage)
+        ? toNumber(finalAmount.discountPercentage)
+        : netTotal > 0
+          ? ((netTotal - discountedTotal) / netTotal) * 100
+          : 0;
+
+    const hasPriceIncrease =
+      discountPercentage < 0 || discountedTotal > netTotal;
+
+    const hasPositiveDiscount =
+      !hasPriceIncrease && (discountPercentage > 0 || discount > 0);
+
     return {
       netTotal,
       discount,
       discountedTotal,
+
       netVAT,
       finalVAT,
       vatDiscount,
+
       netFeesIncVAT,
       discountedFeesIncVAT,
       grandTotal,
+
       discountIncludingVAT: roundCurrency(discount + vatDiscount),
-      hasDiscount: discount > 0,
+
+      discountPercentage,
+
+      hasDiscount: hasPositiveDiscount,
+
+      hasPositiveDiscount,
+      hasPriceIncrease,
     };
   };
 
@@ -1225,18 +1250,25 @@ const View_Engagement_Latter = () => {
   const showRecurringDiscountLine =
     EngagementObj?.DiscountLines ?? Boolean(EngagementObj?.showDiscountLine);
 
-  const recurringNetRowValues =
-    recurringFooterTotals.hasDiscount && !showRecurringDiscountLine
-      ? {
-          fees: recurringFooterTotals.discountedTotal,
-          vat: recurringFooterTotals.finalVAT,
-          feesIncVAT: recurringFooterTotals.discountedFeesIncVAT,
-        }
-      : {
-          fees: recurringFooterTotals.netTotal,
-          vat: recurringFooterTotals.netVAT,
-          feesIncVAT: recurringFooterTotals.netFeesIncVAT,
-        };
+  const useRecurringFinalAsNet =
+    recurringFooterTotals.hasPriceIncrease ||
+    (recurringFooterTotals.hasPositiveDiscount && !showRecurringDiscountLine);
+
+  const recurringNetRowValues = useRecurringFinalAsNet
+    ? {
+        fees: recurringFooterTotals.discountedTotal,
+
+        vat: recurringFooterTotals.finalVAT,
+
+        feesIncVAT: recurringFooterTotals.discountedFeesIncVAT,
+      }
+    : {
+        fees: recurringFooterTotals.netTotal,
+
+        vat: recurringFooterTotals.netVAT,
+
+        feesIncVAT: recurringFooterTotals.netFeesIncVAT,
+      };
 
   // One-off footer calculations, and the row calculations:
 
@@ -1314,9 +1346,15 @@ const View_Engagement_Latter = () => {
   };
 
   const oneOffTotals = calculateOneOffFooterTotals({
-    serviceList: selectedOneOffServiceList,
-    fallbackVatRate: oneOffFinalAmount.vatPercentage,
-    discountPercentage: OneOffPricingInfo.DiscountPercentage,
+    serviceList: selectedOneOffServiceList || [],
+
+    fallbackVatRate: oneOffFinalAmount?.vatPercentage ?? 0,
+
+    discountPercentage:
+      oneOffFinalAmount?.discountPercentageWithAllDecimal ??
+      OneOffPricingInfo?.DefaultDiscount ??
+      OneOffPricingInfo?.DiscountPercentage ??
+      0,
   });
 
   // const roundCurrency = (value) => Math.round((Number(value) || 0) * 100) / 100;
@@ -1326,43 +1364,57 @@ const View_Engagement_Latter = () => {
   const oneOffVatTotal = roundCurrency(oneOffTotals?.vatTotal || 0);
 
   /*
-   * Get the percentage from the API response.
+   * Get the actual one-off percentage.
    *
-   * EngagementObj.oneOffDiscountPercentage_WithAllDecimal
-   * is available in your engagement-letter response.
+   * API final amount is preferred because this screen
+   * is displaying the saved proposal/contract values.
    */
   const explicitOneOffDiscountPercentage = Number(
-    OneOffPricingInfo?.DiscountPercentage ??
+    oneOffFinalAmount?.discountPercentageWithAllDecimal ??
+      OneOffPricingInfo?.DefaultDiscount ??
+      OneOffPricingInfo?.DiscountPercentage ??
       EngagementObj?.oneOffDiscountPercentage_WithAllDecimal ??
       EngagementObj?.oneOffDiscountPercentage ??
       0,
   );
 
-  /*
-   * OneOffPricingInfo.Discount may contain the discount amount.
-   * Use it only as a fallback when the percentage is unavailable.
-   */
   const existingOneOffDiscountAmount = roundCurrency(
-    OneOffPricingInfo?.Discount || 0,
+    OneOffPricingInfo?.Discount ?? oneOffFinalAmount?.discounted ?? 0,
   );
 
-  const oneOffDiscountPercentage =
-    explicitOneOffDiscountPercentage > 0
-      ? explicitOneOffDiscountPercentage
-      : oneOffNetTotal > 0 && existingOneOffDiscountAmount > 0
-        ? (existingOneOffDiscountAmount / oneOffNetTotal) * 100
-        : 0;
+  const hasExplicitOneOffDiscountPercentage =
+    Number.isFinite(explicitOneOffDiscountPercentage) &&
+    explicitOneOffDiscountPercentage !== 0;
 
-  const hasOneOffDiscount = oneOffDiscountPercentage > 0;
+  const oneOffDiscountPercentage = hasExplicitOneOffDiscountPercentage
+    ? explicitOneOffDiscountPercentage
+    : oneOffNetTotal > 0 && existingOneOffDiscountAmount !== 0
+      ? (existingOneOffDiscountAmount / oneOffNetTotal) * 100
+      : 0;
 
+  /*
+   * Keep positive discount and negative price increase
+   * completely separate.
+   */
+  const hasPositiveOneOffDiscount = oneOffDiscountPercentage > 0;
+
+  const hasOneOffPriceIncrease = oneOffDiscountPercentage < 0;
+
+  const hasOneOffDiscount = hasPositiveOneOffDiscount || hasOneOffPriceIncrease;
+
+  /*
+   * +20%:
+   * 1000 * 20% = +200
+   * final = 1000 - 200 = 800
+   *
+   * -100%:
+   * 1000 * -100% = -1000
+   * final = 1000 - (-1000) = 2000
+   */
   const oneOffDiscountAmount = hasOneOffDiscount
     ? roundCurrency((oneOffNetTotal * oneOffDiscountPercentage) / 100)
     : 0;
 
-  /*
-   * The same percentage discount is applied proportionately
-   * to VAT. This also supports rows having different VAT rates.
-   */
   const oneOffVatDiscountAmount = hasOneOffDiscount
     ? roundCurrency((oneOffVatTotal * oneOffDiscountPercentage) / 100)
     : 0;
@@ -1388,25 +1440,37 @@ const View_Engagement_Latter = () => {
   );
 
   /*
-   * When DiscountLines is false, show discounted values
-   * directly in the Net Total row.
+   * Net Total display behaviour:
+   *
+   * Positive + DiscountLines ON
+   * => original
+   *
+   * Positive + DiscountLines OFF
+   * => final discounted
+   *
+   * Negative
+   * => increased final directly
    */
-  const oneOffFooterNetFees =
-    hasOneOffDiscount && !EngagementObj.DiscountLines
-      ? oneOffDiscountedNet
-      : oneOffNetTotal;
+  const useOneOffFinalAsNet =
+    hasOneOffPriceIncrease ||
+    (hasPositiveOneOffDiscount && !EngagementObj?.DiscountLines);
 
-  const oneOffFooterNetVat =
-    hasOneOffDiscount && !EngagementObj.DiscountLines
-      ? oneOffDiscountedVat
-      : oneOffVatTotal;
+  const oneOffFooterNetFees = useOneOffFinalAsNet
+    ? oneOffDiscountedNet
+    : oneOffNetTotal;
 
-  const oneOffFooterNetFeesIncludingVat =
-    hasOneOffDiscount && !EngagementObj.DiscountLines
-      ? oneOffGrandTotal
-      : oneOffNetFeesIncludingVat;
+  const oneOffFooterNetVat = useOneOffFinalAsNet
+    ? oneOffDiscountedVat
+    : oneOffVatTotal;
+
+  const oneOffFooterNetFeesIncludingVat = useOneOffFinalAsNet
+    ? oneOffGrandTotal
+    : oneOffNetFeesIncludingVat;
 
   console.log("recurringServiceCategories", recurringServiceCategories);
+
+  const showOneOffGrandTotal =
+    hasPositiveOneOffDiscount && Boolean(EngagementObj?.DiscountLines);
 
   return (
     <div className="container">
@@ -2374,55 +2438,58 @@ const View_Engagement_Latter = () => {
                                                     </tr>
                                                   )}
 
-                                                <tr className="head-row">
-                                                  {visibleFieldsCustomTemp?.serviceCategory && (
-                                                    <td className="tr-table-class font-14 text-white">
-                                                      Grand Total
-                                                    </td>
-                                                  )}
-                                                  {visibleFieldsCustomTemp?.serviceName && (
-                                                    <td />
-                                                  )}
-                                                  {visibleFieldsCustomTemp?.serviceScope && (
-                                                    <td />
-                                                  )}
-
-                                                  {visibleFieldsCustomTemp?.fees && (
-                                                    <td className="tr-table-class font-14 text-white text-center">
-                                                      {formatValue(
-                                                        recurringFooterTotals.hasDiscount
-                                                          ? recurringFooterTotals.discountedTotal
-                                                          : recurringFooterTotals.netTotal,
-                                                        EngagementObj.currencyID,
+                                                {recurringFooterTotals.hasPositiveDiscount &&
+                                                  showRecurringDiscountLine && (
+                                                    <tr className="head-row">
+                                                      {visibleFieldsCustomTemp?.serviceCategory && (
+                                                        <td className="tr-table-class font-14 text-white">
+                                                          Grand Total
+                                                        </td>
                                                       )}
-                                                    </td>
+
+                                                      {visibleFieldsCustomTemp?.serviceName && (
+                                                        <td />
+                                                      )}
+
+                                                      {visibleFieldsCustomTemp?.serviceScope && (
+                                                        <td />
+                                                      )}
+
+                                                      {visibleFieldsCustomTemp?.fees && (
+                                                        <td className="tr-table-class font-14 text-white text-center">
+                                                          {formatValue(
+                                                            recurringFooterTotals.discountedTotal,
+                                                            EngagementObj.currencyID,
+                                                          )}
+                                                        </td>
+                                                      )}
+
+                                                      {showRecurringVat &&
+                                                        visibleFieldsCustomTemp?.vatRate && (
+                                                          <td />
+                                                        )}
+
+                                                      {showRecurringVat &&
+                                                        visibleFieldsCustomTemp?.vat && (
+                                                          <td className="tr-table-class font-14 text-white text-center">
+                                                            {formatValue(
+                                                              recurringFooterTotals.finalVAT,
+                                                              EngagementObj.currencyID,
+                                                            )}
+                                                          </td>
+                                                        )}
+
+                                                      {showRecurringVat &&
+                                                        visibleFieldsCustomTemp?.feesIncVat && (
+                                                          <td className="tr-table-class font-14 text-white text-center">
+                                                            {formatValue(
+                                                              recurringFooterTotals.grandTotal,
+                                                              EngagementObj.currencyID,
+                                                            )}
+                                                          </td>
+                                                        )}
+                                                    </tr>
                                                   )}
-
-                                                  {showRecurringVat &&
-                                                    visibleFieldsCustomTemp?.vatRate && (
-                                                      <td />
-                                                    )}
-
-                                                  {showRecurringVat &&
-                                                    visibleFieldsCustomTemp?.vat && (
-                                                      <td className="tr-table-class font-14 text-white text-center">
-                                                        {formatValue(
-                                                          recurringFooterTotals.finalVAT,
-                                                          EngagementObj.currencyID,
-                                                        )}
-                                                      </td>
-                                                    )}
-
-                                                  {showRecurringVat &&
-                                                    visibleFieldsCustomTemp?.feesIncVat && (
-                                                      <td className="tr-table-class font-14 text-white text-center">
-                                                        {formatValue(
-                                                          recurringFooterTotals.grandTotal,
-                                                          EngagementObj.currencyID,
-                                                        )}
-                                                      </td>
-                                                    )}
-                                                </tr>
                                               </tbody>
                                             </table>
                                           </div>
@@ -2948,7 +3015,7 @@ const View_Engagement_Latter = () => {
                                                   )}
 
                                                   {visibleFieldsCustomTemp?.fees && (
-                                                    <td className="tr-table-class font-14 text-white text-right">
+                                                    <td className="tr-table-class font-14 text-white text-center">
                                                       {formatValue(
                                                         oneOffFooterNetFees,
                                                         EngagementObj.currencyID,
@@ -3001,7 +3068,7 @@ const View_Engagement_Latter = () => {
                                                       )}
 
                                                       {visibleFieldsCustomTemp?.fees && (
-                                                        <td className="tr-table-class font-14 text-white text-right">
+                                                        <td className="tr-table-class font-14 text-white text-center">
                                                           (-){" "}
                                                           {formatValue(
                                                             oneOffDiscountAmount,
@@ -3040,61 +3107,59 @@ const View_Engagement_Latter = () => {
                                                   )}
 
                                                 {/* GRAND TOTAL */}
-                                                <tr className="head-row">
-                                                  {visibleFieldsCustomTemp?.serviceCategory && (
-                                                    <td className="tr-table-class font-14 text-white">
-                                                      Grand Total
-                                                    </td>
-                                                  )}
+                                                {showOneOffGrandTotal && (
+                                                  <tr className="head-row">
+                                                    {visibleFieldsCustomTemp?.serviceCategory && (
+                                                      <td className="tr-table-class font-14 text-white">
+                                                        Grand Total
+                                                      </td>
+                                                    )}
 
-                                                  {visibleFieldsCustomTemp?.serviceName && (
-                                                    <td></td>
-                                                  )}
-
-                                                  {visibleFieldsCustomTemp?.serviceScope && (
-                                                    <td></td>
-                                                  )}
-
-                                                  {visibleFieldsCustomTemp?.fees && (
-                                                    <td className="tr-table-class font-14 text-white text-center">
-                                                      {formatValue(
-                                                        hasOneOffDiscount
-                                                          ? oneOffDiscountedNet
-                                                          : oneOffNetTotal,
-                                                        EngagementObj.currencyID,
-                                                      )}
-                                                    </td>
-                                                  )}
-
-                                                  {showOneOffVat &&
-                                                    visibleFieldsCustomTemp?.vatRate && (
+                                                    {visibleFieldsCustomTemp?.serviceName && (
                                                       <td></td>
                                                     )}
 
-                                                  {showOneOffVat &&
-                                                    visibleFieldsCustomTemp?.vat && (
+                                                    {visibleFieldsCustomTemp?.serviceScope && (
+                                                      <td></td>
+                                                    )}
+
+                                                    {visibleFieldsCustomTemp?.fees && (
                                                       <td className="tr-table-class font-14 text-white text-center">
                                                         {formatValue(
-                                                          hasOneOffDiscount
-                                                            ? oneOffDiscountedVat
-                                                            : oneOffVatTotal,
+                                                          useOneOffFinalAsNet
+                                                            ? oneOffDiscountedNet
+                                                            : oneOffNetTotal,
                                                           EngagementObj.currencyID,
                                                         )}
                                                       </td>
                                                     )}
 
-                                                  {showOneOffVat &&
-                                                    visibleFieldsCustomTemp?.feesIncVat && (
-                                                      <td className="tr-table-class font-14 text-white text-center">
-                                                        {formatValue(
-                                                          hasOneOffDiscount
-                                                            ? oneOffGrandTotal
-                                                            : oneOffNetFeesIncludingVat,
-                                                          EngagementObj.currencyID,
-                                                        )}
-                                                      </td>
-                                                    )}
-                                                </tr>
+                                                    {showOneOffVat &&
+                                                      visibleFieldsCustomTemp?.vatRate && (
+                                                        <td></td>
+                                                      )}
+
+                                                    {showOneOffVat &&
+                                                      visibleFieldsCustomTemp?.vat && (
+                                                        <td className="tr-table-class font-14 text-white text-center">
+                                                          {formatValue(
+                                                            oneOffDiscountedVat,
+                                                            EngagementObj.currencyID,
+                                                          )}
+                                                        </td>
+                                                      )}
+
+                                                    {showOneOffVat &&
+                                                      visibleFieldsCustomTemp?.feesIncVat && (
+                                                        <td className="tr-table-class font-14 text-white text-center">
+                                                          {formatValue(
+                                                            oneOffGrandTotal,
+                                                            EngagementObj.currencyID,
+                                                          )}
+                                                        </td>
+                                                      )}
+                                                  </tr>
+                                                )}
                                               </tbody>
                                             </table>
                                           </div>
