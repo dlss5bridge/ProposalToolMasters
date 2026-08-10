@@ -12290,7 +12290,8 @@ ${
                 </div>
               </>
             )}
-            {props.ProposalObject.ProposalFormate === 1 && (
+            {(props.ProposalObject.ProposalFormate === 1 ||
+              props.ProposalObject.ProposalFormate === 3) && (
               <>
                 {/* Payment Gateway Label */}
                 <div className="col-lg-2 col-md-2 col-sm-6 mt-4">
