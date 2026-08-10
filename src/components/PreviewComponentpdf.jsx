@@ -12515,7 +12515,10 @@ ${
                       </a>
                     </li>
                     <li>
-                      <a className="dropdown-item" onClick={openPopup}>
+                      <a
+                        className="dropdown-item"
+                        onClick={() => setIsPopUpVisible(true)}
+                      >
                         <span style={{ fontSize: "0.75rem" }}>
                           Customize Email and Send
                         </span>
@@ -12715,7 +12718,10 @@ ${
                       </button>
                     </li>
                     <li>
-                      <button className="dropdown-item" onClick={openPopup}>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => setIsPopUpVisible(true)}
+                      >
                         <span style={{ fontSize: "0.75rem" }}>
                           Customize Email and Send
                         </span>
@@ -12773,7 +12779,7 @@ ${
                             <input
                               type="checkbox"
                               className="me-2"
-                              checked={props.engagementObj.selectedAttachments.find(
+                              checked={props.ProposalObject.selectedAttachments.find(
                                 (att) =>
                                   att.templatePDFKeyID ===
                                   item.templatePDFKeyID,

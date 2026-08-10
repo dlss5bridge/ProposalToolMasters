@@ -1406,7 +1406,7 @@ const View_Proposals = () => {
     recurringFinalAmount?.vatPercentage || 0,
   );
 
-  const feesInQuoteID = Number(ProposalObject?.feesInQuoteID || 1);
+  const feesInQuoteID = Number(ProposalObject?.feeTypeId || 1);
 
   const showFullBreakdown = feesInQuoteID === 1;
   const showCheckMark = feesInQuoteID === 2;
@@ -1842,7 +1842,7 @@ const View_Proposals = () => {
     discountAmount: OneOffPricingInfo?.Discount ?? null,
   });
 
-  const oneOffFeesInQuoteID = Number(ProposalObject?.feesInQuoteID || 1);
+  const oneOffFeesInQuoteID = Number(ProposalObject?.feeTypeId || 1);
 
   const showOneOffFullBreakdown = oneOffFeesInQuoteID === 1;
 
