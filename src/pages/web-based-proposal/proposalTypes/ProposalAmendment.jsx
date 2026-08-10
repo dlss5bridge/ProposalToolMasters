@@ -57,11 +57,15 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   // the client no service picker at all — the Services step is dropped from
   // the stepper entirely (see isPackageType below).
   const isPackageType = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
+  const isCustomPackageType =
+    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
 
-  // Package proposals still show Additional Information (read-only — see
-  // readOnly prop below) even though Services is skipped entirely, so the
-  // client can see the values their pricing is based on.
-  const additionalInfoStepInserted = hasAdditionalInformation;
+  // Package and Custom Package proposals are priced against a fixed
+  // package/discount rather than the per-service driver values Additional
+  // Information exists to capture, so the step is skipped entirely for both
+  // — never inserted into the stepper, never navigable to.
+  const additionalInfoStepInserted =
+    hasAdditionalInformation && !isPackageType && !isCustomPackageType;
 
   // Base step order is fixed, so the final index of any step can be derived
   // up front from its position here plus whether Additional Information gets
@@ -121,12 +125,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         ...baseSteps.slice(0, ADDITIONAL_INFO_INSERT_INDEX),
         {
           label: "Additional Information",
-          component: (
-            <ProposalAdditionalInformationStep
-              theme={theme}
-              readOnly={isPackageType}
-            />
-          ),
+          component: <ProposalAdditionalInformationStep theme={theme} />,
         },
         ...baseSteps.slice(ADDITIONAL_INFO_INSERT_INDEX),
       ]
@@ -178,14 +177,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     }
 
     if (
-      hasAdditionalInformation &&
+      additionalInfoStepInserted &&
       currentStepIndex === ADDITIONAL_INFO_STEP_INDEX
     ) {
-      // Package proposals show this step read-only (see readOnly prop above)
-      // — the client has no way to fix a missing/invalid field, so don't
-      // block them on one.
-      if (isPackageType) return true;
-
       const fieldErrors = getAdditionalInformationFieldErrors(
         additionalInformationList,
       );

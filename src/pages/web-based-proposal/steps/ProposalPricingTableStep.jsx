@@ -31,6 +31,14 @@ const CURRENCY_SYMBOLS = { 1: "£", 2: "€", 3: "$", 4: "₹" };
 
 const SERVICE_CHARGE_TYPE_ID = { RECURRING: 1, ONE_OFF: 2 };
 
+// quoteModel.paymentFrequencyID: 1 Yearly, 2 HalfYearly, 3 Quarterly, 4
+// Monthly. Recurring prices are quoted/stored yearly, so a non-yearly
+// frequency divides the yearly figure down to that billing period — mirrors
+// the Payment_Frequency divisor used in AddUpdateProposal.jsx/
+// AddUpdateEngagementLetter.jsx. One-off services are never billed on a
+// recurring cadence, so this must never apply to them.
+const PAYMENT_FREQUENCY_DIVISOR = { 1: 1, 2: 2, 3: 4, 4: 12 };
+
 // serviceID is only unique within a charge type (recurring vs one-off share
 // the same ID space), so lookups must key on both — otherwise a one-off
 // price entry can be shadowed by a recurring entry with the same serviceID.
@@ -516,6 +524,14 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     [quoteModel?.servicePackageID],
   );
 
+  // Applied to recurring services only (never one-off) when computing live
+  // prices from the pricing API's yearly figures — see
+  // PAYMENT_FREQUENCY_DIVISOR above. Stored quotationFinalAmountList amounts
+  // (the finalAmount branch in buildChargeTypeTotals) are already
+  // frequency-adjusted by the backend and must not be divided again.
+  const paymentFrequencyDivisor =
+    PAYMENT_FREQUENCY_DIVISOR[quoteModel?.paymentFrequencyID] || 1;
+
   const recurringServiceByID = useMemo(
     () => buildServiceDefMap(recurringServices),
     [recurringServices],
@@ -662,16 +678,20 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
 
   const priceByServiceID = useMemo(() => {
     const map = new Map();
-    (pricing || []).forEach((item) =>
-      map.set(
-        priceKey(item.serviceChargeTypeID, item.serviceID),
-        isPackageBased
-          ? packagePriceForItem(item)
-          : Number(item.price) || 0,
-      ),
-    );
+    (pricing || []).forEach((item) => {
+      // Package service price first (per-slot value), then the frequency
+      // divisor — same order for the plain Service formula.
+      const basePrice = isPackageBased
+        ? packagePriceForItem(item)
+        : Number(item.price) || 0;
+      const price =
+        Number(item.serviceChargeTypeID) === SERVICE_CHARGE_TYPE_ID.RECURRING
+          ? basePrice / paymentFrequencyDivisor
+          : basePrice;
+      map.set(priceKey(item.serviceChargeTypeID, item.serviceID), price);
+    });
     return map;
-  }, [pricing, isPackageBased]);
+  }, [pricing, isPackageBased, paymentFrequencyDivisor]);
 
   const recurringSelectedList = useMemo(
     () => selectedList.filter((item) => item.listType === "recurring"),
