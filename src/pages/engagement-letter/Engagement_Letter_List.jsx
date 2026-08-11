@@ -59,6 +59,14 @@ import { CreateEngagementInvoice } from "../../redux/reducer/engagementSlice";
 const Engagement_Letter = () => {
   let getEngagementListApiCallCount = 0;
   const dispatch = useDispatch();
+  const bookkeepingStorage = JSON.parse(
+    localStorage.getItem("persist:Bookkeeping") || "{}",
+  );
+
+  const bookkeeping = JSON.parse(bookkeepingStorage.bookkeeping || "{}");
+
+  const isXeroEnabled = bookkeeping.Xero === true;
+  const isQuickBooksEnabled = bookkeeping.QuickBooks === true;
 
   // Declare State
   const [modelRequestData, setModelRequestData] = useState({
@@ -421,7 +429,10 @@ const Engagement_Letter = () => {
               if (newPaneNo > 1) {
                 newPaneNo = newPaneNo - 1;
               }
-              GetEngagementListForSingleApiData(newPaneNo, SingleElSearchKeyword);
+              GetEngagementListForSingleApiData(
+                newPaneNo,
+                SingleElSearchKeyword,
+              );
               setSingleElCurrentPage(pageNoList);
               return;
             }
@@ -527,13 +538,19 @@ const Engagement_Letter = () => {
         if (data.data.responseData.data.length > 0) {
           const EngagementListData = data.data.responseData.data;
           const statusName =
-            Utils.EngagementLetterStatus.find((option) => option.value === status)?.label || "";
+            Utils.EngagementLetterStatus.find(
+              (option) => option.value === status,
+            )?.label || "";
           const reportingPeriod =
-            Utils.CalenderFilter.find((option) => option.value === selectedOption.value)?.label || "";
+            Utils.CalenderFilter.find(
+              (option) => option.value === selectedOption.value,
+            )?.label || "";
           const businessTypeName =
-            BusinessTypeListData.find((item) => item.value == prospectType)?.label || "";
+            BusinessTypeListData.find((item) => item.value == prospectType)
+              ?.label || "";
           const businessNatureName =
-            NoBTypeListData.find((item) => item.value == businessNatureID)?.label || "";
+            NoBTypeListData.find((item) => item.value == businessNatureID)
+              ?.label || "";
 
           const headers = {
             "Practice Name": orgName.organisationName,
@@ -541,7 +558,8 @@ const Engagement_Letter = () => {
             "Reporting Period Filter": reportingPeriod,
             "Business Nature Filter": businessNatureName,
             "Business Type Filter": businessTypeName,
-            "Total Engagement Letters (Engagement Data)": EngagementListData.length,
+            "Total Engagement Letters (Engagement Data)":
+              EngagementListData.length,
             "Total Engagement Letters (API Engagement Data)":
               singleApiData?.data?.statusCode === 200
                 ? singleApiData?.data?.responseData?.data?.length || 0
@@ -586,7 +604,8 @@ const Engagement_Letter = () => {
           const setColWidths = (sheet, sheetData) => {
             const widths = sheetData.reduce((w, row) => {
               row.forEach((cell, i) => {
-                const val = cell !== null && cell !== undefined ? String(cell) : "";
+                const val =
+                  cell !== null && cell !== undefined ? String(cell) : "";
                 w[i] = Math.max(w[i] || 0, val.length);
               });
               return w;
@@ -597,7 +616,10 @@ const Engagement_Letter = () => {
           const workbook = XLSX.utils.book_new();
 
           // Sheet 1: Summary/filters (now includes both counts)
-          const headersArray = Object.entries(headers).map(([key, value]) => [key, value]);
+          const headersArray = Object.entries(headers).map(([key, value]) => [
+            key,
+            value,
+          ]);
           const summarySheet = XLSX.utils.aoa_to_sheet(headersArray);
           setColWidths(summarySheet, headersArray);
           XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
@@ -607,22 +629,42 @@ const Engagement_Letter = () => {
           const engagementSheetData = [engagementHeaderRow, ...engagementRows];
           const engagementSheet = XLSX.utils.aoa_to_sheet(engagementSheetData);
           setColWidths(engagementSheet, engagementSheetData);
-          XLSX.utils.book_append_sheet(workbook, engagementSheet, "Engagement Data");
+          XLSX.utils.book_append_sheet(
+            workbook,
+            engagementSheet,
+            "Engagement Data",
+          );
 
           // Sheet 3: API (SingleApi) engagement data
-          if (singleApiData?.data?.statusCode === 200 && singleApiData?.data?.responseData?.data?.length > 0) {
-            const singleApiRows = toRows(mapEngagementRows(singleApiData.data.responseData.data));
+          if (
+            singleApiData?.data?.statusCode === 200 &&
+            singleApiData?.data?.responseData?.data?.length > 0
+          ) {
+            const singleApiRows = toRows(
+              mapEngagementRows(singleApiData.data.responseData.data),
+            );
             const singleApiSheetData = [engagementHeaderRow, ...singleApiRows];
             const singleApiSheet = XLSX.utils.aoa_to_sheet(singleApiSheetData);
             setColWidths(singleApiSheet, singleApiSheetData);
-            XLSX.utils.book_append_sheet(workbook, singleApiSheet, "API Engagement Data");
+            XLSX.utils.book_append_sheet(
+              workbook,
+              singleApiSheet,
+              "API Engagement Data",
+            );
           }
 
           const fileName = `${EngagementName}_Data_${orgName.organisationName}_${reportingPeriod}.xlsx`;
           XLSX.writeFile(workbook, fileName);
 
           await GetEngagementListData(
-            1, searchKeyword, status, fromDate, toDate, businessNatureID, prospectType, false,
+            1,
+            searchKeyword,
+            status,
+            fromDate,
+            toDate,
+            businessNatureID,
+            prospectType,
+            false,
           );
         } else {
           console.error("Failed to fetch data for export");
@@ -709,8 +751,11 @@ const Engagement_Letter = () => {
       const data = await ArchiveContract(
         modelRequestData.contractKeyID,
         common.userKeyID,
-        modelRequestData.Action === "ArchiveContract" ? true
-        : modelRequestData.Action === "UnarchiveContract" ? false : null
+        modelRequestData.Action === "ArchiveContract"
+          ? true
+          : modelRequestData.Action === "UnarchiveContract"
+            ? false
+            : null,
       );
       if (data?.data?.statusCode === 200) {
         setLoader(false);
@@ -1002,7 +1047,7 @@ const Engagement_Letter = () => {
     } else if (tab === "WebEL") {
       setActiveTab(tab);
       setSearchSingleELKeyword("");
-      GetEngagementListForSingleApiData(1,"",null,null,null);
+      GetEngagementListForSingleApiData(1, "", null, null, null);
     } else {
       GetEngagementListData(1);
       setActiveTab(tab);
@@ -1410,7 +1455,9 @@ const Engagement_Letter = () => {
                                 </a>
                               </li>
 
-                              {(SingleEngagementList?.length > 0 || activeTab === "WebEL" || hasWebElData) && (
+                              {(SingleEngagementList?.length > 0 ||
+                                activeTab === "WebEL" ||
+                                hasWebElData) && (
                                 <li className="nav-item">
                                   <a
                                     className={`nav-link tab_nav ${
@@ -1426,7 +1473,8 @@ const Engagement_Letter = () => {
                                   </a>
                                 </li>
                               )}
-                              {(OldEngagementList?.length > 0 || activeTab === "OldEL") && (
+                              {(OldEngagementList?.length > 0 ||
+                                activeTab === "OldEL") && (
                                 <li className="nav-item">
                                   <a
                                     className={`nav-link tab_nav ${
@@ -1490,7 +1538,9 @@ const Engagement_Letter = () => {
                                                 <div
                                                   class="search-box  width-searchbox "
                                                   id="w-100"
-                                                  style={{ marginRight: "10px" }}
+                                                  style={{
+                                                    marginRight: "10px",
+                                                  }}
                                                 >
                                                   <i className="ri-search-line search-icon"></i>
                                                   <input
@@ -1503,13 +1553,19 @@ const Engagement_Letter = () => {
                                                     placeholder={
                                                       isMobile
                                                         ? "Search"
-                                                        : getPlaceholderTextName("Search", EngagementName)
+                                                        : getPlaceholderTextName(
+                                                            "Search",
+                                                            EngagementName,
+                                                          )
                                                     }
                                                   />
                                                 </div>
                                                 <div className=" d-flex align-items-start justify-content-start ">
                                                   <Tooltip
-                                                    title={getCrudButtonToolTipName("Export", EngagementName)}
+                                                    title={getCrudButtonToolTipName(
+                                                      "Export",
+                                                      EngagementName,
+                                                    )}
                                                   >
                                                     <div>
                                                       <button
@@ -1528,7 +1584,10 @@ const Engagement_Letter = () => {
                                                     </div>
                                                   </Tooltip>
                                                   <Tooltip
-                                                    title={getCrudButtonToolTipName("Filter", EngagementName)}
+                                                    title={getCrudButtonToolTipName(
+                                                      "Filter",
+                                                      EngagementName,
+                                                    )}
                                                   >
                                                     <div>
                                                       <button
@@ -1552,13 +1611,19 @@ const Engagement_Letter = () => {
                                                   </Tooltip>
                                                   <div className="col-9">
                                                     {isFilterApply ? (
-                                                      <Tooltip title={"Clear Filter"}>
+                                                      <Tooltip
+                                                        title={"Clear Filter"}
+                                                      >
                                                         <div>
                                                           <button
                                                             className="btn btn-md btn-success create-Filter-item-btn text-nowrap"
-                                                            onClick={ClearFilter}
+                                                            onClick={
+                                                              ClearFilter
+                                                            }
                                                           >
-                                                            <span className="text-nowrap">Clear Filter</span>
+                                                            <span className="text-nowrap">
+                                                              Clear Filter
+                                                            </span>
                                                           </button>
                                                         </div>
                                                       </Tooltip>
@@ -1576,9 +1641,17 @@ const Engagement_Letter = () => {
                                                 userAccessData.Admin_Engagement_Latter_CanAdd && (
                                                   <div className="d-flex justify-content-sm-end add-new-btn">
                                                     <CommonButtonComponent
-                                                      title={getCrudButtonToolTipName("Add", EngagementName)}
-                                                      name={getCrudButtonTextName("Add", EngagementName)}
-                                                      AddBtn={() => new_letter()}
+                                                      title={getCrudButtonToolTipName(
+                                                        "Add",
+                                                        EngagementName,
+                                                      )}
+                                                      name={getCrudButtonTextName(
+                                                        "Add",
+                                                        EngagementName,
+                                                      )}
+                                                      AddBtn={() =>
+                                                        new_letter()
+                                                      }
                                                     />
                                                   </div>
                                                 )}
@@ -1588,153 +1661,156 @@ const Engagement_Letter = () => {
 
                                         {activeTab === "WebEL" && (
                                           <div class="row">
-                                        <div class="col-md-6 col-lg-6 col-6  mb-2">
-                                          <div className="d-flex justify-content-between">
-                                          <div className="d-flex justify-content-start">
-                                            <div
-                                              class="search-box  width-searchbox "
-                                              id="w-100"
-                                              style={{ marginRight: "10px" }}
-                                            >
-                                              <i className="ri-search-line search-icon"></i>
-
-                                              <input
-                                                type="text"
-                                                value={SingleElSearchKeyword}
-                                                class="form-control search"
-                                                onChange={(e) => {
-                                                  handleSearchSingleEl(e);
-                                                }}
-                                                placeholder={
-                                                  isMobile
-                                                    ? "Search"
-                                                    : getPlaceholderTextName(
-                                                        "Search",
-                                                        EngagementName,
-                                                      )
-                                                }
-                                              />
-                                            </div>
-                                            <div className=" d-flex align-items-start justify-content-start ">
-                                              <Tooltip
-                                                title={getCrudButtonToolTipName(
-                                                  "Export",
-                                                  EngagementName,
-                                                )}
-                                              >
-                                                <div>
-                                                  <button
-                                                    class="btn btn-md btn-success create-item-btn-apply filter me-2"
-                                                    onClick={handleExport}
+                                            <div class="col-md-6 col-lg-6 col-6  mb-2">
+                                              <div className="d-flex justify-content-between">
+                                                <div className="d-flex justify-content-start">
+                                                  <div
+                                                    class="search-box  width-searchbox "
+                                                    id="w-100"
+                                                    style={{
+                                                      marginRight: "10px",
+                                                    }}
                                                   >
-                                                    {/* <i class="ri-pencil-fill"></i> */}
-                                                    <span
-                                                      style={{
-                                                        marginRight: "0px",
-                                                        width: "42px",
-                                                        fontSize: "15px",
+                                                    <i className="ri-search-line search-icon"></i>
+
+                                                    <input
+                                                      type="text"
+                                                      value={
+                                                        SingleElSearchKeyword
+                                                      }
+                                                      class="form-control search"
+                                                      onChange={(e) => {
+                                                        handleSearchSingleEl(e);
                                                       }}
-                                                    ></span>
-                                                    <i class="ri-file-excel-2-fill  Filter-apply-color"></i>
-                                                  </button>
+                                                      placeholder={
+                                                        isMobile
+                                                          ? "Search"
+                                                          : getPlaceholderTextName(
+                                                              "Search",
+                                                              EngagementName,
+                                                            )
+                                                      }
+                                                    />
+                                                  </div>
+                                                  <div className=" d-flex align-items-start justify-content-start ">
+                                                    <Tooltip
+                                                      title={getCrudButtonToolTipName(
+                                                        "Export",
+                                                        EngagementName,
+                                                      )}
+                                                    >
+                                                      <div>
+                                                        <button
+                                                          class="btn btn-md btn-success create-item-btn-apply filter me-2"
+                                                          onClick={handleExport}
+                                                        >
+                                                          {/* <i class="ri-pencil-fill"></i> */}
+                                                          <span
+                                                            style={{
+                                                              marginRight:
+                                                                "0px",
+                                                              width: "42px",
+                                                              fontSize: "15px",
+                                                            }}
+                                                          ></span>
+                                                          <i class="ri-file-excel-2-fill  Filter-apply-color"></i>
+                                                        </button>
+                                                      </div>
+                                                    </Tooltip>
+                                                    <Tooltip
+                                                      title={getCrudButtonToolTipName(
+                                                        "Filter",
+                                                        EngagementName,
+                                                      )}
+                                                    >
+                                                      <div>
+                                                        <button
+                                                          className={
+                                                            isFilterApply
+                                                              ? "btn btn-md btn-success create-item-btn filter me-2"
+                                                              : "btn btn-md btn-success create-item-btn-apply filter me-2"
+                                                          }
+                                                          data-bs-toggle="modal"
+                                                          data-bs-target="#FilterModel"
+                                                        >
+                                                          {/* <i class="ri-pencil-fill"></i> */}
+
+                                                          <i
+                                                            className={
+                                                              isFilterApply
+                                                                ? "ri-filter-fill align-bottom "
+                                                                : "ri-filter-fill align-bottom Filter-apply-color"
+                                                            }
+                                                          ></i>
+                                                        </button>
+                                                      </div>
+                                                    </Tooltip>
+                                                    <div className="col-9">
+                                                      {isFilterApply ? (
+                                                        <Tooltip
+                                                          title={"Clear Filter"}
+                                                        >
+                                                          <div>
+                                                            <button
+                                                              className="btn btn-md btn-success create-Filter-item-btn text-nowrap"
+                                                              onClick={
+                                                                ClearFilter
+                                                              } // Corrected from onclick to onClick
+                                                            >
+                                                              <span className="text-nowrap">
+                                                                Clear Filter
+                                                              </span>
+                                                            </button>
+                                                          </div>
+                                                        </Tooltip>
+                                                      ) : (
+                                                        ""
+                                                      )}
+                                                    </div>
+                                                  </div>
                                                 </div>
-                                              </Tooltip>
+                                              </div>
+                                            </div>
+                                            <div class="col-md-6 col-lg-6 col-6 text-end mb-2">
                                               <Tooltip
                                                 title={getCrudButtonToolTipName(
-                                                  "Filter",
-                                                  EngagementName,
+                                                  `Delete ${EngagementName}`,
                                                 )}
                                               >
-                                                <div>
+                                                <div className="d-inline-block">
                                                   <button
                                                     className={
-                                                      isFilterApply
+                                                      selectedRows.length !== 0
                                                         ? "btn btn-md btn-success create-item-btn filter me-2"
                                                         : "btn btn-md btn-success create-item-btn-apply filter me-2"
                                                     }
+                                                    disabled={
+                                                      selectedRows.length === 0
+                                                    }
                                                     data-bs-toggle="modal"
-                                                    data-bs-target="#FilterModel"
+                                                    data-bs-target="#ConfirmModel"
+                                                    onClick={() =>
+                                                      setModelRequestData({
+                                                        ...modelRequestData,
+                                                        Action: "Delete",
+                                                      })
+                                                    }
                                                   >
-                                                    {/* <i class="ri-pencil-fill"></i> */}
-
                                                     <i
                                                       className={
-                                                        isFilterApply
-                                                          ? "ri-filter-fill align-bottom "
-                                                          : "ri-filter-fill align-bottom Filter-apply-color"
+                                                        selectedRows.length !==
+                                                        0
+                                                          ? "ri-delete-bin-5-fill align-bottom "
+                                                          : "ri-delete-bin-5-fill align-bottom Filter-apply-color"
                                                       }
                                                     ></i>
                                                   </button>
                                                 </div>
                                               </Tooltip>
-                                              <div className="col-9">
-                                                {isFilterApply ? (
-                                                  <Tooltip
-                                                    title={"Clear Filter"}
-                                                  >
-                                                    <div>
-                                                      <button
-                                                        className="btn btn-md btn-success create-Filter-item-btn text-nowrap"
-                                                        onClick={ClearFilter} // Corrected from onclick to onClick
-                                                      >
-                                                        <span className="text-nowrap">
-                                                          Clear Filter
-                                                        </span>
-                                                      </button>
-                                                    </div>
-                                                  </Tooltip>
-                                                ) : (
-                                                  ""
-                                                )}
-                                              </div>
                                             </div>
-                                          </div>
-                                          </div>
-                                          </div>
-                                          <div class="col-md-6 col-lg-6 col-6 text-end mb-2">
-                                          <Tooltip
-                                                  title={getCrudButtonToolTipName(
-                                                    `Delete ${EngagementName}`,
-                                                  )}
-                                                >
-                                                  <div className="d-inline-block">
-                                                    <button
-                                                      className={
-                                                        selectedRows.length !==
-                                                        0
-                                                          ? "btn btn-md btn-success create-item-btn filter me-2"
-                                                          : "btn btn-md btn-success create-item-btn-apply filter me-2"
-                                                      }
-                                                      disabled={
-                                                        selectedRows.length ===
-                                                        0
-                                                      }
-                                                      data-bs-toggle="modal"
-                                                      data-bs-target="#ConfirmModel"
-                                                      onClick={() =>
-                                                        setModelRequestData({
-                                                          ...modelRequestData,
-                                                          Action: "Delete",
-                                                        })
-                                                      }
-                                                    >
-                                                      <i
-                                                        className={
-                                                          selectedRows.length !==
-                                                          0
-                                                            ? "ri-delete-bin-5-fill align-bottom "
-                                                            : "ri-delete-bin-5-fill align-bottom Filter-apply-color"
-                                                        }
-                                                      ></i>
-                                                    </button>
-                                                  </div>
-                                                </Tooltip>
-                                          </div>
                                           </div>
                                         )}
                                       </div>
-
-                                      
                                     </div>
 
                                     {/* Table Of Template and Template Pdf */}
@@ -2732,69 +2808,69 @@ const Engagement_Letter = () => {
                                                               )}
 
                                                               {/* invoice button  */}
-                                                              {engagement.statusName ==
-                                                                "Signed" && (
-                                                                //check prospect synced or not
-                                                                //check organisation sync with xerO/qbo
-                                                                <li>
-                                                                  {/* <Tooltip title={`Delete ${proposalName}`} placement="right"> */}
-                                                                  <a
-                                                                    className="dropdown-item"
-                                                                    // data-bs-toggle="modal"
-                                                                    // data-bs-target="#ConfirmModel"
-                                                                    onClick={async () => {
-                                                                      //add loader on action button later
-                                                                      try {
-                                                                        const res =
-                                                                          await dispatch(
-                                                                            CreateEngagementInvoice(
-                                                                              {
-                                                                                organisationKeyID:
-                                                                                  common.organisationKeyID,
-                                                                                contractKeyId:
-                                                                                  engagement.contractKeyID,
-                                                                              },
-                                                                            ),
-                                                                          ).unwrap();
+                                                              {engagement.statusName ===
+                                                                "Signed" &&
+                                                                (isXeroEnabled ||
+                                                                  isQuickBooksEnabled) && (
+                                                                  <li>
+                                                                    {/* <Tooltip title={`Delete ${proposalName}`} placement="right"> */}
+                                                                    <a
+                                                                      className="dropdown-item"
+                                                                      // data-bs-toggle="modal"
+                                                                      // data-bs-target="#ConfirmModel"
+                                                                      onClick={async () => {
+                                                                        //add loader on action button later
+                                                                        try {
+                                                                          const res =
+                                                                            await dispatch(
+                                                                              CreateEngagementInvoice(
+                                                                                {
+                                                                                  organisationKeyID:
+                                                                                    common.organisationKeyID,
+                                                                                  contractKeyId:
+                                                                                    engagement.contractKeyID,
+                                                                                },
+                                                                              ),
+                                                                            ).unwrap();
 
-                                                                        // SUCCESS
-                                                                        setOpenSuccessModal(
-                                                                          true,
-                                                                        );
-                                                                        setModelRequestData(
-                                                                          {
-                                                                            ...modelRequestData,
-                                                                            Action:
-                                                                              "Create Invoice",
-                                                                            message:
-                                                                              "Invoice Created Successfully!",
-                                                                          },
-                                                                        );
-                                                                      } catch (error) {
-                                                                        // ERROR
-                                                                        setErrorMessage(
-                                                                          error ||
-                                                                            "Something went wrong",
-                                                                        );
-                                                                        setOpenErrorModal(
-                                                                          true,
-                                                                        );
-                                                                      }
-                                                                    }}
-                                                                  >
-                                                                    <i
-                                                                      className="ri-bill-line"
-                                                                      style={{
-                                                                        marginRight:
-                                                                          "2px",
+                                                                          // SUCCESS
+                                                                          setOpenSuccessModal(
+                                                                            true,
+                                                                          );
+                                                                          setModelRequestData(
+                                                                            {
+                                                                              ...modelRequestData,
+                                                                              Action:
+                                                                                "Create Invoice",
+                                                                              message:
+                                                                                "Invoice Created Successfully!",
+                                                                            },
+                                                                          );
+                                                                        } catch (error) {
+                                                                          // ERROR
+                                                                          setErrorMessage(
+                                                                            error ||
+                                                                              "Something went wrong",
+                                                                          );
+                                                                          setOpenErrorModal(
+                                                                            true,
+                                                                          );
+                                                                        }
                                                                       }}
-                                                                    ></i>{" "}
-                                                                    Create
-                                                                    Invoice
-                                                                  </a>
-                                                                  {/* </Tooltip> */}
-                                                                </li>
-                                                              )}
+                                                                    >
+                                                                      <i
+                                                                        className="ri-bill-line"
+                                                                        style={{
+                                                                          marginRight:
+                                                                            "2px",
+                                                                        }}
+                                                                      ></i>{" "}
+                                                                      Create
+                                                                      Invoice
+                                                                    </a>
+                                                                    {/* </Tooltip> */}
+                                                                  </li>
+                                                                )}
                                                             </ul>
                                                           </div>
                                                         </div>
@@ -3771,8 +3847,9 @@ const Engagement_Letter = () => {
                                 : modelRequestData.Action === "DeleteContract"
                                   ? HandleDeleteDraftContractData
                                   : modelRequestData.Action ===
-                                      "ArchiveContract"
-                                      || modelRequestData.Action === "UnarchiveContract"
+                                        "ArchiveContract" ||
+                                      modelRequestData.Action ===
+                                        "UnarchiveContract"
                                     ? ArchiveContractData
                                     : modelRequestData.Action === "Copy"
                                       ? CopyContractData
