@@ -30,8 +30,13 @@ const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
     const source = isSlab ? driver.slab : driver.variation;
     const options = (source || []).map((option) => ({
       value: isSlab ? option.slabID : option.variationID,
+      // Mirrors AddUpdateProposal.jsx's slab display logic: slabTypeID 2 is
+      // a fixed-value slab (shown via its slabValue), everything else is a
+      // range slab (shown as "slabFrom - slabTo").
       label: isSlab
-        ? option.slabTypeName || `${option.slabFrom} - ${option.slabTo}`
+        ? option.slabTypeID === 2
+          ? String(option.slabValue)
+          : `${option.slabFrom} - ${option.slabTo}`
         : option.variationName,
     }));
     const selected =

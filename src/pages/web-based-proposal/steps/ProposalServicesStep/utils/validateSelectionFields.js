@@ -29,21 +29,40 @@ export const validateSelectionFields = (service, driverValues) => {
           return;
         }
 
+        // Mirrors AddUpdateProposal.jsx's quantity range guard (search
+        // `hasFrom`/`hasTo` there): quantityFrom/quantityTo come back as
+        // `null`, not just `undefined`, when a bound isn't configured, so
+        // both must be excluded — otherwise an unset bound is coerced to 0
+        // and a valid default value (e.g. 1) is rejected as "between 0 and 0".
         const quantity = driver.quantity?.[0];
-        const min =
-          quantity?.quantityFrom !== undefined
-            ? Number(quantity.quantityFrom)
-            : undefined;
-        const max =
-          quantity?.quantityTo !== undefined
-            ? Number(quantity.quantityTo)
-            : undefined;
+        const from = quantity?.quantityFrom;
+        const to = quantity?.quantityTo;
+        const parsedFrom = Number(from);
+        const parsedTo = Number(to);
+        const hasFrom =
+          from !== undefined &&
+          from !== null &&
+          from !== "" &&
+          !Number.isNaN(parsedFrom);
+        const hasTo =
+          to !== undefined &&
+          to !== null &&
+          to !== "" &&
+          !Number.isNaN(parsedTo);
+
         if (
-          (min !== undefined && numericValue < min) ||
-          (max !== undefined && numericValue > max)
+          (hasFrom &&
+            hasTo &&
+            (numericValue < parsedFrom || numericValue > parsedTo)) ||
+          (hasFrom && !hasTo && numericValue < parsedFrom) ||
+          (!hasFrom && hasTo && numericValue > parsedTo)
         ) {
           fieldErrors[driver.globalPricingDriverID] =
-            `Enter a value between ${min} and ${max}.`;
+            hasFrom && hasTo
+              ? `Enter a value between ${parsedFrom} and ${parsedTo}.`
+              : hasFrom
+                ? `Enter a value of at least ${parsedFrom}.`
+                : `Enter a value of at most ${parsedTo}.`;
         }
       } else if (driver.driverTypeID === 3 || driver.driverTypeID === 4) {
         if (entry?.value === null || entry?.value === undefined) {

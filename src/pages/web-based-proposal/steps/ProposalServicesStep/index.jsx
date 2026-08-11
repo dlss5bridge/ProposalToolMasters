@@ -51,13 +51,17 @@ const buildInitialDriverValues = (service) => {
           label: defaultOption ? defaultOption.variationName : null,
         };
       } else if (driver.driverTypeID === 4) {
+        // Mirrors AddUpdateProposal.jsx's slab display logic: slabTypeID 2 is
+        // a fixed-value slab (shown via its slabValue), everything else is a
+        // range slab (shown as "slabFrom - slabTo").
         const defaultOption = driver.slab?.find((option) => option.isDefault);
         values[driver.globalPricingDriverID] = {
           driverName: driver.driverName,
           value: defaultOption ? defaultOption.slabID : null,
           label: defaultOption
-            ? defaultOption.slabTypeName ||
-              `${defaultOption.slabFrom} - ${defaultOption.slabTo}`
+            ? defaultOption.slabTypeID === 2
+              ? String(defaultOption.slabValue)
+              : `${defaultOption.slabFrom} - ${defaultOption.slabTo}`
             : null,
         };
       } else if (driver.driverTypeID === 2) {
