@@ -34,10 +34,19 @@ const SERVICE_CHARGE_TYPE_ID = { RECURRING: 1, ONE_OFF: 2 };
 // quoteModel.paymentFrequencyID: 1 Yearly, 2 HalfYearly, 3 Quarterly, 4
 // Monthly. Recurring prices are quoted/stored yearly, so a non-yearly
 // frequency divides the yearly figure down to that billing period — mirrors
-// the Payment_Frequency divisor used in AddUpdateProposal.jsx/
+// the Payment_Frequency divisor used in AddUpdateProposal.jsx's Review
+// Services tab (handlePaymentFrequencyChange divides every recurring
+// service's yearly price by the same divisor, admin-default or user-added
+// alike, before summing into the section totals) and
 // AddUpdateEngagementLetter.jsx. One-off services are never billed on a
 // recurring cadence, so this must never apply to them.
 const PAYMENT_FREQUENCY_DIVISOR = { 1: 1, 2: 2, 3: 4, 4: 12 };
+const PAYMENT_FREQUENCY_LABEL = {
+  1: "Yearly",
+  2: "Half-Yearly",
+  3: "Quarterly",
+  4: "Monthly",
+};
 
 // serviceID is only unique within a charge type (recurring vs one-off share
 // the same ID space), so lookups must key on both — otherwise a one-off
@@ -128,8 +137,8 @@ const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
 
   // Every driver here is hidden (driverVisibility: false) because it's a
   // global pricing driver captured on the separate Additional Information
-  // step instead — taggedAdditionalDriverEntries supplies its row. Emitting
-  // a driverValue: null placeholder here as well would send a second,
+  // step instead — additionalDriverEntries supplies its row. Emitting a
+  // driverValue: null placeholder here as well would send a second,
   // conflicting row for the same service and shadow that real value.
   if (visibleDrivers.length === 0) {
     return [];
@@ -323,6 +332,7 @@ function FeeSection({
   grandTotal,
   note,
   isCustomPackage,
+  frequencyLabel,
 }) {
   const hasDiscount = Number(discountPercentage) > 0;
   return (
@@ -343,6 +353,17 @@ function FeeSection({
             style={{ color: accent }}
           >
             {title}
+            {/* Same "Recurring Fees (Monthly)" pattern as
+                AddUpdateProposal.jsx's Review Services tab
+                (getPaymentFrequencyLabel). */}
+            {frequencyLabel && (
+              <span
+                className="ml-1 normal-case tracking-normal"
+                style={{ color: theme.textSecondary }}
+              >
+                ({frequencyLabel})
+              </span>
+            )}
           </span>
         </div>
         <span className="text-xs" style={{ color: theme.textSecondary }}>
@@ -525,12 +546,16 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   );
 
   // Applied to recurring services only (never one-off) when computing live
-  // prices from the pricing API's yearly figures — see
-  // PAYMENT_FREQUENCY_DIVISOR above. Stored quotationFinalAmountList amounts
-  // (the finalAmount branch in buildChargeTypeTotals) are already
-  // frequency-adjusted by the backend and must not be divided again.
+  // prices from the pricing API's yearly figures — see priceByServiceID
+  // below. This must NOT be applied a second time to the stored
+  // quotationFinalAmountList recurring finalAmount (defaultRecurringFinalAmount
+  // below) — that figure is already saved at the quote's payment frequency
+  // (see the comment there), for both Service and Package/Custom Package
+  // quotes.
   const paymentFrequencyDivisor =
     PAYMENT_FREQUENCY_DIVISOR[quoteModel?.paymentFrequencyID] || 1;
+  const paymentFrequencyLabel =
+    PAYMENT_FREQUENCY_LABEL[quoteModel?.paymentFrequencyID] || "Yearly";
 
   const recurringServiceByID = useMemo(
     () => buildServiceDefMap(recurringServices),
@@ -562,37 +587,15 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     [additionalInformationList],
   );
 
-  // additionalDriverEntries carry only serviceID + the driver value — unlike
-  // every recurring/oneOff row, they have no serviceChargeTypeID/serviceCatID,
-  // so the backend can't tell which formula (recurring vs one-off) a given
-  // service's global driver value belongs to. Tag each entry with the charge
-  // type(s) of the currently selected service it matches — a service can be
-  // selected under both charge types at once, so emit one row per match.
-  const taggedAdditionalDriverEntries = useMemo(
-    () =>
-      additionalDriverEntries.flatMap((entry) => {
-        const matches = [];
-        const recurringSelection = recurringSelections?.[entry.serviceID];
-        if (recurringSelection) {
-          matches.push({
-            ...entry,
-            serviceChargeTypeID: SERVICE_CHARGE_TYPE_ID.RECURRING,
-            serviceCatID: recurringSelection.serviceCatID,
-          });
-        }
-        const oneOffSelection = oneOffSelections?.[entry.serviceID];
-        if (oneOffSelection) {
-          matches.push({
-            ...entry,
-            serviceChargeTypeID: SERVICE_CHARGE_TYPE_ID.ONE_OFF,
-            serviceCatID: oneOffSelection.serviceCatID,
-          });
-        }
-        return matches.length > 0 ? matches : [entry];
-      }),
-    [additionalDriverEntries, recurringSelections, oneOffSelections],
-  );
-
+  // additionalDriverEntries are sent as-is, with no serviceChargeTypeID/
+  // serviceCatID — mirrors AddUpdateProposal.jsx's extractServiceData
+  // AdditionalData block exactly. A global pricing driver's value can feed
+  // more than one service's pricing formula (e.g. the same GPD referenced by
+  // both a recurring and a one-off service, as with globalPricingDriverID
+  // 19540 above), so tagging the row to a single charge type/category was
+  // wrong — it made the backend apply the value only to the formula matching
+  // that tag and silently zero it out for every other service referencing
+  // the same driver.
   const calculateServicesGPDList = useMemo(() => {
     const recurring = Object.values(recurringSelections || {}).flatMap(
       (selection) =>
@@ -609,13 +612,13 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
         2,
       ),
     );
-    return [...recurring, ...oneOff, ...taggedAdditionalDriverEntries];
+    return [...recurring, ...oneOff, ...additionalDriverEntries];
   }, [
     recurringSelections,
     oneOffSelections,
     recurringServiceByID,
     oneOffServiceByID,
-    taggedAdditionalDriverEntries,
+    additionalDriverEntries,
   ]);
 
   // The Services step's "Next" gate normally blocks leaving with a required
@@ -828,7 +831,14 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   // defaultFinalAmount is the quote's originally saved pricing for this
   // charge type — used as the "what the client was already quoted" baseline
   // for the amendment-discount check below, regardless of whether the
-  // current selections still match it.
+  // current selections still match it. In AddUpdateProposal.jsx's Review
+  // Services tab, handlePaymentFrequencyChange keeps RecurringPricingInfo
+  // (the source of the saved quotationFinalAmountList recurring row) synced
+  // to whatever payment frequency is selected at save time — and the web
+  // proposal has no control to change frequency after that (paymentFrequencyID
+  // is fixed, read-only, from quoteModel) — so this stored recurring
+  // finalAmount already matches quoteModel.paymentFrequencyID and must be
+  // used as-is here, not divided by paymentFrequencyDivisor again.
   const defaultRecurringFinalAmount = findFinalAmount(
     SERVICE_CHARGE_TYPE_ID.RECURRING,
   );
@@ -1013,6 +1023,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   grandTotal={recurringTotals.grandTotal}
                   note={recurringTotals.note}
                   isCustomPackage={isCustomPackage}
+                  frequencyLabel={paymentFrequencyLabel}
                 />
               )}
 
