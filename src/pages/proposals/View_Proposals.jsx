@@ -6437,6 +6437,9 @@ const View_Proposals = () => {
                                                                         1 && (
                                                                         <>
                                                                           {" "}
+                                                                          {
+                                                                            currencySymbol
+                                                                          }
                                                                           {formatValue(
                                                                             subService.quotationPrice,
                                                                           )}
@@ -6464,6 +6467,7 @@ const View_Proposals = () => {
                                                       </td>
                                                       <td className="tr-table-class text-white text-right">
                                                         {" "}
+                                                        {currencySymbol}
                                                         {
                                                           Number(
                                                             RecurringPricingInfo.OriginalPrice,
@@ -6503,7 +6507,8 @@ const View_Proposals = () => {
                                                             Discount
                                                           </td>
                                                           <td className="tr-table-class text-white text-right">
-                                                            (-){" "}
+                                                            (-)
+                                                            {currencySymbol}
                                                             {
                                                               formatValue(
                                                                 RecurringPricingInfo.Discount,
@@ -6521,6 +6526,7 @@ const View_Proposals = () => {
                                                           </td>
                                                           <td className="tr-table-class text-white text-right">
                                                             {" "}
+                                                            {currencySymbol}
                                                             {
                                                               formatValue(
                                                                 RecurringPricingInfo.DiscountedTotal,
@@ -6547,6 +6553,7 @@ const View_Proposals = () => {
                                                         </td>
                                                         <td className="tr-table-class text-white text-right">
                                                           {" "}
+                                                          {currencySymbol}
                                                           {
                                                             formatValue(
                                                               RecurringPricingInfo.VATPrice,
@@ -6564,6 +6571,7 @@ const View_Proposals = () => {
                                                         </td>
                                                         <td className="tr-table-class text-white text-right">
                                                           {" "}
+                                                          {currencySymbol}
                                                           {
                                                             formatValue(
                                                               RecurringPricingInfo.GrandTotal,
@@ -6626,7 +6634,7 @@ const View_Proposals = () => {
                                                           width: "16.66%",
                                                         }}
                                                       >
-                                                        Fees (£)
+                                                        Fees ({currencySymbol})
                                                       </th>
                                                     )}
                                                     {showRecurringVat &&
@@ -6637,7 +6645,7 @@ const View_Proposals = () => {
                                                             width: "16.66%",
                                                           }}
                                                         >
-                                                          VAT Rate
+                                                          {taxName} Rate
                                                         </th>
                                                       )}
                                                     {showRecurringVat &&
@@ -6648,7 +6656,8 @@ const View_Proposals = () => {
                                                             width: "16.66%",
                                                           }}
                                                         >
-                                                          VAT (£)
+                                                          {taxName} (
+                                                          {currencySymbol})
                                                         </th>
                                                       )}
                                                     {showRecurringVat &&
@@ -6659,7 +6668,8 @@ const View_Proposals = () => {
                                                             width: "16.66%",
                                                           }}
                                                         >
-                                                          Fees inc VAT (£)
+                                                          Fees inc {taxName} (
+                                                          {currencySymbol})
                                                         </th>
                                                       )}
                                                   </tr>
@@ -7174,6 +7184,9 @@ const View_Proposals = () => {
                                                                         1 && (
                                                                         <>
                                                                           {" "}
+                                                                          {
+                                                                            currencySymbol
+                                                                          }
                                                                           {formatValue(
                                                                             subService.quotationPrice,
                                                                           )}
@@ -7201,6 +7214,7 @@ const View_Proposals = () => {
                                                       </td>
                                                       <td className="tr-table-class text-white text-right">
                                                         {" "}
+                                                        {currencySymbol}
                                                         {
                                                           Number(
                                                             OneOffPricingInfo.OriginalPrice,
@@ -7241,7 +7255,7 @@ const View_Proposals = () => {
                                                             Discount
                                                           </td>
                                                           <td className="tr-table-class text-white text-right">
-                                                            (-){" "}
+                                                            (-) {currencySymbol}
                                                             {formatValue(
                                                               OneOffPricingInfo.Discount,
                                                             )}
@@ -7255,7 +7269,7 @@ const View_Proposals = () => {
                                                             Discounted Total
                                                           </td>
                                                           <td className="tr-table-class text-white text-right">
-                                                            {" "}
+                                                            {currencySymbol}{" "}
                                                             {formatValue(
                                                               OneOffPricingInfo.DiscountedTotal,
                                                             )}
@@ -7277,6 +7291,7 @@ const View_Proposals = () => {
                                                         </td>
                                                         <td className="tr-table-class text-white text-right">
                                                           {" "}
+                                                          {currencySymbol}
                                                           {
                                                             formatValue(
                                                               OneOffPricingInfo.VATPrice,
@@ -7294,6 +7309,7 @@ const View_Proposals = () => {
                                                         </td>
                                                         <td className="tr-table-class text-white text-right">
                                                           {" "}
+                                                          {currencySymbol}
                                                           {
                                                             formatValue(
                                                               OneOffPricingInfo.GrandTotal,

@@ -6044,7 +6044,7 @@ const ReviewPackagesComponent = (props) => {
       }),
   );
 
-  const hasCustomPackageVAT = Number(props.vatPercentage || 0) > 0;
+  const hasCustomPackageVAT = props.isVatEnabledForOrg;
 
   const showCustomPackageDiscount =
     Boolean(props.engagementObj?.DiscountLines) &&
@@ -6186,7 +6186,7 @@ const ReviewPackagesComponent = (props) => {
   );
 
   const hasCustomOneOffPackageVAT =
-    Number(props.vatPercentage || 0) > 0 ||
+    props.isVatEnabledForOrg ||
     (props.selectedOneOffServiceList || []).some((category) =>
       (category?.servicesList || []).some(
         (service) => Number(service?.service_vat_percentage || 0) > 0,
@@ -7222,15 +7222,15 @@ const ReviewPackagesComponent = (props) => {
                                       pkg.servicePackageName
                                     )}
                                   </td>
-                                  {props.vatPercentage !== 0 &&
+                                  {props.isVatEnabledForOrg &&
                                     props.visibleFieldsCustomTemp.vatRate && (
                                       <td></td>
                                     )}
-                                  {props.vatPercentage !== 0 &&
+                                  {props.isVatEnabledForOrg &&
                                     props.visibleFieldsCustomTemp.vat && (
                                       <td></td>
                                     )}
-                                  {props.vatPercentage !== 0 &&
+                                  {props.isVatEnabledForOrg &&
                                     props.visibleFieldsCustomTemp
                                       .feesIncVat && <td></td>}
                                   {props.visibleFieldsCustomTemp
@@ -7275,7 +7275,7 @@ const ReviewPackagesComponent = (props) => {
                                     </th>
                                   )}
 
-                                  {props.vatPercentage !== 0 &&
+                                  {props.isVatEnabledForOrg &&
                                     props.visibleFieldsCustomTemp.vatRate && (
                                       <th
                                         className="tr-table-class text-white text-right"
@@ -7285,7 +7285,7 @@ const ReviewPackagesComponent = (props) => {
                                       </th>
                                     )}
 
-                                  {props.vatPercentage !== 0 &&
+                                  {props.isVatEnabledForOrg &&
                                     props.visibleFieldsCustomTemp.vat && (
                                       <th
                                         className="tr-table-class text-white text-right"
@@ -7295,7 +7295,7 @@ const ReviewPackagesComponent = (props) => {
                                       </th>
                                     )}
 
-                                  {props.vatPercentage !== 0 &&
+                                  {props.isVatEnabledForOrg &&
                                     props.visibleFieldsCustomTemp
                                       .feesIncVat && (
                                       <th
@@ -7428,9 +7428,8 @@ const ReviewPackagesComponent = (props) => {
                                                     )}
 
                                                     {/* VAT RATE */}
-                                                    {Number(
-                                                      props.vatPercentage,
-                                                    ) > 0 &&
+                                                    {props.isVatEnabledForOrg >
+                                                      0 &&
                                                       props
                                                         .visibleFieldsCustomTemp
                                                         .vatRate && (
@@ -7447,9 +7446,7 @@ const ReviewPackagesComponent = (props) => {
                                                       )}
 
                                                     {/* VAT */}
-                                                    {Number(
-                                                      props.vatPercentage,
-                                                    ) > 0 &&
+                                                    {props.isVatEnabledForOrg &&
                                                       props
                                                         .visibleFieldsCustomTemp
                                                         .vat && (
@@ -7473,9 +7470,7 @@ const ReviewPackagesComponent = (props) => {
                                                       )}
 
                                                     {/* FEES INCLUDING VAT */}
-                                                    {Number(
-                                                      props.vatPercentage,
-                                                    ) > 0 &&
+                                                    {props.isVatEnabledForOrg &&
                                                       props
                                                         .visibleFieldsCustomTemp
                                                         .feesIncVat && (
@@ -7589,15 +7584,15 @@ const ReviewPackagesComponent = (props) => {
                                   </div>
                                 </td>
 
-                                {props.vatPercentage !== 0 &&
+                                {props.isVatEnabledForOrg &&
                                   props.visibleFieldsCustomTemp.vatRate && (
                                     <th></th>
                                   )}
-                                {props.vatPercentage !== 0 &&
+                                {props.isVatEnabledForOrg &&
                                   props.visibleFieldsCustomTemp.vat && (
                                     <th></th>
                                   )}
-                                {props.vatPercentage !== 0 &&
+                                {props.isVatEnabledForOrg &&
                                   props.visibleFieldsCustomTemp.feesIncVat && (
                                     <th></th>
                                   )}
@@ -7650,15 +7645,15 @@ const ReviewPackagesComponent = (props) => {
                                         </div>
                                       </div>
                                     </td>
-                                    {props.vatPercentage !== 0 &&
+                                    {props.isVatEnabledForOrg &&
                                       props.visibleFieldsCustomTemp.vatRate && (
                                         <th></th>
                                       )}
-                                    {props.vatPercentage !== 0 &&
+                                    {props.isVatEnabledForOrg &&
                                       props.visibleFieldsCustomTemp.vat && (
                                         <th></th>
                                       )}
-                                    {props.vatPercentage !== 0 &&
+                                    {props.isVatEnabledForOrg &&
                                       props.visibleFieldsCustomTemp
                                         .feesIncVat && <th></th>}
                                     {props.visibleFieldsCustomTemp
@@ -8872,7 +8867,7 @@ const ReviewPackagesComponent = (props) => {
                                     <tr className="a-la-carte-services-review-head-row">
                                       {props.visibleFieldsCustomTemp
                                         .serviceName && (
-                                        <th colSpan={1 + packageCount}>
+                                        <th colSpan={packageCount}>
                                           {service.serviceCatName}
                                         </th>
                                       )}
@@ -8881,14 +8876,14 @@ const ReviewPackagesComponent = (props) => {
                                       {props.visibleFieldsCustomTemp.fees && (
                                         <th></th>
                                       )}
-                                      {props.vatPercentage !== 0 &&
+                                      {props.isVatEnabledForOrg &&
                                         props.visibleFieldsCustomTemp
                                           .vatRate && <th></th>}
-                                      {props.vatPercentage !== 0 &&
+                                      {props.isVatEnabledForOrg &&
                                         props.visibleFieldsCustomTemp.vat && (
                                           <th></th>
                                         )}
-                                      {props.vatPercentage !== 0 &&
+                                      {props.isVatEnabledForOrg &&
                                         props.visibleFieldsCustomTemp
                                           .feesIncVat && <th></th>}
                                       {props.visibleFieldsCustomTemp
@@ -8897,13 +8892,13 @@ const ReviewPackagesComponent = (props) => {
                                         <>
                                           {props.visibleFieldsCustomTemp
                                             .fees && <th></th>}
-                                          {props.vatPercentage !== 0 &&
+                                          {props.isVatEnabledForOrg &&
                                             props.visibleFieldsCustomTemp
                                               .vatRate && <th></th>}
-                                          {props.vatPercentage !== 0 &&
+                                          {props.isVatEnabledForOrg &&
                                             props.visibleFieldsCustomTemp
                                               .vat && <th></th>}
-                                          {props.vatPercentage !== 0 &&
+                                          {props.isVatEnabledForOrg &&
                                             props.visibleFieldsCustomTemp
                                               .feesIncVat && <th></th>}
                                           {props.visibleFieldsCustomTemp
@@ -8915,13 +8910,13 @@ const ReviewPackagesComponent = (props) => {
                                         <>
                                           {props.visibleFieldsCustomTemp
                                             .fees && <th></th>}
-                                          {props.vatPercentage !== 0 &&
+                                          {props.isVatEnabledForOrg &&
                                             props.visibleFieldsCustomTemp
                                               .vatRate && <th></th>}
-                                          {props.vatPercentage !== 0 &&
+                                          {props.isVatEnabledForOrg &&
                                             props.visibleFieldsCustomTemp
                                               .vat && <th></th>}
-                                          {props.vatPercentage !== 0 &&
+                                          {props.isVatEnabledForOrg &&
                                             props.visibleFieldsCustomTemp
                                               .feesIncVat && <th></th>}
                                           {props.visibleFieldsCustomTemp
@@ -9007,8 +9002,7 @@ const ReviewPackagesComponent = (props) => {
                                                   )}
 
                                                   {/* VAT RATE */}
-                                                  {Number(props.vatPercentage) >
-                                                    0 &&
+                                                  {props.isVatEnabledForOrg &&
                                                     props
                                                       .visibleFieldsCustomTemp
                                                       .vatRate && (
@@ -9022,8 +9016,7 @@ const ReviewPackagesComponent = (props) => {
                                                     )}
 
                                                   {/* VAT */}
-                                                  {Number(props.vatPercentage) >
-                                                    0 &&
+                                                  {props.isVatEnabledForOrg &&
                                                     props
                                                       .visibleFieldsCustomTemp
                                                       .vat && (
@@ -9040,8 +9033,7 @@ const ReviewPackagesComponent = (props) => {
                                                     )}
 
                                                   {/* FEES INC VAT */}
-                                                  {Number(props.vatPercentage) >
-                                                    0 &&
+                                                  {props.isVatEnabledForOrg &&
                                                     props
                                                       .visibleFieldsCustomTemp
                                                       .feesIncVat && (
@@ -9156,15 +9148,15 @@ const ReviewPackagesComponent = (props) => {
                                   </div>
                                 </td>
 
-                                {props.vatPercentage !== 0 &&
+                                {props.isVatEnabledForOrg &&
                                   props.visibleFieldsCustomTemp.vatRate && (
                                     <th></th>
                                   )}
-                                {props.vatPercentage !== 0 &&
+                                {props.isVatEnabledForOrg &&
                                   props.visibleFieldsCustomTemp.vat && (
                                     <th></th>
                                   )}
-                                {props.vatPercentage !== 0 &&
+                                {props.isVatEnabledForOrg &&
                                   props.visibleFieldsCustomTemp.feesIncVat && (
                                     <th></th>
                                   )}
@@ -9217,15 +9209,15 @@ const ReviewPackagesComponent = (props) => {
                                         </div>
                                       </div>
                                     </td>
-                                    {props.vatPercentage !== 0 &&
+                                    {props.isVatEnabledForOrg &&
                                       props.visibleFieldsCustomTemp.vatRate && (
                                         <th></th>
                                       )}
-                                    {props.vatPercentage !== 0 &&
+                                    {props.isVatEnabledForOrg &&
                                       props.visibleFieldsCustomTemp.vat && (
                                         <th></th>
                                       )}
-                                    {props.vatPercentage !== 0 &&
+                                    {props.isVatEnabledForOrg &&
                                       props.visibleFieldsCustomTemp
                                         .feesIncVat && <th></th>}
                                     {props.visibleFieldsCustomTemp
@@ -18883,6 +18875,7 @@ const Add_Update_Engagement_Letter = () => {
                   visibleFieldsCustomTemp={visibleFieldsCustomTemp}
                   setVisibleFieldsCustomTemp={setVisibleFieldsCustomTemp}
                   selectedTemplateID={selectedTemplateID}
+                  isVatEnabledForOrg={isVatEnabledForOrg}
                 />
               )}
               {activeTab === EngagementLetterHeader.ReviewServices && (
