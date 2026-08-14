@@ -2279,8 +2279,6 @@ const ReviewServicesComponent = (props) => {
 
     // Calculate price based on payment frequency
 
-    debugger;
-
     let calculatedOriginalPriceFromServices = 0;
     if (e.value === Payment_Frequency.Yearly) {
       props.setProposalObject((prevState) => ({
@@ -6014,7 +6012,10 @@ const ReviewPackagesComponent = (props) => {
   // Package/Custom Package: a package's recurringMinPrice/recurringDefaultPrice/recurringOriginalPrice
   // are configured yearly, so they must be scaled to the currently selected payment frequency
   // before being compared against (or used to derive) frequency-adjusted recurring totals.
-  const getFrequencyAdjustedRecurringPrice = (basePrice, paymentFrequencyID) => {
+  const getFrequencyAdjustedRecurringPrice = (
+    basePrice,
+    paymentFrequencyID,
+  ) => {
     const price = Number(basePrice);
     if (isNaN(price)) return NaN;
     switch (paymentFrequencyID) {
@@ -13919,8 +13920,7 @@ const ReviewPackagesComponent = (props) => {
                             )}
                             {getPackageMinPriceValidationMessage(
                               props.selectedPackagesList[0]?.oneOffMinPrice,
-                              props.OneOffPricingInfo
-                                .packageOneDisCountedTotal,
+                              props.OneOffPricingInfo.packageOneDisCountedTotal,
                             )}
                           </>
                         )}{" "}
@@ -17341,7 +17341,6 @@ const Add_Update_Proposal = (props) => {
     recurringServiceListData,
     oneOffServiceListData,
   ) => {
-    debugger;
     setLoader(true);
 
     if (obj.calculateServicesGPDList.length === 0) {
@@ -18571,8 +18570,6 @@ const Add_Update_Proposal = (props) => {
 
               recMaxDiscountCopy = RecurringPricingInfo.MaxDiscount;
             }
-
-            debugger;
 
             setRecurringPricingInfo({
               ...RecurringPricingInfo,
@@ -20368,7 +20365,6 @@ const Add_Update_Proposal = (props) => {
 
   // load both recurring and one-off services together
   const loadServiceLists = async () => {
-    debugger;
     setLoader(true);
     try {
       await Promise.all([
@@ -20830,7 +20826,6 @@ const Add_Update_Proposal = (props) => {
     templateID,
     existingPricingTableColumnIDs,
   ) => {
-    debugger;
     setLoader(true);
     try {
       const response = await GetTemplateListLookupList({
@@ -21626,7 +21621,6 @@ const Add_Update_Proposal = (props) => {
             AddFirstPageHtmlContent[index] = updatedFirstPage;
           }
 
-          debugger;
           const { replacedArray, pricingVariables } =
             replaceTemplatePricingVariables(
               AddFirstPageHtmlContent,
@@ -22207,10 +22201,11 @@ const Add_Update_Proposal = (props) => {
     if (!pendingAmendmentSubmit) return;
     const updatedParams = {
       ...pendingAmendmentSubmit.paramsObj,
-      recurringDiscountPercentageForAmendment: pendingAmendmentSubmit.showRecurring
-        ? amendmentDiscountValues.recurringDiscountPercentageForAmendment ||
-          null
-        : null,
+      recurringDiscountPercentageForAmendment:
+        pendingAmendmentSubmit.showRecurring
+          ? amendmentDiscountValues.recurringDiscountPercentageForAmendment ||
+            null
+          : null,
       oneOffDiscountPercentageForAmendment: pendingAmendmentSubmit.showOneOff
         ? amendmentDiscountValues.oneOffDiscountPercentageForAmendment || null
         : null,

@@ -190,7 +190,9 @@ export default function PreviewComponentPdf(props) {
       ...props.ProposalObject,
       ProposalFormate: selectedOption.value,
       webProposalTypeID:
-        selectedOption.value === 3 ? props.ProposalObject.webProposalTypeID : null,
+        selectedOption.value === 3
+          ? props.ProposalObject.webProposalTypeID
+          : null,
       globalPricingDriverID:
         selectedOption.value === 3
           ? props.ProposalObject.globalPricingDriverID
@@ -5126,7 +5128,6 @@ export default function PreviewComponentPdf(props) {
   };
 
   const GetTemplatePdfListData = async () => {
-    debugger;
     setLoader(true);
     // const pageNoList = i - 1;
     try {
@@ -12259,37 +12260,37 @@ ${
             {props.ProposalObject?.ProposalFormate === 3 &&
               (props.ProposalObject?.webProposalTypeID == 2 ||
                 props.ProposalObject?.webProposalTypeID == 3) && (
-              <>
-                {/* Global Variables Label */}
-                <div className="col-lg-2 col-md-2 col-sm-6 d-flex align-items-center mt-4">
-                  <label className="form-label">
-                    Global {proposalName} Variables
-                  </label>
-                </div>
+                <>
+                  {/* Global Variables Label */}
+                  <div className="col-lg-2 col-md-2 col-sm-6 d-flex align-items-center mt-4">
+                    <label className="form-label">
+                      Global {proposalName} Variables
+                    </label>
+                  </div>
 
-                {/* Global Variables Select */}
-                <div className="col-lg-4 col-md-4 col-sm-6 d-flex align-items-center mt-4">
-                  <Select
-                    isMulti
-                    menuPosition="auto"
-                    className="phone-input-country-code selectDropDown GlobalVariablesSelect"
-                    options={props.globalVariables}
-                    value={props.globalVariables?.filter((option) =>
-                      props.ProposalObject.globalPricingDriverID?.includes(
-                        option.value,
-                      ),
-                    )}
-                    onChange={(selectedOptions) => {
-                      props.setProposalObject({
-                        ...props.ProposalObject,
-                        globalPricingDriverID:
-                          selectedOptions?.map((item) => item.value) || [],
-                      });
-                    }}
-                  />
-                </div>
-              </>
-            )}
+                  {/* Global Variables Select */}
+                  <div className="col-lg-4 col-md-4 col-sm-6 d-flex align-items-center mt-4">
+                    <Select
+                      isMulti
+                      menuPosition="auto"
+                      className="phone-input-country-code selectDropDown GlobalVariablesSelect"
+                      options={props.globalVariables}
+                      value={props.globalVariables?.filter((option) =>
+                        props.ProposalObject.globalPricingDriverID?.includes(
+                          option.value,
+                        ),
+                      )}
+                      onChange={(selectedOptions) => {
+                        props.setProposalObject({
+                          ...props.ProposalObject,
+                          globalPricingDriverID:
+                            selectedOptions?.map((item) => item.value) || [],
+                        });
+                      }}
+                    />
+                  </div>
+                </>
+              )}
             {(props.ProposalObject.ProposalFormate === 1 ||
               props.ProposalObject.ProposalFormate === 3) && (
               <>
