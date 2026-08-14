@@ -2096,9 +2096,10 @@ const ReviewServicesComponent = (props) => {
   const recurringEngagementServiceFooter = calculateCustomServiceFooter({
     serviceGroups: props.selectedRecurringServiceList || [],
 
+    discountedPrice: props.RecurringPricingInfo?.DiscountedPrice ?? null,
+
     discountPercentage: recurringEngagementDiscountPercentage,
 
-    // Compatibility fallback for old engagement letters
     discountAmount: props.RecurringPricingInfo?.Discount ?? null,
 
     fallbackVatPercentage: props.vatPercentage || 0,
@@ -2123,6 +2124,7 @@ const ReviewServicesComponent = (props) => {
 
   const oneOffEngagementServiceFooter = calculateCustomServiceFooter({
     serviceGroups: props.selectedOneOffServiceList || [],
+    discountedPrice: props.OneOffPricingInfo?.DiscountedPrice ?? null,
 
     discountPercentage: props.OneOffPricingInfo?.DefaultDiscount ?? null,
 

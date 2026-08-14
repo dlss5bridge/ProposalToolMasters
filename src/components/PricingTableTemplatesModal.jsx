@@ -9692,7 +9692,7 @@ const PricingTableTemplatesModal = ({
                     )}
 
                     {visibleFieldsCustomTemp.fees && (
-                      <td className="tr-table-class font-14 text-white text-right">
+                      <td className="tr-table-class font-14 text-white text-center">
                         (-){" "}
                         {formatValue(
                           customRecurringFooter.discountFees,
@@ -9743,7 +9743,7 @@ const PricingTableTemplatesModal = ({
                     )}
 
                     {visibleFieldsCustomTemp.fees && (
-                      <td className="tr-table-class font-14 text-white text-right">
+                      <td className="tr-table-class font-14 text-white text-center">
                         {formatValue(
                           customRecurringFooter.discountedFees,
                           currencyID,

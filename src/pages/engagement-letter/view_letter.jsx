@@ -2843,7 +2843,7 @@ const View_Engagement_Latter = () => {
                                                         width: "16.66%",
                                                       }}
                                                     >
-                                                      Fees (£)
+                                                      Fees ({currencySymbol})
                                                     </th>
                                                   )}
                                                   {showOneOffVat &&
@@ -2854,7 +2854,7 @@ const View_Engagement_Latter = () => {
                                                           width: "16.66%",
                                                         }}
                                                       >
-                                                        VAT Rate
+                                                        {taxName} Rate
                                                       </th>
                                                     )}
                                                   {showOneOffVat &&
@@ -2865,7 +2865,8 @@ const View_Engagement_Latter = () => {
                                                           width: "16.66%",
                                                         }}
                                                       >
-                                                        VAT (£)
+                                                        {taxName} (
+                                                        {currencySymbol})
                                                       </th>
                                                     )}
                                                   {showOneOffVat &&
@@ -2876,7 +2877,8 @@ const View_Engagement_Latter = () => {
                                                           width: "16.66%",
                                                         }}
                                                       >
-                                                        Fees inc VAT (£)
+                                                        Fees inc {taxName} (
+                                                        {currencySymbol})
                                                       </th>
                                                     )}
                                                 </tr>
@@ -2963,6 +2965,9 @@ const View_Engagement_Latter = () => {
                                                                   <td className="text-center">
                                                                     {EngagementObj.feeTypeId ===
                                                                       1 &&
+                                                                      currencySymbol}
+                                                                    {EngagementObj.feeTypeId ===
+                                                                      1 &&
                                                                       formatValue(
                                                                         price,
                                                                       )}
@@ -2983,6 +2988,9 @@ const View_Engagement_Latter = () => {
                                                                     <td className="text-center">
                                                                       {EngagementObj.feeTypeId ===
                                                                         1 &&
+                                                                        currencySymbol}
+                                                                      {EngagementObj.feeTypeId ===
+                                                                        1 &&
                                                                         formatValue(
                                                                           vatAmount,
                                                                         )}
@@ -2995,6 +3003,9 @@ const View_Engagement_Latter = () => {
                                                                 {showOneOffVat &&
                                                                   visibleFieldsCustomTemp.feesIncVat && (
                                                                     <td className="text-center">
+                                                                      {EngagementObj.feeTypeId ===
+                                                                        1 &&
+                                                                        currencySymbol}
                                                                       {EngagementObj.feeTypeId ===
                                                                         1 &&
                                                                         formatValue(
@@ -3145,7 +3156,7 @@ const View_Engagement_Latter = () => {
                                                         {formatValue(
                                                           useOneOffFinalAsNet
                                                             ? oneOffDiscountedNet
-                                                            : oneOffNetTotal,
+                                                            : oneOffDiscountedNet,
                                                           EngagementObj.currencyID,
                                                         )}
                                                       </td>
