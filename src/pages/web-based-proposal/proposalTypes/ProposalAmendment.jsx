@@ -158,6 +158,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         quoteKeyID: quoteModel?.quoteKeyID,
         clientID: quoteModel?.clientID,
         servicesIDs: selectedServiceIDs,
+        servicePackageIDs: quoteModel?.servicePackageID,
       }),
     );
   }, [isPackageType, quoteModel, selectedServiceIDs, dispatch]);
@@ -217,6 +218,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
           quoteKeyID: quoteModel?.quoteKeyID,
           clientID: quoteModel?.clientID,
           servicesIDs: selectedServiceIDs,
+          servicePackageIDs: quoteModel?.servicePackageID,
         }),
       ).unwrap();
     } catch (err) {

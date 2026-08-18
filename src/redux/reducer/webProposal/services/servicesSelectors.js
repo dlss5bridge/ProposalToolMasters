@@ -22,3 +22,5 @@ export const selectServicesPricingLoading = (state) => state.webProposalServices
 export const selectServicesPricingError = (state) => state.webProposalServices.pricingError;
 export const selectServicesVatPercentage = (state) => state.webProposalServices.vatPercentage;
 export const selectServicesCurrencyID = (state) => state.webProposalServices.currencyID;
+export const selectServicesPackageList = (state) => state.webProposalServices.packageList;
+export const selectServiceMappingWithPackagesList = (state) => state.webProposalServices.serviceMappingWithPackagesList;

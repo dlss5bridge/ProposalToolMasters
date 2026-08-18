@@ -85,6 +85,14 @@ export const getCalculatedServicesPriceByPackages = createAsyncThunk(
         prices: responseData.data || [],
         vatPercentage: responseData.vatPercentage || 0,
         currencyID: responseData.currencyID || 1,
+        packageList: responseData.packageList || [],
+        // Standard "Package" quotes (QUOTE_TYPE_ID.Package) resolve each
+        // service's per-package price from this list, not from the flat
+        // packageOneValue/Two/ThreeValue on `data` — see packagePriceViaMapping
+        // in ProposalPricingTableStep.jsx, mirroring AddUpdateProposal.jsx's
+        // GetCalculatedServicesPriceByPackagesData.
+        serviceMappingWithPackagesList:
+          responseData.serviceMappingWithPackagesList || [],
       };
     } catch (err) {
       return thunkAPI.rejectWithValue(

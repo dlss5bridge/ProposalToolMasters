@@ -15,6 +15,7 @@ import {
   selectServicesPricingError,
   selectServicesVatPercentage,
   selectServicesCurrencyID,
+  selectServiceMappingWithPackagesList,
   getCalculatedServicesPriceByPackages,
 } from "../../../redux/reducer/webProposal/services";
 import {
@@ -32,18 +33,20 @@ const CURRENCY_SYMBOLS = { 1: "£", 2: "€", 3: "$", 4: "₹" };
 const SERVICE_CHARGE_TYPE_ID = { RECURRING: 1, ONE_OFF: 2 };
 
 // quoteModel.paymentFrequencyID: 1 Yearly, 2 HalfYearly, 3 Quarterly, 4
-// Monthly. Recurring prices are quoted/stored yearly, so a non-yearly
-// frequency divides the yearly figure down to that billing period — mirrors
-// the Payment_Frequency divisor used in AddUpdateProposal.jsx's Review
-// Services tab (handlePaymentFrequencyChange divides every recurring
-// service's yearly price by the same divisor, admin-default or user-added
-// alike, before summing into the section totals) and
-// AddUpdateEngagementLetter.jsx. One-off services are never billed on a
-// recurring cadence, so this must never apply to them.
-const PAYMENT_FREQUENCY_DIVISOR = { 1: 1, 2: 2, 3: 4, 4: 12 };
+// Monthly.
 const PAYMENT_FREQUENCY_LABEL = {
   1: "Yearly",
   2: "Half-Yearly",
+  3: "Quarterly",
+  4: "Monthly",
+};
+// Sent as GetValueOf on GetCalculatedServicesPriceByPackages, exactly mirroring
+// AddUpdateProposal.jsx's handleSetCalculatedPackageData/handleCalculatedData
+// switch on ProposalObject.Payment_Frequency — the backend, not the client,
+// scales the recurring price down to this billing period.
+const GET_VALUE_OF_BY_FREQUENCY = {
+  1: "Yearly",
+  2: "HalfYearly",
   3: "Quarterly",
   4: "Monthly",
 };
@@ -208,6 +211,74 @@ const packagePriceForItem = (item) => {
   }, 0);
 };
 
+// Standard "Package" quotes (QUOTE_TYPE_ID.Package) are priced differently
+// from Custom Package in AddUpdateProposal.jsx: Review Packages' Recurring/
+// One-Off Services for this type come from GetCalculatedServicesPriceByPackages
+// Data, which does NOT trust the flat packageOneValue/Two/ThreeValue on a
+// pricing item — those are only used as the *package ID* to cross-join
+// against `serviceMappingWithPackagesList` (one row per service per
+// currently-selected package: {servicePackageID, serviceID, serviceCatID,
+// serviceChargeTypeID, price}). The matched row's own `price` is the real
+// per-package value, and a service's package membership is rebuilt from
+// which servicePackageIDs actually have a matching row for it — not from the
+// pricing item's own servicePackageIDs field. Custom Package keeps using
+// packagePriceForItem above (GetCalculatedServicesPriceData/
+// handleSetCalculatedPackageData never does this cross-join).
+const packagePriceViaMapping = (item, serviceMappingWithPackagesList) => {
+  const rows = (serviceMappingWithPackagesList || []).filter(
+    (row) =>
+      row.serviceID === item.serviceID &&
+      row.serviceCatID === item.serviceCatID &&
+      Number(row.serviceChargeTypeID) === Number(item.serviceChargeTypeID),
+  );
+  const membership = rows.map((row) => String(row.servicePackageID));
+
+  return PACKAGE_PRICE_SLOTS.reduce((sum, { idKey }) => {
+    const slotID = item[idKey];
+    if (slotID === null || slotID === undefined) return sum;
+    if (!membership.includes(String(slotID))) return sum;
+
+    const match = rows.find(
+      (row) => String(row.servicePackageID) === String(slotID),
+    );
+    return sum + (Number(match?.price) || 0);
+  }, 0);
+};
+
+// Per-service, per-package price for the multi-package column display (as
+// opposed to packagePriceForItem/packagePriceViaMapping above, which sum
+// across every package slot a service belongs to for the combined Net
+// Total). Returns null — rendered as "—" — when the service isn't part of
+// that particular package, instead of an amount.
+const priceForServicePackageSlot = (
+  item,
+  packageID,
+  isStandardPackage,
+  serviceMappingWithPackagesList,
+) => {
+  if (!item) return null;
+  const slot = PACKAGE_PRICE_SLOTS.find(
+    ({ idKey }) =>
+      item[idKey] !== null && String(item[idKey]) === String(packageID),
+  );
+  if (!slot) return null;
+
+  if (isStandardPackage) {
+    const match = (serviceMappingWithPackagesList || []).find(
+      (row) =>
+        row.serviceID === item.serviceID &&
+        row.serviceCatID === item.serviceCatID &&
+        Number(row.serviceChargeTypeID) === Number(item.serviceChargeTypeID) &&
+        String(row.servicePackageID) === String(packageID),
+    );
+    return match ? Number(match.price) || 0 : null;
+  }
+
+  const membership = (item.servicePackageIDs || []).map(String);
+  if (!membership.includes(String(packageID))) return null;
+  return Number(item[slot.valueKey]) || 0;
+};
+
 // A charge type's Calculation-card figures. When the selections still match
 // the quote's hydrated defaults, the stored final amount (with whatever
 // discount it already carries) is shown as-is. Otherwise a live recompute is
@@ -241,11 +312,26 @@ const buildChargeTypeTotals = ({
   isPackageBased,
 }) => {
   if (finalAmount) {
+    const storedDiscountPercentage =
+      Number(finalAmount.discountPercentageWithAllDecimal) || 0;
+    const storedNetTotal = Number(finalAmount.netTotal) || 0;
+    // For a surcharge (negative %), the stored `discounted` field mirrors
+    // AddUpdateProposal.jsx's GetNetTotalValueByRecurringPackage, which only
+    // ever populates its discountAmount variable in the positive-discount
+    // branch — the negative branch computes a separate addOnValue that never
+    // gets persisted back into `discounted`. Recompute from the percentage
+    // instead of trusting the persisted (always-0) value so the surcharge
+    // amount actually displays; discountedTotal/grandTotal are unaffected
+    // since those were already correctly persisted including the addOn.
+    const discountAmount =
+      storedDiscountPercentage < 0
+        ? (storedNetTotal * storedDiscountPercentage) / 100
+        : Number(finalAmount.discounted) || 0;
+
     return {
-      netTotal: Number(finalAmount.netTotal) || 0,
-      discountPercentage:
-        Number(finalAmount.discountPercentageWithAllDecimal) || 0,
-      discountAmount: Number(finalAmount.discounted) || 0,
+      netTotal: storedNetTotal,
+      discountPercentage: storedDiscountPercentage,
+      discountAmount,
       discountedTotal: Number(finalAmount.discountedTotal) || 0,
       vatAmount: Number(finalAmount.vat) || 0,
       grandTotal: Number(finalAmount.grandTotal) || 0,
@@ -257,7 +343,13 @@ const buildChargeTypeTotals = ({
   let note = null;
 
   if (isPackageBased) {
-    if (Number(adminDiscountPercentage) > 0) {
+    // Mirrors AddUpdateProposal.jsx's GetNetTotalValueByRecurringPackage: a
+    // negative package discount percentage is a surcharge (raises the
+    // total), not a discount to ignore — gating on `> 0` here silently
+    // dropped it instead of letting the discountAmount/discountedTotal math
+    // below apply it (a negative % naturally produces a negative
+    // discountAmount, which is exactly the surcharge admin computes).
+    if (Number(adminDiscountPercentage)) {
       discountPercentage = Number(adminDiscountPercentage);
     }
   } else {
@@ -281,7 +373,7 @@ const buildChargeTypeTotals = ({
     }
   }
 
-  if (discountPercentage <= 0) {
+  if (discountPercentage === 0) {
     return {
       netTotal: liveNetTotal,
       discountPercentage: 0,
@@ -293,7 +385,17 @@ const buildChargeTypeTotals = ({
     };
   }
 
-  const discountAmount = (liveNetTotal * discountPercentage) / 100;
+  // Matches GetNetTotalValueByRecurringPackage (the Review Package function
+  // this mirrors) exactly rather than a single symmetric formula: a surcharge
+  // (negative %) is added at full precision (its addOnValue is never
+  // rounded), while a discount (positive %) is rounded to 2 decimals via
+  // Math.floor before being subtracted — package/custom-package only, so
+  // Review Package/the PDF and this live recompute land on the same cent.
+  const discountAmount = isPackageBased
+    ? discountPercentage < 0
+      ? (liveNetTotal * discountPercentage) / 100
+      : Math.floor(((liveNetTotal * discountPercentage) / 100) * 100) / 100
+    : (liveNetTotal * discountPercentage) / 100;
   const discountedTotal = liveNetTotal - discountAmount;
   const { vatAmount, grandTotal } = applyVat(discountedTotal, vatPercentage);
 
@@ -333,8 +435,15 @@ function FeeSection({
   note,
   isCustomPackage,
   frequencyLabel,
+  // Only set (and only rendered) for Package/Custom Package quotes with more
+  // than one selected package — every other quote keeps the single price
+  // column above untouched.
+  packageColumns,
+  priceByServiceAndPackage,
 }) {
-  const hasDiscount = Number(discountPercentage) > 0;
+  const hasDiscount = Number(discountPercentage) !== 0;
+  const isSurcharge = Number(discountPercentage) < 0;
+  const hasPackageColumns = (packageColumns?.length || 0) > 1;
   return (
     <div
       className="rounded-xl border-l-4 px-4 py-3"
@@ -374,6 +483,23 @@ function FeeSection({
       {/* Service details, grouped under a header per category — its own
           plain white block */}
       <div className="overflow-hidden rounded-lg bg-white">
+        {hasPackageColumns && (
+          <div
+            className="flex items-center justify-end gap-4 border-b px-3 py-1.5"
+            style={{ borderColor: theme.border }}
+          >
+            {packageColumns.map((pkg) => (
+              <span
+                key={pkg.servicePackageID}
+                className="w-20 flex-shrink-0 truncate text-right text-[10px] font-semibold uppercase tracking-wide"
+                style={{ color: theme.textSecondary }}
+                title={pkg.servicePackageName}
+              >
+                {pkg.servicePackageName}
+              </span>
+            ))}
+          </div>
+        )}
         {categoryGroups.map((group) => (
           <div key={group.serviceCatID ?? group.categoryName}>
             <div
@@ -422,6 +548,30 @@ function FeeSection({
                       className="flex-shrink-0 animate-spin"
                       style={{ color: theme.textSecondary }}
                     />
+                  ) : hasPackageColumns ? (
+                    <span className="flex flex-shrink-0 items-center gap-4">
+                      {packageColumns.map((pkg) => {
+                        const pkgPrice = priceByServiceAndPackage(
+                          chargeTypeID,
+                          item.serviceID,
+                          pkg.servicePackageID,
+                        );
+                        return (
+                          <span
+                            key={pkg.servicePackageID}
+                            className="w-20 flex-shrink-0 text-right text-sm font-medium"
+                            style={{
+                              color:
+                                pkgPrice === null
+                                  ? theme.textSecondary
+                                  : theme.textPrimary,
+                            }}
+                          >
+                            {pkgPrice === null ? "—" : formatAmount(pkgPrice)}
+                          </span>
+                        );
+                      })}
+                    </span>
                   ) : (
                     <span
                       className="flex-shrink-0 text-sm font-medium"
@@ -459,15 +609,17 @@ function FeeSection({
           <>
             <div className="flex items-center justify-between text-sm">
               <span style={{ color: theme.textSecondary }}>
-                Discount ({Number(discountPercentage).toFixed(2)}%)
+                {isSurcharge ? "Surcharge" : "Discount"} (
+                {Number(Math.abs(discountPercentage)).toFixed(2)}%)
               </span>
               <span style={{ color: theme.textSecondary }}>
-                (-) {formatAmount(discountAmount)}
+                {isSurcharge ? "(+)" : "(-)"}{" "}
+                {formatAmount(Math.abs(discountAmount))}
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span style={{ color: theme.textSecondary }}>
-                Discounted Total
+                {isSurcharge ? "Adjusted Total" : "Discounted Total"}
               </span>
               <span style={{ color: theme.textPrimary }}>
                 {formatAmount(discountedTotal)}
@@ -530,13 +682,22 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   const pricingError = useSelector(selectServicesPricingError);
   const vatPercentage = useSelector(selectServicesVatPercentage);
   const currencyID = useSelector(selectServicesCurrencyID);
+  const serviceMappingWithPackagesList = useSelector(
+    selectServiceMappingWithPackagesList,
+  );
 
   // Package/Custom Package quotes are priced against the admin's selected
   // package(s) (quoteModel.servicePackageID), not the generic per-service
   // formula the Service flow uses — see packagePriceForItem/findFinalAmount.
-  const isCustomPackage = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
-  const isPackageBased =
-    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package || isCustomPackage;
+  const isCustomPackage =
+    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
+  // Standard "Package" quotes resolve price via the serviceMappingWithPackages
+  // List cross-join (packagePriceViaMapping); Custom Package keeps using the
+  // flat packageOneValue/Two/ThreeValue fields (packagePriceForItem) — see
+  // the comment above packagePriceViaMapping for why these genuinely differ
+  // in AddUpdateProposal.jsx.
+  const isStandardPackage = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
+  const isPackageBased = isStandardPackage || isCustomPackage;
   // quoteModel is only set once (on load), so keying off the field itself
   // (rather than `|| []` inline, which would be a fresh array every render)
   // keeps this reference-stable for the pricing effect's dependency array.
@@ -545,15 +706,14 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     [quoteModel?.servicePackageID],
   );
 
-  // Applied to recurring services only (never one-off) when computing live
-  // prices from the pricing API's yearly figures — see priceByServiceID
-  // below. This must NOT be applied a second time to the stored
-  // quotationFinalAmountList recurring finalAmount (defaultRecurringFinalAmount
-  // below) — that figure is already saved at the quote's payment frequency
-  // (see the comment there), for both Service and Package/Custom Package
-  // quotes.
-  const paymentFrequencyDivisor =
-    PAYMENT_FREQUENCY_DIVISOR[quoteModel?.paymentFrequencyID] || 1;
+  // GetValueOf tells GetCalculatedServicesPriceByPackages which billing
+  // period to scale recurring prices down to — the backend does the
+  // scaling, mirroring AddUpdateProposal.jsx's handleSetCalculatedPackageData/
+  // handleCalculatedData (both switch on Payment_Frequency into this exact
+  // string set). The response's price/packageXValue figures already reflect
+  // this, so nothing here needs to divide them further client-side.
+  const getValueOfFrequency =
+    GET_VALUE_OF_BY_FREQUENCY[quoteModel?.paymentFrequencyID] || "Yearly";
   const paymentFrequencyLabel =
     PAYMENT_FREQUENCY_LABEL[quoteModel?.paymentFrequencyID] || "Yearly";
 
@@ -665,7 +825,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
         userKeyID: quoteModel.userKeyID,
         organisationKeyID: quoteModel.organisationKeyID,
         ServicePackageIDs: selectedPackageIDs,
-        GetValueOf: null,
+        GetValueOf: getValueOfFrequency,
         calculateServicesGPDList,
       }),
     );
@@ -675,6 +835,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     quoteModel?.organisationKeyID,
     quoteModel?.userKeyID,
     selectedPackageIDs,
+    getValueOfFrequency,
     calculateServicesGPDList,
     hasIncompleteSelections,
   ]);
@@ -682,19 +843,52 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   const priceByServiceID = useMemo(() => {
     const map = new Map();
     (pricing || []).forEach((item) => {
-      // Package service price first (per-slot value), then the frequency
-      // divisor — same order for the plain Service formula.
-      const basePrice = isPackageBased
-        ? packagePriceForItem(item)
-        : Number(item.price) || 0;
-      const price =
-        Number(item.serviceChargeTypeID) === SERVICE_CHARGE_TYPE_ID.RECURRING
-          ? basePrice / paymentFrequencyDivisor
-          : basePrice;
+      // Already scaled to the requested GetValueOf billing period by the
+      // backend — none of these branches need further client-side division.
+      let price;
+      if (isStandardPackage) {
+        price = packagePriceViaMapping(item, serviceMappingWithPackagesList);
+      } else if (isPackageBased) {
+        price = packagePriceForItem(item);
+      } else {
+        price = Number(item.price) || 0;
+      }
       map.set(priceKey(item.serviceChargeTypeID, item.serviceID), price);
     });
     return map;
-  }, [pricing, isPackageBased, paymentFrequencyDivisor]);
+  }, [
+    pricing,
+    isPackageBased,
+    isStandardPackage,
+    serviceMappingWithPackagesList,
+  ]);
+
+  // Raw pricing response item per service (packageOneID/Two/Three,
+  // servicePackageIDs, etc.) — priceByServiceID above already collapses this
+  // down to one combined number, but the per-package column display needs
+  // the original per-slot fields to resolve one package's price at a time.
+  const pricingItemByServiceID = useMemo(() => {
+    const map = new Map();
+    (pricing || []).forEach((item) => {
+      map.set(priceKey(item.serviceChargeTypeID, item.serviceID), item);
+    });
+    return map;
+  }, [pricing]);
+
+  // Shown as separate columns (one per selected package) only when the quote
+  // actually has more than one selected package — a single-package quote
+  // keeps the existing single price column untouched.
+  const packageColumns = isPackageBased
+    ? quoteModel?.selectedPackagesList || []
+    : [];
+
+  const priceByServiceAndPackage = (chargeTypeID, serviceID, packageID) =>
+    priceForServicePackageSlot(
+      pricingItemByServiceID.get(priceKey(chargeTypeID, serviceID)),
+      packageID,
+      isStandardPackage,
+      serviceMappingWithPackagesList,
+    );
 
   const recurringSelectedList = useMemo(
     () => selectedList.filter((item) => item.listType === "recurring"),
@@ -1024,6 +1218,8 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   note={recurringTotals.note}
                   isCustomPackage={isCustomPackage}
                   frequencyLabel={paymentFrequencyLabel}
+                  packageColumns={packageColumns}
+                  priceByServiceAndPackage={priceByServiceAndPackage}
                 />
               )}
 
@@ -1048,6 +1244,8 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   grandTotal={oneOffTotals.grandTotal}
                   note={oneOffTotals.note}
                   isCustomPackage={isCustomPackage}
+                  packageColumns={packageColumns}
+                  priceByServiceAndPackage={priceByServiceAndPackage}
                 />
               )}
             </>

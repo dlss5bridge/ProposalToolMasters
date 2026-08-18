@@ -47,6 +47,8 @@ const initialState = {
   pricingError: null,
   vatPercentage: 0,
   currencyID: 1,
+  packageList: [],
+  serviceMappingWithPackagesList: [],
 };
 
 const servicesSlice = createSlice({
@@ -112,6 +114,9 @@ const servicesSlice = createSlice({
           state.pricing = action.payload.prices;
           state.vatPercentage = action.payload.vatPercentage;
           state.currencyID = action.payload.currencyID;
+          state.packageList = action.payload.packageList;
+          state.serviceMappingWithPackagesList =
+            action.payload.serviceMappingWithPackagesList;
         },
       )
       .addCase(

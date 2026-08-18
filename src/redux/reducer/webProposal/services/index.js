@@ -35,6 +35,8 @@ export {
   selectServicesPricingError,
   selectServicesVatPercentage,
   selectServicesCurrencyID,
+  selectServicesPackageList,
+  selectServiceMappingWithPackagesList,
 } from "./servicesSelectors";
 
 export default reducer;

@@ -49,7 +49,14 @@ const withDefaultDriverValues = (list) =>
 export const getAdditionalInformationList = createAsyncThunk(
   "webProposalAdditionalInformation/getAdditionalInformationList",
   async (
-    { organisationKeyID, userKeyID, quoteKeyID, clientID, servicesIDs },
+    {
+      organisationKeyID,
+      userKeyID,
+      quoteKeyID,
+      clientID,
+      servicesIDs,
+      servicePackageIDs,
+    },
     thunkAPI,
   ) => {
     try {
@@ -61,7 +68,7 @@ export const getAdditionalInformationList = createAsyncThunk(
           ServicesIDs: servicesIDs,
           moduleKeyID: quoteKeyID,
           clientID,
-          ServicePackageIDs: [],
+          ServicePackageIDs: servicePackageIDs || [],
           moduleName: "Quotation",
         },
       );
