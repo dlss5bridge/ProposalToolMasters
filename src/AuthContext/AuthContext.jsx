@@ -1260,7 +1260,7 @@ const AuthContext = ({ children }) => {
       case 4:
         return "GST";
       default:
-        return "";
+        return "VAT";
     }
   }
 
@@ -2133,7 +2133,8 @@ const AuthContext = ({ children }) => {
         { label: "Net Total", value: conditionalRecurringNetTotal },
         { label: "Discount", value: PricingInfo.Discount },
         { label: "Discounted Price", value: PricingInfo.DiscountedTotal },
-        { label: "VAT", value: PricingInfo.VATPrice },
+        // { label: "VAT", value: PricingInfo.VATPrice },
+        { label: getTaxName(common.currencyID), value: PricingInfo.VATPrice },
         { label: "Grand Total", value: PricingInfo.GrandTotal },
       ];
 
@@ -3122,7 +3123,8 @@ const AuthContext = ({ children }) => {
           OneOffPricingInfo.DiscountedTotal,
         ),
         VAT_WithTableView: SingleServiceWithCombinedTableView(
-          "VAT",
+          // "VAT",
+          getTaxName(common.currencyID),
           RecurringPricingInfo.VATPrice,
           OneOffPricingInfo.VATPrice,
         ),

@@ -1487,7 +1487,7 @@ export default function PreviewComponentPdf(props) {
 
   const customRecurringServiceFooter = calculateCustomServiceFooter({
     serviceGroups: props.selectedRecurringServiceList || [],
-
+    discountedPrice: props.RecurringPricingInfo?.DiscountedPrice ?? null,
     discountPercentage: recurringServiceDiscountPercentage,
 
     // Used only as a fallback for older data
@@ -1521,6 +1521,7 @@ export default function PreviewComponentPdf(props) {
 
   const customOneOffServiceFooter = calculateCustomServiceFooter({
     serviceGroups: props.selectedOneOffServiceList || [],
+    discountedPrice: props.OneOffPricingInfo?.DiscountedPrice ?? null,
 
     discountPercentage: oneOffServiceDiscountPercentage,
 

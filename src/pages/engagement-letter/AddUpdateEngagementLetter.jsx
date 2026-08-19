@@ -238,9 +238,9 @@ const BasicInformationComponent = (props) => {
                       <Select
                         className="phone-input-country-code selectDropDown"
                         value={
-                          props.SelectPackagesTypeValue === undefined
+                          props.selectPackagesTypeValue === undefined
                             ? null
-                            : props.SelectPackagesTypeValue
+                            : props.selectPackagesTypeValue
                         }
                         options={props.getServicePackageLookupList.map(
                           (item) => ({
@@ -325,6 +325,9 @@ const BasicInformationComponent = (props) => {
                           );
                           props.setShowSeparatorLines(
                             selectedTemplate.showSeparatorLines,
+                          );
+                          props.setWatermarkImage(
+                            selectedTemplate.watermarkImage,
                           );
                           props.updateVisibleFieldsFromIds(
                             selectedTemplate.pricingTableColumnIDs,
@@ -9707,6 +9710,7 @@ const Add_Update_Engagement_Letter = () => {
     useState(false);
   const [DocumentCode, setDocumentCode] = useState(false);
   const [isTypeChange, setIsTypeChange] = useState(false);
+  const [selectPackagesTypeValue, setSelectPackagesTypeValue] = useState(null);
   const [BrandColor, setBrandColor] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(null);
   const [footerHeight, setFooterHeight] = useState(null);
@@ -11000,26 +11004,30 @@ const Add_Update_Engagement_Letter = () => {
         // Only update template-related fields if no manual selection has occurred
         if (!isTemplateManuallySelected) {
           if (QuoteId !== null) {
-            setEngagementObj({
-              ...engagementObj,
-              acceptedServicePackageID: null,
-              servicePackageKeyID: null,
+            setEngagementObj((prev) => ({
+              ...prev,
+
               ClientID: QuoteId.clientID,
+
               clientKeyID:
                 ClientId?.clientKeyID == undefined
-                  ? null
+                  ? prev.clientKeyID
                   : ClientId?.clientKeyID,
+
               QuoteKeyID:
                 QuoteId?.value == undefined ? QuoteId : QuoteId?.value,
+
               quoteID:
                 QuoteId?.quoteID == undefined ? QuoteId : QuoteId?.quoteID,
-              quoteTypeID: isSelectedDefault[0]?.quoteTypeID,
-              templateKeyID: isSelectedDefault[0]?.templateKeyID,
-              templateID: isSelectedDefault[0]?.templateID,
-              pricingTableColumnIDs: isSelectedDefault[0]?.pricingTableColumnIDs
-                ? isSelectedDefault[0]?.pricingTableColumnIDs
-                : "",
-            });
+
+              quoteTypeID:
+                isSelectedDefault[0]?.quoteTypeID ?? prev.quoteTypeID,
+
+              templateKeyID:
+                isSelectedDefault[0]?.templateKeyID ?? prev.templateKeyID,
+
+              templateID: isSelectedDefault[0]?.templateID ?? prev.templateID,
+            }));
 
             if (isSelectedDefault[0]?.pricingTableColumnIDs !== null) {
               setSelectedTemplateID(6);
@@ -11253,6 +11261,7 @@ const Add_Update_Engagement_Letter = () => {
           setFooterHeight(isSelectedDefault[0].footerHeight);
           setOrientationID(isSelectedDefault[0].orientationID);
           setShowSeparatorLines(isSelectedDefault[0]?.showSeparatorLines);
+          setWatermarkImage(isSelectedDefault[0]?.watermarkImage);
           setPricingTableColumnIDs(
             isSelectedDefault[0]?.pricingTableColumnIDs
               ? isSelectedDefault[0]?.pricingTableColumnIDs
@@ -16973,14 +16982,30 @@ const Add_Update_Engagement_Letter = () => {
     setIsBack(false);
     setEngagementObj({
       ...engagementObj,
-      acceptedServicePackageID: e.value,
-      servicePackageKeyID: e.servicePackageKeyID,
+      acceptedServicePackageID: e?.value ?? null,
+      servicePackageKeyID: e?.servicePackageKeyID ?? null,
     });
   };
   //32) get package value function
-  const SelectPackagesTypeValue = getServicePackageLookupList.find((item) => {
-    return item.value === engagementObj.acceptedServicePackageID;
-  });
+  // const SelectPackagesTypeValue = getServicePackageLookupList.find((item) => {
+  //   return item.value === engagementObj.acceptedServicePackageID;
+  // });
+
+  useEffect(() => {
+    if (
+      !engagementObj.acceptedServicePackageID ||
+      !getServicePackageLookupList?.length
+    ) {
+      return;
+    }
+
+    const selectedPackage = getServicePackageLookupList.find(
+      (item) =>
+        Number(item.value) === Number(engagementObj.acceptedServicePackageID),
+    );
+
+    setSelectPackagesTypeValue(selectedPackage || null);
+  }, [engagementObj.acceptedServicePackageID, getServicePackageLookupList]);
 
   const ClientValue = clientLookUpOptions.find(
     (item) => engagementObj.ClientID === item.value,
@@ -17128,6 +17153,20 @@ const Add_Update_Engagement_Letter = () => {
               QuoteKeyID: ModelData.quoteKeyID,
             });
 
+            // const packageOption = ServicePackage.data.responseData.data.map(
+            //   (item) => ({
+            //     value: item.servicePackageID,
+            //     label: item.servicePackageName,
+            //     servicePackageKeyID: item.servicePackageKeyID,
+            //     needToUpdate: item.needToUpdate === 1,
+            //   }),
+            // );
+            // const selectedPackage = packageOption.find(
+            //   (item) =>
+            //     Number(item.value) ===
+            //     Number(ModelData.acceptedServicePackageID),
+            // );
+
             const packageOption = ServicePackage.data.responseData.data.map(
               (item) => ({
                 value: item.servicePackageID,
@@ -17136,12 +17175,15 @@ const Add_Update_Engagement_Letter = () => {
                 needToUpdate: item.needToUpdate === 1,
               }),
             );
-            SelectedPackage = ServicePackage.data.responseData.data.find(
+
+            SelectedPackage = packageOption.find(
               (item) =>
-                item.servicePackageID == ModelData.acceptedServicePackageID,
+                Number(item.value) ===
+                Number(ModelData.acceptedServicePackageID),
             );
 
             setGetServicePackageLookupList(packageOption);
+            setSelectPackagesTypeValue(SelectedPackage || null);
           }
 
           let TemplateOption = [];
@@ -17293,10 +17335,7 @@ const Add_Update_Engagement_Letter = () => {
           setEngagementObj({
             ...engagementObj,
             DiscountLines: ModelData.showDiscountLine,
-            servicePackageKeyID:
-              ModelData.quoteID !== null
-                ? SelectedPackage?.servicePackageKeyID
-                : null,
+            servicePackageKeyID: SelectedPackage?.servicePackageKeyID ?? null,
             acceptedServicePackageID: ModelData.acceptedServicePackageID,
             tnCTemplateKeyID: ModelData.tnCTemplateKeyID,
             tnCTemplateID: ModelData.tnCTemplateID,
@@ -18685,7 +18724,7 @@ const Add_Update_Engagement_Letter = () => {
                   setEngagementObj={setEngagementObj}
                   requireMessage={requireMessage}
                   getServicePackageLookupList={getServicePackageLookupList}
-                  SelectPackagesTypeValue={SelectPackagesTypeValue}
+                  selectPackagesTypeValue={selectPackagesTypeValue}
                   handleChangePackage={handleChangePackage}
                   handleChangeClient={handleChangeClient}
                   handleChangeProposal={handleChangeProposal}
@@ -18714,6 +18753,7 @@ const Add_Update_Engagement_Letter = () => {
                   setFontFamily={setFontFamily}
                   getFontNameById={getFontNameById}
                   setShowSeparatorLines={setShowSeparatorLines}
+                  setWatermarkImage={setWatermarkImage}
                   setStatementOfFactsObj={setStatementOfFactsObj}
                   setServiceDescriptionObj={setServiceDescriptionObj}
                   updateVisibleFieldsFromIds={updateVisibleFieldsFromIds}
@@ -19044,7 +19084,7 @@ const Add_Update_Engagement_Letter = () => {
                     selectedOneOffServiceList={selectedOneOffServiceList}
                     templateElementList={templateElementList}
                     additionalInformationList={additionalInformationList}
-                    // engagementObj={engagementObj}
+                    engagementObj={engagementObj}
                     pdf={engagementObj.pdf}
                     ProposalObject={engagementObj}
                     getCrudButtonTextName={getCrudButtonTextName}

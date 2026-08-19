@@ -5648,7 +5648,7 @@ const View_Proposals = () => {
                                                                         key={`oneoff-package-${subService.serviceID}-${packageIndex}`}
                                                                       >
                                                                         {visibleFieldsCustomTemp?.fees && (
-                                                                          <td className="text-right">
+                                                                          <td className="text-center">
                                                                             {!packageRow.isIncluded ? (
                                                                               "-"
                                                                             ) : showOneOffPackageBreakdown ? (
@@ -5669,7 +5669,7 @@ const View_Proposals = () => {
 
                                                                         {showOneOffVat &&
                                                                           visibleFieldsCustomTemp?.vatRate && (
-                                                                            <td className="text-right">
+                                                                            <td className="text-center">
                                                                               {packageRow.isIncluded
                                                                                 ? `${packageRow.vatRate}%`
                                                                                 : "-"}
@@ -5678,7 +5678,7 @@ const View_Proposals = () => {
 
                                                                         {showOneOffVat &&
                                                                           visibleFieldsCustomTemp?.vat && (
-                                                                            <td className="text-right">
+                                                                            <td className="text-center">
                                                                               {!packageRow.isIncluded ? (
                                                                                 "-"
                                                                               ) : showOneOffPackageBreakdown ? (
@@ -5699,7 +5699,7 @@ const View_Proposals = () => {
 
                                                                         {showOneOffVat &&
                                                                           visibleFieldsCustomTemp?.feesIncVat && (
-                                                                            <td className="text-right">
+                                                                            <td className="text-center">
                                                                               {!packageRow.isIncluded ? (
                                                                                 "-"
                                                                               ) : showOneOffPackageBreakdown ? (

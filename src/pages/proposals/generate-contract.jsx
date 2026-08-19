@@ -28,6 +28,8 @@ function AcceptInvitation() {
     getFontStylesFromHtml,
     replaceTemplatePricingVariables,
     replaceUrlInHtml,
+    getCurrencySymbol,
+    getTaxName,
   } = useContext(AuthContextProvider);
   const [templateElementList, setTemplateElementList] = useState([]);
   const [pricingVariablesForEmail, setPricingVariablesForEmail] = useState([]);
@@ -281,8 +283,9 @@ function AcceptInvitation() {
     totals,
   }) => {
     const currencyID = organisationData?.otherInformation?.[0]?.currencyID;
-    const currencySymbol = currencyID === 1 ? "£" : "";
-    const taxName = "VAT";
+    const currencySymbol = getCurrencySymbol(currencyID);
+    // const taxName = "VAT";
+    const taxName = getTaxName(currencyID);
     const isVatPresent = (Number(totals?.vatPercentage) || 0) > 0;
 
     const rows = (serviceCatList || [])
@@ -2136,6 +2139,7 @@ function AcceptInvitation() {
       FooterHeight: FooterHeight,
       HeaderImage: HeaderImage,
       FooterImage: FooterImage,
+      WatermarkImage: watermarkImage,
       showSeparatorLines: showSeparatorLines,
     };
     try {

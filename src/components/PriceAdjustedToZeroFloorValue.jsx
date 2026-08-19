@@ -67,8 +67,8 @@ const PriceAdjustedToZeroFloorValue = ({
               style={{ fontSize: "14px" }}
             >
               {isSingle
-                ? "Based on the current pricing set-up, the calculated yearly price for this service worked out to be less than zero:"
-                : "Based on the current pricing set-up, the calculated yearly prices for these services worked out to be less than zero:"}
+                ? "Based on the current pricing set-up, the calculated yearly price for this service worked out to be less than or equal to zero:"
+                : "Based on the current pricing set-up, the calculated yearly prices for these services worked out to be less than or equal to zero:"}
             </p>
 
             <div style={{ display: "flex", justifyContent: "center" }}>
@@ -92,10 +92,10 @@ const PriceAdjustedToZeroFloorValue = ({
 
             <p className="text-muted mt-3 mb-0" style={{ fontSize: "14px" }}>
               {isSingle
-                ? "A price below zero cannot be charged, so it has been shown as " +
+                ? "A price below zero or equal to zero cannot be charged, so it has been shown as " +
                   currencySymbol +
                   "0.01 instead. Please review the pricing rules for this service if this is not what you expected."
-                : "A price below zero cannot be charged, so they have been shown as " +
+                : "A price below zero or equal to zero cannot be charged, so they have been shown as " +
                   currencySymbol +
                   "0.01 instead. Please review the pricing rules for these services if this is not what you expected."}
             </p>

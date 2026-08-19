@@ -1367,6 +1367,10 @@ const View_Engagement_Latter = () => {
 
   // const roundCurrency = (value) => Math.round((Number(value) || 0) * 100) / 100;
 
+  const existingOneOffDiscountedPrice = roundCurrency(
+    OneOffPricingInfo?.DiscountedPrice ?? oneOffFinalAmount?.discounted ?? 0,
+  );
+
   const oneOffNetTotal = roundCurrency(oneOffTotals?.netTotal || 0);
 
   const oneOffVatTotal = roundCurrency(oneOffTotals?.vatTotal || 0);
@@ -1423,17 +1427,24 @@ const View_Engagement_Latter = () => {
     ? roundCurrency((oneOffNetTotal * oneOffDiscountPercentage) / 100)
     : 0;
 
-  const oneOffVatDiscountAmount = hasOneOffDiscount
-    ? roundCurrency((oneOffVatTotal * oneOffDiscountPercentage) / 100)
+  const vatRatio = oneOffNetTotal > 0 ? oneOffVatTotal / oneOffNetTotal : 0;
+
+  const oneOffDiscountedNet =
+    existingOneOffDiscountedPrice > 0
+      ? existingOneOffDiscountedPrice
+      : roundCurrency(oneOffNetTotal - oneOffDiscountAmount);
+
+  const oneOffDiscountedVat = showOneOffVat
+    ? roundCurrency(oneOffDiscountedNet * vatRatio)
     : 0;
 
-  const oneOffDiscountedNet = roundCurrency(
-    oneOffNetTotal - oneOffDiscountAmount,
+  const oneOffVatDiscountAmount = roundCurrency(
+    oneOffVatTotal - oneOffDiscountedVat,
   );
 
-  const oneOffDiscountedVat = roundCurrency(
-    oneOffVatTotal - oneOffVatDiscountAmount,
-  );
+  // const oneOffDiscountedVat = roundCurrency(
+  //   oneOffVatTotal - oneOffVatDiscountAmount,
+  // );
 
   const oneOffNetFeesIncludingVat = roundCurrency(
     oneOffNetTotal + oneOffVatTotal,
@@ -1444,7 +1455,7 @@ const View_Engagement_Latter = () => {
   );
 
   const oneOffGrandTotal = roundCurrency(
-    oneOffDiscountedNet + oneOffDiscountedVat,
+    oneOffDiscountedNet + (showOneOffVat ? oneOffDiscountedVat : 0),
   );
 
   /*
@@ -2681,6 +2692,9 @@ const View_Engagement_Latter = () => {
                                                                 </td>
                                                                 <td className="text-right">
                                                                   {EngagementObj.feeTypeId ===
+                                                                    1 &&
+                                                                    currencySymbol}
+                                                                  {EngagementObj.feeTypeId ===
                                                                     1 && (
                                                                     <>
                                                                       {" "}
@@ -2708,6 +2722,7 @@ const View_Engagement_Latter = () => {
                                                   </td>
                                                   <td className="tr-table-class font-14 text-white text-right">
                                                     {" "}
+                                                    {currencySymbol}
                                                     {
                                                       Number(
                                                         OneOffPricingInfo.OriginalPrice,
@@ -2747,7 +2762,7 @@ const View_Engagement_Latter = () => {
                                                           Discount
                                                         </td>
                                                         <td className="tr-table-class text-white text-right font-14">
-                                                          (-){" "}
+                                                          (-) {currencySymbol}
                                                           {formatValue(
                                                             OneOffPricingInfo.Discount,
                                                           )}
@@ -2759,6 +2774,7 @@ const View_Engagement_Latter = () => {
                                                         </td>
                                                         <td className="tr-table-class font-14 text-white text-right">
                                                           {" "}
+                                                          {currencySymbol}
                                                           {formatValue(
                                                             OneOffPricingInfo.DiscountedTotal,
                                                           )}
@@ -2776,6 +2792,7 @@ const View_Engagement_Latter = () => {
                                                       </td>
                                                       <td className="tr-table-class font-14 text-white text-right">
                                                         {" "}
+                                                        {currencySymbol}
                                                         {formatValue(
                                                           OneOffPricingInfo.VATPrice,
                                                         )}
@@ -2787,6 +2804,7 @@ const View_Engagement_Latter = () => {
                                                       </td>
                                                       <td className="tr-table-class font-14 text-white text-right">
                                                         {" "}
+                                                        {currencySymbol}
                                                         {formatValue(
                                                           OneOffPricingInfo.GrandTotal,
                                                         )}
