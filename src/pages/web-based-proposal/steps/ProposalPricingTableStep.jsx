@@ -16,6 +16,7 @@ import {
   selectServicesVatPercentage,
   selectServicesCurrencyID,
   selectServiceMappingWithPackagesList,
+  selectServicesPackageList,
   getCalculatedServicesPriceByPackages,
 } from "../../../redux/reducer/webProposal/services";
 import {
@@ -410,6 +411,84 @@ const buildChargeTypeTotals = ({
   };
 };
 
+// The Net Total/Discount/VAT/Grand Total block, extracted so it can be
+// rendered once for a single blended total or once per package (each against
+// that package's own totals) without duplicating the markup.
+function CalculationBlock({
+  theme,
+  accent,
+  formatAmount,
+  netTotal,
+  discountPercentage,
+  discountAmount,
+  discountedTotal,
+  vatPercentage,
+  vatAmount,
+  grandTotal,
+}) {
+  const hasDiscount = Number(discountPercentage) !== 0;
+  const isSurcharge = Number(discountPercentage) < 0;
+
+  return (
+    <div
+      className="mt-2 space-y-1.5 rounded-lg px-3 py-2.5"
+      style={{ backgroundColor: `${accent}12` }}
+    >
+      <span
+        className="block text-[11px] font-semibold uppercase tracking-wide"
+        style={{ color: accent }}
+      >
+        Calculation
+      </span>
+      <div className="flex items-center justify-between text-sm">
+        <span style={{ color: theme.textSecondary }}>Net Total</span>
+        <span style={{ color: theme.textPrimary }}>
+          {formatAmount(netTotal)}
+        </span>
+      </div>
+      {hasDiscount && (
+        <>
+          <div className="flex items-center justify-between text-sm">
+            <span style={{ color: theme.textSecondary }}>
+              {isSurcharge ? "Surcharge" : "Discount"} (
+              {Number(Math.abs(discountPercentage)).toFixed(2)}%)
+            </span>
+            <span style={{ color: theme.textSecondary }}>
+              {isSurcharge ? "(+)" : "(-)"}{" "}
+              {formatAmount(Math.abs(discountAmount))}
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span style={{ color: theme.textSecondary }}>
+              {isSurcharge ? "Adjusted Total" : "Discounted Total"}
+            </span>
+            <span style={{ color: theme.textPrimary }}>
+              {formatAmount(discountedTotal)}
+            </span>
+          </div>
+        </>
+      )}
+      <div className="flex items-center justify-between text-sm">
+        <span style={{ color: theme.textSecondary }}>
+          VAT ({Number(vatPercentage) || 0}%)
+        </span>
+        <span style={{ color: theme.textSecondary }}>
+          {formatAmount(vatAmount)}
+        </span>
+      </div>
+      <div
+        className="flex items-center justify-between border-t pt-1.5 font-semibold"
+        style={{ borderColor: `${accent}33` }}
+      >
+        <span style={{ color: theme.textPrimary }}>Grand Total</span>
+        <span className="text-sm font-semibold" style={{ color: accent }}>
+          {formatAmount(grandTotal)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // One charge type rendered as its own tinted section — an accent-colored
 // icon/title identify which charge type it is at a glance, its line items,
 // and a total row, all within a faint accent-tinted container so the two
@@ -440,9 +519,10 @@ function FeeSection({
   // column above untouched.
   packageColumns,
   priceByServiceAndPackage,
+  // One buildChargeTypeTotals result per selected package (see
+  // buildPackageTotalsList) — only set alongside packageColumns above.
+  packageTotalsList,
 }) {
-  const hasDiscount = Number(discountPercentage) !== 0;
-  const isSurcharge = Number(discountPercentage) < 0;
   const hasPackageColumns = (packageColumns?.length || 0) > 1;
   return (
     <div
@@ -480,171 +560,219 @@ function FeeSection({
         </span>
       </div>
 
-      {/* Service details, grouped under a header per category — its own
-          plain white block */}
-      <div className="overflow-hidden rounded-lg bg-white">
-        {hasPackageColumns && (
-          <div
-            className="flex items-center justify-end gap-4 border-b px-3 py-1.5"
-            style={{ borderColor: theme.border }}
-          >
-            {packageColumns.map((pkg) => (
-              <span
-                key={pkg.servicePackageID}
-                className="w-20 flex-shrink-0 truncate text-right text-[10px] font-semibold uppercase tracking-wide"
-                style={{ color: theme.textSecondary }}
-                title={pkg.servicePackageName}
-              >
-                {pkg.servicePackageName}
-              </span>
-            ))}
-          </div>
-        )}
-        {categoryGroups.map((group) => (
-          <div key={group.serviceCatID ?? group.categoryName}>
-            <div
-              className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wide"
-              style={{ color: theme.textSecondary }}
-            >
-              {group.categoryName}
-            </div>
-            {group.items.map((item) => {
-              const price =
-                priceByServiceID.get(priceKey(chargeTypeID, item.serviceID)) ||
-                0;
-              // Custom Package locks the admin's default services (see
-              // ProposalServicesStep) — anything without that `locked` flag
-              // was added by the client themselves, so call it out here too.
-              const isUserAdded = isCustomPackage && !item.locked;
+      {/* Package/Custom Package quotes with more than one selected package:
+          one fully separate, titled block per package — its own service
+          list (only the services actually in that package, admin-configured)
+          and its own Calculation — instead of a single shared list. Mirrors
+          AddUpdateProposal.jsx's Review Packages tab, where each package gets
+          its own table and its own GetNetTotalValueByRecurringPackage run. */}
+      {hasPackageColumns ? (
+        <div className="space-y-3">
+          {packageColumns.map((pkg) => {
+            const pkgTotals = packageTotalsList.find(
+              (entry) => entry.pkg.servicePackageID === pkg.servicePackageID,
+            )?.totals;
+            const pkgCategoryGroups = categoryGroups
+              .map((group) => ({
+                ...group,
+                items: group.items.filter(
+                  (item) =>
+                    priceByServiceAndPackage(
+                      chargeTypeID,
+                      item.serviceID,
+                      pkg.servicePackageID,
+                    ) !== null,
+                ),
+              }))
+              .filter((group) => group.items.length > 0);
 
-              return (
+            return (
+              <div
+                key={pkg.servicePackageID}
+                className="overflow-hidden rounded-lg border bg-white"
+                style={{ borderColor: theme.border }}
+              >
                 <div
-                  key={item.serviceID}
-                  className="flex items-center justify-between gap-3 border-b px-3 py-2.5 last:border-b-0"
-                  style={{ borderColor: theme.border }}
+                  className="px-3 py-2 text-xs font-semibold uppercase tracking-wide"
+                  style={{ backgroundColor: `${accent}1F`, color: accent }}
                 >
-                  <span className="flex min-w-0 items-center gap-2">
-                    <span
-                      className="truncate text-sm"
-                      style={{ color: theme.textPrimary }}
-                    >
-                      {item.serviceName}
-                    </span>
-                    {isUserAdded && (
-                      <span
-                        className="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                        style={{
-                          backgroundColor: `${accent}26`,
-                          color: accent,
-                        }}
+                  {pkg.servicePackageName}
+                </div>
+
+                {pkgCategoryGroups.length === 0 ? (
+                  <p
+                    className="px-3 py-3 text-xs"
+                    style={{ color: theme.textSecondary }}
+                  >
+                    No selected services are included in this package.
+                  </p>
+                ) : (
+                  pkgCategoryGroups.map((group) => (
+                    <div key={group.serviceCatID ?? group.categoryName}>
+                      <div
+                        className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wide"
+                        style={{ color: theme.textSecondary }}
                       >
-                        Added by you
-                      </span>
-                    )}
-                  </span>
-                  {pricingLoading ? (
-                    <Loader2
-                      size={14}
-                      className="flex-shrink-0 animate-spin"
-                      style={{ color: theme.textSecondary }}
-                    />
-                  ) : hasPackageColumns ? (
-                    <span className="flex flex-shrink-0 items-center gap-4">
-                      {packageColumns.map((pkg) => {
+                        {group.categoryName}
+                      </div>
+                      {group.items.map((item) => {
                         const pkgPrice = priceByServiceAndPackage(
                           chargeTypeID,
                           item.serviceID,
                           pkg.servicePackageID,
                         );
+                        const isUserAdded = isCustomPackage && !item.locked;
+
                         return (
-                          <span
-                            key={pkg.servicePackageID}
-                            className="w-20 flex-shrink-0 text-right text-sm font-medium"
-                            style={{
-                              color:
-                                pkgPrice === null
-                                  ? theme.textSecondary
-                                  : theme.textPrimary,
-                            }}
+                          <div
+                            key={item.serviceID}
+                            className="flex items-center justify-between gap-3 border-b px-3 py-2.5 last:border-b-0"
+                            style={{ borderColor: theme.border }}
                           >
-                            {pkgPrice === null ? "—" : formatAmount(pkgPrice)}
-                          </span>
+                            <span className="flex min-w-0 items-center gap-2">
+                              <span
+                                className="truncate text-sm"
+                                style={{ color: theme.textPrimary }}
+                              >
+                                {item.serviceName}
+                              </span>
+                              {isUserAdded && (
+                                <span
+                                  className="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                                  style={{
+                                    backgroundColor: `${accent}26`,
+                                    color: accent,
+                                  }}
+                                >
+                                  Added by you
+                                </span>
+                              )}
+                            </span>
+                            {pricingLoading ? (
+                              <Loader2
+                                size={14}
+                                className="flex-shrink-0 animate-spin"
+                                style={{ color: theme.textSecondary }}
+                              />
+                            ) : (
+                              <span
+                                className="flex-shrink-0 text-sm font-medium"
+                                style={{ color: theme.textPrimary }}
+                              >
+                                {formatAmount(pkgPrice)}
+                              </span>
+                            )}
+                          </div>
                         );
                       })}
-                    </span>
-                  ) : (
-                    <span
-                      className="flex-shrink-0 text-sm font-medium"
-                      style={{ color: theme.textPrimary }}
-                    >
-                      {formatAmount(price)}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+                    </div>
+                  ))
+                )}
 
-      {/* Calculation — visually separate, tinted block so it reads as a
-          distinct summary rather than a continuation of the item list */}
-      <div
-        className="mt-2 space-y-1.5 rounded-lg px-3 py-2.5"
-        style={{ backgroundColor: `${accent}12` }}
-      >
-        <span
-          className="block text-[11px] font-semibold uppercase tracking-wide"
-          style={{ color: accent }}
-        >
-          Calculation
-        </span>
-        <div className="flex items-center justify-between text-sm">
-          <span style={{ color: theme.textSecondary }}>Net Total</span>
-          <span style={{ color: theme.textPrimary }}>
-            {formatAmount(netTotal)}
-          </span>
+                {pkgTotals && (
+                  <div className="px-3 pb-3">
+                    <CalculationBlock
+                      theme={theme}
+                      accent={accent}
+                      formatAmount={formatAmount}
+                      netTotal={pkgTotals.netTotal}
+                      discountPercentage={pkgTotals.discountPercentage}
+                      discountAmount={pkgTotals.discountAmount}
+                      discountedTotal={pkgTotals.discountedTotal}
+                      vatPercentage={vatPercentage}
+                      vatAmount={pkgTotals.vatAmount}
+                      grandTotal={pkgTotals.grandTotal}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
-        {hasDiscount && (
-          <>
-            <div className="flex items-center justify-between text-sm">
-              <span style={{ color: theme.textSecondary }}>
-                {isSurcharge ? "Surcharge" : "Discount"} (
-                {Number(Math.abs(discountPercentage)).toFixed(2)}%)
-              </span>
-              <span style={{ color: theme.textSecondary }}>
-                {isSurcharge ? "(+)" : "(-)"}{" "}
-                {formatAmount(Math.abs(discountAmount))}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span style={{ color: theme.textSecondary }}>
-                {isSurcharge ? "Adjusted Total" : "Discounted Total"}
-              </span>
-              <span style={{ color: theme.textPrimary }}>
-                {formatAmount(discountedTotal)}
-              </span>
-            </div>
-          </>
-        )}
-        <div className="flex items-center justify-between text-sm">
-          <span style={{ color: theme.textSecondary }}>
-            VAT ({Number(vatPercentage) || 0}%)
-          </span>
-          <span style={{ color: theme.textSecondary }}>
-            {formatAmount(vatAmount)}
-          </span>
-        </div>
-        <div
-          className="flex items-center justify-between border-t pt-1.5 font-semibold"
-          style={{ borderColor: `${accent}33` }}
-        >
-          <span style={{ color: theme.textPrimary }}>Grand Total</span>
-          <span className="text-sm font-semibold" style={{ color: accent }}>
-            {formatAmount(grandTotal)}
-          </span>
-        </div>
-      </div>
+      ) : (
+        <>
+          {/* Service details, grouped under a header per category — its own
+              plain white block */}
+          <div className="overflow-hidden rounded-lg bg-white">
+            {categoryGroups.map((group) => (
+              <div key={group.serviceCatID ?? group.categoryName}>
+                <div
+                  className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wide"
+                  style={{ color: theme.textSecondary }}
+                >
+                  {group.categoryName}
+                </div>
+                {group.items.map((item) => {
+                  const price =
+                    priceByServiceID.get(
+                      priceKey(chargeTypeID, item.serviceID),
+                    ) || 0;
+                  // Custom Package locks the admin's default services (see
+                  // ProposalServicesStep) — anything without that `locked`
+                  // flag was added by the client themselves, so call it out
+                  // here too.
+                  const isUserAdded = isCustomPackage && !item.locked;
+
+                  return (
+                    <div
+                      key={item.serviceID}
+                      className="flex items-center justify-between gap-3 border-b px-3 py-2.5 last:border-b-0"
+                      style={{ borderColor: theme.border }}
+                    >
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span
+                          className="truncate text-sm"
+                          style={{ color: theme.textPrimary }}
+                        >
+                          {item.serviceName}
+                        </span>
+                        {isUserAdded && (
+                          <span
+                            className="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                            style={{
+                              backgroundColor: `${accent}26`,
+                              color: accent,
+                            }}
+                          >
+                            Added by you
+                          </span>
+                        )}
+                      </span>
+                      {pricingLoading ? (
+                        <Loader2
+                          size={14}
+                          className="flex-shrink-0 animate-spin"
+                          style={{ color: theme.textSecondary }}
+                        />
+                      ) : (
+                        <span
+                          className="flex-shrink-0 text-sm font-medium"
+                          style={{ color: theme.textPrimary }}
+                        >
+                          {formatAmount(price)}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          <CalculationBlock
+            theme={theme}
+            accent={accent}
+            formatAmount={formatAmount}
+            netTotal={netTotal}
+            discountPercentage={discountPercentage}
+            discountAmount={discountAmount}
+            discountedTotal={discountedTotal}
+            vatPercentage={vatPercentage}
+            vatAmount={vatAmount}
+            grandTotal={grandTotal}
+          />
+        </>
+      )}
 
       {note && (
         <p
@@ -685,6 +813,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   const serviceMappingWithPackagesList = useSelector(
     selectServiceMappingWithPackagesList,
   );
+  const servicesPackageList = useSelector(selectServicesPackageList);
 
   // Package/Custom Package quotes are priced against the admin's selected
   // package(s) (quoteModel.servicePackageID), not the generic per-service
@@ -826,6 +955,10 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
         organisationKeyID: quoteModel.organisationKeyID,
         ServicePackageIDs: selectedPackageIDs,
         GetValueOf: getValueOfFrequency,
+        // One-off services are billed once, never on a recurring cadence —
+        // pinning their own request to "Yearly" keeps their price stable
+        // regardless of the quote's payment frequency (see the thunk).
+        oneOffGetValueOf: "Yearly",
         calculateServicesGPDList,
       }),
     );
@@ -877,10 +1010,14 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
 
   // Shown as separate columns (one per selected package) only when the quote
   // actually has more than one selected package — a single-package quote
-  // keeps the existing single price column untouched.
-  const packageColumns = isPackageBased
-    ? quoteModel?.selectedPackagesList || []
-    : [];
+  // keeps the existing single price column untouched. quoteModel has no
+  // selectedPackagesList field of its own (that's an AddUpdateProposal.jsx
+  // local-state concept, never part of GetQuoteModel's response) — the
+  // equivalent list here is packageList, returned by
+  // GetCalculatedServicesPriceByPackages itself (the same response
+  // servicePackageIDs/pricing came from), so it's only populated once that
+  // fetch has actually returned.
+  const packageColumns = isPackageBased ? servicesPackageList || [] : [];
 
   const priceByServiceAndPackage = (chargeTypeID, serviceID, packageID) =>
     priceForServicePackageSlot(
@@ -1004,6 +1141,57 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     };
   };
 
+  // The single, unblended quotationFinalAmountList row for one specific
+  // package — used by the per-package calculation columns below (as opposed
+  // to findFinalAmount's blended-across-all-selected-packages figure, used
+  // for the single combined Calculation card).
+  const findPackageFinalAmount = (chargeTypeID, packageID) =>
+    quotationFinalAmountList.find(
+      (item) =>
+        Number(item.serviceChargeTypeID) === chargeTypeID &&
+        item.servicePackageID !== null &&
+        item.servicePackageID !== undefined &&
+        String(item.servicePackageID) === String(packageID),
+    ) || null;
+
+  // Same shape AddUpdateProposal.jsx's Review Packages tab shows per package
+  // column (GetNetTotalValueByRecurringPackage runs once per package, each
+  // against its own agreed discount % and net total) — mirrored here via the
+  // same buildChargeTypeTotals used for the single combined card, just
+  // called once per package instead of against the blended figures.
+  const buildPackageTotalsList = (chargeTypeID, selectedItems, unchanged) =>
+    packageColumns.map((pkg) => {
+      const finalAmountRow = findPackageFinalAmount(
+        chargeTypeID,
+        pkg.servicePackageID,
+      );
+      const liveNetTotal = selectedItems.reduce(
+        (sum, item) =>
+          sum +
+          (priceByServiceAndPackage(
+            chargeTypeID,
+            item.serviceID,
+            pkg.servicePackageID,
+          ) || 0),
+        0,
+      );
+      const liveVatAmount = (liveNetTotal * (Number(vatPercentage) || 0)) / 100;
+
+      const totals = buildChargeTypeTotals({
+        finalAmount: unchanged ? finalAmountRow : null,
+        defaultFinalAmount: finalAmountRow,
+        liveNetTotal,
+        liveVatAmount,
+        liveGrandTotal: liveNetTotal + liveVatAmount,
+        vatPercentage,
+        adminDiscountPercentage: finalAmountRow?.discountPercentageWithAllDecimal,
+        chargeTypeLabel: "recurring",
+        isPackageBased: true,
+      });
+
+      return { pkg, totals };
+    });
+
   // A service's own driver values live in recurringSelections/oneOffSelections,
   // but a *global* pricing driver's value lives in the separate Additional
   // Information list — selectionsMatch alone can't see an edit there (the
@@ -1091,6 +1279,27 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     ? Number(oneOffFinalAmount.vatPercentage) || 0
     : Number(vatPercentage) || 0;
 
+  // Per-package Calculation columns (Net Total/Discount/VAT/Grand Total each
+  // computed against that package's own agreed discount %, mirroring
+  // AddUpdateProposal.jsx's Review Packages tab) — only built when there's
+  // more than one selected package to show side by side; a single-package
+  // quote keeps the existing single blended Calculation card above.
+  const hasPackageColumns = packageColumns.length > 1;
+  const recurringPackageTotalsList = hasPackageColumns
+    ? buildPackageTotalsList(
+        SERVICE_CHARGE_TYPE_ID.RECURRING,
+        recurringSelectedList,
+        recurringUnchanged,
+      )
+    : [];
+  const oneOffPackageTotalsList = hasPackageColumns
+    ? buildPackageTotalsList(
+        SERVICE_CHARGE_TYPE_ID.ONE_OFF,
+        oneOffSelectedList,
+        oneOffUnchanged,
+      )
+    : [];
+
   const currencySymbol = CURRENCY_SYMBOLS[currencyID] || "£";
   const formatAmount = (value) => `${currencySymbol}${value.toFixed(2)}`;
 
@@ -1106,9 +1315,9 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   });
 
   // Package/Custom Package proposals are built from admin-selected package(s)
-  // - shown here so the client sees which package they were quoted, same as
-  // servicePackageName on AddUpdateProposal.jsx's selectedPackagesList.
-  const packageName = (quoteModel?.selectedPackagesList || [])
+  // - shown here so the client sees which package(s) they were quoted, same
+  // as servicePackageName on AddUpdateProposal.jsx's selectedPackagesList.
+  const packageName = packageColumns
     .map((pkg) => pkg.servicePackageName)
     .filter(Boolean)
     .join(", ");
@@ -1220,6 +1429,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   frequencyLabel={paymentFrequencyLabel}
                   packageColumns={packageColumns}
                   priceByServiceAndPackage={priceByServiceAndPackage}
+                  packageTotalsList={recurringPackageTotalsList}
                 />
               )}
 
@@ -1246,6 +1456,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   isCustomPackage={isCustomPackage}
                   packageColumns={packageColumns}
                   priceByServiceAndPackage={priceByServiceAndPackage}
+                  packageTotalsList={oneOffPackageTotalsList}
                 />
               )}
             </>
