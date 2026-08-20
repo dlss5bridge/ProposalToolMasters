@@ -25518,7 +25518,6 @@ const Add_Update_Proposal = (props) => {
                   setSelectedTemplateIDOneOff={setSelectedTemplateIDOneOff}
                   selectedTemplateID={selectedTemplateID}
                   selectedTemplateIDOneOff={selectedTemplateIDOneOff}
-                  setVisibleFieldsCustomTemp={setVisibleFieldsCustomTemp}
                   visibleFieldsCustomTemp={visibleFieldsCustomTemp}
                 />
               )}
@@ -25629,7 +25628,6 @@ const Add_Update_Proposal = (props) => {
                   setSelectedTemplateIDOneOff={setSelectedTemplateIDOneOff}
                   selectedTemplateID={selectedTemplateID}
                   selectedTemplateIDOneOff={selectedTemplateIDOneOff}
-                  setVisibleFieldsCustomTemp={setVisibleFieldsCustomTemp}
                   visibleFieldsCustomTemp={visibleFieldsCustomTemp}
                   currencySymbol={currencySymbol}
                   isVatEnabledForOrg={isVatEnabledForOrg}
@@ -25716,7 +25714,6 @@ const Add_Update_Proposal = (props) => {
                     setMergePdfUrl={setMergePdfUrl}
                     vatPercentage={vatPercentage}
                     currencyID={currencyID}
-                    taxName={taxName}
                     currencySymbol={currencySymbol}
                     feeTypeId={ProposalObject.feeTypeId}
                     pricingSettingObj={pricingSettingObj}
@@ -25770,10 +25767,7 @@ const Add_Update_Proposal = (props) => {
                     selectedTemplateIDOneOff={selectedTemplateIDOneOff}
                     selectedTemplateID={selectedTemplateID}
                     visibleFieldsCustomTemp={visibleFieldsCustomTemp}
-                    currencyID={currencyID}
-                    taxName={taxName}
-                    currencySymbol={currencySymbol}
-                    pricingSettingObj={pricingSettingObj}
+                    taxName={taxName} 
                     vatPercentageOneOff={vatPercentageOneOff}
                   />
                 </Suspense>
