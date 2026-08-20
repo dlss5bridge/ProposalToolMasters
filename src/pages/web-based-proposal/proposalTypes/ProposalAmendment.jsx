@@ -21,6 +21,7 @@ import {
 import {
   selectSelectedServiceIDs,
   selectServicesFieldErrors,
+  selectLockedServiceIDs,
   setServicesSelectionError,
   setServicesFieldErrorsVisible,
 } from "../../../redux/reducer/webProposal/services";
@@ -51,6 +52,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const additionalInformationList = useSelector(
     selectAdditionalInformationList,
   );
+  const lockedServiceIDs = useSelector(selectLockedServiceIDs);
   const inputFieldsList = useSelector(selectInputFieldsList);
 
   // Package proposals ship with the admin's fixed default services and give
@@ -60,12 +62,30 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const isCustomPackageType =
     quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
 
-  // Package and Custom Package proposals are priced against a fixed
-  // package/discount rather than the per-service driver values Additional
-  // Information exists to capture, so the step is skipped entirely for both
-  // — never inserted into the stepper, never navigable to.
-  const additionalInfoStepInserted =
-    hasAdditionalInformation && !isPackageType && !isCustomPackageType;
+  // Package proposals are priced against a fixed package/discount rather
+  // than the per-service driver values Additional Information exists to
+  // capture, so the step is skipped entirely — never inserted into the
+  // stepper, never navigable to.
+  //
+  // Custom Package is different: the admin's locked default services are
+  // still priced against a fixed package, but the client can add their own
+  // services on top of that package, and one of those could carry its own
+  // additional-information requirement (a global pricing driver). The step
+  // is only inserted when that's actually the case — i.e. at least one
+  // visible field belongs to a service the client added themselves, not one
+  // of the admin's locked defaults — so a Custom Package proposal with no
+  // client-added services (or none needing extra info) still skips it
+  // exactly like before.
+  const hasClientAddedAdditionalInformation =
+    isCustomPackageType &&
+    getVisibleAdditionalInformationItems(additionalInformationList).some(
+      (item) => !lockedServiceIDs.has(item.serviceID),
+    );
+  const additionalInfoStepInserted = isPackageType
+    ? false
+    : isCustomPackageType
+      ? hasClientAddedAdditionalInformation
+      : hasAdditionalInformation;
 
   // Base step order is fixed, so the final index of any step can be derived
   // up front from its position here plus whether Additional Information gets
@@ -125,7 +145,18 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         ...baseSteps.slice(0, ADDITIONAL_INFO_INSERT_INDEX),
         {
           label: "Additional Information",
-          component: <ProposalAdditionalInformationStep theme={theme} />,
+          component: (
+            <ProposalAdditionalInformationStep
+              theme={theme}
+              // Custom Package: the admin's locked default services keep
+              // their pre-set values shown but not editable; only fields
+              // belonging to a service the client added themselves are
+              // live. Every other proposal type has no locked services, so
+              // this is an empty set and every field stays editable exactly
+              // as before.
+              lockedServiceIDs={isCustomPackageType ? lockedServiceIDs : undefined}
+            />
+          ),
         },
         ...baseSteps.slice(ADDITIONAL_INFO_INSERT_INDEX),
       ]
@@ -181,9 +212,16 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       additionalInfoStepInserted &&
       currentStepIndex === ADDITIONAL_INFO_STEP_INDEX
     ) {
-      const fieldErrors = getAdditionalInformationFieldErrors(
-        additionalInformationList,
-      );
+      // Custom Package: locked fields are read-only, so a stale/incomplete
+      // admin default there must never block the client from proceeding —
+      // only fields belonging to a service the client added themselves can
+      // actually be fixed, so only those are checked.
+      const validatableList = isCustomPackageType
+        ? additionalInformationList.filter(
+            (item) => !lockedServiceIDs.has(item.serviceID),
+          )
+        : additionalInformationList;
+      const fieldErrors = getAdditionalInformationFieldErrors(validatableList);
       if (Object.keys(fieldErrors).length > 0) {
         dispatch(setAdditionalInformationValidationVisible(true));
         return false;
@@ -226,8 +264,13 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       list = [];
     }
 
-    const hasVisibleAdditionalInformation =
-      getVisibleAdditionalInformationItems(list).length > 0;
+    // Mirrors additionalInfoStepInserted above: for Custom Package, only a
+    // client-added service's field counts toward inserting the step — a
+    // freshly re-fetched `list` (not yet in redux) needs the same filter.
+    const visibleItems = getVisibleAdditionalInformationItems(list);
+    const hasVisibleAdditionalInformation = isCustomPackageType
+      ? visibleItems.some((item) => !lockedServiceIDs.has(item.serviceID))
+      : visibleItems.length > 0;
     dispatch(
       updateTotalSteps(
         baseSteps.length + (hasVisibleAdditionalInformation ? 1 : 0),

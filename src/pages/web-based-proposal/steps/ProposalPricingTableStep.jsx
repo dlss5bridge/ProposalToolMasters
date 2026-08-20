@@ -421,7 +421,7 @@ function CalculationBlock({
                 className="font-medium"
                 style={{ color: isSurcharge ? accent : theme.textSecondary }}
               >
-                {isSurcharge ? "(+)" : "(-)"}{" "}
+                {isSurcharge ? "(+)" : ""}{" "}
                 {formatAmount(Math.abs(discountAmount))}
               </span>
             </div>
@@ -429,7 +429,10 @@ function CalculationBlock({
               <span style={{ color: theme.textSecondary }}>
                 {isSurcharge ? "Adjusted Total" : "Discounted Total"}
               </span>
-              <span className="font-medium" style={{ color: theme.textPrimary }}>
+              <span
+                className="font-medium"
+                style={{ color: theme.textPrimary }}
+              >
                 {formatAmount(discountedTotal)}
               </span>
             </div>
@@ -555,479 +558,494 @@ function FeeSection({
       </div>
 
       <div className="px-4 pb-4 sm:px-5">
-
-      {hasPackageColumns ? (
-        // A CSS-grid "plan comparison" layout, not a spreadsheet table: the
-        // Service column takes only as much width as it needs (capped), and
-        // every package gets an equal, flexible share of whatever space is
-        // left — so 2 packages fill the card just as cleanly as 4 do. Every
-        // row (header, category label, service, calculation, CTA) reuses
-        // the same column template so everything lines up perfectly without
-        // table borders/cellspacing doing the work.
-        <div
-          className="overflow-x-auto rounded-2xl border"
-          style={{ borderColor: theme.border }}
-        >
+        {hasPackageColumns ? (
+          // A CSS-grid "plan comparison" layout, not a spreadsheet table: the
+          // Service column takes only as much width as it needs (capped), and
+          // every package gets an equal, flexible share of whatever space is
+          // left — so 2 packages fill the card just as cleanly as 4 do. Every
+          // row (header, category label, service, calculation, CTA) reuses
+          // the same column template so everything lines up perfectly without
+          // table borders/cellspacing doing the work.
           <div
-            className="min-w-[560px]"
-            style={{
-              display: "grid",
-              gridTemplateColumns: `minmax(200px,260px) repeat(${packageColumns.length}, minmax(0,1fr))`,
-            }}
+            className="overflow-x-auto rounded-2xl border"
+            style={{ borderColor: theme.border }}
           >
-            {/* Plan header row — each package reads as its own card header:
+            <div
+              className="min-w-[560px]"
+              style={{
+                display: "grid",
+                gridTemplateColumns: `minmax(200px,260px) repeat(${packageColumns.length}, minmax(0,1fr))`,
+              }}
+            >
+              {/* Plan header row — each package reads as its own card header:
                 bold name, a colored top rule + soft tint + checkmark on the
                 selected one, so "which plan is this" never needs a legend. */}
-            <div
-              className="sticky left-0 z-10 flex items-end px-4 py-3"
-              style={{ backgroundColor: theme.background }}
-            >
-              <span
-                className="text-[11px] font-bold uppercase tracking-wider"
-                style={{ color: theme.textSecondary }}
+              <div
+                className="sticky left-0 z-10 flex items-end px-4 py-3"
+                style={{ backgroundColor: theme.background }}
               >
-                Service
-              </span>
-            </div>
-            {packageColumns.map((pkg) => {
-              const isActive =
-                String(pkg.servicePackageID) === String(selectedPackageID);
-              return (
-                <div
-                  key={pkg.servicePackageID}
-                  className="flex flex-col items-center gap-0.5 border-l px-3 py-3 text-center"
-                  style={{
-                    borderColor: theme.border,
-                    borderTop: `3px solid ${isActive ? accent : "transparent"}`,
-                    backgroundColor: isActive ? `${accent}14` : theme.background,
-                  }}
+                <span
+                  className="text-[11px] font-bold uppercase tracking-wider"
+                  style={{ color: theme.textSecondary }}
                 >
-                  {isActive ? (
-                    <span
-                      className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide"
-                      style={{ color: accent }}
-                    >
-                      <Check size={11} strokeWidth={3} /> Your Plan
-                    </span>
-                  ) : (
-                    <span
-                      className="text-[10px] font-semibold uppercase tracking-wide"
-                      style={{ color: theme.textSecondary }}
-                    >
-                      Plan
-                    </span>
-                  )}
-                  <span
-                    className="max-w-full truncate text-sm font-bold"
-                    style={{ color: isActive ? accent : theme.textPrimary }}
-                    title={pkg.servicePackageName}
+                  Service
+                </span>
+              </div>
+              {packageColumns.map((pkg) => {
+                const isActive =
+                  String(pkg.servicePackageID) === String(selectedPackageID);
+                return (
+                  <div
+                    key={pkg.servicePackageID}
+                    className="flex flex-col items-center gap-0.5 border-l px-3 py-3 text-center"
+                    style={{
+                      borderColor: theme.border,
+                      borderTop: `3px solid ${isActive ? accent : "transparent"}`,
+                      backgroundColor: isActive
+                        ? `${accent}14`
+                        : theme.background,
+                    }}
                   >
-                    {pkg.servicePackageName}
-                  </span>
-                </div>
-              );
-            })}
-
-            {/* Category + service rows */}
-            {categoryGroups.map((group) => (
-              <Fragment key={group.serviceCatID ?? group.categoryName}>
-                <div
-                  className="sticky left-0 z-10 border-t px-4 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider"
-                  style={{
-                    gridColumn: "1 / -1",
-                    borderColor: theme.border,
-                    backgroundColor: "#fff",
-                    color: theme.textSecondary,
-                  }}
-                >
-                  {group.categoryName}
-                </div>
-                {group.items.map((item) => {
-                  const isUserAdded = isCustomPackage && !item.locked;
-
-                  return (
-                    <Fragment key={item.serviceID}>
-                      <div
-                        className="sticky left-0 z-10 flex min-w-0 items-center gap-2 border-t px-4 py-2.5"
-                        style={{ borderColor: theme.border, backgroundColor: "#fff" }}
+                    {isActive ? (
+                      <span
+                        className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide"
+                        style={{ color: accent }}
                       >
-                        <span
-                          className="truncate text-sm"
-                          style={{ color: theme.textPrimary }}
+                        <Check size={11} strokeWidth={3} /> Your Plan
+                      </span>
+                    ) : (
+                      <span
+                        className="text-[10px] font-semibold uppercase tracking-wide"
+                        style={{ color: theme.textSecondary }}
+                      >
+                        Plan
+                      </span>
+                    )}
+                    <span
+                      className="max-w-full truncate text-sm font-bold"
+                      style={{ color: isActive ? accent : theme.textPrimary }}
+                      title={pkg.servicePackageName}
+                    >
+                      {pkg.servicePackageName}
+                    </span>
+                  </div>
+                );
+              })}
+
+              {/* Category + service rows */}
+              {categoryGroups.map((group) => (
+                <Fragment key={group.serviceCatID ?? group.categoryName}>
+                  <div
+                    className="sticky left-0 z-10 border-t px-4 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider"
+                    style={{
+                      gridColumn: "1 / -1",
+                      borderColor: theme.border,
+                      backgroundColor: "#fff",
+                      color: theme.textSecondary,
+                    }}
+                  >
+                    {group.categoryName}
+                  </div>
+                  {group.items.map((item) => {
+                    const isUserAdded = isCustomPackage && !item.locked;
+
+                    return (
+                      <Fragment key={item.serviceID}>
+                        <div
+                          className="sticky left-0 z-10 flex min-w-0 items-center gap-2 border-t px-4 py-2.5"
+                          style={{
+                            borderColor: theme.border,
+                            backgroundColor: "#fff",
+                          }}
                         >
-                          {item.serviceName}
-                        </span>
-                        {isUserAdded && (
                           <span
-                            className="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                            style={{
-                              backgroundColor: `${accent}26`,
-                              color: accent,
-                            }}
+                            className="truncate text-sm"
+                            style={{ color: theme.textPrimary }}
                           >
-                            Added by you
+                            {item.serviceName}
                           </span>
-                        )}
-                      </div>
-                      {packageColumns.map((pkg) => {
-                        const isActive =
-                          String(pkg.servicePackageID) ===
-                          String(selectedPackageID);
-                        const pkgPrice = priceByServiceAndPackage(
-                          chargeTypeID,
-                          item.serviceID,
-                          pkg.servicePackageID,
-                        );
+                          {isUserAdded && (
+                            <span
+                              className="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                              style={{
+                                backgroundColor: `${accent}26`,
+                                color: accent,
+                              }}
+                            >
+                              Added by you
+                            </span>
+                          )}
+                        </div>
+                        {packageColumns.map((pkg) => {
+                          const isActive =
+                            String(pkg.servicePackageID) ===
+                            String(selectedPackageID);
+                          const pkgPrice = priceByServiceAndPackage(
+                            chargeTypeID,
+                            item.serviceID,
+                            pkg.servicePackageID,
+                          );
 
-                        return (
-                          <div
-                            key={pkg.servicePackageID}
-                            className="flex items-center justify-end border-l border-t px-3 py-2.5"
-                            style={{
-                              borderColor: theme.border,
-                              backgroundColor: isActive
-                                ? `${accent}0A`
-                                : undefined,
-                            }}
-                          >
-                            {pricingLoading ? (
-                              <Loader2
-                                size={14}
-                                className="animate-spin"
-                                style={{ color: theme.textSecondary }}
-                              />
-                            ) : (
-                              <span
-                                className="text-sm font-medium"
-                                style={{
-                                  color:
-                                    pkgPrice === null
-                                      ? theme.textSecondary
-                                      : theme.textPrimary,
-                                }}
-                              >
-                                {pkgPrice === null
-                                  ? "—"
-                                  : formatAmount(pkgPrice)}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </Fragment>
-                  );
-                })}
-              </Fragment>
-            ))}
+                          return (
+                            <div
+                              key={pkg.servicePackageID}
+                              className="flex items-center justify-end border-l border-t px-3 py-2.5"
+                              style={{
+                                borderColor: theme.border,
+                                backgroundColor: isActive
+                                  ? `${accent}0A`
+                                  : undefined,
+                              }}
+                            >
+                              {pricingLoading ? (
+                                <Loader2
+                                  size={14}
+                                  className="animate-spin"
+                                  style={{ color: theme.textSecondary }}
+                                />
+                              ) : (
+                                <span
+                                  className="text-sm font-medium"
+                                  style={{
+                                    color:
+                                      pkgPrice === null
+                                        ? theme.textSecondary
+                                        : theme.textPrimary,
+                                  }}
+                                >
+                                  {pkgPrice === null
+                                    ? "—"
+                                    : formatAmount(pkgPrice)}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </Fragment>
+                    );
+                  })}
+                </Fragment>
+              ))}
 
-            {/* Calculation — a tinted zone set apart from the plain service
+              {/* Calculation — a tinted zone set apart from the plain service
                 rows above, ending in the Grand Total band and the CTA row,
                 mirroring CalculationBlock's own type scale (text-sm lines,
                 bold text-base Grand Total) so Service and Package/Custom
                 Package quotes read with identical hierarchy. */}
-            <div
-              className="sticky left-0 z-10 px-4 pt-3 text-[11px] font-bold uppercase tracking-wider"
-              style={{ backgroundColor: `${accent}08`, color: theme.textSecondary }}
-            >
-              Net Total
-            </div>
-            {packageTotalsList.map(({ pkg, totals }) => {
-              const isActive =
-                String(pkg.servicePackageID) === String(selectedPackageID);
-              return (
-                <div
-                  key={pkg.servicePackageID}
-                  className="border-l px-3 pt-3 text-right text-sm font-medium"
-                  style={{
-                    borderColor: theme.border,
-                    backgroundColor: isActive ? `${accent}12` : `${accent}08`,
-                    color: theme.textPrimary,
-                  }}
-                >
-                  {formatAmount(totals.netTotal)}
-                </div>
-              );
-            })}
+              <div
+                className="sticky left-0 z-10 px-4 pt-3 text-[11px] font-bold uppercase tracking-wider"
+                style={{
+                  backgroundColor: `${accent}08`,
+                  color: theme.textSecondary,
+                }}
+              >
+                Net Total
+              </div>
+              {packageTotalsList.map(({ pkg, totals }) => {
+                const isActive =
+                  String(pkg.servicePackageID) === String(selectedPackageID);
+                return (
+                  <div
+                    key={pkg.servicePackageID}
+                    className="border-l px-3 pt-3 text-right text-sm font-medium"
+                    style={{
+                      borderColor: theme.border,
+                      backgroundColor: isActive ? `${accent}12` : `${accent}08`,
+                      color: theme.textPrimary,
+                    }}
+                  >
+                    {formatAmount(totals.netTotal)}
+                  </div>
+                );
+              })}
 
-            {packageTotalsList.some(
-              ({ totals }) => Number(totals.discountPercentage) !== 0,
-            ) && (
-              <>
-                <div
-                  className="sticky left-0 z-10 px-4 py-1 text-sm"
-                  style={{
-                    backgroundColor: `${accent}08`,
-                    color: theme.textSecondary,
-                  }}
-                >
-                  Discount / Surcharge
-                </div>
-                {packageTotalsList.map(({ pkg, totals }) => {
-                  const pct = Number(totals.discountPercentage);
-                  const isSurcharge = pct < 0;
-                  const isActive =
-                    String(pkg.servicePackageID) === String(selectedPackageID);
-                  return (
-                    <div
-                      key={pkg.servicePackageID}
-                      className="border-l px-3 py-1 text-right text-sm font-medium"
-                      style={{
-                        borderColor: theme.border,
-                        backgroundColor: isActive
-                          ? `${accent}12`
-                          : `${accent}08`,
-                        color: isSurcharge ? accent : theme.textSecondary,
-                      }}
-                    >
-                      {pct === 0
-                        ? "—"
-                        : `${isSurcharge ? "+" : "-"}${formatAmount(
-                            Math.abs(totals.discountAmount),
-                          )} (${Math.abs(pct).toFixed(2)}%)`}
-                    </div>
-                  );
-                })}
+              {packageTotalsList.some(
+                ({ totals }) => Number(totals.discountPercentage) !== 0,
+              ) && (
+                <>
+                  <div
+                    className="sticky left-0 z-10 px-4 py-1 text-sm"
+                    style={{
+                      backgroundColor: `${accent}08`,
+                      color: theme.textSecondary,
+                    }}
+                  >
+                    Discount / Surcharge
+                  </div>
+                  {packageTotalsList.map(({ pkg, totals }) => {
+                    const pct = Number(totals.discountPercentage);
+                    const isSurcharge = pct < 0;
+                    const isActive =
+                      String(pkg.servicePackageID) ===
+                      String(selectedPackageID);
+                    return (
+                      <div
+                        key={pkg.servicePackageID}
+                        className="border-l px-3 py-1 text-right text-sm font-medium"
+                        style={{
+                          borderColor: theme.border,
+                          backgroundColor: isActive
+                            ? `${accent}12`
+                            : `${accent}08`,
+                          color: isSurcharge ? accent : theme.textSecondary,
+                        }}
+                      >
+                        {pct === 0
+                          ? "—"
+                          : `${isSurcharge ? "+" : "-"}${formatAmount(
+                              Math.abs(totals.discountAmount),
+                            )} (${Math.abs(pct).toFixed(2)}%)`}
+                      </div>
+                    );
+                  })}
 
-                <div
-                  className="sticky left-0 z-10 px-4 py-1 text-sm"
-                  style={{
-                    backgroundColor: `${accent}08`,
-                    color: theme.textSecondary,
-                  }}
-                >
-                  {packageTotalsList.some(
-                    ({ totals }) => Number(totals.discountPercentage) < 0,
-                  )
-                    ? "Discounted / Adjusted Total"
-                    : "Discounted Total"}
-                </div>
-                {packageTotalsList.map(({ pkg, totals }) => {
-                  const isActive =
-                    String(pkg.servicePackageID) === String(selectedPackageID);
-                  return (
-                    <div
-                      key={pkg.servicePackageID}
-                      className="border-l px-3 py-1 text-right text-sm font-medium"
-                      style={{
-                        borderColor: theme.border,
-                        backgroundColor: isActive
-                          ? `${accent}12`
-                          : `${accent}08`,
-                        color: theme.textPrimary,
-                      }}
-                    >
-                      {formatAmount(totals.discountedTotal)}
-                    </div>
-                  );
-                })}
-              </>
-            )}
+                  <div
+                    className="sticky left-0 z-10 px-4 py-1 text-sm"
+                    style={{
+                      backgroundColor: `${accent}08`,
+                      color: theme.textSecondary,
+                    }}
+                  >
+                    {packageTotalsList.some(
+                      ({ totals }) => Number(totals.discountPercentage) < 0,
+                    )
+                      ? "Discounted / Adjusted Total"
+                      : "Discounted Total"}
+                  </div>
+                  {packageTotalsList.map(({ pkg, totals }) => {
+                    const isActive =
+                      String(pkg.servicePackageID) ===
+                      String(selectedPackageID);
+                    return (
+                      <div
+                        key={pkg.servicePackageID}
+                        className="border-l px-3 py-1 text-right text-sm font-medium"
+                        style={{
+                          borderColor: theme.border,
+                          backgroundColor: isActive
+                            ? `${accent}12`
+                            : `${accent}08`,
+                          color: theme.textPrimary,
+                        }}
+                      >
+                        {formatAmount(totals.discountedTotal)}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
 
-            <div
-              className="sticky left-0 z-10 px-4 py-1 text-sm"
-              style={{ backgroundColor: `${accent}08`, color: theme.textSecondary }}
-            >
-              VAT ({Number(vatPercentage) || 0}%)
-            </div>
-            {packageTotalsList.map(({ pkg, totals }) => {
-              const isActive =
-                String(pkg.servicePackageID) === String(selectedPackageID);
-              return (
-                <div
-                  key={pkg.servicePackageID}
-                  className="border-l px-3 py-1 text-right text-sm font-medium"
-                  style={{
-                    borderColor: theme.border,
-                    backgroundColor: isActive ? `${accent}12` : `${accent}08`,
-                    color: theme.textSecondary,
-                  }}
-                >
-                  {formatAmount(totals.vatAmount)}
-                </div>
-              );
-            })}
+              <div
+                className="sticky left-0 z-10 px-4 py-1 text-sm"
+                style={{
+                  backgroundColor: `${accent}08`,
+                  color: theme.textSecondary,
+                }}
+              >
+                VAT ({Number(vatPercentage) || 0}%)
+              </div>
+              {packageTotalsList.map(({ pkg, totals }) => {
+                const isActive =
+                  String(pkg.servicePackageID) === String(selectedPackageID);
+                return (
+                  <div
+                    key={pkg.servicePackageID}
+                    className="border-l px-3 py-1 text-right text-sm font-medium"
+                    style={{
+                      borderColor: theme.border,
+                      backgroundColor: isActive ? `${accent}12` : `${accent}08`,
+                      color: theme.textSecondary,
+                    }}
+                  >
+                    {formatAmount(totals.vatAmount)}
+                  </div>
+                );
+              })}
 
-            {/* Grand Total — the headline price per plan, sized and
+              {/* Grand Total — the headline price per plan, sized and
                 weighted like CalculationBlock's own Grand Total band. */}
-            <div
-              className="sticky left-0 z-10 flex items-center px-4 py-3 text-xs font-bold uppercase tracking-wide"
-              style={{ backgroundColor: `${accent}1A`, color: theme.textPrimary }}
-            >
-              Grand Total
-            </div>
-            {packageTotalsList.map(({ pkg, totals }) => {
-              const isActive =
-                String(pkg.servicePackageID) === String(selectedPackageID);
-              return (
-                <div
-                  key={pkg.servicePackageID}
-                  className="border-l px-3 py-3 text-right text-lg font-bold"
-                  style={{
-                    borderColor: `${accent}26`,
-                    backgroundColor: isActive ? `${accent}29` : `${accent}1A`,
-                    color: accent,
-                  }}
-                >
-                  {formatAmount(totals.grandTotal)}
-                </div>
-              );
-            })}
+              <div
+                className="sticky left-0 z-10 flex items-center px-4 py-3 text-xs font-bold uppercase tracking-wide"
+                style={{
+                  backgroundColor: `${accent}1A`,
+                  color: theme.textPrimary,
+                }}
+              >
+                Grand Total
+              </div>
+              {packageTotalsList.map(({ pkg, totals }) => {
+                const isActive =
+                  String(pkg.servicePackageID) === String(selectedPackageID);
+                return (
+                  <div
+                    key={pkg.servicePackageID}
+                    className="border-l px-3 py-3 text-right text-lg font-bold"
+                    style={{
+                      borderColor: `${accent}26`,
+                      backgroundColor: isActive ? `${accent}29` : `${accent}1A`,
+                      color: accent,
+                    }}
+                  >
+                    {formatAmount(totals.grandTotal)}
+                  </div>
+                );
+              })}
 
-            {/* Call to action — a full-width "Select Plan" button per
+              {/* Call to action — a full-width "Select Plan" button per
                 column, filled with a check for the active plan, so choosing
                 a package feels like a purchase decision, not a table edit. */}
-            <div
-              className="sticky left-0 z-10 px-4 py-3"
-              style={{ backgroundColor: theme.background }}
-            />
-            {packageColumns.map((pkg) => {
-              const isActive =
-                String(pkg.servicePackageID) === String(selectedPackageID);
-              return (
-                <div
-                  key={pkg.servicePackageID}
-                  className="border-l px-3 py-3"
-                  style={{
-                    borderColor: theme.border,
-                    backgroundColor: theme.background,
-                  }}
-                >
-                  {isActive ? (
-                    <span
-                      className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold shadow-sm"
-                      style={{ backgroundColor: accent, color: "#fff" }}
-                    >
-                      <Check size={13} strokeWidth={3} />
-                      Selected
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => onSelectPackage(pkg.servicePackageID)}
-                      className="w-full rounded-lg border px-3 py-2 text-xs font-bold transition-colors hover:text-white"
-                      style={{
-                        borderColor: accent,
-                        color: accent,
-                        backgroundColor: "#fff",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = accent;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#fff";
-                      }}
-                    >
-                      Select This Plan
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+              <div
+                className="sticky left-0 z-10 px-4 py-3"
+                style={{ backgroundColor: theme.background }}
+              />
+              {packageColumns.map((pkg) => {
+                const isActive =
+                  String(pkg.servicePackageID) === String(selectedPackageID);
+                return (
+                  <div
+                    key={pkg.servicePackageID}
+                    className="border-l px-3 py-3"
+                    style={{
+                      borderColor: theme.border,
+                      backgroundColor: theme.background,
+                    }}
+                  >
+                    {isActive ? (
+                      <span
+                        className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold shadow-sm"
+                        style={{ backgroundColor: accent, color: "#fff" }}
+                      >
+                        <Check size={13} strokeWidth={3} />
+                        Selected
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onSelectPackage(pkg.servicePackageID)}
+                        className="w-full rounded-lg border px-3 py-2 text-xs font-bold transition-colors hover:text-white"
+                        style={{
+                          borderColor: accent,
+                          color: accent,
+                          backgroundColor: "#fff",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = accent;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#fff";
+                        }}
+                      >
+                        Select This Plan
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ) : (
-        <>
-          {/* Service details, grouped under a header per category — its own
+        ) : (
+          <>
+            {/* Service details, grouped under a header per category — its own
               rounded, bordered block so it reads as one cohesive list. */}
-          <div
-            className="overflow-hidden rounded-xl border bg-white"
-            style={{ borderColor: theme.border }}
-          >
-            {categoryGroups.map((group) => (
-              <div key={group.serviceCatID ?? group.categoryName}>
-                <div
-                  className="border-t px-3.5 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider first:border-t-0"
-                  style={{
-                    color: theme.textSecondary,
-                    borderColor: theme.border,
-                  }}
-                >
-                  {group.categoryName}
-                </div>
-                {group.items.map((item) => {
-                  const price = priceByServiceID.get(
-                    priceKey(chargeTypeID, item.serviceID),
-                  );
-                  // Custom Package locks the admin's default services (see
-                  // ProposalServicesStep) — anything without that `locked`
-                  // flag was added by the client themselves, so call it out
-                  // here too.
-                  const isUserAdded = isCustomPackage && !item.locked;
-                  const notInPackage = isPackageBased && price === null;
+            <div
+              className="overflow-hidden rounded-xl border bg-white"
+              style={{ borderColor: theme.border }}
+            >
+              {categoryGroups.map((group) => (
+                <div key={group.serviceCatID ?? group.categoryName}>
+                  <div
+                    className="border-t px-3.5 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider first:border-t-0"
+                    style={{
+                      color: theme.textSecondary,
+                      borderColor: theme.border,
+                    }}
+                  >
+                    {group.categoryName}
+                  </div>
+                  {group.items.map((item) => {
+                    const price = priceByServiceID.get(
+                      priceKey(chargeTypeID, item.serviceID),
+                    );
+                    // Custom Package locks the admin's default services (see
+                    // ProposalServicesStep) — anything without that `locked`
+                    // flag was added by the client themselves, so call it out
+                    // here too.
+                    const isUserAdded = isCustomPackage && !item.locked;
+                    const notInPackage = isPackageBased && price === null;
 
-                  return (
-                    <div
-                      key={item.serviceID}
-                      className="flex items-center justify-between gap-3 border-b px-3.5 py-2.5 last:border-b-0"
-                      style={{ borderColor: theme.border }}
-                    >
-                      <span className="flex min-w-0 items-center gap-2">
-                        <span
-                          className="truncate text-sm"
-                          style={{ color: theme.textPrimary }}
-                        >
-                          {item.serviceName}
-                        </span>
-                        {isUserAdded && (
+                    return (
+                      <div
+                        key={item.serviceID}
+                        className="flex items-center justify-between gap-3 border-b px-3.5 py-2.5 last:border-b-0"
+                        style={{ borderColor: theme.border }}
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
                           <span
-                            className="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                            className="truncate text-sm"
+                            style={{ color: theme.textPrimary }}
+                          >
+                            {item.serviceName}
+                          </span>
+                          {isUserAdded && (
+                            <span
+                              className="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                              style={{
+                                backgroundColor: `${accent}26`,
+                                color: accent,
+                              }}
+                            >
+                              Added by you
+                            </span>
+                          )}
+                        </span>
+                        {pricingLoading ? (
+                          <Loader2
+                            size={14}
+                            className="flex-shrink-0 animate-spin"
+                            style={{ color: theme.textSecondary }}
+                          />
+                        ) : (
+                          <span
+                            className="flex-shrink-0 text-sm font-semibold"
                             style={{
-                              backgroundColor: `${accent}26`,
-                              color: accent,
+                              color: notInPackage
+                                ? theme.textSecondary
+                                : theme.textPrimary,
                             }}
                           >
-                            Added by you
+                            {notInPackage ? "—" : formatAmount(price || 0)}
                           </span>
                         )}
-                      </span>
-                      {pricingLoading ? (
-                        <Loader2
-                          size={14}
-                          className="flex-shrink-0 animate-spin"
-                          style={{ color: theme.textSecondary }}
-                        />
-                      ) : (
-                        <span
-                          className="flex-shrink-0 text-sm font-semibold"
-                          style={{
-                            color: notInPackage
-                              ? theme.textSecondary
-                              : theme.textPrimary,
-                          }}
-                        >
-                          {notInPackage ? "—" : formatAmount(price || 0)}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
 
-          <CalculationBlock
-            theme={theme}
-            accent={accent}
-            formatAmount={formatAmount}
-            netTotal={netTotal}
-            discountPercentage={discountPercentage}
-            discountAmount={discountAmount}
-            discountedTotal={discountedTotal}
-            vatPercentage={vatPercentage}
-            vatAmount={vatAmount}
-            grandTotal={grandTotal}
-          />
-        </>
-      )}
+            <CalculationBlock
+              theme={theme}
+              accent={accent}
+              formatAmount={formatAmount}
+              netTotal={netTotal}
+              discountPercentage={discountPercentage}
+              discountAmount={discountAmount}
+              discountedTotal={discountedTotal}
+              vatPercentage={vatPercentage}
+              vatAmount={vatAmount}
+              grandTotal={grandTotal}
+            />
+          </>
+        )}
 
-      {note && (
-        <p
-          className="mt-2 text-xs italic"
-          style={{ color: theme.textSecondary }}
-        >
-          {note}
-        </p>
-      )}
+        {note && (
+          <p
+            className="mt-2 text-xs italic"
+            style={{ color: theme.textSecondary }}
+          >
+            {note}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -1396,7 +1414,10 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   // package) stay computed against the one selected package only.
   const buildPackageTotalsList = (chargeTypeID, selectedItems, unchanged) =>
     packageColumns.map((pkg) => {
-      const finalAmountRow = findFinalAmount(chargeTypeID, pkg.servicePackageID);
+      const finalAmountRow = findFinalAmount(
+        chargeTypeID,
+        pkg.servicePackageID,
+      );
       const liveNetTotal = selectedItems.reduce(
         (sum, item) =>
           sum +
@@ -1416,7 +1437,8 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
         liveVatAmount,
         liveGrandTotal: liveNetTotal + liveVatAmount,
         vatPercentage,
-        adminDiscountPercentage: finalAmountRow?.discountPercentageWithAllDecimal,
+        adminDiscountPercentage:
+          finalAmountRow?.discountPercentageWithAllDecimal,
         chargeTypeLabel:
           chargeTypeID === SERVICE_CHARGE_TYPE_ID.RECURRING
             ? "recurring"

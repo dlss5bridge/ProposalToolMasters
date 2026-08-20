@@ -39,7 +39,28 @@ export const validateAdditionalInformationItem = (item) => {
   }
 
   if (item.driverTypeID === 3 || item.driverTypeID === 4) {
-    return isEmpty(item.driverValue) ? `${item.driverName} is required.` : null;
+    if (isEmpty(item.driverValue)) {
+      return `${item.driverName} is required.`;
+    }
+
+    // A slab with slabTypeID 2 is the "Other" option — the client has to
+    // type an exact number for it (stored on that slab's own slabValue, see
+    // ProposalAdditionalInformationStep), so picking "Other" alone isn't
+    // enough to satisfy this field.
+    if (item.driverTypeID === 4) {
+      const selectedSlab = item.slab?.find(
+        (option) => option.slabID === item.driverValue,
+      );
+      if (
+        selectedSlab?.slabTypeID === 2 &&
+        (isEmpty(selectedSlab.slabValue) ||
+          Number.isNaN(Number(selectedSlab.slabValue)))
+      ) {
+        return `Enter a value for ${item.driverName}.`;
+      }
+    }
+
+    return null;
   }
 
   if (item.driverTypeID === 5) {

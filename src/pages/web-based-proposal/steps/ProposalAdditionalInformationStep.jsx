@@ -27,6 +27,12 @@ const FIELD_MAX_WIDTH = 420;
 export default function ProposalAdditionalInformationStep({
   theme,
   readOnly = false,
+  // Custom Package only: serviceIDs whose fields must stay read-only (the
+  // admin's locked default services) even though the step as a whole is
+  // editable — every other proposal type passes nothing, so every field
+  // stays editable exactly as before (isFieldReadOnly falls back to the
+  // whole-step `readOnly` flag alone).
+  lockedServiceIDs,
 }) {
   const dispatch = useDispatch();
   const additionalInformationList = useSelector(
@@ -39,14 +45,17 @@ export default function ProposalAdditionalInformationStep({
   const visibleItems = getVisibleAdditionalInformationItems(
     additionalInformationList,
   );
+  const hasLockedFields = visibleItems.some((item) =>
+    lockedServiceIDs?.has(item.serviceID),
+  );
 
   const fieldErrors = useMemo(
     () => getAdditionalInformationFieldErrors(additionalInformationList),
     [additionalInformationList],
   );
 
-  const handleChange = (globalPricingDriverID, patch) => {
-    if (readOnly) return;
+  const handleChange = (globalPricingDriverID, patch, isFieldReadOnly) => {
+    if (isFieldReadOnly) return;
     dispatch(
       setAdditionalInformationList(
         updateItem(additionalInformationList, globalPricingDriverID, patch),
@@ -54,11 +63,11 @@ export default function ProposalAdditionalInformationStep({
     );
   };
 
-  const renderField = (item, errorMessage) => {
+  const renderField = (item, errorMessage, isFieldReadOnly) => {
     const hasError = Boolean(errorMessage);
     const inputClassName = `w-full rounded-lg border px-3 py-2 text-sm${
       hasError ? " border-red-500" : ""
-    }${readOnly ? " cursor-not-allowed opacity-60" : ""}`;
+    }${isFieldReadOnly ? " cursor-not-allowed opacity-60" : ""}`;
     const inputStyle = { borderColor: hasError ? "#dc2626" : theme.border };
 
     if (item.driverTypeID === 2) {
@@ -70,11 +79,13 @@ export default function ProposalAdditionalInformationStep({
           value={item.driverValue ?? ""}
           min={quantity?.quantityFrom ?? undefined}
           max={quantity?.quantityTo ?? undefined}
-          disabled={readOnly}
+          disabled={isFieldReadOnly}
           onChange={(e) =>
-            handleChange(item.globalPricingDriverID, {
-              driverValue: e.target.value,
-            })
+            handleChange(
+              item.globalPricingDriverID,
+              { driverValue: e.target.value },
+              isFieldReadOnly,
+            )
           }
           placeholder={`Enter ${item.driverName}`}
           className={inputClassName}
@@ -86,35 +97,93 @@ export default function ProposalAdditionalInformationStep({
     if (item.driverTypeID === 3 || item.driverTypeID === 4) {
       const isSlab = item.driverTypeID === 4;
       const source = isSlab ? item.slab : item.variation;
+      // A slab with slabTypeID 2 is the "Other" entry — it has no
+      // slabFrom/slabTo range of its own; the client types an exact number
+      // instead, same as the legacy SelectServices.jsx flow. Mirrors that
+      // component's `slabTypeID === 2 ? "Other" : "<from> - <to>"` label.
       const options = (source || []).map((option) => ({
         value: isSlab ? option.slabID : option.variationID,
         label: isSlab
-          ? `${option.slabFrom} - ${option.slabTo}`
+          ? option.slabTypeID === 2
+            ? "Other"
+            : `${option.slabFrom} - ${option.slabTo}`
           : option.variationName,
       }));
       const selected =
         options.find((option) => option.value === item.driverValue) || null;
+      const selectedSlab = isSlab
+        ? item.slab?.find((option) => option.slabID === item.driverValue)
+        : null;
+      const isOtherSlabSelected = selectedSlab?.slabTypeID === 2;
 
       return (
-        <Select
-          options={options}
-          value={selected}
-          isDisabled={readOnly}
-          onChange={(option) => {
-            handleChange(item.globalPricingDriverID, {
-              driverValue: option?.value ?? null,
-            });
-          }}
-          menuPortalTarget={document.body}
-          placeholder={`Select ${item.driverName}`}
-          styles={{
-            control: (base) => ({
-              ...base,
-              borderRadius: "0.5rem",
-              borderColor: hasError ? "#dc2626" : base.borderColor,
-            }),
-          }}
-        />
+        <>
+          <Select
+            options={options}
+            value={selected}
+            isDisabled={isFieldReadOnly}
+            onChange={(option) => {
+              const newlySelectedSlab = isSlab
+                ? item.slab?.find((slab) => slab.slabID === option?.value)
+                : null;
+              // Picking "Other" must start blank, not whatever slabValue the
+              // backend happened to send for that slab row (e.g. a leftover
+              // default) — the client hasn't typed anything yet. Mirrors
+              // legacy SelectServices.jsx clearing driverValue on selection.
+              const patch =
+                newlySelectedSlab?.slabTypeID === 2
+                  ? {
+                      driverValue: option.value,
+                      slab: item.slab.map((slab) =>
+                        slab.slabID === option.value
+                          ? { ...slab, slabValue: "" }
+                          : slab,
+                      ),
+                    }
+                  : { driverValue: option?.value ?? null };
+              handleChange(item.globalPricingDriverID, patch, isFieldReadOnly);
+            }}
+            menuPortalTarget={document.body}
+            placeholder={`Select ${item.driverName}`}
+            styles={{
+              control: (base) => ({
+                ...base,
+                borderRadius: "0.5rem",
+                borderColor: hasError ? "#dc2626" : base.borderColor,
+              }),
+            }}
+          />
+          {isOtherSlabSelected && (
+            <input
+              type="number"
+              min={0}
+              value={selectedSlab?.slabValue ?? ""}
+              disabled={isFieldReadOnly}
+              onChange={(e) => {
+                // The typed number is the Other slab's own slabValue, not a
+                // separate field — buildAdditionalInformationDriverEntries
+                // resolves driverValue by looking up item.slab's slabValue
+                // for the selected slabID, same as legacy SelectServices.jsx
+                // overwriting the isDefault slab's slabValue in place.
+                const nextValue = e.target.value;
+                handleChange(
+                  item.globalPricingDriverID,
+                  {
+                    slab: (item.slab || []).map((option) =>
+                      option.slabID === item.driverValue
+                        ? { ...option, slabValue: nextValue }
+                        : option,
+                    ),
+                  },
+                  isFieldReadOnly,
+                );
+              }}
+              placeholder={item.driverName}
+              className={inputClassName}
+              style={{ ...inputStyle, marginTop: 8 }}
+            />
+          )}
+        </>
       );
     }
 
@@ -126,11 +195,13 @@ export default function ProposalAdditionalInformationStep({
           type="text"
           value={item.enteredText ?? ""}
           maxLength={textBlock.textLength || 100}
-          disabled={readOnly}
+          disabled={isFieldReadOnly}
           onChange={(e) =>
-            handleChange(item.globalPricingDriverID, {
-              enteredText: e.target.value,
-            })
+            handleChange(
+              item.globalPricingDriverID,
+              { enteredText: e.target.value },
+              isFieldReadOnly,
+            )
           }
           placeholder={`Enter ${item.driverName}`}
           className={inputClassName}
@@ -144,11 +215,13 @@ export default function ProposalAdditionalInformationStep({
         <input
           type="date"
           value={item.enteredDate ?? ""}
-          disabled={readOnly}
+          disabled={isFieldReadOnly}
           onChange={(e) =>
-            handleChange(item.globalPricingDriverID, {
-              enteredDate: e.target.value,
-            })
+            handleChange(
+              item.globalPricingDriverID,
+              { enteredDate: e.target.value },
+              isFieldReadOnly,
+            )
           }
           className={inputClassName}
           style={inputStyle}
@@ -200,7 +273,9 @@ export default function ProposalAdditionalInformationStep({
             >
               {readOnly
                 ? "These values were set when your proposal was prepared and can't be changed."
-                : "Provide the additional details required for the selected services."}
+                : hasLockedFields
+                  ? "Fields already set when your proposal was prepared are locked; provide the remaining details below for the services you added."
+                  : "Provide the additional details required for the selected services."}
             </Typography>
           </div>
 
@@ -209,6 +284,8 @@ export default function ProposalAdditionalInformationStep({
               const errorMessage = validationVisible
                 ? fieldErrors[item.globalPricingDriverID]
                 : null;
+              const isFieldReadOnly =
+                readOnly || Boolean(lockedServiceIDs?.has(item.serviceID));
 
               return (
                 <div
@@ -224,14 +301,14 @@ export default function ProposalAdditionalInformationStep({
                     }}
                   >
                     {item.driverName}
-                    {!readOnly && (
+                    {!isFieldReadOnly && (
                       <Box component="span" sx={{ color: "#dc2626", ml: 0.25 }}>
                         *
                       </Box>
                     )}
                   </Typography>
 
-                  {renderField(item, errorMessage)}
+                  {renderField(item, errorMessage, isFieldReadOnly)}
 
                   {errorMessage && (
                     <Typography sx={{ fontSize: 12, color: "#dc2626" }}>

@@ -37,6 +37,7 @@ export {
   selectServicesCurrencyID,
   selectServicesPackageList,
   selectServiceMappingWithPackagesList,
+  selectLockedServiceIDs,
 } from "./servicesSelectors";
 
 export default reducer;

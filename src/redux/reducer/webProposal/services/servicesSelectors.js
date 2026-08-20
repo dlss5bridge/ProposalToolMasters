@@ -24,3 +24,20 @@ export const selectServicesVatPercentage = (state) => state.webProposalServices.
 export const selectServicesCurrencyID = (state) => state.webProposalServices.currencyID;
 export const selectServicesPackageList = (state) => state.webProposalServices.packageList;
 export const selectServiceMappingWithPackagesList = (state) => state.webProposalServices.serviceMappingWithPackagesList;
+
+// Custom Package proposals lock the admin's default service picks (see
+// ProposalServicesStep's lockIfCustomPackage) so the client can't remove
+// them, but can still add more services on top — used to tell a locked
+// default service's Additional Information fields (read-only) apart from a
+// client-added service's (editable).
+export const selectLockedServiceIDs = (state) => {
+  const { recurringSelections, oneOffSelections } = state.webProposalServices;
+  return new Set(
+    [
+      ...Object.values(recurringSelections || {}),
+      ...Object.values(oneOffSelections || {}),
+    ]
+      .filter((selection) => selection.locked)
+      .map((selection) => selection.serviceID),
+  );
+};
