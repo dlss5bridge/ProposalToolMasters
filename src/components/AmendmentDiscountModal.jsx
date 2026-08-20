@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "@mui/material/Modal";
 import Backdrop from "@mui/material/Backdrop";
+import { isAmendmentDiscountFieldValid } from "../pages/proposals/utils/amendmentDiscount";
 
 const sanitizePercentageInput = (value) => {
   // Only digits and a single decimal point - up to 2 decimal places.
@@ -25,6 +26,20 @@ const sanitizePercentageInput = (value) => {
 };
 
 const AmendmentDiscountModal = (props) => {
+  const recurringValid =
+    !props.showRecurring ||
+    isAmendmentDiscountFieldValid(
+      props.recurringDiscountPercentageForAmendment,
+      props.minRecurringDiscount,
+    );
+  const oneOffValid =
+    !props.showOneOff ||
+    isAmendmentDiscountFieldValid(
+      props.oneOffDiscountPercentageForAmendment,
+      props.minOneOffDiscount,
+    );
+  const isConfirmDisabled = !recurringValid || !oneOffValid;
+
   return (
     <Modal
       open={props.open}
@@ -75,6 +90,12 @@ const AmendmentDiscountModal = (props) => {
                         )
                       }
                     />
+                    {!recurringValid &&
+                      props.recurringDiscountPercentageForAmendment !== "" && (
+                        <span className="validation">
+                          {`Must be at least ${props.minRecurringDiscount}%.`}
+                        </span>
+                      )}
                   </div>
                 </div>
               )}
@@ -97,11 +118,17 @@ const AmendmentDiscountModal = (props) => {
                         )
                       }
                     />
+                    {!oneOffValid &&
+                      props.oneOffDiscountPercentageForAmendment !== "" && (
+                        <span className="validation">
+                          {`Must be at least ${props.minOneOffDiscount}%.`}
+                        </span>
+                      )}
                   </div>
                 </div>
               )}
             </div>
-            <div className="d-flex gap-2 justify-content-center mt-4 mb-2">
+            <div className="d-flex gap-2 justify-content-end mt-4 mb-2 pr-5">
               <button
                 type="button"
                 className="btn btn-md btn-light cancel-item-btn"
@@ -113,6 +140,7 @@ const AmendmentDiscountModal = (props) => {
                 type="button"
                 className="btn btn-md btn-success create-item-btn"
                 onClick={props.handleConfirm}
+                disabled={isConfirmDisabled}
               >
                 <span>Confirm</span>
               </button>

@@ -69,6 +69,10 @@ import ErrorModel from "../../components/ErrorModel";
 import { GetPaymentGatewayModel } from "../../redux/Services/Setting/PaymentGatewayApi";
 import RecordsAvailablePopupModel from "../../components/RecordsAvailablePopupModel";
 import AmendmentDiscountModal from "../../components/AmendmentDiscountModal";
+import {
+  getAmendmentDiscountVisibility,
+  isAmendmentDiscountFormValid,
+} from "./utils/amendmentDiscount";
 import EditableCell from "../../components/EditableCell";
 import Text_Editor from "../../components/Text_Editor";
 import EmailFailurePopUP from "../../components/EmailFailurePopUp";
@@ -22172,6 +22176,8 @@ const Add_Update_Proposal = (props) => {
   // Sends the built quote payload to AddUpdateQuote, routing through the
   // Engagement Letter template check first when applicable.
   const submitQuoteRequest = async (paramsObj, statusId) => {
+    //debugger
+    // return; //TODO: remove this once proposal amendment discount changes tested.
     if (
       ProposalObject.ProposalFormate === 1 &&
       common.enableEL === 1 &&
@@ -22204,6 +22210,22 @@ const Add_Update_Proposal = (props) => {
 
   const handleConfirmAmendmentDiscount = async () => {
     if (!pendingAmendmentSubmit) return;
+    // Defense in depth — the modal itself disables Confirm while invalid,
+    // but don't let a stale click submit a discount below the floor.
+    if (
+      !isAmendmentDiscountFormValid({
+        showRecurring: pendingAmendmentSubmit.showRecurring,
+        showOneOff: pendingAmendmentSubmit.showOneOff,
+        recurringDiscountPercentageForAmendment:
+          amendmentDiscountValues.recurringDiscountPercentageForAmendment,
+        oneOffDiscountPercentageForAmendment:
+          amendmentDiscountValues.oneOffDiscountPercentageForAmendment,
+        minRecurringDiscount: RecurringFrequencyPricingInfo?.DefaultDiscount,
+        minOneOffDiscount: OneOffPricingInfoCopy?.DefaultDiscount,
+      })
+    ) {
+      return;
+    }
     const updatedParams = {
       ...pendingAmendmentSubmit.paramsObj,
       recurringDiscountPercentageForAmendment:
@@ -23128,28 +23150,38 @@ const Add_Update_Proposal = (props) => {
     // Proposal Amendment proposals need an explicit amendment discount
     // entered before submitting, whenever a discount was applied to the
     // recurring and/or one-off services actually selected on this proposal.
-    const hasRecurringDiscountForAmendment =
-      ApiRequest_ParamsObj.recurringDiscountPercentage !== null &&
-      Number(ApiRequest_ParamsObj.recurringDiscountPercentage) !== 0;
-    const hasOneOffDiscountForAmendment =
-      ApiRequest_ParamsObj.oneOffDiscountPercentage !== null &&
-      Number(ApiRequest_ParamsObj.oneOffDiscountPercentage) !== 0;
+    const { showRecurring, showOneOff, shouldShowDialog } =
+      getAmendmentDiscountVisibility({
+        recurringDiscountPercentage:
+          ApiRequest_ParamsObj.recurringDiscountPercentage,
+        oneOffDiscountPercentage: ApiRequest_ParamsObj.oneOffDiscountPercentage,
+        selectedRecurringServiceListLength: selectedRecurringServiceList.length,
+        selectedOneOffServiceListLength: selectedOneOffServiceList.length,
+      });
 
     if (
       StatusId === 2 &&
       ProposalObject.ProposalFormate === 3 &&
       ProposalObject.webProposalTypeID === 3 &&
-      (hasRecurringDiscountForAmendment || hasOneOffDiscountForAmendment)
+      shouldShowDialog
     ) {
       setPendingAmendmentSubmit({
         paramsObj: ApiRequest_ParamsObj,
         statusId: StatusId,
-        showRecurring: hasRecurringDiscountForAmendment,
-        showOneOff: hasOneOffDiscountForAmendment,
+        showRecurring,
+        showOneOff,
       });
+      // Prefill with the discount % already agreed on the Review Services /
+      // Pricing tab, so the sender sees what they're amending from — they
+      // still have to raise it above that value before Confirm unlocks (see
+      // isAmendmentDiscountFieldValid).
       setAmendmentDiscountValues({
-        recurringDiscountPercentageForAmendment: "",
-        oneOffDiscountPercentageForAmendment: "",
+        recurringDiscountPercentageForAmendment: showRecurring
+          ? (RecurringFrequencyPricingInfo?.DefaultDiscount ?? "")
+          : "",
+        oneOffDiscountPercentageForAmendment: showOneOff
+          ? (OneOffPricingInfoCopy?.DefaultDiscount ?? "")
+          : "",
       });
       setShowAmendmentDiscountModal(true);
       setLoader(false);
@@ -25783,6 +25815,8 @@ const Add_Update_Proposal = (props) => {
           handleConfirm={handleConfirmAmendmentDiscount}
           showRecurring={pendingAmendmentSubmit?.showRecurring}
           showOneOff={pendingAmendmentSubmit?.showOneOff}
+          minRecurringDiscount={RecurringFrequencyPricingInfo?.DefaultDiscount}
+          minOneOffDiscount={OneOffPricingInfoCopy?.DefaultDiscount}
           recurringDiscountPercentageForAmendment={
             amendmentDiscountValues.recurringDiscountPercentageForAmendment
           }
