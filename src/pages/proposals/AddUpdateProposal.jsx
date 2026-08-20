@@ -23126,7 +23126,16 @@ const Add_Update_Proposal = (props) => {
       documentCode: DocumentCode || null,
       quoteFormatID: ProposalObject.ProposalFormate || null,
       webProposalTypeID: ProposalObject.webProposalTypeID || null,
-      globalPricingDriverID: ProposalObject.globalPricingDriverID || [],
+      // The API previously took globalPricingDriverID as a plain array of
+      // IDs; it now wants each ID wrapped with a `values` slot that the
+      // client fills in later on the web-based proposal's Input Fields step
+      // — always null when the admin creates/updates the proposal here.
+      globalPricingDriverIDsWithValues: (
+        ProposalObject.globalPricingDriverID || []
+      ).map((globalPricingDriverID) => ({
+        globalPricingDriverID,
+        values: null,
+      })),
       recurringDiscountPercentageForAmendment: null,
       oneOffDiscountPercentageForAmendment: null,
       recurringHtmlContent: ProposalObject.recurringHtmlContent || null,
