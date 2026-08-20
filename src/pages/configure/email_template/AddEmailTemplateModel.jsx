@@ -100,7 +100,7 @@ function AddUpdateEmailTemplate(props) {
     setModelAction(
       location?.state?.Action === undefined || location?.state?.Action === null
         ? "Add"
-        : "Update"
+        : "Update",
     ); //Do not change this naming convention
     GetProfessionTypeLookupListData();
     GetTemplateTypeLookupListData();
@@ -109,7 +109,7 @@ function AddUpdateEmailTemplate(props) {
     if (location.state?.templateKeyID !== null) {
       GetEmailTemplatesModelData(
         location.state?.templateKeyID,
-        location.state?.Type
+        location.state?.Type,
       );
     }
   }, [location.state]);
@@ -147,7 +147,7 @@ function AddUpdateEmailTemplate(props) {
     (ptype) => ({
       value: ptype.professionTypeId,
       label: ptype.professionTypeName,
-    })
+    }),
   );
   const professionTypeValue = TemplateObj?.professionTypeList?.map((item) => ({
     value: item.professionTypeId,
@@ -307,7 +307,7 @@ function AddUpdateEmailTemplate(props) {
       templateElementList[0].htmlContent === "<p><br></p>"
     ) {
       scrollUpDownByElementID(
-        `EditorDiv_${templateElementList[0].htmlContent}`
+        `EditorDiv_${templateElementList[0].htmlContent}`,
       );
       setRequireErrorMessage(true);
       return false;
@@ -497,14 +497,14 @@ function AddUpdateEmailTemplate(props) {
     }
   };
   const templateTypeFilter = TemplateTypeLookupList?.filter(
-    (template) => template.value == TemplateObj.templateTypeID
+    (template) => template.value == TemplateObj.templateTypeID,
   );
 
   const IsActiveFilter = Utils.IS_default.find(
-    (item) => TemplateObj.isDefault == item.value
+    (item) => TemplateObj.isDefault == item.value,
   );
   const professionTypeInputValue = professionTypeLookupList.filter(
-    (item) => common.professionTypeLists[0] === item.professionTypeId
+    (item) => common.professionTypeLists[0] === item.professionTypeId,
   );
   const DeclineSuperAdminChangesData = async (Decline) => {
     if (Decline === "Decline") {
@@ -712,7 +712,7 @@ function AddUpdateEmailTemplate(props) {
                             const inputValue = e.target.value;
                             const trimmedValue = inputValue.replace(
                               /^\s+/g,
-                              ""
+                              "",
                             );
                             const capitalizedValue =
                               trimmedValue.charAt(0).toUpperCase() +
@@ -826,7 +826,7 @@ function AddUpdateEmailTemplate(props) {
                 {" "}
                 {common.professionTypeLists?.length <= 1 &&
                 errorMessage?.includes(
-                  `Please dont choose this profession type`
+                  `Please dont choose this profession type`,
                 )
                   ? errorMessage.split(".")[0]
                   : errorMessage}

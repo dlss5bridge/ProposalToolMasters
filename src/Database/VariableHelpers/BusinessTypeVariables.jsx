@@ -188,6 +188,7 @@ const commonVariablesForOrganisation = [
   "$Accountant.CompanyName$",
   "$Accountant.CompanyNumber$",
   "$DocumentSentDate$",
+  "$WebProposalLink$",
 ];
 export default {
   BusinessSoleTraderVariables,

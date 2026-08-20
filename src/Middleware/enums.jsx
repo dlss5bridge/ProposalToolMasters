@@ -47,6 +47,7 @@ export const EMAIL_TEMPLATE = {
   Contract_Accepted_Email_Send_To_Sender: 21,
   Contract_Declined_Email_Send_To_Receiver: 22,
   Web_Based_Proposal: 47,
+  Complete_Payment_For_Your_Engagement: 48,
 };
 export const SUPER_EMAIL_TEMPLATE = {
   SuperAllVariable: null,
