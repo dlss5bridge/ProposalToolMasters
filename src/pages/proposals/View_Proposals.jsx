@@ -1385,14 +1385,27 @@ const View_Proposals = () => {
       : formattedInput;
   };
 
+  const organisationList = JSON.parse(
+    localStorage.getItem("OrganisationLocalList") || "[]",
+  );
+
+  const storedOrg = organisationList.find(
+    (item) => item.organisationKeyID === common.organisationKeyID,
+  );
+
+  // Remember, here the opposite sign is used for the vatStatus because, in the backend they have stored opposite. If the org is vat reg th en they have stored false else true.
+
+  const isVatEnabledForOrg =
+    storedOrg?.isVatRegistered === true ? false : true || false;
+
   // Recurring service
 
   const hasVatColumn = (vatValue) => {
     return Number(vatValue || 0) !== 0;
   };
 
-  const showRecurringVat = hasVatColumn(vatPercentage);
-  const showOneOffVat = hasVatColumn(vatPercentage);
+  const showRecurringVat = hasVatColumn(isVatEnabledForOrg);
+  const showOneOffVat = hasVatColumn(isVatEnabledForOrg);
 
   // const selectedRecurringServiceList =
   //   ProposalObject?.reccrunigServiceCatList || [];
@@ -3321,9 +3334,14 @@ const View_Proposals = () => {
                                                                         null ? (
                                                                           <span className="fa fa-times"></span>
                                                                         ) : (
-                                                                          formatValue(
-                                                                            subService.packageOneValue,
-                                                                          )
+                                                                          <>
+                                                                            {
+                                                                              currencySymbol
+                                                                            }
+                                                                            {formatValue(
+                                                                              subService.packageOneValue,
+                                                                            )}
+                                                                          </>
                                                                         )}
                                                                       </>
                                                                     ) : subService.packageOneValue !==
@@ -3361,9 +3379,14 @@ const View_Proposals = () => {
                                                                             null ? (
                                                                               <span className="fa fa-times"></span>
                                                                             ) : (
-                                                                              formatValue(
-                                                                                subService.packageTwoValue,
-                                                                              )
+                                                                              <>
+                                                                                {
+                                                                                  currencySymbol
+                                                                                }
+                                                                                {formatValue(
+                                                                                  subService.packageTwoValue,
+                                                                                )}
+                                                                              </>
                                                                             )
                                                                             // Number(
                                                                             //   subService.packageTwoValue
@@ -3412,9 +3435,14 @@ const View_Proposals = () => {
                                                                             null ? (
                                                                               <span className="fa fa-times"></span>
                                                                             ) : (
-                                                                              formatValue(
-                                                                                subService.packageThreeValue,
-                                                                              )
+                                                                              <>
+                                                                                {
+                                                                                  currencySymbol
+                                                                                }
+                                                                                {formatValue(
+                                                                                  subService.packageThreeValue,
+                                                                                )}
+                                                                              </>
                                                                             )
                                                                             // Number(
                                                                             //   subService.packageThreeValue
@@ -3596,6 +3624,7 @@ const View_Proposals = () => {
                                                       className="tr-table-class font-14 text-white text-right"
                                                     >
                                                       {" "}
+                                                      {currencySymbol}
                                                       {Number(
                                                         RecurringPricingInfo.packageOneNetTotal,
                                                       ) <
@@ -3630,6 +3659,7 @@ const View_Proposals = () => {
                                                         className="tr-table-class font-14 text-white text-right"
                                                       >
                                                         {" "}
+                                                        {currencySymbol}
                                                         {Number(
                                                           RecurringPricingInfo.packageTwoNetTotal,
                                                         ) <
@@ -3665,6 +3695,7 @@ const View_Proposals = () => {
                                                         className="tr-table-class font-14 text-white text-right"
                                                       >
                                                         {" "}
+                                                        {currencySymbol}
                                                         {Number(
                                                           RecurringPricingInfo.packageThreeNetTotal,
                                                         ) <
@@ -3715,15 +3746,8 @@ const View_Proposals = () => {
                                                             }}
                                                             className="tr-table-class font-14 text-white text-right"
                                                           >
-                                                            (-){" "}
-                                                            {new Intl.NumberFormat(
-                                                              "en-GB",
-                                                              {
-                                                                style:
-                                                                  "currency",
-                                                                currency: "GBP",
-                                                              },
-                                                            ).format(
+                                                            (-) {currencySymbol}
+                                                            {formatValue(
                                                               Number(
                                                                 RecurringPricingInfo.packageOneDisCount,
                                                               ),
@@ -3748,15 +3772,8 @@ const View_Proposals = () => {
                                                               className="tr-table-class font-14 text-white text-right"
                                                             >
                                                               (-){" "}
-                                                              {new Intl.NumberFormat(
-                                                                "en-GB",
-                                                                {
-                                                                  style:
-                                                                    "currency",
-                                                                  currency:
-                                                                    "GBP",
-                                                                },
-                                                              ).format(
+                                                              {currencySymbol}
+                                                              {formatValue(
                                                                 Number(
                                                                   RecurringPricingInfo.packageTwoDisCount,
                                                                 ),
@@ -3781,15 +3798,8 @@ const View_Proposals = () => {
                                                               className="tr-table-class font-14 text-white text-right"
                                                             >
                                                               (-){" "}
-                                                              {new Intl.NumberFormat(
-                                                                "en-GB",
-                                                                {
-                                                                  style:
-                                                                    "currency",
-                                                                  currency:
-                                                                    "GBP",
-                                                                },
-                                                              ).format(
+                                                              {currencySymbol}
+                                                              {formatValue(
                                                                 Number(
                                                                   RecurringPricingInfo.packageThreeDisCount,
                                                                 ),
@@ -3816,14 +3826,8 @@ const View_Proposals = () => {
                                                             }}
                                                             className="tr-table-class font-14 text-white text-right"
                                                           >
-                                                            {new Intl.NumberFormat(
-                                                              "en-GB",
-                                                              {
-                                                                style:
-                                                                  "currency",
-                                                                currency: "GBP",
-                                                              },
-                                                            ).format(
+                                                            {currencySymbol}
+                                                            {formatValue(
                                                               Number(
                                                                 RecurringPricingInfo.packageOneDisCountedTotal,
                                                               ),
@@ -3848,15 +3852,8 @@ const View_Proposals = () => {
                                                               }}
                                                               className="tr-table-class font-14  text-white text-right"
                                                             >
-                                                              {new Intl.NumberFormat(
-                                                                "en-GB",
-                                                                {
-                                                                  style:
-                                                                    "currency",
-                                                                  currency:
-                                                                    "GBP",
-                                                                },
-                                                              ).format(
+                                                              {currencySymbol}
+                                                              {formatValue(
                                                                 Number(
                                                                   RecurringPricingInfo.packageTwoDisCountedTotal,
                                                                 ),
@@ -3880,15 +3877,8 @@ const View_Proposals = () => {
                                                               }}
                                                               className="tr-table-class font-14 text-white text-right"
                                                             >
-                                                              {new Intl.NumberFormat(
-                                                                "en-GB",
-                                                                {
-                                                                  style:
-                                                                    "currency",
-                                                                  currency:
-                                                                    "GBP",
-                                                                },
-                                                              ).format(
+                                                              {currencySymbol}
+                                                              {formatValue(
                                                                 Number(
                                                                   RecurringPricingInfo.packageThreeDisCountedTotal,
                                                                 ),
@@ -3923,6 +3913,7 @@ const View_Proposals = () => {
                                                           className="tr-table-class font-14 text-white text-right"
                                                         >
                                                           {" "}
+                                                          {currencySymbol}
                                                           {formatValue(
                                                             RecurringPricingInfo.PackageOneVaTPrice,
                                                           )}
@@ -3944,6 +3935,7 @@ const View_Proposals = () => {
                                                             className="tr-table-class font-14 text-white text-right"
                                                           >
                                                             {" "}
+                                                            {currencySymbol}
                                                             {formatValue(
                                                               RecurringPricingInfo.PackageTwoVaTPrice,
                                                             )}
@@ -3966,6 +3958,7 @@ const View_Proposals = () => {
                                                             className="tr-table-class font-14 text-white text-right"
                                                           >
                                                             {" "}
+                                                            {currencySymbol}
                                                             {formatValue(
                                                               RecurringPricingInfo.PackageThreeVaTPrice,
                                                             )}
@@ -3992,6 +3985,7 @@ const View_Proposals = () => {
                                                           className="tr-table-class font-14 text-white text-right"
                                                         >
                                                           {" "}
+                                                          {currencySymbol}
                                                           {formatValue(
                                                             RecurringPricingInfo.PackageOneGrandTotal,
                                                           )}
@@ -4013,6 +4007,7 @@ const View_Proposals = () => {
                                                             className="tr-table-class font-14 text-white text-right"
                                                           >
                                                             {" "}
+                                                            {currencySymbol}
                                                             {formatValue(
                                                               RecurringPricingInfo.PackageTwoGrandTotal,
                                                             )}
@@ -4035,6 +4030,7 @@ const View_Proposals = () => {
                                                             className="tr-table-class font-14 text-white text-right"
                                                           >
                                                             {" "}
+                                                            {currencySymbol}
                                                             {formatValue(
                                                               RecurringPricingInfo.PackageThreeGrandTotal,
                                                             )}
@@ -4124,10 +4120,12 @@ const View_Proposals = () => {
                                                                             {!packageRow.isIncluded ? (
                                                                               "-"
                                                                             ) : showRecurringPackageBreakdown ? (
-                                                                              formatValue(
-                                                                                packageRow.price,
-                                                                                ProposalObject.currencyID,
-                                                                              )
+                                                                              <>
+                                                                                {formatValue(
+                                                                                  packageRow.price,
+                                                                                  ProposalObject.currencyID,
+                                                                                )}
+                                                                              </>
                                                                             ) : (
                                                                               <span
                                                                                 className="fa fa-check"
@@ -4152,10 +4150,12 @@ const View_Proposals = () => {
                                                                               {!packageRow.isIncluded ? (
                                                                                 "-"
                                                                               ) : showRecurringPackageBreakdown ? (
-                                                                                formatValue(
-                                                                                  packageRow.vatAmount,
-                                                                                  ProposalObject.currencyID,
-                                                                                )
+                                                                                <>
+                                                                                  {formatValue(
+                                                                                    packageRow.vatAmount,
+                                                                                    ProposalObject.currencyID,
+                                                                                  )}
+                                                                                </>
                                                                               ) : (
                                                                                 <span
                                                                                   className="fa fa-check"
@@ -4171,10 +4171,12 @@ const View_Proposals = () => {
                                                                               {!packageRow.isIncluded ? (
                                                                                 "-"
                                                                               ) : showRecurringPackageBreakdown ? (
-                                                                                formatValue(
-                                                                                  packageRow.feesIncludingVat,
-                                                                                  ProposalObject.currencyID,
-                                                                                )
+                                                                                <>
+                                                                                  {formatValue(
+                                                                                    packageRow.feesIncludingVat,
+                                                                                    ProposalObject.currencyID,
+                                                                                  )}
+                                                                                </>
                                                                               ) : (
                                                                                 <span
                                                                                   className="fa fa-check"
@@ -4865,9 +4867,14 @@ const View_Proposals = () => {
                                                                         null ? (
                                                                           <span className="fa fa-times"></span>
                                                                         ) : (
-                                                                          formatValue(
-                                                                            subService.packageOneValue,
-                                                                          )
+                                                                          <>
+                                                                            {
+                                                                              currencySymbol
+                                                                            }
+                                                                            {formatValue(
+                                                                              subService.packageOneValue,
+                                                                            )}
+                                                                          </>
                                                                         )}
                                                                       </>
                                                                     ) : subService.packageOneValue !==
@@ -4904,9 +4911,14 @@ const View_Proposals = () => {
                                                                           null ? (
                                                                             <span className="fa fa-times"></span>
                                                                           ) : (
-                                                                            formatValue(
-                                                                              subService.packageTwoValue,
-                                                                            )
+                                                                            <>
+                                                                              {
+                                                                                currencySymbol
+                                                                              }
+                                                                              {formatValue(
+                                                                                subService.packageTwoValue,
+                                                                              )}
+                                                                            </>
                                                                           )}
                                                                         </>
                                                                       ) : subService.packageTwoValue !==
@@ -4944,9 +4956,14 @@ const View_Proposals = () => {
                                                                           null ? (
                                                                             <span className="fa fa-times"></span>
                                                                           ) : (
-                                                                            formatValue(
-                                                                              subService.packageThreeValue,
-                                                                            )
+                                                                            <>
+                                                                              {
+                                                                                currencySymbol
+                                                                              }
+                                                                              {formatValue(
+                                                                                subService.packageThreeValue,
+                                                                              )}
+                                                                            </>
                                                                           )}
                                                                         </>
                                                                       ) : subService.packageThreeValue !==
@@ -5120,6 +5137,7 @@ const View_Proposals = () => {
                                                         className="tr-table-class text-white text-right"
                                                       >
                                                         {" "}
+                                                        {currencySymbol}
                                                         {Number(
                                                           OneOffPricingInfo.packageOneNetTotal,
                                                         ) <
@@ -5154,6 +5172,7 @@ const View_Proposals = () => {
                                                           className="tr-table-class text-white text-right"
                                                         >
                                                           {" "}
+                                                          {currencySymbol}
                                                           {Number(
                                                             OneOffPricingInfo.packageTwoNetTotal,
                                                           ) <
@@ -5189,6 +5208,7 @@ const View_Proposals = () => {
                                                           className="tr-table-class text-white text-right"
                                                         >
                                                           {" "}
+                                                          {currencySymbol}
                                                           {Number(
                                                             OneOffPricingInfo.packageThreeNetTotal,
                                                           ) <
@@ -5239,15 +5259,8 @@ const View_Proposals = () => {
                                                             }}
                                                             className="tr-table-class text-white text-right"
                                                           >
-                                                            (-){" "}
-                                                            {new Intl.NumberFormat(
-                                                              "en-GB",
-                                                              {
-                                                                style:
-                                                                  "currency",
-                                                                currency: "GBP",
-                                                              },
-                                                            ).format(
+                                                            (-) {currencySymbol}
+                                                            {formatValue(
                                                               Number(
                                                                 OneOffPricingInfo.packageOneDisCount,
                                                               ),
@@ -5271,15 +5284,8 @@ const View_Proposals = () => {
                                                               className="tr-table-class text-white text-right"
                                                             >
                                                               (-){" "}
-                                                              {new Intl.NumberFormat(
-                                                                "en-GB",
-                                                                {
-                                                                  style:
-                                                                    "currency",
-                                                                  currency:
-                                                                    "GBP",
-                                                                },
-                                                              ).format(
+                                                              {currencySymbol}
+                                                              {formatValue(
                                                                 Number(
                                                                   OneOffPricingInfo.packageTwoDisCount,
                                                                 ),
@@ -5304,15 +5310,8 @@ const View_Proposals = () => {
                                                               className="tr-table-class text-white text-right"
                                                             >
                                                               (-){" "}
-                                                              {new Intl.NumberFormat(
-                                                                "en-GB",
-                                                                {
-                                                                  style:
-                                                                    "currency",
-                                                                  currency:
-                                                                    "GBP",
-                                                                },
-                                                              ).format(
+                                                              {currencySymbol}
+                                                              {formatValue(
                                                                 Number(
                                                                   OneOffPricingInfo.packageThreeDisCount,
                                                                 ),
@@ -5339,14 +5338,8 @@ const View_Proposals = () => {
                                                             }}
                                                             className="tr-table-class text-white text-right"
                                                           >
-                                                            {new Intl.NumberFormat(
-                                                              "en-GB",
-                                                              {
-                                                                style:
-                                                                  "currency",
-                                                                currency: "GBP",
-                                                              },
-                                                            ).format(
+                                                            {currencySymbol}
+                                                            {formatValue(
                                                               Number(
                                                                 OneOffPricingInfo.packageOneDisCountedTotal,
                                                               ),
@@ -5369,15 +5362,8 @@ const View_Proposals = () => {
                                                               }}
                                                               className="tr-table-class text-white text-right"
                                                             >
-                                                              {new Intl.NumberFormat(
-                                                                "en-GB",
-                                                                {
-                                                                  style:
-                                                                    "currency",
-                                                                  currency:
-                                                                    "GBP",
-                                                                },
-                                                              ).format(
+                                                              {currencySymbol}
+                                                              {formatValue(
                                                                 Number(
                                                                   OneOffPricingInfo.packageTwoDisCountedTotal,
                                                                 ),
@@ -5401,15 +5387,8 @@ const View_Proposals = () => {
                                                               }}
                                                               className="tr-table-class text-white text-right"
                                                             >
-                                                              {new Intl.NumberFormat(
-                                                                "en-GB",
-                                                                {
-                                                                  style:
-                                                                    "currency",
-                                                                  currency:
-                                                                    "GBP",
-                                                                },
-                                                              ).format(
+                                                              {currencySymbol}
+                                                              {formatValue(
                                                                 Number(
                                                                   OneOffPricingInfo.packageThreeDisCountedTotal,
                                                                 ),
@@ -5443,6 +5422,7 @@ const View_Proposals = () => {
                                                           className="tr-table-class text-white text-right"
                                                         >
                                                           {" "}
+                                                          {currencySymbol}
                                                           {formatValue(
                                                             OneOffPricingInfo.PackageOneVaTPrice,
                                                           )}
@@ -5464,6 +5444,7 @@ const View_Proposals = () => {
                                                             className="tr-table-class text-white text-right"
                                                           >
                                                             {" "}
+                                                            {currencySymbol}
                                                             {formatValue(
                                                               OneOffPricingInfo.PackageTwoVaTPrice,
                                                             )}
@@ -5486,6 +5467,7 @@ const View_Proposals = () => {
                                                             className="tr-table-class text-white text-right"
                                                           >
                                                             {" "}
+                                                            {currencySymbol}
                                                             {formatValue(
                                                               OneOffPricingInfo.PackageThreeVaTPrice,
                                                             )}
@@ -5512,6 +5494,7 @@ const View_Proposals = () => {
                                                           className="tr-table-class text-white text-right"
                                                         >
                                                           {" "}
+                                                          {currencySymbol}
                                                           {formatValue(
                                                             OneOffPricingInfo.PackageOneGrandTotal,
                                                           )}
@@ -5533,6 +5516,7 @@ const View_Proposals = () => {
                                                             className="tr-table-class text-white text-right"
                                                           >
                                                             {" "}
+                                                            {currencySymbol}
                                                             {formatValue(
                                                               OneOffPricingInfo.PackageTwoGrandTotal,
                                                             )}
@@ -5555,6 +5539,7 @@ const View_Proposals = () => {
                                                             className="tr-table-class text-white text-right"
                                                           >
                                                             {" "}
+                                                            {currencySymbol}
                                                             {formatValue(
                                                               OneOffPricingInfo.PackageThreeGrandTotal,
                                                             )}
@@ -5652,10 +5637,12 @@ const View_Proposals = () => {
                                                                             {!packageRow.isIncluded ? (
                                                                               "-"
                                                                             ) : showOneOffPackageBreakdown ? (
-                                                                              formatValue(
-                                                                                packageRow.price,
-                                                                                currencyID,
-                                                                              )
+                                                                              <>
+                                                                                {formatValue(
+                                                                                  packageRow.price,
+                                                                                  currencyID,
+                                                                                )}
+                                                                              </>
                                                                             ) : showOneOffPackageCheckMark ? (
                                                                               <span
                                                                                 className="fa fa-check"
@@ -5682,10 +5669,12 @@ const View_Proposals = () => {
                                                                               {!packageRow.isIncluded ? (
                                                                                 "-"
                                                                               ) : showOneOffPackageBreakdown ? (
-                                                                                formatValue(
-                                                                                  packageRow.vatAmount,
-                                                                                  currencyID,
-                                                                                )
+                                                                                <>
+                                                                                  {formatValue(
+                                                                                    packageRow.vatAmount,
+                                                                                    currencyID,
+                                                                                  )}
+                                                                                </>
                                                                               ) : showOneOffPackageCheckMark ? (
                                                                                 <span
                                                                                   className="fa fa-check"
@@ -5703,10 +5692,12 @@ const View_Proposals = () => {
                                                                               {!packageRow.isIncluded ? (
                                                                                 "-"
                                                                               ) : showOneOffPackageBreakdown ? (
-                                                                                formatValue(
-                                                                                  packageRow.feesIncludingVat,
-                                                                                  currencyID,
-                                                                                )
+                                                                                <>
+                                                                                  {formatValue(
+                                                                                    packageRow.feesIncludingVat,
+                                                                                    currencyID,
+                                                                                  )}
+                                                                                </>
                                                                               ) : showOneOffPackageCheckMark ? (
                                                                                 <span
                                                                                   className="fa fa-check"
