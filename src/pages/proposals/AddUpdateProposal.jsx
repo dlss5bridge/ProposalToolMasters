@@ -21827,7 +21827,19 @@ const Add_Update_Proposal = (props) => {
             paymentGatewayID: ModelData.paymentGatewayID,
             ProposalFormate: ModelData.quoteFormatID || 2,
             webProposalTypeID: ModelData?.webProposalTypeID,
-            globalPricingDriverID: ModelData?.globalPricingDriverID || [],
+            // GetProposalModel now returns the saved selection as
+            // globalPricingDriverIDsWithValues ({globalPricingDriverID,
+            // values}[]) to match the new AddUpdateQuote payload shape — the
+            // Global Proposal Variables select still just needs the plain ID
+            // list, so unwrap it here (falling back to the old plain-array
+            // field for any proposal saved before this change).
+            globalPricingDriverID: Array.isArray(
+              ModelData?.globalPricingDriverIDsWithValues,
+            )
+              ? ModelData.globalPricingDriverIDsWithValues.map(
+                  (item) => item.globalPricingDriverID,
+                )
+              : ModelData?.globalPricingDriverID || [],
             DiscountLines:
               ModelData.feesInQuoteID === 1
                 ? true
