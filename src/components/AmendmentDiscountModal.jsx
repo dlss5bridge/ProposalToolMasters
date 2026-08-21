@@ -30,13 +30,13 @@ const AmendmentDiscountModal = (props) => {
     !props.showRecurring ||
     isAmendmentDiscountFieldValid(
       props.recurringDiscountPercentageForAmendment,
-      props.minRecurringDiscount,
+      props.maxRecurringDiscount,
     );
   const oneOffValid =
     !props.showOneOff ||
     isAmendmentDiscountFieldValid(
       props.oneOffDiscountPercentageForAmendment,
-      props.minOneOffDiscount,
+      props.maxOneOffDiscount,
     );
   const isConfirmDisabled = !recurringValid || !oneOffValid;
 
@@ -93,7 +93,7 @@ const AmendmentDiscountModal = (props) => {
                     {!recurringValid &&
                       props.recurringDiscountPercentageForAmendment !== "" && (
                         <span className="validation">
-                          {`Must be at least ${props.minRecurringDiscount}%.`}
+                          {`Must not exceed ${props.maxRecurringDiscount}%.`}
                         </span>
                       )}
                   </div>
@@ -121,7 +121,7 @@ const AmendmentDiscountModal = (props) => {
                     {!oneOffValid &&
                       props.oneOffDiscountPercentageForAmendment !== "" && (
                         <span className="validation">
-                          {`Must be at least ${props.minOneOffDiscount}%.`}
+                          {`Must not exceed ${props.maxOneOffDiscount}%.`}
                         </span>
                       )}
                   </div>

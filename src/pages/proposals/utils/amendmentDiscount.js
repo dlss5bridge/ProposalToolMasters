@@ -36,13 +36,12 @@ export const getAmendmentDiscountVisibility = ({
   };
 };
 
-// A re-entered amendment % must be at least what was already agreed on the
-// Review Services / Pricing tab for that charge type — the sender can keep
-// the same discount (e.g. re-confirm a 10% discount as-is) but can't drop
-// below it, since anything smaller would silently undercut the original
-// quote. A missing floor (null/undefined/"") means there's nothing to
-// compare against, so any entered value is accepted.
-export const isAmendmentDiscountFieldValid = (enteredValue, minValue) => {
+// A re-entered amendment % must not exceed what the admin originally entered
+// on the Review Services tab for that charge type — the sender can keep it
+// as-is or lower it, but can't raise it past the original admin discount. A
+// missing ceiling (null/undefined/"") means there's nothing to compare
+// against, so any entered value is accepted.
+export const isAmendmentDiscountFieldValid = (enteredValue, maxValue) => {
   if (
     enteredValue === "" ||
     enteredValue === null ||
@@ -50,10 +49,10 @@ export const isAmendmentDiscountFieldValid = (enteredValue, minValue) => {
   ) {
     return false;
   }
-  if (minValue === null || minValue === undefined || minValue === "") {
+  if (maxValue === null || maxValue === undefined || maxValue === "") {
     return true;
   }
-  return Number(enteredValue) >= Number(minValue);
+  return Number(enteredValue) <= Number(maxValue);
 };
 
 // Whole-form validity for the Confirm button — every field the dialog is
@@ -64,20 +63,20 @@ export const isAmendmentDiscountFormValid = ({
   showOneOff,
   recurringDiscountPercentageForAmendment,
   oneOffDiscountPercentageForAmendment,
-  minRecurringDiscount,
-  minOneOffDiscount,
+  maxRecurringDiscount,
+  maxOneOffDiscount,
 }) => {
   const recurringValid =
     !showRecurring ||
     isAmendmentDiscountFieldValid(
       recurringDiscountPercentageForAmendment,
-      minRecurringDiscount,
+      maxRecurringDiscount,
     );
   const oneOffValid =
     !showOneOff ||
     isAmendmentDiscountFieldValid(
       oneOffDiscountPercentageForAmendment,
-      minOneOffDiscount,
+      maxOneOffDiscount,
     );
 
   return recurringValid && oneOffValid;

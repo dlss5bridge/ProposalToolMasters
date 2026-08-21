@@ -22223,7 +22223,8 @@ const Add_Update_Proposal = (props) => {
   const handleConfirmAmendmentDiscount = async () => {
     if (!pendingAmendmentSubmit) return;
     // Defense in depth — the modal itself disables Confirm while invalid,
-    // but don't let a stale click submit a discount below the floor.
+    // but don't let a stale click submit a discount above the admin's
+    // original discount.
     if (
       !isAmendmentDiscountFormValid({
         showRecurring: pendingAmendmentSubmit.showRecurring,
@@ -22232,8 +22233,8 @@ const Add_Update_Proposal = (props) => {
           amendmentDiscountValues.recurringDiscountPercentageForAmendment,
         oneOffDiscountPercentageForAmendment:
           amendmentDiscountValues.oneOffDiscountPercentageForAmendment,
-        minRecurringDiscount: RecurringFrequencyPricingInfo?.DefaultDiscount,
-        minOneOffDiscount: OneOffPricingInfoCopy?.DefaultDiscount,
+        maxRecurringDiscount: RecurringFrequencyPricingInfo?.DefaultDiscount,
+        maxOneOffDiscount: OneOffPricingInfoCopy?.DefaultDiscount,
       })
     ) {
       return;
@@ -23184,6 +23185,7 @@ const Add_Update_Proposal = (props) => {
       StatusId === 2 &&
       ProposalObject.ProposalFormate === 3 &&
       ProposalObject.webProposalTypeID === 3 &&
+      ProposalObject.selectedProposalTypeValue === 3 &&
       shouldShowDialog
     ) {
       setPendingAmendmentSubmit({
@@ -23192,9 +23194,8 @@ const Add_Update_Proposal = (props) => {
         showRecurring,
         showOneOff,
       });
-      // Prefill with the discount % already agreed on the Review Services /
-      // Pricing tab, so the sender sees what they're amending from — they
-      // still have to raise it above that value before Confirm unlocks (see
+      // Prefill with the admin-entered discount % from the Review Services
+      // tab — valid as-is, but the sender can't raise it any further (see
       // isAmendmentDiscountFieldValid).
       setAmendmentDiscountValues({
         recurringDiscountPercentageForAmendment: showRecurring
@@ -25830,8 +25831,8 @@ const Add_Update_Proposal = (props) => {
           handleConfirm={handleConfirmAmendmentDiscount}
           showRecurring={pendingAmendmentSubmit?.showRecurring}
           showOneOff={pendingAmendmentSubmit?.showOneOff}
-          minRecurringDiscount={RecurringFrequencyPricingInfo?.DefaultDiscount}
-          minOneOffDiscount={OneOffPricingInfoCopy?.DefaultDiscount}
+          maxRecurringDiscount={RecurringFrequencyPricingInfo?.DefaultDiscount}
+          maxOneOffDiscount={OneOffPricingInfoCopy?.DefaultDiscount}
           recurringDiscountPercentageForAmendment={
             amendmentDiscountValues.recurringDiscountPercentageForAmendment
           }
