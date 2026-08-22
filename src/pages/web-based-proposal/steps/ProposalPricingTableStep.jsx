@@ -594,23 +594,33 @@ function FeeSection({
           // row (header, category label, service, calculation, CTA) reuses
           // the same column template so everything lines up perfectly without
           // table borders/cellspacing doing the work.
+          // Same visual language as the plain Service pricing list below
+          // (and its CalculationBlock): a plain white rounded-xl card,
+          // horizontal-only dividers (no vertical grid lines), quiet
+          // typography for line items, and one tinted "Calculation" zone
+          // at the bottom with its own bold Grand Total band — just with
+          // package columns standing in for the single value column.
           <div
-            className="overflow-x-auto rounded-2xl border"
+            className="overflow-x-auto rounded-xl border bg-white"
             style={{ borderColor: theme.border }}
           >
             <div
-              className="min-w-[560px]"
               style={{
                 display: "grid",
-                gridTemplateColumns: `minmax(200px,260px) repeat(${packageColumns.length}, minmax(0,1fr))`,
+                gridTemplateColumns: `minmax(200px,260px) repeat(${packageColumns.length}, minmax(140px,1fr))`,
+                minWidth: `${200 + packageColumns.length * 140}px`,
               }}
             >
-              {/* Plan header row — each package reads as its own card header:
-                bold name, a colored top rule + soft tint + checkmark on the
-                selected one, so "which plan is this" never needs a legend. */}
+              {/* Plan header row — package name only, one line. Selection
+                lives on the name itself (a click target with a checkmark
+                when active) instead of a separate "Selected"/"Select this
+                plan" line, so the header stays compact. */}
               <div
-                className="sticky left-0 z-10 flex items-end px-4 py-3"
-                style={{ backgroundColor: theme.background }}
+                className="sticky left-0 z-10 flex items-end border-b px-3.5 pb-2 pt-3"
+                style={{
+                  backgroundColor: "#fff",
+                  borderColor: theme.border,
+                }}
               >
                 <span
                   className="text-[11px] font-bold uppercase tracking-wider"
@@ -625,51 +635,56 @@ function FeeSection({
                 return (
                   <div
                     key={pkg.servicePackageID}
-                    className="flex flex-col items-center gap-0.5 border-l px-3 py-3 text-center"
+                    className="flex items-center justify-center border-b px-3 py-2.5 text-center"
                     style={{
                       borderColor: theme.border,
-                      borderTop: `3px solid ${isActive ? accent : "transparent"}`,
-                      backgroundColor: isActive
-                        ? `${accent}14`
-                        : theme.background,
+                      borderTop: `2px solid ${isActive ? accent : "transparent"}`,
                     }}
                   >
                     {isActive ? (
                       <span
-                        className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide"
+                        className="flex max-w-full items-center gap-1 text-sm font-bold"
                         style={{ color: accent }}
+                        title={pkg.servicePackageName}
                       >
-                        <Check size={11} strokeWidth={3} /> Your Plan
+                        <Check
+                          size={13}
+                          strokeWidth={3}
+                          className="flex-shrink-0"
+                        />
+                        <span className="truncate">
+                          {pkg.servicePackageName}
+                        </span>
                       </span>
                     ) : (
-                      <span
-                        className="text-[10px] font-semibold uppercase tracking-wide"
-                        style={{ color: theme.textSecondary }}
+                      <button
+                        type="button"
+                        onClick={() => onSelectPackage(pkg.servicePackageID)}
+                        className="max-w-full appearance-none truncate border-0 bg-transparent p-0 text-sm font-bold"
+                        style={{ color: theme.textPrimary }}
+                        title={pkg.servicePackageName}
                       >
-                        Plan
-                      </span>
+                        {pkg.servicePackageName}
+                      </button>
                     )}
-                    <span
-                      className="max-w-full truncate text-sm font-bold"
-                      style={{ color: isActive ? accent : theme.textPrimary }}
-                      title={pkg.servicePackageName}
-                    >
-                      {pkg.servicePackageName}
-                    </span>
                   </div>
                 );
               })}
 
-              {/* Category + service rows */}
-              {visibleCategoryGroups.map((group) => (
+              {/* Category + service rows — same type scale as the plain
+                list, but colored in the accent (the same tone used for the
+                Calculation label below) so a category reads unmistakably
+                as its own section, distinct from the neutral-grey "Service"
+                column header and the plain service names beneath it. */}
+              {visibleCategoryGroups.map((group, groupIndex) => (
                 <Fragment key={group.serviceCatID ?? group.categoryName}>
                   <div
-                    className="sticky left-0 z-10 border-t px-4 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider"
+                    className="sticky left-0 z-10 px-3.5 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider"
                     style={{
                       gridColumn: "1 / -1",
-                      borderColor: theme.border,
+                      borderTop: groupIndex === 0 ? "none" : `1px solid ${theme.border}`,
                       backgroundColor: "#fff",
-                      color: theme.textSecondary,
+                      color: accent,
                     }}
                   >
                     {group.categoryName}
@@ -680,14 +695,14 @@ function FeeSection({
                     return (
                       <Fragment key={item.serviceID}>
                         <div
-                          className="sticky left-0 z-10 flex min-w-0 items-center gap-2 border-t px-4 py-2.5"
+                          className="sticky left-0 z-10 flex min-w-0 items-center gap-2 border-b px-3.5 py-2.5"
                           style={{
                             borderColor: theme.border,
                             backgroundColor: "#fff",
                           }}
                         >
                           <span
-                            className="truncate text-sm"
+                            className="text-sm leading-snug"
                             style={{ color: theme.textPrimary }}
                           >
                             {item.serviceName}
@@ -705,9 +720,6 @@ function FeeSection({
                           )}
                         </div>
                         {packageColumns.map((pkg) => {
-                          const isActive =
-                            String(pkg.servicePackageID) ===
-                            String(selectedPackageID);
                           const pkgPrice = priceByServiceAndPackage(
                             chargeTypeID,
                             item.serviceID,
@@ -717,13 +729,8 @@ function FeeSection({
                           return (
                             <div
                               key={pkg.servicePackageID}
-                              className="flex items-center justify-end border-l border-t px-3 py-2.5"
-                              style={{
-                                borderColor: theme.border,
-                                backgroundColor: isActive
-                                  ? `${accent}0A`
-                                  : undefined,
-                              }}
+                              className="flex items-center justify-end border-b px-3 py-2.5"
+                              style={{ borderColor: theme.border }}
                             >
                               {pricingLoading ? (
                                 <Loader2
@@ -733,7 +740,7 @@ function FeeSection({
                                 />
                               ) : (
                                 <span
-                                  className="text-sm font-medium"
+                                  className="text-right text-sm font-semibold"
                                   style={{
                                     color:
                                       pkgPrice === null
@@ -755,46 +762,62 @@ function FeeSection({
                 </Fragment>
               ))}
 
-              {/* Calculation — a tinted zone set apart from the plain service
-                rows above, ending in the Grand Total band and the CTA row,
-                mirroring CalculationBlock's own type scale (text-sm lines,
-                bold text-base Grand Total) so Service and Package/Custom
-                Package quotes read with identical hierarchy. */}
+              {/* Calculation — same tinted zone + Grand Total band as
+                CalculationBlock (identical background/border tokens and
+                type scale: text-sm regular lines, text-base bold Grand
+                Total), just repeated once per package column instead of
+                once for a single total. */}
               <div
-                className="sticky left-0 z-10 px-4 pt-3 text-[11px] font-bold uppercase tracking-wider"
+                className="sticky left-0 z-10 px-3.5 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wider"
                 style={{
-                  backgroundColor: `${accent}08`,
+                  backgroundColor: `${accent}0A`,
+                  borderTop: `1px solid ${accent}26`,
+                  color: accent,
+                }}
+              >
+                Calculation
+              </div>
+              {packageColumns.map((pkg) => (
+                <div
+                  key={pkg.servicePackageID}
+                  className="px-3 pb-1 pt-3"
+                  style={{
+                    backgroundColor: `${accent}0A`,
+                    borderTop: `1px solid ${accent}26`,
+                  }}
+                />
+              ))}
+
+              <div
+                className="sticky left-0 z-10 px-3.5 py-1 text-sm"
+                style={{
+                  backgroundColor: `${accent}0A`,
                   color: theme.textSecondary,
                 }}
               >
                 Net Total
               </div>
-              {packageTotalsList.map(({ pkg, totals }) => {
-                const isActive =
-                  String(pkg.servicePackageID) === String(selectedPackageID);
-                return (
-                  <div
-                    key={pkg.servicePackageID}
-                    className="border-l px-3 pt-3 text-right text-sm font-medium"
-                    style={{
-                      borderColor: theme.border,
-                      backgroundColor: isActive ? `${accent}12` : `${accent}08`,
-                      color: theme.textPrimary,
-                    }}
-                  >
-                    {formatAmount(totals.netTotal)}
-                  </div>
-                );
-              })}
+              {packageTotalsList.map(({ pkg, totals }) => (
+                <div
+                  key={pkg.servicePackageID}
+                  className="px-3 py-1 text-right text-sm font-medium"
+                  style={{
+                    backgroundColor: `${accent}0A`,
+                    color: theme.textPrimary,
+                  }}
+                >
+                  {formatAmount(totals.netTotal)}
+                </div>
+              ))}
 
               {packageTotalsList.some(
                 ({ totals }) => Number(totals.discountPercentage) !== 0,
               ) && (
                 <>
                   <div
-                    className="sticky left-0 z-10 px-4 py-1 text-sm"
+                    className="sticky left-0 z-10 px-3.5 py-1 text-sm"
                     style={{
-                      backgroundColor: `${accent}08`,
+                      backgroundColor: `${accent}0A`,
                       color: theme.textSecondary,
                     }}
                   >
@@ -803,24 +826,18 @@ function FeeSection({
                   {packageTotalsList.map(({ pkg, totals }) => {
                     const pct = Number(totals.discountPercentage);
                     const isSurcharge = pct < 0;
-                    const isActive =
-                      String(pkg.servicePackageID) ===
-                      String(selectedPackageID);
                     return (
                       <div
                         key={pkg.servicePackageID}
-                        className="border-l px-3 py-1 text-right text-sm font-medium"
+                        className="px-3 py-1 text-right text-sm font-medium"
                         style={{
-                          borderColor: theme.border,
-                          backgroundColor: isActive
-                            ? `${accent}12`
-                            : `${accent}08`,
+                          backgroundColor: `${accent}0A`,
                           color: isSurcharge ? accent : theme.textSecondary,
                         }}
                       >
                         {pct === 0
                           ? "—"
-                          : `${isSurcharge ? "+" : "-"}${formatAmount(
+                          : `${isSurcharge ? "(+) " : ""}${formatAmount(
                               Math.abs(totals.discountAmount),
                             )} (${Math.abs(pct).toFixed(2)}%)`}
                       </div>
@@ -828,72 +845,59 @@ function FeeSection({
                   })}
 
                   <div
-                    className="sticky left-0 z-10 px-4 py-1 text-sm"
+                    className="sticky left-0 z-10 px-3.5 py-1 text-sm"
                     style={{
-                      backgroundColor: `${accent}08`,
+                      backgroundColor: `${accent}0A`,
                       color: theme.textSecondary,
                     }}
                   >
                     {packageTotalsList.some(
                       ({ totals }) => Number(totals.discountPercentage) < 0,
                     )
-                      ? "Discounted / Adjusted Total"
+                      ? "Adjusted Total"
                       : "Discounted Total"}
                   </div>
-                  {packageTotalsList.map(({ pkg, totals }) => {
-                    const isActive =
-                      String(pkg.servicePackageID) ===
-                      String(selectedPackageID);
-                    return (
-                      <div
-                        key={pkg.servicePackageID}
-                        className="border-l px-3 py-1 text-right text-sm font-medium"
-                        style={{
-                          borderColor: theme.border,
-                          backgroundColor: isActive
-                            ? `${accent}12`
-                            : `${accent}08`,
-                          color: theme.textPrimary,
-                        }}
-                      >
-                        {formatAmount(totals.discountedTotal)}
-                      </div>
-                    );
-                  })}
+                  {packageTotalsList.map(({ pkg, totals }) => (
+                    <div
+                      key={pkg.servicePackageID}
+                      className="px-3 py-1 text-right text-sm font-medium"
+                      style={{
+                        backgroundColor: `${accent}0A`,
+                        color: theme.textPrimary,
+                      }}
+                    >
+                      {formatAmount(totals.discountedTotal)}
+                    </div>
+                  ))}
                 </>
               )}
 
               <div
-                className="sticky left-0 z-10 px-4 py-1 text-sm"
+                className="sticky left-0 z-10 px-3.5 pb-2.5 pt-1 text-sm"
                 style={{
-                  backgroundColor: `${accent}08`,
+                  backgroundColor: `${accent}0A`,
                   color: theme.textSecondary,
                 }}
               >
                 VAT ({Number(vatPercentage) || 0}%)
               </div>
-              {packageTotalsList.map(({ pkg, totals }) => {
-                const isActive =
-                  String(pkg.servicePackageID) === String(selectedPackageID);
-                return (
-                  <div
-                    key={pkg.servicePackageID}
-                    className="border-l px-3 py-1 text-right text-sm font-medium"
-                    style={{
-                      borderColor: theme.border,
-                      backgroundColor: isActive ? `${accent}12` : `${accent}08`,
-                      color: theme.textSecondary,
-                    }}
-                  >
-                    {formatAmount(totals.vatAmount)}
-                  </div>
-                );
-              })}
+              {packageTotalsList.map(({ pkg, totals }) => (
+                <div
+                  key={pkg.servicePackageID}
+                  className="px-3 pb-2.5 pt-1 text-right text-sm font-medium"
+                  style={{
+                    backgroundColor: `${accent}0A`,
+                    color: theme.textPrimary,
+                  }}
+                >
+                  {formatAmount(totals.vatAmount)}
+                </div>
+              ))}
 
-              {/* Grand Total — the headline price per plan, sized and
-                weighted like CalculationBlock's own Grand Total band. */}
+              {/* Grand Total — the one filled, bold band, exactly matching
+                CalculationBlock's Grand Total footer strip. */}
               <div
-                className="sticky left-0 z-10 flex items-center px-4 py-3 text-xs font-bold uppercase tracking-wide"
+                className="sticky left-0 z-10 flex items-center px-3.5 py-2.5 text-xs font-bold uppercase tracking-wide"
                 style={{
                   backgroundColor: `${accent}1A`,
                   color: theme.textPrimary,
@@ -901,74 +905,18 @@ function FeeSection({
               >
                 Grand Total
               </div>
-              {packageTotalsList.map(({ pkg, totals }) => {
-                const isActive =
-                  String(pkg.servicePackageID) === String(selectedPackageID);
-                return (
-                  <div
-                    key={pkg.servicePackageID}
-                    className="border-l px-3 py-3 text-right text-lg font-bold"
-                    style={{
-                      borderColor: `${accent}26`,
-                      backgroundColor: isActive ? `${accent}29` : `${accent}1A`,
-                      color: accent,
-                    }}
-                  >
-                    {formatAmount(totals.grandTotal)}
-                  </div>
-                );
-              })}
-
-              {/* Call to action — a full-width "Select Plan" button per
-                column, filled with a check for the active plan, so choosing
-                a package feels like a purchase decision, not a table edit. */}
-              <div
-                className="sticky left-0 z-10 px-4 py-3"
-                style={{ backgroundColor: theme.background }}
-              />
-              {packageColumns.map((pkg) => {
-                const isActive =
-                  String(pkg.servicePackageID) === String(selectedPackageID);
-                return (
-                  <div
-                    key={pkg.servicePackageID}
-                    className="border-l px-3 py-3"
-                    style={{
-                      borderColor: theme.border,
-                      backgroundColor: theme.background,
-                    }}
-                  >
-                    {isActive ? (
-                      <span
-                        className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold shadow-sm"
-                        style={{ backgroundColor: accent, color: "#fff" }}
-                      >
-                        <Check size={13} strokeWidth={3} />
-                        Selected
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => onSelectPackage(pkg.servicePackageID)}
-                        className="w-full rounded-lg border px-3 py-2 text-xs font-bold transition-colors hover:text-white"
-                        style={{
-                          borderColor: accent,
-                          color: accent,
-                          backgroundColor: "#fff",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = accent;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "#fff";
-                        }}
-                      >
-                        Select This Plan
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
+              {packageTotalsList.map(({ pkg, totals }) => (
+                <div
+                  key={pkg.servicePackageID}
+                  className="px-3 py-2.5 text-right text-base font-bold"
+                  style={{
+                    backgroundColor: `${accent}1A`,
+                    color: accent,
+                  }}
+                >
+                  {formatAmount(totals.grandTotal)}
+                </div>
+              ))}
             </div>
           </div>
         ) : (
@@ -1229,15 +1177,24 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   // driverValue and break that calculation — so re-check the same
   // requirement here, right before firing the request, regardless of how
   // this step was reached.
+  // Standard Package quotes have no Services step for the client to fill in
+  // a quantity/variation/slab field — every selection comes from the
+  // admin's own defaults (see buildSelectionsFromQuoteModel's driverValue
+  // hydration), and GetCalculatedServicesPriceByPackages already prices
+  // them successfully as-is, so this required-field check (and the "go
+  // back to Services" warning it drives) only applies where the client
+  // actually has a Services step to complete.
   const hasIncompleteSelections = useMemo(
     () =>
-      validateSelectionsMap(recurringSelections, recurringServiceByID)
+      !isStandardPackage &&
+      (validateSelectionsMap(recurringSelections, recurringServiceByID)
         .hasError ||
-      validateSelectionsMap(oneOffSelections, oneOffServiceByID).hasError ||
-      Object.keys(
-        getAdditionalInformationFieldErrors(additionalInformationList),
-      ).length > 0,
+        validateSelectionsMap(oneOffSelections, oneOffServiceByID).hasError ||
+        Object.keys(
+          getAdditionalInformationFieldErrors(additionalInformationList),
+        ).length > 0),
     [
+      isStandardPackage,
       recurringSelections,
       oneOffSelections,
       recurringServiceByID,
