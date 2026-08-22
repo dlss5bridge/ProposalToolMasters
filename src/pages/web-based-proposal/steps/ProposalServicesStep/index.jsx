@@ -102,6 +102,7 @@ const ServiceSelectionComponent = ({ theme }) => {
   // which the client can add to but not remove — Package/Service proposals
   // have no such restriction.
   const isCustomPackage = quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
+  const isPackageType = quoteTypeID === QUOTE_TYPE_ID.Package;
 
   const [recurringSelections, setRecurringSelections] = useState({});
   const [oneOffSelections, setOneOffSelections] = useState({});
@@ -156,7 +157,11 @@ const ServiceSelectionComponent = ({ theme }) => {
       recurringSelections: hydratedRecurring,
       oneOffSelections: hydratedOneOff,
       nextOrder,
-    } = buildSelectionsFromQuoteModel(recurringServices, oneOffServices);
+    } = buildSelectionsFromQuoteModel(
+      recurringServices,
+      oneOffServices,
+      isPackageType,
+    );
 
     // Mark the admin's default picks as locked so toggleService/removeSelection
     // can refuse to remove them, while anything the client adds afterwards
@@ -214,6 +219,7 @@ const ServiceSelectionComponent = ({ theme }) => {
     recurringServicesLoading,
     oneOffServicesLoading,
     isCustomPackage,
+    isPackageType,
   ]);
 
   const toggleService = (listType, category, service) => {

@@ -495,6 +495,10 @@ function FeeSection({
   frequencyLabel,
   // Package/Custom Package quotes only — see ProposalPricingTableStep
   isPackageBased,
+  // Standard "Package" quotes only (not Custom Package) — gates the
+  // "hide services that belong to none of this proposal's packages" filter
+  // below, so Custom Package's own row set stays untouched.
+  isStandardPackage,
   // Every package this proposal was quoted with, one price/calculation
   // column each, plus the single shared selectedPackageID/onSelectPackage
   // that both the Recurring and One-off sections read from and write to —
@@ -507,6 +511,30 @@ function FeeSection({
   onSelectPackage,
 }) {
   const hasPackageColumns = (packageColumns?.length || 0) > 1;
+
+  // Standard Package quotes only: a service that isn't mapped to ANY of
+  // this proposal's packages has nothing to show in any column (every
+  // cell would be "—"), so drop it from the grid entirely instead of
+  // rendering a dead row. Custom Package keeps its full row set — its
+  // client-added services are real selections, not package mappings.
+  const visibleCategoryGroups =
+    hasPackageColumns && isStandardPackage
+      ? categoryGroups
+          .map((group) => ({
+            ...group,
+            items: group.items.filter((item) =>
+              packageColumns.some(
+                (pkg) =>
+                  priceByServiceAndPackage(
+                    chargeTypeID,
+                    item.serviceID,
+                    pkg.servicePackageID,
+                  ) !== null,
+              ),
+            ),
+          }))
+          .filter((group) => group.items.length > 0)
+      : categoryGroups;
 
   return (
     <div
@@ -633,7 +661,7 @@ function FeeSection({
               })}
 
               {/* Category + service rows */}
-              {categoryGroups.map((group) => (
+              {visibleCategoryGroups.map((group) => (
                 <Fragment key={group.serviceCatID ?? group.categoryName}>
                   <div
                     className="sticky left-0 z-10 border-t px-4 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider"
@@ -1227,7 +1255,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
       !isActive ||
       !quoteModel?.organisationKeyID ||
       calculateServicesGPDList.length === 0 ||
-      hasIncompleteSelections
+      (hasIncompleteSelections && !isStandardPackage)
     ) {
       return;
     }
@@ -1254,6 +1282,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
     getValueOfFrequency,
     calculateServicesGPDList,
     hasIncompleteSelections,
+    isStandardPackage,
   ]);
 
   // null means "this service isn't part of the selected package" (rendered
@@ -1689,6 +1718,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   isCustomPackage={isCustomPackage}
                   frequencyLabel={paymentFrequencyLabel}
                   isPackageBased={isPackageBased}
+                  isStandardPackage={isStandardPackage}
                   packageColumns={packageColumns}
                   priceByServiceAndPackage={priceByServiceAndPackage}
                   packageTotalsList={recurringPackageTotalsList}
@@ -1719,6 +1749,7 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   note={oneOffTotals.note}
                   isCustomPackage={isCustomPackage}
                   isPackageBased={isPackageBased}
+                  isStandardPackage={isStandardPackage}
                   packageColumns={packageColumns}
                   priceByServiceAndPackage={priceByServiceAndPackage}
                   packageTotalsList={oneOffPackageTotalsList}
