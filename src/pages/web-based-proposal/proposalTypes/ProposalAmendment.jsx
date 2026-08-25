@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProposalFooter from "../layout/ProposalFooter";
 import ProposalHeader from "../layout/ProposalHeader";
@@ -40,11 +40,19 @@ import {
   setInputFieldsValidationVisible,
 } from "../../../redux/reducer/webProposal/inputFields";
 import { QUOTE_TYPE_ID } from "../../../Middleware/enums";
+import { redirectUri } from "../../../Base-Url/Base_Url";
+import { resolveServicePackageKeyID } from "../utils/resolveServicePackageKeyID";
 
 export default function ProposalAmendment({ theme, proposal, services }) {
   const dispatch = useDispatch();
   const activeStep = useSelector(selectActiveStep);
   const quoteModel = useSelector(selectQuoteModel);
+  const [acceptError, setAcceptError] = useState(null);
+  // Mirrors ProposalPricingTableStep's own selection state (via
+  // onSelectedPackageChange below) purely so Next/Amend can be gated on
+  // whether a package has actually been selected yet — same pattern as
+  // StandardProposal.jsx / ProposalInputForm.jsx.
+  const [selectedPackageKeyID, setSelectedPackageKeyID] = useState(null);
   const selectedServiceIDs = useSelector(selectSelectedServiceIDs);
   const servicesFieldErrors = useSelector(selectServicesFieldErrors);
   const hasAdditionalInformation = useSelector(selectHasAdditionalInformation);
@@ -61,6 +69,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const isPackageType = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
   const isCustomPackageType =
     quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
+  const isPackageBased = isPackageType || isCustomPackageType;
 
   // Package proposals are priced against a fixed package/discount rather
   // than the per-service driver values Additional Information exists to
@@ -126,6 +135,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         <ProposalPricingTableStep
           theme={theme}
           isActive={activeStep === PRICING_STEP_INDEX}
+          onSelectedPackageChange={setSelectedPackageKeyID}
         />
       ),
     },
@@ -195,6 +205,18 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   }, [isPackageType, quoteModel, selectedServiceIDs, dispatch]);
 
   const handleBeforeNextStep = async (currentStepIndex) => {
+    // Package/Custom Package quotes must have a package selected before
+    // leaving the Pricing Table step — otherwise Additional Information/
+    // Input Fields (or the eventual Amend) would have nothing to price/
+    // contract against.
+    if (currentStepIndex === PRICING_STEP_INDEX && isPackageBased) {
+      if (!selectedPackageKeyID) {
+        setAcceptError("Please select a package to continue.");
+        return false;
+      }
+      setAcceptError(null);
+    }
+
     if (hasInputFields && currentStepIndex === INPUT_FIELDS_STEP_INDEX) {
       const fieldErrors = getInputFieldsFieldErrors(
         inputFieldsList,
@@ -281,7 +303,10 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   };
 
   // Placeholder endpoint until the real "Amend Proposal" API is ready — see
-  // AmendWebProposal in ProposalApi.jsx.
+  // AmendWebProposal in ProposalApi.jsx. Once it resolves, the redirect
+  // below mirrors StandardProposal.jsx's handleAccept exactly, so every
+  // Web-Based Proposal type lands on the same generate-contract flow after
+  // its final action.
   const handleAmendProposal = async () => {
     try {
       await dispatch(
@@ -290,6 +315,62 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     } catch (err) {
       // Endpoint is a placeholder for now, so failures are expected.
     }
+
+    const quoteKeyID = quoteModel?.quoteKeyID;
+    // themeSettings was already fetched by GetOrganisationThemeSettings on
+    // page load (see WebBasedProposal in index.jsx) — reuse it instead of
+    // calling the endpoint again here.
+    const themeSettings = proposal.themeSettings;
+    const serviceChargeTypeID = themeSettings?.serviceChargeTypeID;
+
+    if (!quoteKeyID || serviceChargeTypeID == null) {
+      setAcceptError("Failed to amend proposal. Please try again.");
+      return;
+    }
+
+    if (isPackageBased && !selectedPackageKeyID) {
+      setAcceptError("Please select a package to continue.");
+      return;
+    }
+
+    if (themeSettings?.isCollectPaymentBeforeProposalAmendment) {
+      // TODO: Implement payment-before-acceptance flow
+      setAcceptError(
+        "Payment is required before this proposal can be accepted.",
+      );
+      return;
+    }
+
+    setAcceptError(null);
+
+    // Mirrors the email accept link's query shape exactly (see
+    // PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl):
+    // quoteKeyID, ServiceChargeTypeID, Action, ServicePackageKeyID,
+    // ContractSignatoryKeyID. ServicePackageKeyID is a different value from
+    // the selected servicePackageID — it must be looked up from
+    // themeSettings._ServicePackage (see resolveServicePackageKeyID) — and a
+    // Service-based proposal has no packages at all, so it's left out of the
+    // URL entirely for that case.
+    const servicePackageID =
+      selectedPackageKeyID ?? quoteModel?.servicePackageID?.[0];
+    const servicePackageKeyID = resolveServicePackageKeyID(
+      themeSettings,
+      servicePackageID,
+    );
+    const params = new URLSearchParams({
+      quoteKeyID,
+      ServiceChargeTypeID: String(serviceChargeTypeID),
+      Action: "Accepted",
+      ContractSignatoryKeyID: themeSettings?.contractSignatoryKeyID ?? "",
+    });
+    if (servicePackageKeyID) {
+      params.set("ServicePackageKeyID", servicePackageKeyID);
+    }
+
+    // Full navigation (not react-router's navigate) — the client-facing
+    // generate-contract destination lives on the production proposal
+    // domain, not necessarily the origin this app is currently served from.
+    window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
   };
 
   return (
@@ -352,6 +433,11 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       </div>
 
       <ProposalFooter theme={theme}>
+        {acceptError && (
+          <div className="mb-2 text-right text-sm text-red-600">
+            {acceptError}
+          </div>
+        )}
         <ProposalStepper
           theme={theme}
           steps={stepLabels}

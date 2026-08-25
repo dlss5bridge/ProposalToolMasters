@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 import ProposalHeader from "../layout/ProposalHeader";
 import ProposalLayout from "../layout/ProposalLayout";
@@ -12,9 +11,10 @@ import ProposalPricingTableStep from "../steps/ProposalPricingTableStep";
 import ProposalServicesStep from "../steps/ProposalServicesStep";
 import { selectActiveStep } from "../../../redux/reducer/webProposal/stepper";
 import { QUOTE_TYPE_ID } from "../../../Middleware/enums";
+import { redirectUri } from "../../../Base-Url/Base_Url";
+import { resolveServicePackageKeyID } from "../utils/resolveServicePackageKeyID";
 
 export default function StandardProposal({ proposal, theme }) {
-  const navigate = useNavigate();
   const activeStep = useSelector(selectActiveStep);
   const [acceptError, setAcceptError] = useState(null);
   // Mirrors ProposalPricingTableStep's own selection state (via
@@ -59,9 +59,7 @@ export default function StandardProposal({ proposal, theme }) {
     }
 
     if (themeSettings?.isCollectPaymentBeforeProposalAmendment) {
-      // TODO: no client-facing payment-collection flow exists in the
-      // codebase yet — once built, this branch should route there instead
-      // of going straight to /generate-contract.
+      // TODO: Implement payment-before-acceptance flow
       setAcceptError(
         "Payment is required before this proposal can be accepted.",
       );
@@ -73,18 +71,31 @@ export default function StandardProposal({ proposal, theme }) {
     // Mirrors the email accept link's query shape exactly (see
     // PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl):
     // quoteKeyID, ServiceChargeTypeID, Action, ServicePackageKeyID,
-    // ContractSignatoryKeyID.
-    const servicePackageKeyID =
+    // ContractSignatoryKeyID. ServicePackageKeyID is a different value from
+    // the selected servicePackageID — it must be looked up from
+    // themeSettings._ServicePackage (see resolveServicePackageKeyID) — and a
+    // Service-based proposal has no packages at all, so it's left out of the
+    // URL entirely for that case.
+    const servicePackageID =
       selectedPackageKeyID ?? quoteModel?.servicePackageID?.[0];
+    const servicePackageKeyID = resolveServicePackageKeyID(
+      themeSettings,
+      servicePackageID,
+    );
     const params = new URLSearchParams({
       quoteKeyID,
       ServiceChargeTypeID: String(serviceChargeTypeID),
       Action: "Accepted",
-      ServicePackageKeyID: servicePackageKeyID ?? "",
       ContractSignatoryKeyID: themeSettings?.contractSignatoryKeyID ?? "",
     });
+    if (servicePackageKeyID) {
+      params.set("ServicePackageKeyID", servicePackageKeyID);
+    }
 
-    navigate(`/generate-contract?${params.toString()}`);
+    // Full navigation (not react-router's navigate) — the client-facing
+    // generate-contract destination lives on the production proposal
+    // domain, not necessarily the origin this app is currently served from.
+    window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
   };
 
   // Package/Custom Package proposals need a Pricing Table step so the client

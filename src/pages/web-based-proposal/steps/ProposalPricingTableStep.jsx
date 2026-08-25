@@ -544,6 +544,15 @@ function FeeSection({
           .filter((group) => group.items.length > 0)
       : categoryGroups;
 
+  // The header badge must reflect what's actually rendered below, not the
+  // raw selection count — for Standard Package quotes those can differ
+  // (dead rows not in any package are dropped from visibleCategoryGroups
+  // above), so this sums the same groups the table renders.
+  const visibleServiceCount = visibleCategoryGroups.reduce(
+    (sum, group) => sum + group.items.length,
+    0,
+  );
+
   return (
     // No card box, no filled header background — just a plain accent-icon
     // title row on the page's own white surface. The dark theme is reserved
@@ -606,7 +615,7 @@ function FeeSection({
               color: theme.textSecondary,
             }}
           >
-            {items.length} service{items.length === 1 ? "" : "s"}
+            {visibleServiceCount} service{visibleServiceCount === 1 ? "" : "s"}
           </span>
         </div>
       </div>
@@ -962,14 +971,14 @@ function FeeSection({
                     return (
                       <div
                         key={pkg.servicePackageID}
-                        className="flex items-center justify-center px-2 py-2"
+                        className="flex items-center justify-end px-3 py-2"
                         style={{ backgroundColor: `${accent}1A` }}
                       >
                         <button
                           type="button"
                           onClick={() => onSelectPackage(pkg.servicePackageID)}
                           disabled={isActive}
-                          className="flex w-full items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs font-bold transition disabled:cursor-default"
+                          className="inline-flex max-w-full items-center justify-center gap-1 rounded-lg px-3.5 py-2 text-xs font-bold transition disabled:cursor-default"
                           style={
                             isActive
                               ? { backgroundColor: accent, color: "#fff" }

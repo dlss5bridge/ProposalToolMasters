@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 import { selectActiveStep } from "../../../redux/reducer/webProposal/stepper";
 import {
@@ -24,10 +23,11 @@ import ProposalPricingTableStep from "../steps/ProposalPricingTableStep";
 import ProposalServicesStep from "../steps/ProposalServicesStep";
 import ProposalInputFieldsStep from "../steps/ProposalInputFieldsStep";
 import { QUOTE_TYPE_ID } from "../../../Middleware/enums";
+import { redirectUri } from "../../../Base-Url/Base_Url";
+import { resolveServicePackageKeyID } from "../utils/resolveServicePackageKeyID";
 
 export default function StandardProposalWithInputs({ proposal, theme }) {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const activeStep = useSelector(selectActiveStep);
   const hasInputFields = useSelector(selectHasInputFields);
   const quoteModel = useSelector(selectQuoteModel);
@@ -52,6 +52,17 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
   const INPUT_FIELDS_STEP_INDEX = isPackageBased ? 2 : 1;
 
   const handleBeforeNextStep = (currentStepIndex) => {
+    // Package/Custom Package quotes must have a package selected before
+    // leaving the Pricing Table step — otherwise Input Fields (or the
+    // eventual Accept) would have nothing to price/contract against.
+    if (currentStepIndex === PRICING_STEP_INDEX && isPackageBased) {
+      if (!selectedPackageKeyID) {
+        setAcceptError("Please select a package to continue.");
+        return false;
+      }
+      setAcceptError(null);
+    }
+
     if (!hasInputFields || currentStepIndex !== INPUT_FIELDS_STEP_INDEX) {
       return true;
     }
@@ -111,9 +122,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     }
 
     if (themeSettings?.isCollectPaymentBeforeProposalAmendment) {
-      // TODO: no client-facing payment-collection flow exists in the
-      // codebase yet — once built, this branch should route there instead
-      // of going straight to /generate-contract.
+      // TODO: Implement payment-before-acceptance flow
       setAcceptError(
         "Payment is required before this proposal can be accepted.",
       );
@@ -125,18 +134,31 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     // Mirrors the email accept link's query shape exactly (see
     // PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl):
     // quoteKeyID, ServiceChargeTypeID, Action, ServicePackageKeyID,
-    // ContractSignatoryKeyID.
-    const servicePackageKeyID =
+    // ContractSignatoryKeyID. ServicePackageKeyID is a different value from
+    // the selected servicePackageID — it must be looked up from
+    // themeSettings._ServicePackage (see resolveServicePackageKeyID) — and a
+    // Service-based proposal has no packages at all, so it's left out of the
+    // URL entirely for that case.
+    const servicePackageID =
       selectedPackageKeyID ?? quoteModel?.servicePackageID?.[0];
+    const servicePackageKeyID = resolveServicePackageKeyID(
+      themeSettings,
+      servicePackageID,
+    );
     const params = new URLSearchParams({
       quoteKeyID,
       ServiceChargeTypeID: String(serviceChargeTypeID),
       Action: "Accepted",
-      ServicePackageKeyID: servicePackageKeyID ?? "",
       ContractSignatoryKeyID: themeSettings?.contractSignatoryKeyID ?? "",
     });
+    if (servicePackageKeyID) {
+      params.set("ServicePackageKeyID", servicePackageKeyID);
+    }
 
-    navigate(`/generate-contract?${params.toString()}`);
+    // Full navigation (not react-router's navigate) — the client-facing
+    // generate-contract destination lives on the production proposal
+    // domain, not necessarily the origin this app is currently served from.
+    window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
   };
 
   const steps = [
