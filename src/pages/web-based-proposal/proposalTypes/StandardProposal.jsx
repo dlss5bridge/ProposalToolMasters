@@ -1,32 +1,117 @@
 import { useState } from "react";
-import { Check, Loader2 } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import ProposalHeader from "../layout/ProposalHeader";
 import ProposalLayout from "../layout/ProposalLayout";
 import ProposalFooter from "../layout/ProposalFooter";
+import ProposalStepper from "../layout/ProposalStepper";
 import ProposalSidebar from "../layout/ProposalSidebar";
-import PdfViewer from "../pdf/PdfViewer";
-import { acceptProposal } from "../../../redux/reducer/webProposal";
+import ProposalPdfStep from "../steps/ProposalPdfStep";
+import ProposalPricingTableStep from "../steps/ProposalPricingTableStep";
+import ProposalServicesStep from "../steps/ProposalServicesStep";
+import { selectActiveStep } from "../../../redux/reducer/webProposal/stepper";
+import { QUOTE_TYPE_ID } from "../../../Middleware/enums";
 
 export default function StandardProposal({ proposal, theme }) {
-  const dispatch = useDispatch();
-  const [isAccepting, setIsAccepting] = useState(false);
+  const navigate = useNavigate();
+  const activeStep = useSelector(selectActiveStep);
+  const [acceptError, setAcceptError] = useState(null);
+  // Mirrors ProposalPricingTableStep's own selection state (via
+  // onSelectedPackageChange below) purely so the footer Accept button here
+  // can be gated on whether a package has actually been selected yet — the
+  // Pricing Table step remains the single source of truth for the selection
+  // itself.
+  const [selectedPackageKeyID, setSelectedPackageKeyID] = useState(null);
 
-  // Placeholder endpoint until the real "Accept" API is ready — see
-  // AcceptWebProposal in ProposalApi.jsx.
-  const handleAccept = async () => {
-    setIsAccepting(true);
-    try {
-      await dispatch(
-        acceptProposal({ quoteKeyID: proposal.quoteModel?.quoteKeyID }),
-      ).unwrap();
-    } catch (err) {
-      // Endpoint is a placeholder for now, so failures are expected.
-    } finally {
-      setIsAccepting(false);
+  const quoteModel = proposal.quoteModel;
+  const isPackageType = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
+  const isCustomPackageType =
+    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
+  const isPackageBased = isPackageType || isCustomPackageType;
+
+  // Same "Accept" destination the admin-side proposal email button links to
+  // (see PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl) —
+  // /generate-contract itself calls GenerateContractFromProposal on mount,
+  // generates the contract PDF, and hands off to SignEasy, so accepting here
+  // just navigates there with the same query params instead of duplicating
+  // that flow.
+  const handleAccept = () => {
+    const quoteKeyID = quoteModel?.quoteKeyID;
+    // themeSettings was already fetched by GetOrganisationThemeSettings on
+    // page load (see WebBasedProposal in index.jsx) — reuse it instead of
+    // calling the endpoint again here.
+    const themeSettings = proposal.themeSettings;
+    const serviceChargeTypeID = themeSettings?.serviceChargeTypeID;
+
+    if (!quoteKeyID || serviceChargeTypeID == null) {
+      setAcceptError("Failed to accept proposal. Please try again.");
+      return;
     }
+
+    // Package/Custom Package proposals must have a package selected on the
+    // Pricing Table step before the proposal can be accepted — the Accept
+    // Package/Select Package button there only picks a package, it never
+    // submits, so this is the one gate that actually blocks acceptance.
+    if (isPackageBased && !selectedPackageKeyID) {
+      setAcceptError("Please select a package to continue.");
+      return;
+    }
+
+    if (themeSettings?.isCollectPaymentBeforeProposalAmendment) {
+      // TODO: no client-facing payment-collection flow exists in the
+      // codebase yet — once built, this branch should route there instead
+      // of going straight to /generate-contract.
+      setAcceptError(
+        "Payment is required before this proposal can be accepted.",
+      );
+      return;
+    }
+
+    setAcceptError(null);
+
+    // Mirrors the email accept link's query shape exactly (see
+    // PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl):
+    // quoteKeyID, ServiceChargeTypeID, Action, ServicePackageKeyID,
+    // ContractSignatoryKeyID.
+    const servicePackageKeyID =
+      selectedPackageKeyID ?? quoteModel?.servicePackageID?.[0];
+    const params = new URLSearchParams({
+      quoteKeyID,
+      ServiceChargeTypeID: String(serviceChargeTypeID),
+      Action: "Accepted",
+      ServicePackageKeyID: servicePackageKeyID ?? "",
+      ContractSignatoryKeyID: themeSettings?.contractSignatoryKeyID ?? "",
+    });
+
+    navigate(`/generate-contract?${params.toString()}`);
   };
+
+  // Package/Custom Package proposals need a Pricing Table step so the client
+  // can review the calculated package price before accepting — every other
+  // Standard Proposal has nothing to step through, so `steps` stays a single
+  // entry and ProposalStepper collapses to a plain Accept button on its own.
+  const PRICING_STEP_INDEX = 1;
+  const steps = [
+    { label: "Proposal", component: <ProposalPdfStep theme={theme} /> },
+    ...(isPackageBased
+      ? [
+          {
+            label: "Pricing Table",
+            component: (
+              <ProposalPricingTableStep
+                theme={theme}
+                isActive={activeStep === PRICING_STEP_INDEX}
+                onSelectedPackageChange={setSelectedPackageKeyID}
+              />
+            ),
+          },
+        ]
+      : []),
+  ];
+
+  const stepLabels = steps.map((step) => step.label);
+  const stepComponents = steps.map((step) => step.component);
 
   return (
     <ProposalLayout theme={theme}>
@@ -47,14 +132,7 @@ export default function StandardProposal({ proposal, theme }) {
       >
         {/* Sidebar */}
         <aside
-          className="
-        hidden
-        lg:flex
-        lg:w-80
-        lg:flex-shrink-0
-        overflow-y-auto
-        border-r
-      "
+          className="hidden lg:flex lg:w-80 lg:flex-shrink-0 overflow-y-auto border-r"
           style={{
             backgroundColor: theme.background,
             borderColor: theme.border,
@@ -63,128 +141,48 @@ export default function StandardProposal({ proposal, theme }) {
           <ProposalSidebar theme={theme} proposal={proposal} />
         </aside>
 
-        {/* PDF Section */}
+        {/* Step Content */}
         <main
-          className="
-        w-full
-        flex-1
-        overflow-hidden
-        p-1.5
-        sm:p-3
-      "
+          className="flex-1 overflow-hidden"
           style={{
             backgroundColor: theme.background,
           }}
         >
-          {/* Full width on mobile so the PDF frame isn't squeezed into 90% of
-              an already-small viewport. From lg up, w-[90%] (not centered)
-              leaves a consistent 10% gap on the right instead of a fixed
-              pixel margin. */}
-          <div className="h-full w-full lg:w-[90%]">
-            <div
-              className="
-            flex
-            h-full
-            flex-col
-            overflow-hidden
-            rounded-xl
-            border
-            bg-white
-            shadow-lg
-            sm:rounded-2xl
-          "
-              style={{
-                borderColor: theme.border,
-              }}
-            >
-              {/* Top Accent */}
-              <div
-                className="h-1.5"
-                style={{
-                  background: `linear-gradient(90deg, ${theme.primary}, ${theme.secondary})`,
-                }}
-              />
-
-              {/* PDF Viewer */}
-              <div className="flex-1 overflow-hidden bg-white">
-                <PdfViewer theme={theme} />
-              </div>
+          {/* Package proposals skip a visible Services step entirely, but the
+              Pricing Table still needs the admin's default selections
+              hydrated into redux — so the step stays mounted here,
+              permanently hidden, purely to run its data-fetch/hydration
+              effects in the background (mirrors ProposalAmendment.jsx). */}
+          {isPackageBased && (
+            <div className="hidden">
+              <ProposalServicesStep theme={theme} />
             </div>
-          </div>
+          )}
+
+          {stepComponents.map((component, index) => (
+            <div
+              key={index}
+              className={index === activeStep ? "contents" : "hidden"}
+            >
+              {component}
+            </div>
+          ))}
         </main>
       </div>
 
       <ProposalFooter theme={theme}>
-        <div className="flex justify-end">
-          <button
-            onClick={handleAccept}
-            disabled={isAccepting}
-            className="flex h-9 items-center justify-center gap-1 rounded-md px-4 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-40"
-            style={{
-              backgroundColor: theme.primary,
-            }}
-          >
-            {isAccepting ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <>
-                Accept
-                <Check size={16} />
-              </>
-            )}
-          </button>
-        </div>
+        {acceptError && (
+          <div className="mb-2 text-right text-sm text-red-600">
+            {acceptError}
+          </div>
+        )}
+        <ProposalStepper
+          theme={theme}
+          steps={stepLabels}
+          onFinish={() => handleAccept()}
+          finishLabel="Accept"
+        />
       </ProposalFooter>
     </ProposalLayout>
   );
 }
-
-// import PdfViewer from "../pdf/PdfViewer";
-
-// export default function StandardProposal({
-//   theme,
-//   steps,
-//   activeStep,
-//   setActiveStep,
-//   pageNumber,
-//   setPageNumber,
-//   numPages,
-//   setNumPages,
-//   zoom,
-//   setZoom,
-//   children,
-// }) {
-//   //==================functions=====================
-//   const handlePreviousPage = () => {
-//     setPageNumber((p) => Math.max(1, p - 1));
-//   };
-
-//   const handleNextPage = () => {
-//     setPageNumber((p) => Math.min(numPages, p + 1));
-//   };
-
-//   const zoomIn = () => {
-//     setZoom((z) => Math.min(3, z + 0.2));
-//   };
-
-//   const zoomOut = () => {
-//     setZoom((z) => Math.max(0.6, z - 0.2));
-//   };
-
-//   return (
-//     <div className="h-full">
-//       <PdfViewer
-//         theme={theme}
-//         pageNumber={pageNumber}
-//         setPageNumber={setPageNumber}
-//         numPages={numPages}
-//         zoom={zoom}
-//         setNumPages={setNumPages}
-//         onPreviousPage={handlePreviousPage}
-//         onNextPage={handleNextPage}
-//         zoomIn={zoomIn}
-//         zoomOut={zoomOut}
-//       />
-//     </div>
-//   );
-// }

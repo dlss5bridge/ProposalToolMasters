@@ -393,11 +393,15 @@ function CalculationBlock({
   const isSurcharge = Number(discountPercentage) < 0;
 
   return (
+    // No nested card box here — a plain top divider is enough to separate
+    // the totals from the line items above. Only the Grand Total keeps a
+    // filled band, so it stays the single figure that's unmistakable at a
+    // glance.
     <div
-      className="mt-3 overflow-hidden rounded-xl border"
-      style={{ borderColor: `${accent}26`, backgroundColor: `${accent}0A` }}
+      className="mt-3 overflow-hidden rounded-lg border-t"
+      style={{ borderColor: theme.border }}
     >
-      <div className="space-y-1.5 px-3.5 pb-2.5 pt-2.5">
+      <div className="space-y-1.5 px-1 pb-2.5 pt-2.5">
         <span
           className="block text-[11px] font-bold uppercase tracking-wider"
           style={{ color: accent }}
@@ -447,11 +451,11 @@ function CalculationBlock({
           </span>
         </div>
       </div>
-      {/* Grand Total gets its own emphasized band — a filled footer strip,
+      {/* Grand Total gets its own emphasized band — a filled, rounded strip,
           bolder and larger than every other line above — so it's the one
           figure that's unmistakable at a glance. */}
       <div
-        className="flex items-center justify-between px-3.5 py-2.5"
+        className="mt-1.5 flex items-center justify-between rounded-lg px-3.5 py-2.5"
         style={{ backgroundColor: `${accent}1A` }}
       >
         <span
@@ -509,6 +513,10 @@ function FeeSection({
   packageTotalsList,
   selectedPackageID,
   onSelectPackage,
+  // Package/Custom Package quotes only — shown on the right of the section
+  // title when there's a single package (the comparison grid already shows
+  // every package's own name in its column header).
+  selectedPackageName,
 }) {
   const hasPackageColumns = (packageColumns?.length || 0) > 1;
 
@@ -537,11 +545,11 @@ function FeeSection({
       : categoryGroups;
 
   return (
-    <div
-      className="overflow-hidden rounded-2xl border-l-4 shadow-sm"
-      style={{ borderColor: accent, backgroundColor: `${accent}08` }}
-    >
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 pb-3 pt-3.5 sm:px-5">
+    // No card box, no filled header background — just a plain accent-icon
+    // title row on the page's own white surface. The dark theme is reserved
+    // for the Package Name headers only (see the comparison grid below).
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
         <div className="flex items-center gap-2.5">
           <span
             className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
@@ -574,18 +582,36 @@ function FeeSection({
             )}
           </div>
         </div>
-        <span
-          className="rounded-full px-2.5 py-1 text-xs font-medium"
-          style={{
-            backgroundColor: theme.background,
-            color: theme.textSecondary,
-          }}
-        >
-          {items.length} service{items.length === 1 ? "" : "s"}
-        </span>
+        <div className="flex flex-shrink-0 items-center gap-2">
+          {/* Package Name, right-aligned — only shown for the single-package
+              layout; the comparison grid already names every package in its
+              own column header. */}
+          {!hasPackageColumns && selectedPackageName && (
+            <span
+              className="inline-flex max-w-[45vw] items-center gap-1 truncate rounded-full px-2.5 py-1 text-xs font-semibold sm:max-w-xs"
+              style={{
+                backgroundColor: `${accent}1A`,
+                color: accent,
+              }}
+              title={selectedPackageName}
+            >
+              <Check size={11} strokeWidth={3} className="flex-shrink-0" />
+              <span className="truncate">{selectedPackageName}</span>
+            </span>
+          )}
+          <span
+            className="rounded-full px-2.5 py-1 text-xs font-medium"
+            style={{
+              backgroundColor: theme.background,
+              color: theme.textSecondary,
+            }}
+          >
+            {items.length} service{items.length === 1 ? "" : "s"}
+          </span>
+        </div>
       </div>
 
-      <div className="px-4 pb-4 sm:px-5">
+      <div>
         {hasPackageColumns ? (
           // A CSS-grid "plan comparison" layout, not a spreadsheet table: the
           // Service column takes only as much width as it needs (capped), and
@@ -594,16 +620,12 @@ function FeeSection({
           // row (header, category label, service, calculation, CTA) reuses
           // the same column template so everything lines up perfectly without
           // table borders/cellspacing doing the work.
-          // Same visual language as the plain Service pricing list below
-          // (and its CalculationBlock): a plain white rounded-xl card,
-          // horizontal-only dividers (no vertical grid lines), quiet
-          // typography for line items, and one tinted "Calculation" zone
-          // at the bottom with its own bold Grand Total band — just with
+          // No nested card box here — the grid sits directly in the section.
+          // Horizontal-only dividers (no vertical grid lines), quiet
+          // typography for line items, and one tinted "Calculation" zone at
+          // the bottom with its own bold Grand Total band — just with
           // package columns standing in for the single value column.
-          <div
-            className="overflow-x-auto rounded-xl border bg-white"
-            style={{ borderColor: theme.border }}
-          >
+          <div className="overflow-x-auto overflow-y-hidden">
             <div
               style={{
                 display: "grid",
@@ -611,20 +633,22 @@ function FeeSection({
                 minWidth: `${200 + packageColumns.length * 140}px`,
               }}
             >
-              {/* Plan header row — package name only, one line. Selection
-                lives on the name itself (a click target with a checkmark
-                when active) instead of a separate "Selected"/"Select this
-                plan" line, so the header stays compact. */}
+              {/* Plan header row — package name only, one line, on a dark
+                theme background so each package's own identity is clearly
+                prominent. Selection lives on the name itself (a filled
+                brand-accent pill when active) instead of a separate
+                "Selected"/"Select this plan" line, so the header stays
+                compact. */}
               <div
-                className="sticky left-0 z-10 flex items-end border-b px-3.5 pb-2 pt-3"
+                className="sticky left-0 z-10 flex items-center px-3.5 pb-2 pt-3"
                 style={{
-                  backgroundColor: "#fff",
-                  borderColor: theme.border,
+                  backgroundColor: theme.secondary,
+                  borderBottom: "1px solid rgba(255,255,255,0.16)",
                 }}
               >
                 <span
                   className="text-[11px] font-bold uppercase tracking-wider"
-                  style={{ color: theme.textSecondary }}
+                  style={{ color: "rgba(255,255,255,0.75)" }}
                 >
                   Service
                 </span>
@@ -635,16 +659,16 @@ function FeeSection({
                 return (
                   <div
                     key={pkg.servicePackageID}
-                    className="flex items-center justify-center border-b px-3 py-2.5 text-center"
+                    className="flex items-center justify-end px-3 py-2.5 text-center"
                     style={{
-                      borderColor: theme.border,
-                      borderTop: `2px solid ${isActive ? accent : "transparent"}`,
+                      backgroundColor: theme.secondary,
+                      borderBottom: "1px solid rgba(255,255,255,0.16)",
                     }}
                   >
                     {isActive ? (
                       <span
-                        className="flex max-w-full items-center gap-1 text-sm font-bold"
-                        style={{ color: accent }}
+                        className="flex max-w-full items-center gap-1 rounded-full px-3 py-1.5 text-sm font-bold"
+                        style={{ backgroundColor: accent, color: "#fff" }}
                         title={pkg.servicePackageName}
                       >
                         <Check
@@ -660,8 +684,8 @@ function FeeSection({
                       <button
                         type="button"
                         onClick={() => onSelectPackage(pkg.servicePackageID)}
-                        className="max-w-full appearance-none truncate border-0 bg-transparent p-0 text-sm font-bold"
-                        style={{ color: theme.textPrimary }}
+                        className="max-w-full appearance-none truncate rounded-full border-0 bg-transparent px-3 py-1.5 text-sm font-bold transition hover:bg-white/10"
+                        style={{ color: "rgba(255,255,255,0.85)" }}
                         title={pkg.servicePackageName}
                       >
                         {pkg.servicePackageName}
@@ -682,7 +706,8 @@ function FeeSection({
                     className="sticky left-0 z-10 px-3.5 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider"
                     style={{
                       gridColumn: "1 / -1",
-                      borderTop: groupIndex === 0 ? "none" : `1px solid ${theme.border}`,
+                      borderTop:
+                        groupIndex === 0 ? "none" : `1px solid ${theme.border}`,
                       backgroundColor: "#fff",
                       color: accent,
                     }}
@@ -917,16 +942,61 @@ function FeeSection({
                   {formatAmount(totals.grandTotal)}
                 </div>
               ))}
+
+              {/* Select Package — one button per column, immediately below
+                  that package's own Grand Total, so it's unambiguous which
+                  package it picks. This only selects the package (same
+                  effect as clicking its name above) — it never submits or
+                  accepts the proposal; that's the footer Accept button's
+                  job, once a package is selected. */}
+              {onSelectPackage && (
+                <>
+                  <div
+                    className="sticky left-0 z-10 px-3.5 py-2.5"
+                    style={{ backgroundColor: `${accent}1A` }}
+                  />
+                  {packageColumns.map((pkg) => {
+                    const isActive =
+                      String(pkg.servicePackageID) ===
+                      String(selectedPackageID);
+                    return (
+                      <div
+                        key={pkg.servicePackageID}
+                        className="flex items-center justify-center px-2 py-2"
+                        style={{ backgroundColor: `${accent}1A` }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => onSelectPackage(pkg.servicePackageID)}
+                          disabled={isActive}
+                          className="flex w-full items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs font-bold transition disabled:cursor-default"
+                          style={
+                            isActive
+                              ? { backgroundColor: accent, color: "#fff" }
+                              : {
+                                  backgroundColor: "#fff",
+                                  color: accent,
+                                  border: `1px solid ${accent}`,
+                                }
+                          }
+                        >
+                          {isActive ? "Selected" : "Select Package"}
+                          <Check size={13} strokeWidth={3} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </>
+              )}
             </div>
           </div>
         ) : (
           <>
-            {/* Service details, grouped under a header per category — its own
-              rounded, bordered block so it reads as one cohesive list. */}
-            <div
-              className="overflow-hidden rounded-xl border bg-white"
-              style={{ borderColor: theme.border }}
-            >
+            {/* Service details, grouped under a header per category — sits
+              directly in the section (no nested card box); horizontal
+              dividers alone separate items, since the plain title row above
+              is already this content's only heading. */}
+            <div>
               {categoryGroups.map((group) => (
                 <div key={group.serviceCatID ?? group.categoryName}>
                   <div
@@ -1027,7 +1097,15 @@ function FeeSection({
   );
 }
 
-export default function ProposalPricingTableStep({ theme, isActive }) {
+export default function ProposalPricingTableStep({
+  theme,
+  isActive,
+  // Package/Custom Package quotes only — called whenever the client's
+  // selected package changes (including the initial auto-select for a
+  // single-package quote), so the parent can gate its own footer Accept
+  // button on whether a selection has actually been made.
+  onSelectedPackageChange,
+}) {
   const dispatch = useDispatch();
 
   const quoteModel = useSelector(selectQuoteModel);
@@ -1082,17 +1160,26 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
   // The proposal can only ever be priced/quoted against ONE package at a
   // time — Recurring and One-off are never allowed to show different
   // packages, so this is a single, proposal-level selection (not one per
-  // charge type) shared by both FeeSections below. Defaults to the admin's
-  // first configured package as soon as it's known, without waiting on the
-  // pricing fetch.
-  const [selectedPackageID, setSelectedPackageID] = useState(
-    () => selectedPackageIDs[0] ?? null,
+  // charge type) shared by both FeeSections below. Only auto-selected when
+  // there's exactly one configured package (no real choice to make); with
+  // more than one, the client must explicitly pick one — the footer Accept
+  // button stays disabled until they do (see onSelectedPackageChange below).
+  const [selectedPackageID, setSelectedPackageID] = useState(() =>
+    selectedPackageIDs.length === 1 ? selectedPackageIDs[0] : null,
   );
   useEffect(() => {
-    if (selectedPackageID === null && selectedPackageIDs.length > 0) {
+    if (selectedPackageID === null && selectedPackageIDs.length === 1) {
       setSelectedPackageID(selectedPackageIDs[0]);
     }
   }, [selectedPackageID, selectedPackageIDs]);
+
+  // Lets the parent (StandardProposal) gate the footer Accept button on
+  // whether a package has actually been selected yet — this component's own
+  // selection state stays the single source of truth; the callback just
+  // mirrors it upward.
+  useEffect(() => {
+    onSelectedPackageChange?.(selectedPackageID);
+  }, [selectedPackageID, onSelectedPackageChange]);
 
   // GetValueOf tells GetCalculatedServicesPriceByPackages which billing
   // period to scale recurring prices down to — the backend does the
@@ -1681,6 +1768,9 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   packageTotalsList={recurringPackageTotalsList}
                   selectedPackageID={selectedPackageID}
                   onSelectPackage={setSelectedPackageID}
+                  selectedPackageName={
+                    isPackageBased ? selectedPackage?.servicePackageName : null
+                  }
                 />
               )}
 
@@ -1712,6 +1802,9 @@ export default function ProposalPricingTableStep({ theme, isActive }) {
                   packageTotalsList={oneOffPackageTotalsList}
                   selectedPackageID={selectedPackageID}
                   onSelectPackage={setSelectedPackageID}
+                  selectedPackageName={
+                    isPackageBased ? selectedPackage?.servicePackageName : null
+                  }
                 />
               )}
             </>
