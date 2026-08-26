@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   AcceptWebProposal,
+  AddUpdateQuoteWebProposal,
   AmendWebProposal,
   GetOrganisationThemeSettings,
   GetProposalModelWithoutToken,
@@ -59,6 +60,31 @@ export const getOrganisationThemeSettings = createAsyncThunk(
       if (res?.data?.statusCode === 200 && res?.data?.responseData?.data) {
         const [themeSettings] = res.data.responseData.data;
         return themeSettings || null;
+      }
+
+      return thunkAPI.rejectWithValue(
+        res?.data?.errorMessage || "Something went wrong",
+      );
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err?.response?.data || "Something went wrong",
+      );
+    }
+  },
+);
+
+// Real "final Accept/Amend" persistence call, shared by every web proposal
+// type. Params is the AddUpdateQuote payload built from GetQuoteModel's
+// response (state.webProposal.quoteModel) with only the user's actual
+// changes applied on top — see buildAddUpdateQuotePayload.
+export const addUpdateQuote = createAsyncThunk(
+  "webProposal/addUpdateQuote",
+  async (params, thunkAPI) => {
+    try {
+      const res = await AddUpdateQuoteWebProposal(params);
+
+      if (res?.data?.statusCode === 200) {
+        return res.data?.responseData?.data ?? null;
       }
 
       return thunkAPI.rejectWithValue(

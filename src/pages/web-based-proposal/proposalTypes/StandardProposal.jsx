@@ -66,6 +66,10 @@ export default function StandardProposal({ proposal, theme }) {
       return;
     }
 
+    // This proposal type has no data the client can change (no Input
+    // Fields, package selection is fixed to the admin's default), so there
+    // is nothing to persist via AddUpdateQuote — go straight to
+    // Generate Contract.
     setAcceptError(null);
 
     // Mirrors the email accept link's query shape exactly (see

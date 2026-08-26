@@ -10,8 +10,9 @@ import {
 } from "../../../redux/reducer/webProposal/inputFields";
 import {
   selectQuoteModel,
-  saveProposalInputFields,
+  addUpdateQuote,
 } from "../../../redux/reducer/webProposal";
+import { buildAddUpdateQuotePayload } from "../utils/buildAddUpdateQuotePayload";
 import ProposalLayout from "../layout/ProposalLayout";
 import ProposalHeader from "../layout/ProposalHeader";
 import ProposalFooter from "../layout/ProposalFooter";
@@ -79,18 +80,68 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     return true;
   };
 
-  // Placeholder endpoint until the real "Save" API is ready — see
-  // SaveWebProposalInputFields in ProposalApi.jsx. Only used for the plain
-  // (non-package) Input Fields flow — Package/Custom Package quotes finish
-  // via handleAccept below instead, same as StandardProposal.jsx.
+  // Plain (non-package) Input Fields flow's "Save" action — Package/Custom
+  // Package quotes finish via handleAccept below instead. Base request is
+  // the complete GetQuoteModel response; only the
+  // globalPricingDriverIDsWithValues entries the client actually filled in
+  // are patched on top, same as handleAccept. Mirrors handleAccept's
+  // generate-contract redirect too, since this is the "finish" action for
+  // this (non-package) proposal type just as handleAccept is for package
+  // ones.
   const handleSave = async () => {
+    const quoteKeyID = quoteModel?.quoteKeyID;
+    // themeSettings was already fetched by GetOrganisationThemeSettings on
+    // page load (see WebBasedProposal in index.jsx) — reuse it instead of
+    // calling the endpoint again here.
+    const themeSettings = proposal.themeSettings;
+    const serviceChargeTypeID = themeSettings?.serviceChargeTypeID;
+
+    if (!quoteKeyID || serviceChargeTypeID == null) {
+      setAcceptError("Failed to save proposal. Please try again.");
+      return;
+    }
+
+    if (themeSettings?.isCollectPaymentBeforeProposalAmendment) {
+      // TODO: Implement payment-before-acceptance flow
+      setAcceptError(
+        "Payment is required before this proposal can be accepted.",
+      );
+      return;
+    }
+
     try {
       await dispatch(
-        saveProposalInputFields({ quoteKeyID: quoteModel?.quoteKeyID }),
+        addUpdateQuote(
+          buildAddUpdateQuotePayload(quoteModel, inputFieldsList),
+        ),
       ).unwrap();
     } catch (err) {
-      // Endpoint is a placeholder for now, so failures are expected.
+      setAcceptError("Failed to save proposal. Please try again.");
+      return;
     }
+
+    // eslint-disable-next-line no-debugger
+    debugger; // TEMP: inspect AddUpdateQuote payload/response before navigating away.
+
+    setAcceptError(null);
+
+    // Mirrors the email accept link's query shape exactly (see
+    // PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl):
+    // quoteKeyID, ServiceChargeTypeID, Action, ContractSignatoryKeyID. This
+    // is a Service-based (non-package) proposal, so there's no
+    // ServicePackageKeyID to resolve — left out of the URL entirely, same
+    // as handleAccept does for that case.
+    const params = new URLSearchParams({
+      quoteKeyID,
+      ServiceChargeTypeID: String(serviceChargeTypeID),
+      Action: "Accepted",
+      ContractSignatoryKeyID: themeSettings?.contractSignatoryKeyID ?? "",
+    });
+
+    // Full navigation (not react-router's navigate) — the client-facing
+    // generate-contract destination lives on the production proposal
+    // domain, not necessarily the origin this app is currently served from.
+    window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
   };
 
   // Same "Accept" destination the admin-side proposal email button links to
@@ -99,7 +150,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
   // generates the contract PDF, and hands off to SignEasy, so accepting here
   // just navigates there with the same query params instead of duplicating
   // that flow. Mirrors StandardProposal.jsx's handleAccept exactly.
-  const handleAccept = () => {
+  const handleAccept = async () => {
     const quoteKeyID = quoteModel?.quoteKeyID;
     // themeSettings was already fetched by GetOrganisationThemeSettings on
     // page load (see WebBasedProposal in index.jsx) — reuse it instead of
@@ -128,6 +179,24 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       );
       return;
     }
+
+    // Base request is the complete GetQuoteModel response; only the
+    // globalPricingDriverIDsWithValues entries the client actually filled in
+    // on the Input Fields step are patched on top — the package selection
+    // and everything else stays exactly as GetQuoteModel returned it.
+    try {
+      await dispatch(
+        addUpdateQuote(
+          buildAddUpdateQuotePayload(quoteModel, inputFieldsList),
+        ),
+      ).unwrap();
+    } catch (err) {
+      setAcceptError("Failed to accept proposal. Please try again.");
+      return;
+    }
+
+    // eslint-disable-next-line no-debugger
+    debugger; // TEMP: inspect AddUpdateQuote payload/response before navigating away.
 
     setAcceptError(null);
 

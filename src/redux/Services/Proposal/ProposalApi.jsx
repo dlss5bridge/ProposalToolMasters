@@ -208,6 +208,17 @@ export const SaveWebProposalInputFields = async (params) => {
   return res;
 };
 
+// AddUpdateQuote as used from the web-based-proposal flow (client-facing,
+// no auth token) — same endpoint AddUpdateProposal.jsx calls via the
+// authenticated AddUpdateQuote above, mirrors AmendWebProposal's pattern.
+export const AddUpdateQuoteWebProposal = async (params) => {
+  const res = await postApi(
+    `${ProposalBaseUrlQuote}/AddUpdateQuote`,
+    params,
+  );
+  return res;
+};
+
 export const AcceptWebProposal = async (params) => {
   const res = await postApi(
     `${ProposalBaseUrlQuote}/AcceptWebProposal`,

@@ -6,6 +6,7 @@ export {
   amendProposal,
   saveProposalInputFields,
   acceptProposal,
+  addUpdateQuote,
 } from "./webProposalThunk";
 
 export {

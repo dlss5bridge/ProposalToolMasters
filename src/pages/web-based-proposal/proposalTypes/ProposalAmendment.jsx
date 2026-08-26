@@ -16,7 +16,7 @@ import {
 } from "../../../redux/reducer/webProposal/stepper";
 import {
   selectQuoteModel,
-  amendProposal,
+  addUpdateQuote,
 } from "../../../redux/reducer/webProposal";
 import {
   selectSelectedServiceIDs,
@@ -42,6 +42,7 @@ import {
 import { QUOTE_TYPE_ID } from "../../../Middleware/enums";
 import { redirectUri } from "../../../Base-Url/Base_Url";
 import { resolveServicePackageKeyID } from "../utils/resolveServicePackageKeyID";
+import { buildAddUpdateQuotePayload } from "../utils/buildAddUpdateQuotePayload";
 
 export default function ProposalAmendment({ theme, proposal, services }) {
   const dispatch = useDispatch();
@@ -302,20 +303,10 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     return true;
   };
 
-  // Placeholder endpoint until the real "Amend Proposal" API is ready — see
-  // AmendWebProposal in ProposalApi.jsx. Once it resolves, the redirect
-  // below mirrors StandardProposal.jsx's handleAccept exactly, so every
-  // Web-Based Proposal type lands on the same generate-contract flow after
-  // its final action.
+  // Redirect below mirrors StandardProposal.jsx's handleAccept exactly, so
+  // every Web-Based Proposal type lands on the same generate-contract flow
+  // after its final action.
   const handleAmendProposal = async () => {
-    try {
-      await dispatch(
-        amendProposal({ quoteKeyID: quoteModel?.quoteKeyID }),
-      ).unwrap();
-    } catch (err) {
-      // Endpoint is a placeholder for now, so failures are expected.
-    }
-
     const quoteKeyID = quoteModel?.quoteKeyID;
     // themeSettings was already fetched by GetOrganisationThemeSettings on
     // page load (see WebBasedProposal in index.jsx) — reuse it instead of
@@ -341,6 +332,35 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       return;
     }
 
+    // Base request is the complete GetQuoteModel response. Package
+    // Amendment never lets the client add/remove services, so the base
+    // payload's services/additionalInformation/package data is left exactly
+    // as GetQuoteModel returned it for every amendment case here — only the
+    // globalPricingDriverIDsWithValues entries the client actually filled in
+    // on the Input Fields step are patched on top.
+    let amendedQuoteKeyID;
+    try {
+      // On success, AddUpdateQuote's responseData.data is the new
+      // quoteKeyID for this amendment (the addUpdateQuote thunk already
+      // unwraps to responseData.data) — Generate Contract must be called
+      // with that one, not the original quoteModel.quoteKeyID, since an
+      // amendment persists as a new quote record.
+      amendedQuoteKeyID = await dispatch(
+        addUpdateQuote({
+          ...buildAddUpdateQuotePayload(quoteModel, inputFieldsList),
+          isAmend: true,
+        }),
+      ).unwrap();
+    } catch (err) {
+      setAcceptError("Failed to amend proposal. Please try again.");
+      return;
+    }
+
+    if (!amendedQuoteKeyID) {
+      setAcceptError("Failed to amend proposal. Please try again.");
+      return;
+    }
+
     setAcceptError(null);
 
     // Mirrors the email accept link's query shape exactly (see
@@ -358,7 +378,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       servicePackageID,
     );
     const params = new URLSearchParams({
-      quoteKeyID,
+      quoteKeyID: amendedQuoteKeyID,
       ServiceChargeTypeID: String(serviceChargeTypeID),
       Action: "Accepted",
       ContractSignatoryKeyID: themeSettings?.contractSignatoryKeyID ?? "",
@@ -366,6 +386,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     if (servicePackageKeyID) {
       params.set("ServicePackageKeyID", servicePackageKeyID);
     }
+
+    // eslint-disable-next-line no-debugger
+    debugger; // TEMP: inspect the resolved generate-contract params before navigating away.
 
     // Full navigation (not react-router's navigate) — the client-facing
     // generate-contract destination lives on the production proposal
