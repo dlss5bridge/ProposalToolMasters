@@ -201,19 +201,23 @@ const PACKAGE_PRICE_SLOTS = [
   { idKey: "packageThreeID", valueKey: "packageThreeValue" },
 ];
 
-// Standard "Package" quotes (QUOTE_TYPE_ID.Package) are priced differently
-// from Custom Package in AddUpdateProposal.jsx: Review Packages' Recurring/
-// One-Off Services for this type come from GetCalculatedServicesPriceByPackages
-// Data, which does NOT trust the flat packageOneValue/Two/ThreeValue on a
-// pricing item — those are only used as the *package ID* to cross-join
-// against `serviceMappingWithPackagesList` (one row per service per
-// currently-selected package: {servicePackageID, serviceID, serviceCatID,
-// serviceChargeTypeID, price}). The matched row's own `price` is the real
-// per-package value. Custom Package instead trusts the flat
-// packageOneValue/Two/ThreeValue directly, gated by the pricing item's own
-// servicePackageIDs membership (GetCalculatedServicesPriceData/
-// handleSetCalculatedPackageData never does the cross-join). Returns null —
-// rendered as "—" — when the service isn't part of the selected package.
+// GetCalculatedServicesPriceByPackages's `serviceMappingWithPackagesList`
+// (one row per service per configured package: {servicePackageID, serviceID,
+// serviceCatID, serviceChargeTypeID, price}) is the admin-saved per-package
+// price this quote was actually agreed/discounted against — the same figure
+// quotationFinalAmountList's netTotal and the PDF total add up to. A pricing
+// item's own flat packageOneValue/Two/ThreeValue, by contrast, is a live
+// recalculation off the service's current pricing formula/driver values,
+// which drifts from the saved price whenever the catalog or global pricing
+// drivers change after the quote was last saved — using it instead of the
+// cross-join match was showing the Pricing Table's line items well below
+// its own (correctly stored) Net Total for a Custom Package quote where that
+// drift had happened. Both Standard and Custom Package trust the cross-join
+// match first for exactly this reason; the flat value is only a fallback
+// for a service the cross-join has no row for at all (e.g. one the client
+// added themselves in Custom Package, never part of the admin's original
+// package mapping). Returns null — rendered as "—" — when the service isn't
+// part of the selected package by either source.
 const priceForSelectedPackage = (
   item,
   packageID,
@@ -227,16 +231,20 @@ const priceForSelectedPackage = (
   );
   if (!slot) return null;
 
-  if (isStandardPackage) {
-    const match = (serviceMappingWithPackagesList || []).find(
-      (row) =>
-        row.serviceID === item.serviceID &&
-        row.serviceCatID === item.serviceCatID &&
-        Number(row.serviceChargeTypeID) === Number(item.serviceChargeTypeID) &&
-        String(row.servicePackageID) === String(packageID),
-    );
-    return match ? Number(match.price) || 0 : null;
-  }
+  const match = (serviceMappingWithPackagesList || []).find(
+    (row) =>
+      row.serviceID === item.serviceID &&
+      row.serviceCatID === item.serviceCatID &&
+      Number(row.serviceChargeTypeID) === Number(item.serviceChargeTypeID) &&
+      String(row.servicePackageID) === String(packageID),
+  );
+  if (match) return Number(match.price) || 0;
+
+  // Standard Package quotes are always fully described by the cross-join —
+  // no match there means the service genuinely isn't part of this package.
+  // Custom Package falls back to the flat value for services outside that
+  // mapping (the client's own additions).
+  if (isStandardPackage) return null;
 
   const membership = (item.servicePackageIDs || []).map(String);
   if (!membership.includes(String(packageID))) return null;
@@ -291,14 +299,21 @@ const buildChargeTypeTotals = ({
       storedDiscountPercentage < 0
         ? (storedNetTotal * storedDiscountPercentage) / 100
         : Number(finalAmount.discounted) || 0;
+    const storedDiscountedTotal = Number(finalAmount.discountedTotal) || 0;
+    const storedVatAmount = Number(finalAmount.vat) || 0;
 
     return {
       netTotal: storedNetTotal,
       discountPercentage: storedDiscountPercentage,
       discountAmount,
-      discountedTotal: Number(finalAmount.discountedTotal) || 0,
-      vatAmount: Number(finalAmount.vat) || 0,
-      grandTotal: Number(finalAmount.grandTotal) || 0,
+      discountedTotal: storedDiscountedTotal,
+      vatAmount: storedVatAmount,
+      // Derived from the other two stored fields rather than trusting
+      // finalAmount.grandTotal directly — that field has been seen null on
+      // a saved quote (e.g. one with no VAT configured) even though
+      // discountedTotal/vat were both correctly persisted, which displayed
+      // as a £0.00 Grand Total despite a real, non-zero discounted total.
+      grandTotal: storedDiscountedTotal + storedVatAmount,
       note: null,
     };
   }
@@ -855,7 +870,7 @@ function FeeSection({
                       color: theme.textSecondary,
                     }}
                   >
-                    Discount / Surcharge
+                    Discount
                   </div>
                   {packageTotalsList.map(({ pkg, totals }) => {
                     const pct = Number(totals.discountPercentage);
