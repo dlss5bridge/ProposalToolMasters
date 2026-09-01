@@ -178,17 +178,24 @@ export default function ProposalAmendment({ theme, proposal, services }) {
 
   const ADDITIONAL_INFO_STEP_INDEX = ADDITIONAL_INFO_INSERT_INDEX;
 
-  // For every other proposal type this fetch happens when the client clicks
-  // Next out of the Services step (see the SERVICES_STEP_INDEX branch of
-  // handleBeforeNextStep below). Package proposals have no Services step to
-  // leave, so without this neither the (read-only) Additional Information
-  // step nor the Pricing Table would ever learn a selected service's global
-  // pricing driver value — those services would reach
-  // GetCalculatedServicesPriceByPackages with no driver row at all and come
-  // back unpriced.
+  // For a Service/Amendment proposal this fetch happens when the client
+  // clicks Next out of the Services step (see the SERVICES_STEP_INDEX branch
+  // of handleBeforeNextStep below). Standard Package proposals have no
+  // Services step to leave, so without this neither the (read-only)
+  // Additional Information step nor the Pricing Table would ever learn a
+  // selected service's global pricing driver value.
+  //
+  // Custom Package does have a Services step, but its locked default
+  // services are already selected before the client ever reaches it — if the
+  // Pricing Table becomes active without that step's Next handler having run
+  // (e.g. the stepper's tab lets an already-reachable step be opened
+  // directly, skipping it), the same gap applies: those services would reach
+  // GetCalculatedServicesPriceByPackages with no global-driver row at all,
+  // silently pricing off the package's generic defaults instead of this
+  // quote's actual resolved values. So this runs for both package types.
   const additionalInfoFetchedRef = useRef(false);
   useEffect(() => {
-    if (!isPackageType) return;
+    if (!isPackageBased) return;
     if (additionalInfoFetchedRef.current) return;
     if (!quoteModel?.quoteKeyID || selectedServiceIDs.length === 0) return;
 
@@ -203,7 +210,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         servicePackageIDs: quoteModel?.servicePackageID,
       }),
     );
-  }, [isPackageType, quoteModel, selectedServiceIDs, dispatch]);
+  }, [isPackageBased, quoteModel, selectedServiceIDs, dispatch]);
 
   const handleBeforeNextStep = async (currentStepIndex) => {
     // Package/Custom Package quotes must have a package selected before

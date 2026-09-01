@@ -126,20 +126,35 @@ export const buildAddUpdateQuotePayload = (quoteModel, inputFieldsList) => {
     payload[field] = quoteModel[field] ?? null;
   });
 
-  // AddUpdateQuote's backend model marks these two non-nullable — the admin
-  // flow always sends a real TabName (its current tab label) and a
-  // (possibly empty) pricingVariablesList array, never null. GetQuoteModel
-  // can return either as null when unset, so fall back to a safe non-null
-  // default instead of forwarding null and tripping that validation.
+  // AddUpdateQuote's backend model marks these non-nullable — the admin
+  // flow always sends a real TabName (its current tab label), a
+  // (possibly empty) pricingVariablesList array, and templatePDFKeyIDs as
+  // an array, never null. GetQuoteModel can return any of these as null
+  // when unset, so fall back to a safe non-null default instead of
+  // forwarding null and tripping that validation.
   payload.TabName = quoteModel.TabName || "";
   payload.pricingVariablesList = Array.isArray(quoteModel.pricingVariablesList)
     ? quoteModel.pricingVariablesList
     : [];
+  payload.templatePDFKeyIDs = Array.isArray(quoteModel.templatePDFKeyIDs)
+    ? quoteModel.templatePDFKeyIDs
+    : [];
+  // servicePackageID is a real array ([1933], etc.) for Package/Custom
+  // Package quotes — only a Service-based quote (no packages at all) has
+  // it null on GetQuoteModel, and the admin flow always sends [] for that
+  // case rather than null.
+  payload.servicePackageID = Array.isArray(quoteModel.servicePackageID)
+    ? quoteModel.servicePackageID
+    : [];
 
   // GetQuoteModel returns this as serviceMappingWithPackagesList (lowercase
-  // s) but AddUpdateQuote expects ServiceMappingWithPackagesList.
-  payload.ServiceMappingWithPackagesList =
-    quoteModel.serviceMappingWithPackagesList ?? null;
+  // s) but AddUpdateQuote expects ServiceMappingWithPackagesList — also
+  // non-nullable, so default to [] like the other array fields above.
+  payload.ServiceMappingWithPackagesList = Array.isArray(
+    quoteModel.serviceMappingWithPackagesList,
+  )
+    ? quoteModel.serviceMappingWithPackagesList
+    : [];
 
   payload.globalPricingDriverIDsWithValues =
     buildGlobalPricingDriverIDsWithValues(quoteModel, inputFieldsList);
