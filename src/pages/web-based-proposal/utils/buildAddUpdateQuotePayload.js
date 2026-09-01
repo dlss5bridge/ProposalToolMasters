@@ -65,6 +65,130 @@ export const buildGlobalPricingDriverIDsWithValues = (
   );
 };
 
+// Turns one committed selection (+ its service catalog definition) into the
+// moduleServicesGPDList row shape AddUpdateProposal.jsx's modifiedDraftArray
+// builds (AddUpdateProposal.jsx:22648-22698) — only driverVisibility: true
+// drivers get a row, and driverValue is the actual numeric value (a
+// variation/slab option's variationValue/slabValue, not its ID; the ID
+// itself is carried separately as variationID/slabID). msgMapID/msMapID are
+// always null here, same as the admin flow's freshly-built rows — the
+// backend assigns real ones on save.
+const buildModuleServicesGPDList = (selection, serviceDef) => {
+  const visibleDrivers = (serviceDef?.pricingDriverList || []).filter(
+    (driver) => driver.driverVisibility,
+  );
+
+  const rows = visibleDrivers.map((driver) => {
+    const entry = selection.driverValues?.[driver.globalPricingDriverID];
+    let driverValue = null;
+    let variationID = null;
+    let slabID = null;
+
+    if (driver.driverTypeID === 2) {
+      driverValue =
+        entry?.value !== undefined && entry?.value !== ""
+          ? Number(entry.value)
+          : null;
+    } else if (driver.driverTypeID === 3) {
+      variationID = entry?.value ?? null;
+      driverValue =
+        driver.variation?.find((option) => option.variationID === variationID)
+          ?.variationValue ?? null;
+    } else if (driver.driverTypeID === 4) {
+      slabID = entry?.value ?? null;
+      driverValue =
+        driver.slab?.find((option) => option.slabID === slabID)?.slabValue ??
+        null;
+    }
+
+    return {
+      driverValue,
+      msgMapID: null,
+      msMapID: null,
+      globalPricingDriverID: driver.globalPricingDriverID,
+      variationID,
+      slabID,
+      textID: null,
+      dateID: null,
+      enteredText: null,
+      enteredDate: null,
+      enteredDateFormat: null,
+    };
+  });
+
+  return rows.length === 0 ? null : rows;
+};
+
+// Builds a Map<serviceID, serviceDefinition> from the recurring/one-off
+// service catalog lookups (GetServicesWithGlobalPricingDriverListByService
+// ChargeType responses) — each category's servicesList entry carries the
+// pricingDriverList buildModuleServicesGPDList needs.
+const buildServiceDefMap = (categories) => {
+  const map = new Map();
+  (categories || []).forEach((category) => {
+    (category.servicesList || []).forEach((service) =>
+      map.set(service.serviceID, service),
+    );
+  });
+  return map;
+};
+
+// Reconstructs selectedServicesList from the client's live, possibly-edited
+// service selections (recurringSelections/oneOffSelections) instead of the
+// stale copy on quoteModel (fetched once at page load, before any Services-
+// step edits) — mirrors AddUpdateProposal.jsx's modifiedDraftArray
+// (AddUpdateProposal.jsx:22645-22719) field-for-field. Only meaningful for
+// Service-based/Custom Package Amendment, where the client can actually add
+// or remove services; Package Amendment has no Services step and keeps the
+// quoteModel passthrough instead (see buildAddUpdateQuotePayload).
+export const buildSelectedServicesListFromSelections = ({
+  recurringSelections,
+  oneOffSelections,
+  recurringServices,
+  oneOffServices,
+  pricing,
+  isCustomPackageType,
+}) => {
+  const recurringDefs = buildServiceDefMap(recurringServices);
+  const oneOffDefs = buildServiceDefMap(oneOffServices);
+
+  const priceByServiceID = new Map();
+  (pricing || []).forEach((item) => {
+    priceByServiceID.set(
+      `${item.serviceChargeTypeID}:${item.serviceID}`,
+      Number(item.price) || 0,
+    );
+  });
+
+  const buildEntry = (selection, serviceChargeTypeID, serviceDef) => ({
+    driverValue: null,
+    msMapID: null,
+    serviceID: selection.serviceID,
+    proposedServiceName: selection.serviceName,
+    serviceCatID: selection.serviceCatID,
+    serviceChargeTypeID,
+    servicePackageID: null,
+    // Custom Package prices services against the package rather than each
+    // service's own formula — AddUpdateProposal.jsx sends null for that
+    // case (selectedProposalTypeValue === 4) and the actual live price
+    // otherwise.
+    finalCalculatedServicePrice: isCustomPackageType
+      ? null
+      : (priceByServiceID.get(`${serviceChargeTypeID}:${selection.serviceID}`) ??
+        null),
+    moduleServicesGPDList: buildModuleServicesGPDList(selection, serviceDef),
+  });
+
+  const recurringList = Object.values(recurringSelections || {}).map(
+    (selection) => buildEntry(selection, 1, recurringDefs.get(selection.serviceID)),
+  );
+  const oneOffList = Object.values(oneOffSelections || {}).map((selection) =>
+    buildEntry(selection, 2, oneOffDefs.get(selection.serviceID)),
+  );
+
+  return [...recurringList, ...oneOffList];
+};
+
 // AddUpdateQuote only accepts this exact field set — mirrors
 // ApiRequest_ParamsObj in AddUpdateProposal.jsx:23077-23170. GetQuoteModel's
 // response carries several extra bookkeeping/audit fields (templateKeyID,
@@ -118,7 +242,14 @@ const ADD_UPDATE_QUOTE_FIELD_MAP = [
 // from what the client actually entered on the Input Fields step.
 // Package/Custom Package selection data, services, additional information,
 // and everything else is left exactly as GetQuoteModel returned it.
-export const buildAddUpdateQuotePayload = (quoteModel, inputFieldsList) => {
+// selectedServicesList override is used by Service-based/Custom Package
+// Amendment (see buildSelectedServicesListFromSelections) — every other
+// caller omits it and keeps the quoteModel passthrough below.
+export const buildAddUpdateQuotePayload = (
+  quoteModel,
+  inputFieldsList,
+  selectedServicesListOverride,
+) => {
   if (!quoteModel) return null;
 
   const payload = {};
@@ -158,6 +289,10 @@ export const buildAddUpdateQuotePayload = (quoteModel, inputFieldsList) => {
 
   payload.globalPricingDriverIDsWithValues =
     buildGlobalPricingDriverIDsWithValues(quoteModel, inputFieldsList);
+
+  if (selectedServicesListOverride) {
+    payload.selectedServicesList = selectedServicesListOverride;
+  }
 
   return payload;
 };

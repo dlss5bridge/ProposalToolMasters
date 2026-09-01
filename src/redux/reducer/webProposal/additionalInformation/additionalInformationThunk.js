@@ -26,7 +26,7 @@ export const getAdditionalInformationList = createAsyncThunk(
         `${Base_Url}/configure/Services/GetPricingFormulasGlobalPricingDrivers`,
         {
           organisationKeyID,
-          userKeyID: "af735c9a-bb05-481a-866f-4bcc1a325a41", //TODO: revert this later
+          userKeyID,
           ServicesIDs: servicesIDs,
           moduleKeyID: quoteKeyID,
           clientID,

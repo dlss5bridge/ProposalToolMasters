@@ -22,7 +22,7 @@ const buildServicesPayload = (
   serviceChargeTypeID,
 ) => ({
   organisationKeyID,
-  userKeyID: "af735c9a-bb05-481a-866f-4bcc1a325a41", //TODO: revert this later
+  userKeyID,
   moduleKeyID: quoteKeyID,
   ClientKeyID: String(clientID),
   QuoteTypeID: quoteTypeID,

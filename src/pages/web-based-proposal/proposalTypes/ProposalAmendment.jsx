@@ -22,6 +22,11 @@ import {
   selectSelectedServiceIDs,
   selectServicesFieldErrors,
   selectLockedServiceIDs,
+  selectRecurringSelections,
+  selectOneOffSelections,
+  selectRecurringServices,
+  selectOneOffServices,
+  selectServicesPricing,
   setServicesSelectionError,
   setServicesFieldErrorsVisible,
 } from "../../../redux/reducer/webProposal/services";
@@ -42,7 +47,10 @@ import {
 import { QUOTE_TYPE_ID } from "../../../Middleware/enums";
 import { redirectUri } from "../../../Base-Url/Base_Url";
 import { resolveServicePackageKeyID } from "../utils/resolveServicePackageKeyID";
-import { buildAddUpdateQuotePayload } from "../utils/buildAddUpdateQuotePayload";
+import {
+  buildAddUpdateQuotePayload,
+  buildSelectedServicesListFromSelections,
+} from "../utils/buildAddUpdateQuotePayload";
 
 export default function ProposalAmendment({ theme, proposal, services }) {
   const dispatch = useDispatch();
@@ -63,6 +71,11 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   );
   const lockedServiceIDs = useSelector(selectLockedServiceIDs);
   const inputFieldsList = useSelector(selectInputFieldsList);
+  const recurringSelections = useSelector(selectRecurringSelections);
+  const oneOffSelections = useSelector(selectOneOffSelections);
+  const recurringServices = useSelector(selectRecurringServices);
+  const oneOffServices = useSelector(selectOneOffServices);
+  const servicesPricing = useSelector(selectServicesPricing);
 
   // Package proposals ship with the admin's fixed default services and give
   // the client no service picker at all — the Services step is dropped from
@@ -340,11 +353,25 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     }
 
     // Base request is the complete GetQuoteModel response. Package
-    // Amendment never lets the client add/remove services, so the base
-    // payload's services/additionalInformation/package data is left exactly
-    // as GetQuoteModel returned it for every amendment case here — only the
-    // globalPricingDriverIDsWithValues entries the client actually filled in
-    // on the Input Fields step are patched on top.
+    // Amendment never lets the client add/remove services, so its
+    // selectedServicesList is left exactly as GetQuoteModel returned it —
+    // Service-based and Custom Package Amendment, by contrast, let the
+    // client add/remove services on the Services step, so their
+    // selectedServicesList is rebuilt from the live, currently-committed
+    // selections instead of the stale quoteModel copy (fetched once at page
+    // load, before any edits) — see buildSelectedServicesListFromSelections.
+    // Every other field, and additionalInformationList, on top.
+    const selectedServicesListOverride = isPackageType
+      ? undefined
+      : buildSelectedServicesListFromSelections({
+          recurringSelections,
+          oneOffSelections,
+          recurringServices,
+          oneOffServices,
+          pricing: servicesPricing,
+          isCustomPackageType,
+        });
+
     let amendedQuoteKeyID;
     try {
       // On success, AddUpdateQuote's responseData.data is the new
@@ -354,7 +381,11 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       // amendment persists as a new quote record.
       amendedQuoteKeyID = await dispatch(
         addUpdateQuote({
-          ...buildAddUpdateQuotePayload(quoteModel, inputFieldsList),
+          ...buildAddUpdateQuotePayload(
+            quoteModel,
+            inputFieldsList,
+            selectedServicesListOverride,
+          ),
           isAmend: true,
         }),
       ).unwrap();
