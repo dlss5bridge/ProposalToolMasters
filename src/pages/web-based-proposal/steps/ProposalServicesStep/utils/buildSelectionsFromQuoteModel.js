@@ -26,9 +26,27 @@ const buildDriverValues = (service) => {
             : null,
         };
       } else if (driver.driverTypeID === 2) {
+        // GetServicesWithGlobalPricingDriverListByServiceChargeType has been
+        // observed returning a quantity driver's driverValue equal to its
+        // own globalPricingDriverID (e.g. "Number of Self Assessments",
+        // globalPricingDriverID 31537, came back with driverValue: 31537)
+        // instead of a real quantity or null — every other quantity driver
+        // on this same response correctly comes back null when unset. A
+        // real quantity would never coincidentally equal its own 5-digit
+        // driver ID, so that exact match is treated as corrupted/unset data.
+        // This is a locked Custom Package default service with no field for
+        // the client to correct it themselves, so it can't be left blank
+        // either (blank sends null, zeroing the whole formula out) — 1 is
+        // the sensible default for an unset "how many" count. Left as-is,
+        // the corrupted value gets sent straight through as the driver's
+        // multiplier, e.g. turning Self-Assessment's €300.00 into
+        // €4,730,550.00 (300 × 31537, halved again for a half-yearly quote).
+        const isCorruptedDefault =
+          driver.driverValue != null &&
+          driver.driverValue === driver.globalPricingDriverID;
         values[driver.globalPricingDriverID] = {
           driverName: driver.driverName,
-          value: driver.driverValue ?? "",
+          value: isCorruptedDefault ? 1 : (driver.driverValue ?? ""),
         };
       }
     });

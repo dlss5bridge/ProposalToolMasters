@@ -204,20 +204,26 @@ const PACKAGE_PRICE_SLOTS = [
 // GetCalculatedServicesPriceByPackages's `serviceMappingWithPackagesList`
 // (one row per service per configured package: {servicePackageID, serviceID,
 // serviceCatID, serviceChargeTypeID, price}) is the admin-saved per-package
-// price this quote was actually agreed/discounted against — the same figure
-// quotationFinalAmountList's netTotal and the PDF total add up to. A pricing
-// item's own flat packageOneValue/Two/ThreeValue, by contrast, is a live
-// recalculation off the service's current pricing formula/driver values,
-// which drifts from the saved price whenever the catalog or global pricing
-// drivers change after the quote was last saved — using it instead of the
-// cross-join match was showing the Pricing Table's line items well below
-// its own (correctly stored) Net Total for a Custom Package quote where that
-// drift had happened. Both Standard and Custom Package trust the cross-join
-// match first for exactly this reason; the flat value is only a fallback
-// for a service the cross-join has no row for at all (e.g. one the client
-// added themselves in Custom Package, never part of the admin's original
-// package mapping). Returns null — rendered as "—" — when the service isn't
-// part of the selected package by either source.
+// price a Standard Package quote (a fixed, non-editable service list) was
+// actually agreed/discounted against — the same figure quotationFinalAmount
+// List's netTotal and the PDF total add up to. Standard Package trusts this
+// cross-join match first for exactly that reason.
+//
+// Custom Package is deliberately different, and matches
+// AddUpdateProposal.jsx's ReviewPackagesComponent exactly: that component
+// never reads serviceMappingWithPackagesList at all — it reads a pricing
+// item's own flat packageOneValue/Two/ThreeValue straight off the API
+// response (see its RecurringServicePrices/OneOffServicePrices state
+// building in handleSetCalculatedPackageServiceData). That's the only value
+// that reflects the driver inputs actually captured for this quote — one
+// entry per serviceID+globalPricingDriverID, built by buildDriverEntries/
+// buildAdditionalInformationDriverEntries below and sent once per package
+// slot in the single combined GetCalculatedServicesPriceByPackages request
+// (see calculateServicesGPDList in ProposalPricingTableStep). The cross-join
+// is a stale, admin-set snapshot from before this quote's own driver values
+// were resolved, so using it for Custom Package would silently ignore them.
+// Returns null — rendered as "—" — when the service isn't part of the
+// selected package by either source.
 const priceForSelectedPackage = (
   item,
   packageID,
@@ -231,6 +237,22 @@ const priceForSelectedPackage = (
   );
   if (!slot) return null;
 
+  if (!isStandardPackage) {
+    // The pricing item tags a slot's packageOneID/Two/ThreeID with whichever
+    // package the API put in that position, even for a package this service
+    // isn't actually mapped to at all (that slot's own Value then comes back
+    // null) — e.g. a service belonging only to package 1929 can still carry
+    // packageOneID: 1928 with packageOneValue: null. Reading `slot` alone
+    // would surface that null as 0 ("€0.00") for the unrelated package
+    // instead of "—". `servicePackageIDs` is the service's actual package
+    // membership list (mirrors AddUpdateProposal.jsx's ReviewPackagesComponent
+    // checking `servicePackageIDs.includes(packageOneID)` before trusting
+    // packageOneValue), so membership must be checked explicitly here too.
+    const membership = (item.servicePackageIDs || []).map(String);
+    if (!membership.includes(String(packageID))) return null;
+    return Number(item[slot.valueKey]) || 0;
+  }
+
   const match = (serviceMappingWithPackagesList || []).find(
     (row) =>
       row.serviceID === item.serviceID &&
@@ -238,17 +260,9 @@ const priceForSelectedPackage = (
       Number(row.serviceChargeTypeID) === Number(item.serviceChargeTypeID) &&
       String(row.servicePackageID) === String(packageID),
   );
-  if (match) return Number(match.price) || 0;
-
   // Standard Package quotes are always fully described by the cross-join —
   // no match there means the service genuinely isn't part of this package.
-  // Custom Package falls back to the flat value for services outside that
-  // mapping (the client's own additions).
-  if (isStandardPackage) return null;
-
-  const membership = (item.servicePackageIDs || []).map(String);
-  if (!membership.includes(String(packageID))) return null;
-  return Number(item[slot.valueKey]) || 0;
+  return match ? Number(match.price) || 0 : null;
 };
 
 // A charge type's Calculation-card figures. When the selections still match
@@ -1333,6 +1347,16 @@ export default function ProposalPricingTableStep({
         userKeyID: quoteModel.userKeyID,
         organisationKeyID: quoteModel.organisationKeyID,
         ServicePackageIDs: selectedPackageIDs,
+        // Mirrors AddUpdateProposal.jsx's handleSetCalculatedPackageServiceData/
+        // handleCalculatedData: GetValueOf always tracks the quote's actual
+        // payment frequency (switch on Payment_Frequency), for every
+        // proposal type including Package/Custom Package. This only affects
+        // the live flat packageOneValue/Two/ThreeValue fallback used for a
+        // service with no serviceMappingWithPackagesList row (e.g. a Custom
+        // Package client's own addition) — every service the admin already
+        // configured for this package is priced from that cross-join's own
+        // saved `price` instead (see priceForSelectedPackage), which is a
+        // static figure GetValueOf can't scale either way.
         GetValueOf: getValueOfFrequency,
         // One-off services are billed once, never on a recurring cadence —
         // pinning their own request to "Yearly" keeps their price stable
