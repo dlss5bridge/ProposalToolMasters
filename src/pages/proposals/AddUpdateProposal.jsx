@@ -23002,6 +23002,7 @@ const Add_Update_Proposal = (props) => {
             AddItem.driverVisibility === true,
         )
         ?.map((item) => {
+          // msgMapID/msMapID are forced to null below — API expects them null in the request payload
           let driverValue;
           let slabID;
           let variationID;
@@ -23015,8 +23016,8 @@ const Add_Update_Proposal = (props) => {
             );
             driverValue = defaultSlab.slabValue;
             slabID = defaultSlab.slabID;
-            msgMapID = item.msgMapID;
-            msMapID = item.msMapID;
+            msgMapID = null;
+            msMapID = null;
           } else if (
             item.variation &&
             item.variation.some((variationItem) => variationItem.isDefault)
@@ -23026,8 +23027,8 @@ const Add_Update_Proposal = (props) => {
             );
             driverValue = defaultVariation.variationValue;
             variationID = defaultVariation.variationID;
-            msgMapID = item.msgMapID;
-            msMapID = item.msMapID;
+            msgMapID = null;
+            msMapID = null;
           } else if (
             item.date &&
             item.date.some((dateItem) => dateItem.isDefault)
@@ -23038,21 +23039,21 @@ const Add_Update_Proposal = (props) => {
             driverValue =
               defaultDate.dateValue ?? defaultDate.defaultDateValue ?? 0;
             dateID = defaultDate.dateID;
-            msgMapID = item.msgMapID;
-            msMapID = item.msMapID;
+            msgMapID = null;
+            msMapID = null;
           } else if (item.text && item.text.length > 0) {
             driverValue = item.text?.[0]?.textValue ?? 0;
             textID = item.text?.[0]?.textID;
-            msgMapID = item.msgMapID;
-            msMapID = item.msMapID;
+            msgMapID = null;
+            msMapID = null;
           } else if (item.driverTypeID === 2 || item.driverTypeID === 1) {
             driverValue = item.driverValue === null ? 0 : item.driverValue;
             slabID = item.slabID;
             variationID = item.variationID;
             dateID = item.dateID;
             textID = item.textID;
-            msgMapID = item.msgMapID;
-            msMapID = item.msMapID;
+            msgMapID = null;
+            msMapID = null;
           }
           return {
             msgMapID,
