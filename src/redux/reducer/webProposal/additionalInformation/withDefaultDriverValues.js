@@ -13,7 +13,23 @@
 // doesn't (e.g. the org has since removed that option).
 export const withDefaultDriverValues = (list) =>
   (list || []).map((item) => {
-    if (item.driverTypeID === 3) {
+    if (item.driverTypeID === 2) {
+      // GetPricingFormulasGlobalPricingDrivers has been observed returning a
+      // quantity driver's driverValue equal to its own globalPricingDriverID
+      // instead of a real quantity or null — same corrupted-default pattern
+      // documented in buildSelectionsFromQuoteModel.js's isCorruptedDefault
+      // for the sibling Services-step endpoint. A real quantity would never
+      // coincidentally equal its own 5-digit driver ID, so that exact match
+      // is treated as unset data and reset to 0 (this field is editable by
+      // the client here, unlike the locked Custom Package default there, so
+      // there's no need for a non-zero placeholder).
+      if (
+        item.driverValue != null &&
+        item.driverValue === item.globalPricingDriverID
+      ) {
+        return { ...item, driverValue: 0 };
+      }
+    } else if (item.driverTypeID === 3) {
       const hasSelected = item.variation?.some(
         (option) => option.variationID === item.variationID,
       );

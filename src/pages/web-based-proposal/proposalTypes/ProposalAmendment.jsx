@@ -27,6 +27,7 @@ import {
   selectRecurringServices,
   selectOneOffServices,
   selectServicesPricing,
+  selectServicesCurrencyID,
   setServicesSelectionError,
   setServicesFieldErrorsVisible,
 } from "../../../redux/reducer/webProposal/services";
@@ -76,6 +77,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const recurringServices = useSelector(selectRecurringServices);
   const oneOffServices = useSelector(selectOneOffServices);
   const servicesPricing = useSelector(selectServicesPricing);
+  const servicesCurrencyID = useSelector(selectServicesCurrencyID);
 
   // Package proposals ship with the admin's fixed default services and give
   // the client no service picker at all — the Services step is dropped from
@@ -385,6 +387,13 @@ export default function ProposalAmendment({ theme, proposal, services }) {
             quoteModel,
             inputFieldsList,
             selectedServicesListOverride,
+            additionalInformationList,
+            {
+              recurringSelections,
+              oneOffSelections,
+              pricing: servicesPricing,
+              currencyID: servicesCurrencyID,
+            },
           ),
           isAmend: true,
         }),

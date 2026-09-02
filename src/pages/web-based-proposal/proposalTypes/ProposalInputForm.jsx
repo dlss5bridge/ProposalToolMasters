@@ -196,7 +196,12 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     try {
       await dispatch(
         addUpdateQuote(
-          buildAddUpdateQuotePayload(quoteModel, inputFieldsList),
+          buildAddUpdateQuotePayload(
+            quoteModel,
+            inputFieldsList,
+            undefined,
+            additionalInformationList,
+          ),
         ),
       ).unwrap();
     } catch (err) {
@@ -271,7 +276,12 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     try {
       await dispatch(
         addUpdateQuote(
-          buildAddUpdateQuotePayload(quoteModel, inputFieldsList),
+          buildAddUpdateQuotePayload(
+            quoteModel,
+            inputFieldsList,
+            undefined,
+            additionalInformationList,
+          ),
         ),
       ).unwrap();
     } catch (err) {

@@ -81,6 +81,8 @@ export const addUpdateQuote = createAsyncThunk(
   "webProposal/addUpdateQuote",
   async (params, thunkAPI) => {
     try {
+      console.log("addUpdateQuote payload ==>>", params);
+
       const res = await AddUpdateQuoteWebProposal(params);
 
       if (res?.data?.statusCode === 200) {

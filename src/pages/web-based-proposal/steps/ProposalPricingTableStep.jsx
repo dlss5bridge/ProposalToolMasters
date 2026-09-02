@@ -206,24 +206,26 @@ const PACKAGE_PRICE_SLOTS = [
 // serviceCatID, serviceChargeTypeID, price}) is the admin-saved per-package
 // price a Standard Package quote (a fixed, non-editable service list) was
 // actually agreed/discounted against — the same figure quotationFinalAmount
-// List's netTotal and the PDF total add up to. Standard Package trusts this
+// List's netTotal and the PDF total add up to. That's what
+// GetCalculatedServicesPriceByPackagesData (AddUpdateProposal.jsx, the
+// consumer used for Standard Package, selectedProposalTypeValue === 2)
+// overrides each service's price with — see its "Override package values if
+// data is found in recurringServices" block. Standard Package trusts this
 // cross-join match first for exactly that reason.
 //
 // Custom Package is deliberately different, and matches
-// AddUpdateProposal.jsx's ReviewPackagesComponent exactly: that component
-// never reads serviceMappingWithPackagesList at all — it reads a pricing
-// item's own flat packageOneValue/Two/ThreeValue straight off the API
-// response (see its RecurringServicePrices/OneOffServicePrices state
-// building in handleSetCalculatedPackageServiceData). That's the only value
-// that reflects the driver inputs actually captured for this quote — one
-// entry per serviceID+globalPricingDriverID, built by buildDriverEntries/
-// buildAdditionalInformationDriverEntries below and sent once per package
-// slot in the single combined GetCalculatedServicesPriceByPackages request
-// (see calculateServicesGPDList in ProposalPricingTableStep). The cross-join
-// is a stale, admin-set snapshot from before this quote's own driver values
-// were resolved, so using it for Custom Package would silently ignore them.
-// Returns null — rendered as "—" — when the service isn't part of the
-// selected package by either source.
+// AddUpdateProposal.jsx's ReviewPackagesComponent exactly: for Custom
+// Package (selectedProposalTypeValue === 4), the consumer is
+// GetCalculatedServicesPriceData, not GetCalculatedServicesPriceByPackages
+// Data — and it never reads serviceMappingWithPackagesList for price at all.
+// It reads a pricing item's own flat packageOneValue/Two/ThreeValue straight
+// off the API response into recArrayWithPrice, which becomes
+// selectedRecurringServiceList — the exact prop ReviewPackagesComponent
+// renders — with no further scaling. (serviceMappingWithPackagesList is
+// still consulted there, but only to rebuild each service's
+// servicePackageIDs membership list, never its price.) Returns null —
+// rendered as "—" — when the service isn't part of the selected package by
+// either source.
 const priceForSelectedPackage = (
   item,
   packageID,
