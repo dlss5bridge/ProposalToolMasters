@@ -94,7 +94,10 @@ const normalizeSelectionsForCompare = (selections) =>
     }))
     .sort((a, b) => String(a.serviceID).localeCompare(String(b.serviceID)));
 
-const selectionsMatch = (current, defaults) =>
+// Exported for ProposalAmendment.jsx's isAmend gate — an amendment is only
+// a genuine amendment when something the client controls (a service
+// selection or a driver value) actually changed from the admin's defaults.
+export const selectionsMatch = (current, defaults) =>
   JSON.stringify(normalizeSelectionsForCompare(current)) ===
   JSON.stringify(normalizeSelectionsForCompare(defaults));
 

@@ -1048,10 +1048,1006 @@ export const buildPricingVariablesListForServiceType = ({
   );
 };
 
-// Dispatches pricingVariablesList building by proposal type — same split as
-// buildQuotationFinalAmountList: only a Service-type quote's totals/service
-// list can go stale from a client Services-step edit, so only that type is
-// rebuilt here; Package/Custom Package keep the quoteModel passthrough.
+// ---------------------------------------------------------------------------
+// pricingVariablesList (Package and Custom Package) — ports
+// replaceTemplatePricingVariables' non-Service branch (AuthContext.jsx:3250-
+// 3567, reached whenever selectedProposalTypeValue !== 3 — the admin flow
+// itself never distinguishes Package from Custom Package here, so neither
+// does this) plus the package-shaped helpers it calls (GetReplacePackageTableView,
+// GetReplacePackageCombinedTableView, and the servicePackageList branches of
+// GetReplaceValueByWithComma/WithBulletList/ReplaceVariable_WithTableView
+// already ported above). Ported verbatim, quirks included — e.g.
+// AuthContext.jsx's own Discounted_Total_WithComma/WithBulletList/
+// WithTableView calls omit the Type argument, so those three always resolve
+// through every branch to PackageOneValue: null, same as admin sends today.
+//
+// Six variables are intentionally left as the quoteModel passthrough instead
+// of rebuilt: AllServices_WithTableView/WithComma/WithBulletList and their
+// WithPrice variants. Their admin-side source data (each service's own
+// packageOneID/packageOneValue/servicePackageIDs, from the admin's package-
+// scoped service catalog fetch) isn't part of the web proposal's live
+// selection state, and Package/Custom Package here never let the client
+// change which services are priced in anyway (Package Amendment has no
+// Services step at all; Custom Package's added services aren't reflected in
+// that admin-only catalog shape either) — so there's nothing for a live
+// rebuild to actually fix for these six, unlike the totals below (which
+// source cleanly from quotationFinalAmountList).
+
+// AuthContext.jsx:1556 GetReplacePackageTableView
+const getReplacePackageTableView = (pricingInfo, type, servicePackageList) => {
+  const packageValueByType = {
+    "Net Total": [
+      Number(pricingInfo.packageOneNetTotal) >
+      Number(pricingInfo.packageOneDisCountedTotal)
+        ? pricingInfo.packageOneNetTotal
+        : pricingInfo.packageOneDisCountedTotal,
+      Number(pricingInfo.packageTwoNetTotal) >
+      Number(pricingInfo.packageTwoDisCountedTotal)
+        ? pricingInfo.packageTwoNetTotal
+        : pricingInfo.packageTwoDisCountedTotal,
+      Number(pricingInfo.packageThreeNetTotal) >
+      Number(pricingInfo.packageThreeDisCountedTotal)
+        ? pricingInfo.packageThreeNetTotal
+        : pricingInfo.packageThreeDisCountedTotal,
+    ],
+    Discount: [
+      pricingInfo.packageOneDisCount,
+      pricingInfo.packageTwoDisCount,
+      pricingInfo.packageThreeDisCount,
+    ],
+    "Discounted Total": [
+      pricingInfo.packageOneDisCountedTotal,
+      pricingInfo.packageTwoDisCountedTotal,
+      pricingInfo.packageThreeDisCountedTotal,
+    ],
+    VAT: [
+      pricingInfo.PackageOneVaTPrice,
+      pricingInfo.PackageTwoVaTPrice,
+      pricingInfo.PackageThreeVaTPrice,
+    ],
+    "Grand Total": [
+      pricingInfo.PackageOneGrandTotal,
+      pricingInfo.PackageTwoGrandTotal,
+      pricingInfo.PackageThreeGrandTotal,
+    ],
+    "Original Price": [
+      pricingInfo.packageOneNetTotal,
+      pricingInfo.packageTwoNetTotal,
+      pricingInfo.packageThreeNetTotal,
+    ],
+    "Default Percentage": [
+      pricingInfo.DiscountPercentagePackageOne,
+      pricingInfo.DiscountPercentagePackageTwo,
+      pricingInfo.DiscountPercentagePackageThree,
+    ],
+    "Discounted Price": [
+      pricingInfo.packageOneDisCountedTotal,
+      pricingInfo.packageTwoDisCountedTotal,
+      pricingInfo.packageThreeDisCountedTotal,
+    ],
+  };
+  const [packageOneValue, packageTwoValue, packageThreeValue] =
+    packageValueByType[type] || [null, null, null];
+
+  const headers = servicePackageList
+    .map(
+      (item) =>
+        `<th style="border: 1px solid black; padding: 8px; width: 25%;">${item.servicePackageName}</th>`,
+    )
+    .join("");
+
+  let rowValues = "";
+  if (servicePackageList.length === 1) {
+    rowValues = `<td style="border: 1px solid black; padding: 8px;text-align:center;width: 25%;">${formatValue(packageOneValue)}</td>`;
+  } else if (servicePackageList.length === 2) {
+    rowValues = `
+        <td style="border: 1px solid black; padding: 8px;text-align:right;width: 25%;">${formatValue(packageOneValue)}</td>
+        <td style="border: 1px solid black; padding: 8px;text-align:right;width: 25%;">${formatValue(packageTwoValue)}</td>
+      `;
+  } else if (servicePackageList.length === 3) {
+    rowValues = `
+        <td style="border: 1px solid black; padding: 8px;text-align: right;width: 25%;">${formatValue(packageOneValue)}</td>
+        <td style="border: 1px solid black; padding: 8px;text-align: right;width: 25%;">${formatValue(packageTwoValue)}</td>
+        <td style="border: 1px solid black; padding: 8px;text-align: right;width: 25%;">${formatValue(packageThreeValue)}</td>
+      `;
+  }
+
+  return `
+      <table style="border-collapse: collapse; width: 100%; page-break-inside: avoid; break-inside: avoid;">
+        <tr>
+          <th style="border: 1px solid black; padding: 8px;width: 25%;">Package Name</th>
+          ${headers}
+        </tr>
+        <tr>
+          <th style="border: 1px solid black; padding: 8px;width: 25%;">${type}</th>
+          ${rowValues}
+        </tr>
+      </table>`;
+};
+
+// AuthContext.jsx:1661 GetReplacePackageCombinedTableView
+const getReplacePackageCombinedTableView = (
+  recurringPricingInfo,
+  oneOffPricingInfo,
+  type,
+  servicePackageList,
+) => {
+  const recurringValueByType = {
+    "Net Total": [
+      Number(recurringPricingInfo.packageOneNetTotal) >
+      Number(recurringPricingInfo.packageOneDisCountedTotal)
+        ? recurringPricingInfo.packageOneNetTotal
+        : recurringPricingInfo.packageOneDisCountedTotal,
+      Number(recurringPricingInfo.packageTwoNetTotal) >
+      Number(recurringPricingInfo.packageTwoDisCountedTotal)
+        ? recurringPricingInfo.packageTwoNetTotal
+        : recurringPricingInfo.packageTwoDisCountedTotal,
+      Number(recurringPricingInfo.packageThreeNetTotal) >
+      Number(recurringPricingInfo.packageThreeDisCountedTotal)
+        ? recurringPricingInfo.packageThreeNetTotal
+        : recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+    Discount: [
+      recurringPricingInfo.packageOneDisCount,
+      recurringPricingInfo.packageTwoDisCount,
+      recurringPricingInfo.packageThreeDisCount,
+    ],
+    "Discounted Total": [
+      recurringPricingInfo.packageOneDisCountedTotal,
+      recurringPricingInfo.packageTwoDisCountedTotal,
+      recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+    VAT: [
+      recurringPricingInfo.PackageOneVaTPrice,
+      recurringPricingInfo.PackageTwoVaTPrice,
+      recurringPricingInfo.PackageThreeVaTPrice,
+    ],
+    "Grand Total": [
+      recurringPricingInfo.PackageOneGrandTotal,
+      recurringPricingInfo.PackageTwoGrandTotal,
+      recurringPricingInfo.PackageThreeGrandTotal,
+    ],
+    "Original Price": [
+      recurringPricingInfo.packageOneNetTotal,
+      recurringPricingInfo.packageTwoNetTotal,
+      recurringPricingInfo.packageThreeNetTotal,
+    ],
+    "Default Percentage": [
+      recurringPricingInfo.DiscountPercentagePackageOne,
+      recurringPricingInfo.DiscountPercentagePackageTwo,
+      recurringPricingInfo.DiscountPercentagePackageThree,
+    ],
+    "Discounted Price": [
+      recurringPricingInfo.packageOneDisCountedTotal,
+      recurringPricingInfo.packageTwoDisCountedTotal,
+      recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+  };
+  const oneOffValueByType = {
+    "Net Total": [
+      Number(oneOffPricingInfo.packageOneNetTotal) >
+      Number(oneOffPricingInfo.packageOneDisCountedTotal)
+        ? oneOffPricingInfo.packageOneNetTotal
+        : oneOffPricingInfo.packageOneDisCountedTotal,
+      Number(oneOffPricingInfo.packageTwoNetTotal) >
+      Number(oneOffPricingInfo.packageTwoDisCountedTotal)
+        ? oneOffPricingInfo.packageTwoNetTotal
+        : oneOffPricingInfo.packageTwoDisCountedTotal,
+      // Mirrors AuthContext.jsx:1710 verbatim — the package-three fallback
+      // there reads RecurringPricingInfo instead of OneOffPricingInfo.
+      Number(oneOffPricingInfo.packageThreeNetTotal) >
+      Number(oneOffPricingInfo.packageThreeDisCountedTotal)
+        ? oneOffPricingInfo.packageThreeNetTotal
+        : recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+    Discount: [
+      oneOffPricingInfo.packageOneDisCount,
+      oneOffPricingInfo.packageTwoDisCount,
+      oneOffPricingInfo.packageThreeDisCount,
+    ],
+    "Discounted Total": [
+      oneOffPricingInfo.packageOneDisCountedTotal,
+      oneOffPricingInfo.packageTwoDisCountedTotal,
+      oneOffPricingInfo.packageThreeDisCountedTotal,
+    ],
+    VAT: [
+      oneOffPricingInfo.PackageOneVaTPrice,
+      oneOffPricingInfo.PackageTwoVaTPrice,
+      oneOffPricingInfo.PackageThreeVaTPrice,
+    ],
+    "Grand Total": [
+      oneOffPricingInfo.PackageOneGrandTotal,
+      oneOffPricingInfo.PackageTwoGrandTotal,
+      oneOffPricingInfo.PackageThreeGrandTotal,
+    ],
+    "Original Price": [
+      oneOffPricingInfo.packageOneNetTotal,
+      oneOffPricingInfo.packageTwoNetTotal,
+      oneOffPricingInfo.packageThreeNetTotal,
+    ],
+    "Default Percentage": [
+      oneOffPricingInfo.DiscountPercentagePackageOne,
+      oneOffPricingInfo.DiscountPercentagePackageTwo,
+      oneOffPricingInfo.DiscountPercentagePackageThree,
+    ],
+    "Discounted Price": [
+      oneOffPricingInfo.packageOneDisCountedTotal,
+      oneOffPricingInfo.packageTwoDisCountedTotal,
+      oneOffPricingInfo.packageThreeDisCountedTotal,
+    ],
+  };
+
+  const [recurringOne, recurringTwo, recurringThree] =
+    recurringValueByType[type] || [null, null, null];
+  const [oneOffOne, oneOffTwo, oneOffThree] = oneOffValueByType[type] || [
+    null,
+    null,
+    null,
+  ];
+
+  const cell = (recurringValue, oneOffValue) => `
+        <td style="border: 1px solid black; padding: 8px;width: 25%;text-align: right;"><ul>
+          <li>Recurring Services: ${formatValue(recurringValue)}</li>
+          <li>One-Off Services: ${formatValue(oneOffValue)}</li>
+        </ul></td>`;
+
+  let rowValues = "";
+  if (servicePackageList.length === 1) {
+    rowValues = cell(recurringOne, oneOffOne);
+  } else if (servicePackageList.length === 2) {
+    rowValues = `${cell(recurringOne, oneOffOne)}${cell(recurringTwo, oneOffTwo)}`;
+  } else if (servicePackageList.length === 3) {
+    rowValues = `${cell(recurringOne, oneOffOne)}${cell(recurringTwo, oneOffTwo)}${cell(recurringThree, oneOffThree)}`;
+  }
+
+  return `
+      <table style="border-collapse: collapse; width: 100%; page-break-inside: avoid; break-inside: avoid;">
+        <tr>
+          <th style="border: 1px solid black; padding: 8px;width: 25%;">Package Name</th>
+          ${servicePackageList
+            .map(
+              (item) =>
+                `<th style="border: 1px solid black; padding: 8px;">${item.servicePackageName}</th>`,
+            )
+            .join("")}
+        </tr>
+        <tr>
+          <th style="border: 1px solid black; padding: 8px;width: 25%;">${type}</th>
+          ${rowValues}
+        </tr>
+      </table>`;
+};
+
+// AuthContext.jsx:1824 GetReplaceValueByWithComma, servicePackageList branch
+const getReplaceValueByWithCommaPackage = (
+  recurringPricingInfo,
+  oneOffPricingInfo,
+  servicePackageList,
+  type,
+) => {
+  const recurringByType = {
+    "Net Total": [
+      Number(recurringPricingInfo.packageOneNetTotal) >
+      Number(recurringPricingInfo.packageOneDisCountedTotal)
+        ? recurringPricingInfo.packageOneNetTotal
+        : recurringPricingInfo.packageOneDisCountedTotal,
+      Number(recurringPricingInfo.packageTwoNetTotal) >
+      Number(recurringPricingInfo.packageTwoDisCountedTotal)
+        ? recurringPricingInfo.packageTwoNetTotal
+        : recurringPricingInfo.packageTwoDisCountedTotal,
+      Number(recurringPricingInfo.packageThreeNetTotal) >
+      Number(recurringPricingInfo.packageThreeDisCountedTotal)
+        ? recurringPricingInfo.packageThreeNetTotal
+        : recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+    Discount: [
+      recurringPricingInfo.packageOneDisCount,
+      recurringPricingInfo.packageTwoDisCount,
+      recurringPricingInfo.packageThreeDisCount,
+    ],
+    "Discounted Total": [
+      recurringPricingInfo.packageOneDisCountedTotal,
+      recurringPricingInfo.packageTwoDisCountedTotal,
+      recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+    VAT: [
+      recurringPricingInfo.PackageOneVaTPrice,
+      recurringPricingInfo.PackageTwoVaTPrice,
+      recurringPricingInfo.PackageThreeVaTPrice,
+    ],
+    "Grand Total": [
+      recurringPricingInfo.PackageOneGrandTotal,
+      recurringPricingInfo.PackageTwoGrandTotal,
+      recurringPricingInfo.PackageThreeGrandTotal,
+    ],
+    "Original Price": [
+      recurringPricingInfo.packageOneNetTotal,
+      recurringPricingInfo.packageTwoNetTotal,
+      recurringPricingInfo.packageThreeNetTotal,
+    ],
+    "Default Percentage": [
+      recurringPricingInfo.DiscountPercentagePackageOne,
+      recurringPricingInfo.DiscountPercentagePackageTwo,
+      recurringPricingInfo.DiscountPercentagePackageThree,
+    ],
+    "Discounted Price": [
+      recurringPricingInfo.packageOneDisCountedTotal,
+      recurringPricingInfo.packageTwoDisCountedTotal,
+      recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+  };
+  const oneOffByType = {
+    "Net Total": [
+      Number(oneOffPricingInfo.packageOneNetTotal) >
+      Number(oneOffPricingInfo.packageOneDisCountedTotal)
+        ? oneOffPricingInfo.packageOneNetTotal
+        : oneOffPricingInfo.packageOneDisCountedTotal,
+      Number(oneOffPricingInfo.packageTwoNetTotal) >
+      Number(oneOffPricingInfo.packageTwoDisCountedTotal)
+        ? oneOffPricingInfo.packageTwoNetTotal
+        : oneOffPricingInfo.packageTwoDisCountedTotal,
+      Number(oneOffPricingInfo.packageThreeNetTotal) >
+      Number(oneOffPricingInfo.packageThreeDisCountedTotal)
+        ? oneOffPricingInfo.packageThreeNetTotal
+        : oneOffPricingInfo.packageThreeDisCountedTotal,
+    ],
+    Discount: [
+      oneOffPricingInfo.packageOneDisCount,
+      oneOffPricingInfo.packageTwoDisCount,
+      oneOffPricingInfo.packageThreeDisCount,
+    ],
+    "Discounted Total": [
+      oneOffPricingInfo.packageOneDisCountedTotal,
+      oneOffPricingInfo.packageTwoDisCountedTotal,
+      oneOffPricingInfo.packageThreeDisCountedTotal,
+    ],
+    VAT: [
+      oneOffPricingInfo.PackageOneVaTPrice,
+      oneOffPricingInfo.PackageTwoVaTPrice,
+      oneOffPricingInfo.PackageThreeVaTPrice,
+    ],
+    "Grand Total": [
+      oneOffPricingInfo.PackageOneGrandTotal,
+      oneOffPricingInfo.PackageTwoGrandTotal,
+      oneOffPricingInfo.PackageThreeGrandTotal,
+    ],
+    "Original Price": [
+      oneOffPricingInfo.packageOneNetTotal,
+      oneOffPricingInfo.packageTwoNetTotal,
+      oneOffPricingInfo.packageThreeNetTotal,
+    ],
+    "Default Percentage": [
+      oneOffPricingInfo.DiscountPercentagePackageOne,
+      oneOffPricingInfo.DiscountPercentagePackageTwo,
+      oneOffPricingInfo.DiscountPercentagePackageThree,
+    ],
+    "Discounted Price": [
+      oneOffPricingInfo.packageOneDisCountedTotal,
+      oneOffPricingInfo.packageTwoDisCountedTotal,
+      oneOffPricingInfo.packageThreeDisCountedTotal,
+    ],
+  };
+  const recurringValues = recurringByType[type] || [null, null, null];
+  const oneOffValues = oneOffByType[type] || [null, null, null];
+
+  return servicePackageList
+    .map(
+      (item, index) =>
+        `<b>${item.servicePackageName}</b>: Recurring Services: ${formatValue(
+          recurringValues[index],
+        )}, One-Off Services: ${formatValue(oneOffValues[index])}`,
+    )
+    .join(", ");
+};
+
+// AuthContext.jsx:1957 GetReplaceValueByWithBulletList, servicePackageList
+// branch — same per-type value resolution as getReplaceValueByWithCommaPackage
+// (kept as a private copy here rather than shared, since the source only
+// shares the Type-to-field switch by literal duplication too), wrapped as a
+// <ul><li> list instead of the comma view's joined <b> string.
+const getReplaceValueByWithBulletListPackage = (
+  recurringPricingInfo,
+  oneOffPricingInfo,
+  servicePackageList,
+  type,
+) => {
+  const recurringByType = {
+    "Net Total": [
+      Number(recurringPricingInfo.packageOneNetTotal) >
+      Number(recurringPricingInfo.packageOneDisCountedTotal)
+        ? recurringPricingInfo.packageOneNetTotal
+        : recurringPricingInfo.packageOneDisCountedTotal,
+      Number(recurringPricingInfo.packageTwoNetTotal) >
+      Number(recurringPricingInfo.packageTwoDisCountedTotal)
+        ? recurringPricingInfo.packageTwoNetTotal
+        : recurringPricingInfo.packageTwoDisCountedTotal,
+      Number(recurringPricingInfo.packageThreeNetTotal) >
+      Number(recurringPricingInfo.packageThreeDisCountedTotal)
+        ? recurringPricingInfo.packageThreeNetTotal
+        : recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+    Discount: [
+      recurringPricingInfo.packageOneDisCount,
+      recurringPricingInfo.packageTwoDisCount,
+      recurringPricingInfo.packageThreeDisCount,
+    ],
+    "Discounted Total": [
+      recurringPricingInfo.packageOneDisCountedTotal,
+      recurringPricingInfo.packageTwoDisCountedTotal,
+      recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+    VAT: [
+      recurringPricingInfo.PackageOneVaTPrice,
+      recurringPricingInfo.PackageTwoVaTPrice,
+      recurringPricingInfo.PackageThreeVaTPrice,
+    ],
+    "Grand Total": [
+      recurringPricingInfo.PackageOneGrandTotal,
+      recurringPricingInfo.PackageTwoGrandTotal,
+      recurringPricingInfo.PackageThreeGrandTotal,
+    ],
+    "Original Price": [
+      recurringPricingInfo.packageOneNetTotal,
+      recurringPricingInfo.packageTwoNetTotal,
+      recurringPricingInfo.packageThreeNetTotal,
+    ],
+    "Default Percentage": [
+      recurringPricingInfo.DiscountPercentagePackageOne,
+      recurringPricingInfo.DiscountPercentagePackageTwo,
+      recurringPricingInfo.DiscountPercentagePackageThree,
+    ],
+    "Discounted Price": [
+      recurringPricingInfo.packageOneDisCountedTotal,
+      recurringPricingInfo.packageTwoDisCountedTotal,
+      recurringPricingInfo.packageThreeDisCountedTotal,
+    ],
+  };
+  const oneOffByType = {
+    "Net Total": [
+      Number(oneOffPricingInfo.packageOneNetTotal) >
+      Number(oneOffPricingInfo.packageOneDisCountedTotal)
+        ? oneOffPricingInfo.packageOneNetTotal
+        : oneOffPricingInfo.packageOneDisCountedTotal,
+      Number(oneOffPricingInfo.packageTwoNetTotal) >
+      Number(oneOffPricingInfo.packageTwoDisCountedTotal)
+        ? oneOffPricingInfo.packageTwoNetTotal
+        : oneOffPricingInfo.packageTwoDisCountedTotal,
+      Number(oneOffPricingInfo.packageThreeNetTotal) >
+      Number(oneOffPricingInfo.packageThreeDisCountedTotal)
+        ? oneOffPricingInfo.packageThreeNetTotal
+        : oneOffPricingInfo.packageThreeDisCountedTotal,
+    ],
+    Discount: [
+      oneOffPricingInfo.packageOneDisCount,
+      oneOffPricingInfo.packageTwoDisCount,
+      oneOffPricingInfo.packageThreeDisCount,
+    ],
+    "Discounted Total": [
+      oneOffPricingInfo.packageOneDisCountedTotal,
+      oneOffPricingInfo.packageTwoDisCountedTotal,
+      oneOffPricingInfo.packageThreeDisCountedTotal,
+    ],
+    VAT: [
+      oneOffPricingInfo.PackageOneVaTPrice,
+      oneOffPricingInfo.PackageTwoVaTPrice,
+      oneOffPricingInfo.PackageThreeVaTPrice,
+    ],
+    "Grand Total": [
+      oneOffPricingInfo.PackageOneGrandTotal,
+      oneOffPricingInfo.PackageTwoGrandTotal,
+      oneOffPricingInfo.PackageThreeGrandTotal,
+    ],
+    "Original Price": [
+      oneOffPricingInfo.packageOneNetTotal,
+      oneOffPricingInfo.packageTwoNetTotal,
+      oneOffPricingInfo.packageThreeNetTotal,
+    ],
+    "Default Percentage": [
+      oneOffPricingInfo.DiscountPercentagePackageOne,
+      oneOffPricingInfo.DiscountPercentagePackageTwo,
+      oneOffPricingInfo.DiscountPercentagePackageThree,
+    ],
+    "Discounted Price": [
+      oneOffPricingInfo.packageOneDisCountedTotal,
+      oneOffPricingInfo.packageTwoDisCountedTotal,
+      oneOffPricingInfo.packageThreeDisCountedTotal,
+    ],
+  };
+  const recurringValues = recurringByType[type] || [null, null, null];
+  const oneOffValues = oneOffByType[type] || [null, null, null];
+
+  return `
+        <ul>
+          ${servicePackageList
+            .map(
+              (item, index) => `
+            <li>${item.servicePackageName}: Recurring Services: ${formatValue(
+              recurringValues[index],
+            )}, One-Off Services: ${formatValue(oneOffValues[index])}</li>
+          `,
+            )
+            .join("")}
+        </ul>
+      `;
+};
+
+// AuthContext.jsx:2117 ReplaceVariable_WithTableView, servicePackageList
+// branch — the per-package Net Total/Discount/Discounted Price/VAT/Grand
+// Total table. withoutName mirrors the admin call site passing Type:
+// "WithOutName" to omit the package-name header row.
+const replaceVariableWithTableViewPackage = (
+  hasServices,
+  pricingInfo,
+  servicePackageList,
+  withoutName,
+) => {
+  if (!hasServices) return "";
+
+  const packageData = ["One", "Two", "Three"].map((suffix) => {
+    const netTotal = pricingInfo[`package${suffix}NetTotal`];
+    const discountedTotal = pricingInfo[`package${suffix}DisCountedTotal`];
+    return {
+      netTotal: Math.max(Number(netTotal) || 0, Number(discountedTotal) || 0),
+      discountedTotal,
+      discount: pricingInfo[`package${suffix}DisCount`],
+      vatPrice: pricingInfo[`Package${suffix}VaTPrice`],
+      grandTotal: pricingInfo[`Package${suffix}GrandTotal`],
+    };
+  });
+
+  return `
+  <table style="border-collapse: collapse; width: 100%; margin-bottom: 16px; page-break-inside: avoid; break-inside: avoid;">
+    <!-- Package Names Row -->
+    ${
+      !withoutName
+        ? `
+        <tr>
+          <th style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: left; width: 25%;">Package Name</th>
+          ${servicePackageList
+            .map(
+              (pkg) => `
+              <th style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: right; width: 25%;">
+                ${pkg.servicePackageName}
+              </th>
+            `,
+            )
+            .join("")}
+        </tr>
+      `
+        : ""
+    }
+
+    <!-- Data Rows -->
+
+          <tr>
+            <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: left; width: 25%;">Net Total</td>
+            ${servicePackageList
+              .map(
+                (pkg, index) => `
+              <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: right; width: 25%;">
+                ${formatValue(packageData[index]?.netTotal || 0)}
+              </td>
+            `,
+              )
+              .join("")}
+          </tr>
+          <tr>
+            <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: left; width: 25%;">Discount</td>
+            ${servicePackageList
+              .map(
+                (pkg, index) => `
+              <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: right; width: 25%;">
+                ${formatValue(packageData[index]?.discount || 0)}
+              </td>
+            `,
+              )
+              .join("")}
+          </tr>
+          <tr>
+            <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: left; width: 25%;">Discounted Price</td>
+            ${servicePackageList
+              .map(
+                (pkg, index) => `
+              <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: right; width: 25%;">
+                ${formatValue(packageData[index]?.discountedTotal || 0)}
+              </td>
+            `,
+              )
+              .join("")}
+          </tr>
+          <tr>
+            <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: left; width: 25%;">VAT</td>
+            ${servicePackageList
+              .map(
+                (pkg, index) => `
+              <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: right; width: 25%;">
+                ${formatValue(packageData[index]?.vatPrice || 0)}
+              </td>
+            `,
+              )
+              .join("")}
+          </tr>
+          <tr>
+            <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: left; width: 25%;">Grand Total</td>
+            ${servicePackageList
+              .map(
+                (pkg, index) => `
+              <td style="border: 1px solid rgb(10, 10, 10); padding: 8px; text-align: right; width: 25%;">
+                ${formatValue(packageData[index]?.grandTotal || 0)}
+              </td>
+            `,
+              )
+              .join("")}
+          </tr>
+
+
+  </table>
+`;
+};
+
+// Maps quotationFinalAmountList rows (the existing quoteModel passthrough —
+// Package/Custom Package quotes aren't rebuilt, see buildQuotationFinalAmountList)
+// to the packageOneNetTotal/packageOneDisCount/.../DiscountPercentagePackageOne
+// (…Two/…Three) field set the ported package helpers above read, matching
+// each servicePackageList entry to its row by servicePackageID.
+const buildPricingInfoWithPackagesFromRows = (
+  rows,
+  serviceChargeTypeID,
+  servicePackageList,
+) => {
+  const info = {};
+  ["One", "Two", "Three"].forEach((suffix, index) => {
+    const pkg = servicePackageList[index];
+    const row = pkg
+      ? (rows || []).find(
+          (r) =>
+            Number(r.serviceChargeTypeID) === serviceChargeTypeID &&
+            String(r.servicePackageID) === String(pkg.servicePackageID),
+        )
+      : null;
+    info[`package${suffix}NetTotal`] = row?.netTotal ?? 0;
+    info[`package${suffix}DisCount`] = row?.discounted ?? 0;
+    info[`package${suffix}DisCountedTotal`] = row?.discountedTotal ?? 0;
+    info[`Package${suffix}VaTPrice`] = row?.vat ?? 0;
+    info[`Package${suffix}GrandTotal`] = row?.grandTotal ?? 0;
+    info[`DiscountPercentagePackage${suffix}`] =
+      row?.discountPercentageWithAllDecimal ?? 0;
+  });
+  return info;
+};
+
+// Rebuilds pricingVariablesList for Package/Custom Package, byte-for-byte
+// matching AuthContext.jsx's replaceTemplatePricingVariables non-Service
+// branch (AuthContext.jsx:3250-3567) for every variable except the six
+// AllServices_*/AllServicesWithPrice_* ones — see the comment above
+// getReplacePackageTableView for why those stay as the quoteModel
+// passthrough.
+export const buildPricingVariablesListForPackageType = ({
+  quoteModel,
+  servicePackageList,
+  paymentFrequencyID,
+}) => {
+  const rows = Array.isArray(quoteModel?.quotationFinalAmountList)
+    ? quoteModel.quotationFinalAmountList
+    : [];
+  const packages = (servicePackageList || []).slice(0, 3);
+
+  const recurringPricingInfo = buildPricingInfoWithPackagesFromRows(
+    rows,
+    1,
+    packages,
+  );
+  const oneOffPricingInfo = buildPricingInfoWithPackagesFromRows(
+    rows,
+    2,
+    packages,
+  );
+
+  const hasRecurring = rows.some(
+    (row) => Number(row.serviceChargeTypeID) === 1,
+  );
+  const hasOneOff = rows.some((row) => Number(row.serviceChargeTypeID) === 2);
+
+  const passthroughByName = new Map(
+    (Array.isArray(quoteModel?.pricingVariablesList)
+      ? quoteModel.pricingVariablesList
+      : []
+    ).map((entry) => [entry.variableName, entry.variableValue]),
+  );
+  const passthrough = (variableName) =>
+    passthroughByName.get(`$${variableName}$`) ?? "";
+
+  const resultTotalVariablesWithValues = {
+    AllRecuringResultTotalVariable_WithPackageName:
+      replaceVariableWithTableViewPackage(
+        hasRecurring,
+        recurringPricingInfo,
+        packages,
+        false,
+      ),
+    AllOneOffResultTotalVariable_WithPackageName:
+      replaceVariableWithTableViewPackage(
+        hasOneOff,
+        oneOffPricingInfo,
+        packages,
+        false,
+      ),
+    AllRecurringResultTotalVariable_WithoutPackageName:
+      replaceVariableWithTableViewPackage(
+        hasRecurring,
+        recurringPricingInfo,
+        packages,
+        true,
+      ),
+    AllOneOffResultTotalVariable_WithoutPackageName:
+      replaceVariableWithTableViewPackage(
+        hasOneOff,
+        oneOffPricingInfo,
+        packages,
+        true,
+      ),
+
+    AllServices_WithTableView: passthrough("AllServices_WithTableView"),
+    AllServicesWithPrice_WithTableView: passthrough(
+      "AllServicesWithPrice_WithTableView",
+    ),
+    AllServices_WithComma: passthrough("AllServices_WithComma"),
+    AllServicesWithPrice_WithComma: passthrough(
+      "AllServicesWithPrice_WithComma",
+    ),
+    AllServices_WithBulletList: passthrough("AllServices_WithBulletList"),
+    AllServicesWithPrice_WithBulletList: passthrough(
+      "AllServicesWithPrice_WithBulletList",
+    ),
+
+    Net_Total_Recurring: getReplacePackageTableView(
+      recurringPricingInfo,
+      "Net Total",
+      packages,
+    ),
+    Discount_Recurring: getReplacePackageTableView(
+      recurringPricingInfo,
+      "Discount",
+      packages,
+    ),
+    Discounted_Total_Recurring: getReplacePackageTableView(
+      recurringPricingInfo,
+      "Discounted Total",
+      packages,
+    ),
+    VAT_Recurring: getReplacePackageTableView(
+      recurringPricingInfo,
+      "VAT",
+      packages,
+    ),
+    Grand_Total_Recurring: getReplacePackageTableView(
+      recurringPricingInfo,
+      "Grand Total",
+      packages,
+    ),
+    Original_Price_Recurring: getReplacePackageTableView(
+      recurringPricingInfo,
+      "Original Price",
+      packages,
+    ),
+    Discount_Percentage_Recurring: getReplacePackageTableView(
+      recurringPricingInfo,
+      "Default Percentage",
+      packages,
+    ),
+    Discounted_Price_Recurring: getReplacePackageTableView(
+      recurringPricingInfo,
+      "Discounted Price",
+      packages,
+    ),
+    Payment_Frequency_Recurring: getPaymentFrequencyLabel(paymentFrequencyID),
+
+    Net_Total_OneOff: getReplacePackageTableView(
+      oneOffPricingInfo,
+      "Net Total",
+      packages,
+    ),
+    Discount_OneOff: getReplacePackageTableView(
+      oneOffPricingInfo,
+      "Discount",
+      packages,
+    ),
+    Discounted_Total_OneOff: getReplacePackageTableView(
+      oneOffPricingInfo,
+      "Discounted Total",
+      packages,
+    ),
+    VAT_OneOff: getReplacePackageTableView(oneOffPricingInfo, "VAT", packages),
+    Grand_Total_OneOff: getReplacePackageTableView(
+      oneOffPricingInfo,
+      "Grand Total",
+      packages,
+    ),
+    Original_Price_OneOff: getReplacePackageTableView(
+      oneOffPricingInfo,
+      "Original Price",
+      packages,
+    ),
+    Discount_Percentage_OneOff: getReplacePackageTableView(
+      oneOffPricingInfo,
+      "Default Percentage",
+      packages,
+    ),
+    Discounted_Price_OneOff: getReplacePackageTableView(
+      oneOffPricingInfo,
+      "Discounted Price",
+      packages,
+    ),
+
+    Net_Total_WithTableView: getReplacePackageCombinedTableView(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      "Net Total",
+      packages,
+    ),
+    Discount_WithTableView: getReplacePackageCombinedTableView(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      "Discount",
+      packages,
+    ),
+    Discounted_Total_WithTableView: getReplacePackageCombinedTableView(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      "Discounted Total",
+      packages,
+    ),
+    Discounted_Price_WithTableView: getReplacePackageCombinedTableView(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      "Discounted Price",
+      packages,
+    ),
+    VAT_WithTableView: getReplacePackageCombinedTableView(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      "VAT",
+      packages,
+    ),
+    Grand_Total_WithTableView: getReplacePackageCombinedTableView(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      "Grand Total",
+      packages,
+    ),
+    Original_Price_WithTableView: getReplacePackageCombinedTableView(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      "Original Price",
+      packages,
+    ),
+    Discount_Percentage_WithTableView: getReplacePackageCombinedTableView(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      "Default Percentage",
+      packages,
+    ),
+
+    Net_Total_WithComma: getReplaceValueByWithCommaPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Net Total",
+    ),
+    Discount_WithComma: getReplaceValueByWithCommaPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Discount",
+    ),
+    // Mirrors AuthContext.jsx:3469-3474 verbatim — the admin call site omits
+    // the Type argument here, so this (like the two below it) resolves
+    // through every branch to null/null/null.
+    Discounted_Total_WithComma: getReplaceValueByWithCommaPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      undefined,
+    ),
+    VAT_WithComma: getReplaceValueByWithCommaPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "VAT",
+    ),
+    Grand_Total_WithComma: getReplaceValueByWithCommaPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Grand Total",
+    ),
+    Original_Price_WithComma: getReplaceValueByWithCommaPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Original Price",
+    ),
+    Discount_Percentage_WithComma: getReplaceValueByWithCommaPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Default Percentage",
+    ),
+    // AuthContext.jsx:3508 passes Type: "Default Price" here, which matches
+    // none of the branches (the real key is "Discounted Price") — mirrored
+    // verbatim, so this also resolves to null/null/null.
+    Discounted_Price_WithComma: getReplaceValueByWithCommaPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Default Price",
+    ),
+
+    Net_Total_WithBulletList: getReplaceValueByWithBulletListPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Net Total",
+    ),
+    Discount_WithBulletList: getReplaceValueByWithBulletListPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Discount",
+    ),
+    Discounted_Total_WithBulletList: getReplaceValueByWithBulletListPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      undefined,
+    ),
+    VAT_WithBulletList: getReplaceValueByWithBulletListPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "VAT",
+    ),
+    Grand_Total_WithBulletList: getReplaceValueByWithBulletListPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Grand Total",
+    ),
+    Original_Price_WithBulletList: getReplaceValueByWithBulletListPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Original Price",
+    ),
+    Discount_Percentage_WithBulletList: getReplaceValueByWithBulletListPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Default Percentage",
+    ),
+    Discounted_Price_WithBulletList: getReplaceValueByWithBulletListPackage(
+      recurringPricingInfo,
+      oneOffPricingInfo,
+      packages,
+      "Default Price",
+    ),
+  };
+
+  return Object.entries(resultTotalVariablesWithValues).map(
+    ([variableName, variableValue]) => ({
+      variableName: `$${variableName}$`,
+      variableValue: variableValue == null ? "0.00" : String(variableValue),
+    }),
+  );
+};
+
+// Dispatches pricingVariablesList building by proposal type — Service
+// rebuilds from the live selections/totals (buildPricingVariablesListForServiceType);
+// Package and Custom Package both rebuild from the existing
+// quotationFinalAmountList + servicePackageList
+// (buildPricingVariablesListForPackageType — the admin flow itself never
+// distinguishes the two here either); any other/unrecognised type keeps the
+// plain quoteModel passthrough.
 export const buildPricingVariablesList = ({
   quoteModel,
   quotationFinalAmountRows,
@@ -1059,6 +2055,7 @@ export const buildPricingVariablesList = ({
   oneOffSelections,
   pricing,
   currencyID,
+  servicePackageList,
 }) => {
   if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Service) {
     return buildPricingVariablesListForServiceType({
@@ -1068,6 +2065,17 @@ export const buildPricingVariablesList = ({
       pricing,
       paymentFrequencyID: quoteModel?.paymentFrequencyID,
       currencyID,
+    });
+  }
+
+  if (
+    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package ||
+    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage
+  ) {
+    return buildPricingVariablesListForPackageType({
+      quoteModel,
+      servicePackageList,
+      paymentFrequencyID: quoteModel?.paymentFrequencyID,
     });
   }
 
@@ -1087,7 +2095,12 @@ export const buildPricingVariablesList = ({
 // (AddUpdateProposal.jsx:22700-22716 / 22650-22698), dropping any extra
 // GetQuoteModel-only bookkeeping fields and forcing msgMapID/msMapID to
 // null the same way buildModuleServicesGPDList and
-// buildAdditionalInformationListForPayload already do.
+// buildAdditionalInformationListForPayload already do. servicePackageID is
+// likewise always sent as null — modifiedDraftArray hardcodes
+// `servicePackageID: null` unconditionally (AddUpdateProposal.jsx:22708),
+// for every proposal type including Package, so forwarding whatever value
+// GetQuoteModel happens to return here (as the old passthrough-only version
+// of this function did) doesn't match the admin flow for a Package quote.
 const toNullableNumber = (value) =>
   value === null || value === undefined || value === "" ? null : Number(value);
 
@@ -1121,7 +2134,7 @@ const normalizeSelectedServicesListFromQuoteModel = (selectedServicesList) => {
     proposedServiceName: service.proposedServiceName ?? null,
     serviceCatID: service.serviceCatID,
     serviceChargeTypeID: service.serviceChargeTypeID,
-    servicePackageID: service.servicePackageID ?? null,
+    servicePackageID: null,
     finalCalculatedServicePrice: toNullableNumber(
       service.finalCalculatedServicePrice,
     ),
@@ -1200,6 +2213,106 @@ const buildAdditionalInformationListForPayload = (additionalInformationList) => 
   );
 };
 
+// A Package-type quote never shows the Additional Information step to the
+// client (additionalInfoStepInserted is hardcoded false for it in
+// ProposalAmendment.jsx — see the comment there), so the live
+// additionalInformationList redux list this route fetches has nothing
+// visible in it and buildAdditionalInformationListForPayload above
+// correctly resolves to an empty array for it. But that's the wrong source
+// for a Package quote's payload: GetQuoteModel's own additionalInformationList
+// already carries the real saved driver values (already close to the
+// AddUpdateQuote row shape — just msgMapID/msMapID need nulling, like
+// normalizeSelectedServicesListFromQuoteModel does for selectedServicesList)
+// and must be forwarded instead of an empty list. Only used for Package —
+// Service and Custom Package both keep reading the live list, unaffected.
+const normalizeAdditionalInformationListFromQuoteModel = (
+  additionalInformationList,
+) => {
+  if (!Array.isArray(additionalInformationList)) {
+    return additionalInformationList ?? null;
+  }
+
+  return additionalInformationList.map((item) => ({
+    msgMapID: null,
+    msMapID: null,
+    globalPricingDriverID: item.globalPricingDriverID,
+    driverValue: toNullableNumber(item.driverValue) ?? item.driverValue ?? null,
+    variationID: item.variationID ?? null,
+    slabID: item.slabID ?? null,
+    dateID: item.dateID ?? null,
+    textID: item.textID ?? null,
+    enteredText: item.enteredText ?? null,
+    enteredDate: item.enteredDate ?? null,
+    enteredDateFormat: item.enteredDateFormat ?? null,
+  }));
+};
+
+// Dispatches additionalInformationList building by proposal type — Service
+// and Custom Package both rebuild from the Additional Information step's
+// live list (buildAdditionalInformationListForPayload), unchanged from
+// before; Package instead normalizes GetQuoteModel's own list (see
+// normalizeAdditionalInformationListFromQuoteModel above), since the live
+// list is never populated with anything visible for that type.
+const buildAdditionalInformationList = ({
+  quoteModel,
+  additionalInformationList,
+  quoteModelAdditionalInformationList,
+}) => {
+  if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package) {
+    return normalizeAdditionalInformationListFromQuoteModel(
+      quoteModelAdditionalInformationList,
+    );
+  }
+
+  return additionalInformationList
+    ? buildAdditionalInformationListForPayload(additionalInformationList)
+    : quoteModelAdditionalInformationList;
+};
+
+// Mirrors AddUpdateProposal.jsx's own submit-time rebuild of
+// quoteAdditionalServicesInPackages (AddUpdateProposal.jsx:22721-22737):
+// {serviceID, serviceCatID, serviceChargeTypeID, servicePackageIDs} for
+// every currently-selected service flagged isAdditionalService. A
+// Package-scoped services fetch sets isAdditionalService = !isDisabled on
+// every row it returns (AddUpdateProposal.jsx:20419-20424) — there's no
+// separate isAdditionalService field on the web proposal's own services
+// catalog response, so it's derived the same way from each service
+// definition's own isDisabled flag here. servicePackageIDs is every package
+// this Standard Package quote has configured (GetPackageServicesList/
+// GetServicesWithGlobalPricingDriverListByServiceChargeType both stamp the
+// full requested ServicePackageIDs array onto every row for a
+// package-scoped fetch, so a Standard Package's own selections are never
+// scoped to just one package). Package-type only — Custom Package keeps the
+// GetQuoteModel passthrough untouched (see buildAddUpdateQuotePayload).
+const buildQuoteAdditionalServicesInPackagesForPackageType = ({
+  recurringSelections,
+  oneOffSelections,
+  recurringServices,
+  oneOffServices,
+  servicePackageID,
+}) => {
+  const recurringDefs = buildServiceDefMap(recurringServices);
+  const oneOffDefs = buildServiceDefMap(oneOffServices);
+  const servicePackageIDs = Array.isArray(servicePackageID)
+    ? servicePackageID
+    : [];
+
+  const buildRows = (selections, defs, serviceChargeTypeID) =>
+    Object.values(selections || {})
+      .filter((selection) => !defs.get(selection.serviceID)?.isDisabled)
+      .map((selection) => ({
+        serviceID: selection.serviceID,
+        serviceCatID: selection.serviceCatID,
+        serviceChargeTypeID,
+        servicePackageIDs,
+      }));
+
+  return [
+    ...buildRows(recurringSelections, recurringDefs, 1),
+    ...buildRows(oneOffSelections, oneOffDefs, 2),
+  ];
+};
+
 // AddUpdateQuote only accepts this exact field set — mirrors
 // ApiRequest_ParamsObj in AddUpdateProposal.jsx:23077-23170. GetQuoteModel's
 // response carries several extra bookkeeping/audit fields (templateKeyID,
@@ -1264,12 +2377,19 @@ const ADD_UPDATE_QUOTE_FIELD_MAP = [
 // in — every caller has one available, since GetQuoteModel's copy uses a
 // different row shape AddUpdateQuote doesn't accept. quotationFinalAmountList
 // and pricingVariablesList are both rebuilt per proposal type (see
-// buildQuotationFinalAmountList and buildPricingVariablesList — same split:
-// only a Service-type quote recomputes, everything else keeps the
-// quoteModel passthrough); serviceSelectionsForTotals
-// ({recurringSelections, oneOffSelections, pricing, currencyID}) supplies
-// the live data those rebuilds need and is only read for a Service-type
-// quote, so every other caller can omit it.
+// buildQuotationFinalAmountList and buildPricingVariablesList): Service
+// recomputes from the live selections/pricing; Package and Custom Package
+// both rebuild pricingVariablesList from the existing quotationFinalAmountList
+// (left untouched itself) plus servicePackageList; any other/unrecognised
+// type keeps the plain passthrough. ServiceMappingWithPackagesList is
+// likewise preferred live over the GetQuoteModel passthrough when supplied
+// (see the comment above that assignment). serviceSelectionsForTotals
+// ({recurringSelections, oneOffSelections, pricing, currencyID,
+// servicePackageList, serviceMappingWithPackagesList}) supplies the live
+// data these rebuilds need — Service only reads the first four,
+// Package/Custom Package only read servicePackageList and
+// serviceMappingWithPackagesList — so a caller can omit whichever fields
+// its proposal type never needs.
 export const buildAddUpdateQuotePayload = (
   quoteModel,
   inputFieldsList,
@@ -1305,21 +2425,38 @@ export const buildAddUpdateQuotePayload = (
     ? quoteModel.servicePackageID
     : [];
 
-  // GetQuoteModel returns this as serviceMappingWithPackagesList (lowercase
-  // s) but AddUpdateQuote expects ServiceMappingWithPackagesList — also
-  // non-nullable, so default to [] like the other array fields above.
+  // AddUpdateProposal.jsx never sends GetQuoteModel's own saved
+  // serviceMappingWithPackagesList copy back — its ServiceMappingWithPackagesList
+  // state is populated straight from GetCalculatedServicesPriceByPackages'
+  // own response (AddUpdateProposal.jsx:19520-19559:
+  // serviceMappingWithPackagesList off responseData, mapped into
+  // ServiceMappingWithPackagesList state, sent as-is at
+  // AddUpdateProposal.jsx:23170) — i.e. always this quote's current
+  // pricing-engine output, never a stale saved one. The web proposal
+  // already fetches that exact same data live (getCalculatedServicesPriceByPackages,
+  // state.webProposalServices.serviceMappingWithPackagesList) for the
+  // Pricing Table step, so prefer it here too; falls back to the
+  // GetQuoteModel passthrough only when the live list isn't available
+  // (e.g. a Service-type quote, which has no packages and never populates
+  // this at all). Field casing differs between the two
+  // (serviceMappingWithPackagesList vs ServiceMappingWithPackagesList) —
+  // also non-nullable, so default to [] like the other array fields above.
   payload.ServiceMappingWithPackagesList = Array.isArray(
-    quoteModel.serviceMappingWithPackagesList,
+    serviceSelectionsForTotals?.serviceMappingWithPackagesList,
   )
-    ? quoteModel.serviceMappingWithPackagesList
-    : [];
+    ? serviceSelectionsForTotals.serviceMappingWithPackagesList
+    : Array.isArray(quoteModel.serviceMappingWithPackagesList)
+      ? quoteModel.serviceMappingWithPackagesList
+      : [];
 
   payload.globalPricingDriverIDsWithValues =
     buildGlobalPricingDriverIDsWithValues(quoteModel, inputFieldsList);
 
-  payload.additionalInformationList = additionalInformationList
-    ? buildAdditionalInformationListForPayload(additionalInformationList)
-    : payload.additionalInformationList;
+  payload.additionalInformationList = buildAdditionalInformationList({
+    quoteModel,
+    additionalInformationList,
+    quoteModelAdditionalInformationList: payload.additionalInformationList,
+  });
 
   payload.selectedServicesList = selectedServicesListOverride
     ? selectedServicesListOverride
@@ -1339,11 +2476,25 @@ export const buildAddUpdateQuotePayload = (
   // always undefined for a Service-type proposal and the filter naturally
   // empties out to []. GetQuoteModel doesn't apply that same rule to what it
   // returns here, so a Service-type quote's row can still come back
-  // non-empty — force it to [] to match, same as the admin flow always
-  // does for this proposal type. Package/Custom Package quotes keep the
-  // quoteModel passthrough untouched.
+  // non-empty — force it to [] to match, same as the admin flow always does
+  // for this proposal type.
+  //
+  // Package quotes rebuild it live from the current selections the same way
+  // admin does at submit time, instead of forwarding GetQuoteModel's stale
+  // saved copy — see buildQuoteAdditionalServicesInPackagesForPackageType.
+  // Custom Package keeps the quoteModel passthrough untouched (out of scope
+  // here; its own client-added-service handling is elsewhere).
   if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Service) {
     payload.quoteAdditionalServicesInPackages = [];
+  } else if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package) {
+    payload.quoteAdditionalServicesInPackages =
+      buildQuoteAdditionalServicesInPackagesForPackageType({
+        recurringSelections: serviceSelectionsForTotals?.recurringSelections,
+        oneOffSelections: serviceSelectionsForTotals?.oneOffSelections,
+        recurringServices: serviceSelectionsForTotals?.recurringServices,
+        oneOffServices: serviceSelectionsForTotals?.oneOffServices,
+        servicePackageID: payload.servicePackageID,
+      });
   }
 
   payload.pricingVariablesList = buildPricingVariablesList({
@@ -1353,6 +2504,7 @@ export const buildAddUpdateQuotePayload = (
     oneOffSelections: serviceSelectionsForTotals?.oneOffSelections,
     pricing: serviceSelectionsForTotals?.pricing,
     currencyID: serviceSelectionsForTotals?.currencyID,
+    servicePackageList: serviceSelectionsForTotals?.servicePackageList,
   });
 
   return payload;

@@ -15,6 +15,10 @@ import {
 import {
   selectSelectedServiceIDs,
   selectLockedServiceIDs,
+  selectRecurringSelections,
+  selectOneOffSelections,
+  selectRecurringServices,
+  selectOneOffServices,
 } from "../../../redux/reducer/webProposal/services";
 import {
   getAdditionalInformationList,
@@ -50,6 +54,10 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     selectAdditionalInformationList,
   );
   const lockedServiceIDs = useSelector(selectLockedServiceIDs);
+  const recurringSelections = useSelector(selectRecurringSelections);
+  const oneOffSelections = useSelector(selectOneOffSelections);
+  const recurringServices = useSelector(selectRecurringServices);
+  const oneOffServices = useSelector(selectOneOffServices);
 
   const isPackageType = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
   const isCustomPackageType =
@@ -273,6 +281,11 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     // globalPricingDriverIDsWithValues entries the client actually filled in
     // on the Input Fields step are patched on top — the package selection
     // and everything else stays exactly as GetQuoteModel returned it.
+    // serviceSelectionsForTotals is only actually read for a Package-type
+    // quote's quoteAdditionalServicesInPackages rebuild (see
+    // buildQuoteAdditionalServicesInPackagesForPackageType) — Custom Package
+    // ignores these fields, same as Service ignores them here since it never
+    // reaches handleAccept (isPackageBased-gated) at all.
     try {
       await dispatch(
         addUpdateQuote(
@@ -281,6 +294,12 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
             inputFieldsList,
             undefined,
             additionalInformationList,
+            {
+              recurringSelections,
+              oneOffSelections,
+              recurringServices,
+              oneOffServices,
+            },
           ),
         ),
       ).unwrap();

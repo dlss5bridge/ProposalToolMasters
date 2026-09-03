@@ -24,10 +24,14 @@ import {
   selectLockedServiceIDs,
   selectRecurringSelections,
   selectOneOffSelections,
+  selectDefaultRecurringSelections,
+  selectDefaultOneOffSelections,
   selectRecurringServices,
   selectOneOffServices,
   selectServicesPricing,
   selectServicesCurrencyID,
+  selectServicesPackageList,
+  selectServiceMappingWithPackagesList,
   setServicesSelectionError,
   setServicesFieldErrorsVisible,
 } from "../../../redux/reducer/webProposal/services";
@@ -36,8 +40,10 @@ import {
   getAdditionalInformationFieldErrors,
   getVisibleAdditionalInformationItems,
   selectAdditionalInformationList,
+  selectDefaultAdditionalInformationList,
   selectHasAdditionalInformation,
   setAdditionalInformationValidationVisible,
+  additionalInformationEntriesMatch,
 } from "../../../redux/reducer/webProposal/additionalInformation";
 import {
   selectHasInputFields,
@@ -52,6 +58,7 @@ import {
   buildAddUpdateQuotePayload,
   buildSelectedServicesListFromSelections,
 } from "../utils/buildAddUpdateQuotePayload";
+import { selectionsMatch } from "../steps/ProposalPricingTableStep";
 
 export default function ProposalAmendment({ theme, proposal, services }) {
   const dispatch = useDispatch();
@@ -74,10 +81,21 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const inputFieldsList = useSelector(selectInputFieldsList);
   const recurringSelections = useSelector(selectRecurringSelections);
   const oneOffSelections = useSelector(selectOneOffSelections);
+  const defaultRecurringSelections = useSelector(
+    selectDefaultRecurringSelections,
+  );
+  const defaultOneOffSelections = useSelector(selectDefaultOneOffSelections);
+  const defaultAdditionalInformationList = useSelector(
+    selectDefaultAdditionalInformationList,
+  );
   const recurringServices = useSelector(selectRecurringServices);
   const oneOffServices = useSelector(selectOneOffServices);
   const servicesPricing = useSelector(selectServicesPricing);
   const servicesCurrencyID = useSelector(selectServicesCurrencyID);
+  const servicesPackageList = useSelector(selectServicesPackageList);
+  const serviceMappingWithPackagesList = useSelector(
+    selectServiceMappingWithPackagesList,
+  );
 
   // Package proposals ship with the admin's fixed default services and give
   // the client no service picker at all — the Services step is dropped from
@@ -374,6 +392,19 @@ export default function ProposalAmendment({ theme, proposal, services }) {
           isCustomPackageType,
         });
 
+    // isAmend must only be true when the client actually changed something
+    // from the admin's defaults — a service selection/driver value or an
+    // Additional Information driver value. Submitting the unedited default
+    // proposal (e.g. just picking a package and accepting) is not an
+    // amendment.
+    const hasBeenAmended =
+      !selectionsMatch(recurringSelections, defaultRecurringSelections) ||
+      !selectionsMatch(oneOffSelections, defaultOneOffSelections) ||
+      !additionalInformationEntriesMatch(
+        additionalInformationList,
+        defaultAdditionalInformationList,
+      );
+
     let amendedQuoteKeyID;
     try {
       // On success, AddUpdateQuote's responseData.data is the new
@@ -391,11 +422,15 @@ export default function ProposalAmendment({ theme, proposal, services }) {
             {
               recurringSelections,
               oneOffSelections,
+              recurringServices,
+              oneOffServices,
               pricing: servicesPricing,
               currencyID: servicesCurrencyID,
+              servicePackageList: servicesPackageList,
+              serviceMappingWithPackagesList,
             },
           ),
-          isAmend: true,
+          isAmend: hasBeenAmended,
         }),
       ).unwrap();
     } catch (err) {
