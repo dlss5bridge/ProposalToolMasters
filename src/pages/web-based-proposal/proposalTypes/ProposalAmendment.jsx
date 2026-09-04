@@ -227,12 +227,31 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   // silently pricing off the package's generic defaults instead of this
   // quote's actual resolved values. So this runs for both package types.
   const additionalInfoFetchedRef = useRef(false);
+  // Custom Package only: tracks which service IDs the safety-net fetch below
+  // has already covered. A plain one-shot ref (like Package uses) would
+  // permanently miss a service the client adds on the Services step after
+  // this quote's locked defaults already hydrated and triggered the first
+  // fetch — handleBeforeNextStep's own refetch covers that when the client
+  // clicks Next out of Services, but the stepper's tabs let them jump
+  // straight to a later step instead, skipping that handler entirely.
+  // Refetching whenever a not-yet-covered ID shows up closes that gap
+  // without changing anything for Package (untouched below).
+  const additionalInfoFetchedServiceIDsRef = useRef(new Set());
   useEffect(() => {
     if (!isPackageBased) return;
-    if (additionalInfoFetchedRef.current) return;
     if (!quoteModel?.quoteKeyID || selectedServiceIDs.length === 0) return;
 
-    additionalInfoFetchedRef.current = true;
+    if (isCustomPackageType) {
+      const hasNewServiceID = selectedServiceIDs.some(
+        (id) => !additionalInfoFetchedServiceIDsRef.current.has(id),
+      );
+      if (!hasNewServiceID) return;
+      additionalInfoFetchedServiceIDsRef.current = new Set(selectedServiceIDs);
+    } else {
+      if (additionalInfoFetchedRef.current) return;
+      additionalInfoFetchedRef.current = true;
+    }
+
     dispatch(
       getAdditionalInformationList({
         organisationKeyID: quoteModel?.organisationKeyID,
@@ -243,7 +262,13 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         servicePackageIDs: quoteModel?.servicePackageID,
       }),
     );
-  }, [isPackageBased, quoteModel, selectedServiceIDs, dispatch]);
+  }, [
+    isPackageBased,
+    isCustomPackageType,
+    quoteModel,
+    selectedServiceIDs,
+    dispatch,
+  ]);
 
   const handleBeforeNextStep = async (currentStepIndex) => {
     // Package/Custom Package quotes must have a package selected before
@@ -389,7 +414,6 @@ export default function ProposalAmendment({ theme, proposal, services }) {
           recurringServices,
           oneOffServices,
           pricing: servicesPricing,
-          isCustomPackageType,
         });
 
     // isAmend must only be true when the client actually changed something

@@ -149,7 +149,6 @@ export const buildSelectedServicesListFromSelections = ({
   recurringServices,
   oneOffServices,
   pricing,
-  isCustomPackageType,
 }) => {
   const recurringDefs = buildServiceDefMap(recurringServices);
   const oneOffDefs = buildServiceDefMap(oneOffServices);
@@ -170,14 +169,18 @@ export const buildSelectedServicesListFromSelections = ({
     serviceCatID: selection.serviceCatID,
     serviceChargeTypeID,
     servicePackageID: null,
-    // Custom Package prices services against the package rather than each
-    // service's own formula — AddUpdateProposal.jsx sends null for that
-    // case (selectedProposalTypeValue === 4) and the actual live price
-    // otherwise.
-    finalCalculatedServicePrice: isCustomPackageType
-      ? null
-      : (priceByServiceID.get(`${serviceChargeTypeID}:${selection.serviceID}`) ??
-        null),
+    // AddUpdateProposal.jsx:22709-22713 only sends null here for its
+    // "Master Agreement - Custom Variable Fee" quote type
+    // (selectedProposalTypeValue === 4) — a type with no QUOTE_TYPE_ID
+    // equivalent that the web proposal flow never reaches. Custom Package
+    // is selectedProposalTypeValue === 1, which admin's own condition
+    // excludes, so it gets the real live price via
+    // service.originalServicePrice, same as every other type this function
+    // is called for (Service). Previously this was wrongly nulled for
+    // Custom Package by conflating it with admin's value-4 case.
+    finalCalculatedServicePrice:
+      priceByServiceID.get(`${serviceChargeTypeID}:${selection.serviceID}`) ??
+      null,
     moduleServicesGPDList: buildModuleServicesGPDList(selection, serviceDef),
   });
 
@@ -2155,7 +2158,34 @@ const normalizeSelectedServicesListFromQuoteModel = (selectedServicesList) => {
 // null — the backend assigns real ones on save. Falls back to the
 // GetQuoteModel passthrough when the live list isn't available (e.g. a
 // proposal type with no Additional Information step at all).
-const buildAdditionalInformationListForPayload = (additionalInformationList) => {
+const buildAdditionalInformationListForPayload = (
+  additionalInformationList,
+  // Both Custom Package only (see buildAdditionalInformationList below):
+  {
+    // When the live driverValue doesn't resolve to a real variation/slab
+    // option — e.g. GetPricingFormulasGlobalPricingDrivers not reliably
+    // returning the saved selection for one of Custom Package's
+    // admin-locked default services, the same "corrupted default"
+    // unreliability already worked around elsewhere for this endpoint (see
+    // withDefaultDriverValues.js) — fall back to whichever option the API
+    // still marks isDefault, exactly the value AddUpdateProposal.jsx's own
+    // modifiedAdditionalServiceArray reads (AddUpdateProposal.jsx:23013-
+    // 23031: it picks the isDefault-flagged slab/variation directly, rather
+    // than resolving driverValue to an ID first). Service/Package never
+    // pass this, so their behavior is unchanged.
+    fallbackToIsDefaultOption = false,
+    // withDefaultDriverValues.js already corrects this in the redux list
+    // for a quantity driver (driverTypeID 2) whose driverValue came back
+    // equal to its own globalPricingDriverID — the same "corrupted default"
+    // GetPricingFormulasGlobalPricingDrivers quirk documented there — but
+    // this function reads item.driverValue straight off the passed-in list
+    // without re-checking, so a row that fetch never corrected (or a
+    // caller that skipped it) can still leak globalPricingDriverID through
+    // as driverValue into the payload. Re-applies the identical guard right
+    // before it's sent.
+    fixCorruptedQuantityDefault = false,
+  } = {},
+) => {
   if (!Array.isArray(additionalInformationList)) return additionalInformationList ?? null;
 
   return getVisibleAdditionalInformationItems(additionalInformationList).map(
@@ -2167,23 +2197,36 @@ const buildAdditionalInformationListForPayload = (additionalInformationList) => 
       let textID = null;
 
       if (item.driverTypeID === 2) {
+        const rawDriverValue =
+          fixCorruptedQuantityDefault &&
+          item.driverValue != null &&
+          item.driverValue === item.globalPricingDriverID
+            ? 0
+            : item.driverValue;
         driverValue =
-          item.driverValue !== undefined &&
-          item.driverValue !== null &&
-          item.driverValue !== ""
-            ? Number(item.driverValue)
+          rawDriverValue !== undefined &&
+          rawDriverValue !== null &&
+          rawDriverValue !== ""
+            ? Number(rawDriverValue)
             : null;
       } else if (item.driverTypeID === 3) {
         variationID = item.driverValue ?? null;
-        driverValue =
-          item.variation?.find(
-            (option) => option.variationID === variationID,
-          )?.variationValue ?? null;
+        let matchedVariation = item.variation?.find(
+          (option) => option.variationID === variationID,
+        );
+        if (!matchedVariation && fallbackToIsDefaultOption) {
+          matchedVariation = item.variation?.find((option) => option.isDefault);
+          if (matchedVariation) variationID = matchedVariation.variationID;
+        }
+        driverValue = matchedVariation?.variationValue ?? null;
       } else if (item.driverTypeID === 4) {
         slabID = item.driverValue ?? null;
-        driverValue =
-          item.slab?.find((option) => option.slabID === slabID)?.slabValue ??
-          null;
+        let matchedSlab = item.slab?.find((option) => option.slabID === slabID);
+        if (!matchedSlab && fallbackToIsDefaultOption) {
+          matchedSlab = item.slab?.find((option) => option.isDefault);
+          if (matchedSlab) slabID = matchedSlab.slabID;
+        }
+        driverValue = matchedSlab?.slabValue ?? null;
       } else if (item.driverTypeID === 5) {
         const textBlock = item.text?.[0] ?? null;
         textID = textBlock?.textID ?? null;
@@ -2213,46 +2256,116 @@ const buildAdditionalInformationListForPayload = (additionalInformationList) => 
   );
 };
 
-// A Package-type quote never shows the Additional Information step to the
-// client (additionalInfoStepInserted is hardcoded false for it in
-// ProposalAmendment.jsx — see the comment there), so the live
-// additionalInformationList redux list this route fetches has nothing
-// visible in it and buildAdditionalInformationListForPayload above
-// correctly resolves to an empty array for it. But that's the wrong source
-// for a Package quote's payload: GetQuoteModel's own additionalInformationList
-// already carries the real saved driver values (already close to the
-// AddUpdateQuote row shape — just msgMapID/msMapID need nulling, like
-// normalizeSelectedServicesListFromQuoteModel does for selectedServicesList)
-// and must be forwarded instead of an empty list. Only used for Package —
-// Service and Custom Package both keep reading the live list, unaffected.
+// The live additionalInformationList redux list only ever carries drivers
+// for services GetPricingFormulasGlobalPricingDrivers was actually asked
+// about (ProposalAmendment.jsx's servicesIDs: selectedServiceIDs) — a
+// Package-type quote never shows the Additional Information step at all
+// (additionalInfoStepInserted is hardcoded false for it), so that live list
+// has nothing visible in it; a Custom Package quote's admin-added default
+// services (locked, outside the client's own selection) can likewise be
+// missing from it. Either way buildAdditionalInformationListForPayload
+// above then drops those drivers' rows from the payload entirely — even
+// though GetQuoteModel's own additionalInformationList still has the real
+// saved values for them (already close to the AddUpdateQuote row shape —
+// just msgMapID/msMapID need nulling, like
+// normalizeSelectedServicesListFromQuoteModel does for selectedServicesList).
 const normalizeAdditionalInformationListFromQuoteModel = (
   additionalInformationList,
+  // Custom Package only — see the matching flag on
+  // buildAdditionalInformationListForPayload. This passthrough's rows carry
+  // no driverTypeID to branch on, but a quantity-type row is the only kind
+  // with none of variationID/slabID/dateID/textID set, so that absence is
+  // used as the same signal here: if driverValue still equals this row's
+  // own globalPricingDriverID (the corrupted-default GetPricingFormulas
+  // GlobalPricingDrivers quirk, persisted from a prior save that went out
+  // uncorrected), reset it to 0 instead of forwarding the corrupted value.
+  { fixCorruptedQuantityDefault = false } = {},
 ) => {
   if (!Array.isArray(additionalInformationList)) {
     return additionalInformationList ?? null;
   }
 
-  return additionalInformationList.map((item) => ({
-    msgMapID: null,
-    msMapID: null,
-    globalPricingDriverID: item.globalPricingDriverID,
-    driverValue: toNullableNumber(item.driverValue) ?? item.driverValue ?? null,
-    variationID: item.variationID ?? null,
-    slabID: item.slabID ?? null,
-    dateID: item.dateID ?? null,
-    textID: item.textID ?? null,
-    enteredText: item.enteredText ?? null,
-    enteredDate: item.enteredDate ?? null,
-    enteredDateFormat: item.enteredDateFormat ?? null,
-  }));
+  return additionalInformationList.map((item) => {
+    const isPlainValueRow =
+      item.variationID == null &&
+      item.slabID == null &&
+      item.dateID == null &&
+      item.textID == null;
+    const rawDriverValue =
+      fixCorruptedQuantityDefault &&
+      isPlainValueRow &&
+      item.driverValue != null &&
+      item.driverValue === item.globalPricingDriverID
+        ? 0
+        : item.driverValue;
+
+    return {
+      msgMapID: null,
+      msMapID: null,
+      globalPricingDriverID: item.globalPricingDriverID,
+      driverValue: toNullableNumber(rawDriverValue) ?? rawDriverValue ?? null,
+      variationID: item.variationID ?? null,
+      slabID: item.slabID ?? null,
+      dateID: item.dateID ?? null,
+      textID: item.textID ?? null,
+      enteredText: item.enteredText ?? null,
+      enteredDate: item.enteredDate ?? null,
+      enteredDateFormat: item.enteredDateFormat ?? null,
+    };
+  });
+};
+
+// Merges the live-rebuilt rows (fresher — reflect whatever the client just
+// edited) with GetQuoteModel's own saved rows (normalized), keyed by
+// globalPricingDriverID: a driver present in both takes the live version; a
+// driver GetQuoteModel has that the live fetch never covered (see the
+// comment above normalizeAdditionalInformationListFromQuoteModel) is kept
+// from the saved copy instead of being silently dropped; a driver only the
+// live list has (freshly added) is appended as-is.
+const mergeAdditionalInformationLists = (
+  liveList,
+  quoteModelList,
+  { fixCorruptedQuantityDefault = false } = {},
+) => {
+  const passthroughList =
+    normalizeAdditionalInformationListFromQuoteModel(quoteModelList, {
+      fixCorruptedQuantityDefault,
+    }) || [];
+  const liveByDriverID = new Map(
+    (liveList || []).map((item) => [item.globalPricingDriverID, item]),
+  );
+
+  const merged = passthroughList.map(
+    (item) => liveByDriverID.get(item.globalPricingDriverID) ?? item,
+  );
+
+  const passthroughDriverIDs = new Set(
+    passthroughList.map((item) => item.globalPricingDriverID),
+  );
+  (liveList || []).forEach((item) => {
+    if (!passthroughDriverIDs.has(item.globalPricingDriverID)) {
+      merged.push(item);
+    }
+  });
+
+  return merged;
 };
 
 // Dispatches additionalInformationList building by proposal type — Service
-// and Custom Package both rebuild from the Additional Information step's
-// live list (buildAdditionalInformationListForPayload), unchanged from
-// before; Package instead normalizes GetQuoteModel's own list (see
-// normalizeAdditionalInformationListFromQuoteModel above), since the live
-// list is never populated with anything visible for that type.
+// is unchanged: rebuilds purely from the Additional Information step's live
+// list (buildAdditionalInformationListForPayload), same as before. Package
+// is also unchanged from its own existing fix: always the normalized
+// GetQuoteModel passthrough, never the live list — its
+// additionalInfoStepInserted is hardcoded false (the client never sees this
+// step, so there's nothing to merge from a live edit), and its live redux
+// list isn't verified to always be empty in practice, so merging it in
+// could resurface the exact driverValue-corruption bug
+// fixCorruptedQuantityDefault exists to fix (a fix Package doesn't get,
+// since its own consumer never showed the gap). Only Custom Package merges
+// the live list with GetQuoteModel's saved one (see
+// mergeAdditionalInformationLists above), since it's the one type that can
+// have drivers — an admin-added, locked default service among them — the
+// live fetch's scope never covers.
 const buildAdditionalInformationList = ({
   quoteModel,
   additionalInformationList,
@@ -2261,6 +2374,20 @@ const buildAdditionalInformationList = ({
   if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package) {
     return normalizeAdditionalInformationListFromQuoteModel(
       quoteModelAdditionalInformationList,
+    );
+  }
+
+  if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage) {
+    const liveList = additionalInformationList
+      ? buildAdditionalInformationListForPayload(additionalInformationList, {
+          fallbackToIsDefaultOption: true,
+          fixCorruptedQuantityDefault: true,
+        })
+      : [];
+    return mergeAdditionalInformationLists(
+      liveList,
+      quoteModelAdditionalInformationList,
+      { fixCorruptedQuantityDefault: true },
     );
   }
 
@@ -2277,25 +2404,61 @@ const buildAdditionalInformationList = ({
 // every row it returns (AddUpdateProposal.jsx:20419-20424) — there's no
 // separate isAdditionalService field on the web proposal's own services
 // catalog response, so it's derived the same way from each service
-// definition's own isDisabled flag here. servicePackageIDs is every package
-// this Standard Package quote has configured (GetPackageServicesList/
-// GetServicesWithGlobalPricingDriverListByServiceChargeType both stamp the
-// full requested ServicePackageIDs array onto every row for a
-// package-scoped fetch, so a Standard Package's own selections are never
-// scoped to just one package). Package-type only — Custom Package keeps the
-// GetQuoteModel passthrough untouched (see buildAddUpdateQuotePayload).
-const buildQuoteAdditionalServicesInPackagesForPackageType = ({
+// definition's own isDisabled flag here.
+//
+// servicePackageIDs differs by type, because admin's own two
+// package-pricing consumers build it differently:
+//   - Standard Package (GetCalculatedServicesPriceByPackagesData,
+//     AddUpdateProposal.jsx:19011-19073) — left untouched here, out of
+//     scope for this fix.
+//   - Custom Package (GetCalculatedServicesPriceData,
+//     AddUpdateProposal.jsx:17829-17849, repeated at 17858+/17908+): for
+//     service.isAdditionalService (a client-added, non-locked service —
+//     matched here by !isDisabled), servicePackageIDs is NOT recomputed
+//     from live pricing data at all. serviceMappingWithPackagesList only
+//     ever carries the admin's own package cross-join rows (the package's
+//     pre-configured default services), so a client addition structurally
+//     never has a row there — filtering it for one always returns [],
+//     which is exactly the bug being fixed here. Admin instead reads
+//     straight off this quote's own previously-saved
+//     quoteAdditionalServicesInPackages (QuotationAdditionalServices,
+//     seeded from ModelData.quoteAdditionalServicesInPackages at
+//     AddUpdateProposal.jsx:21732-21734), matched by serviceID +
+//     serviceChargeTypeID — i.e. whichever package(s) this addition was
+//     already assigned to on a prior save, carried forward as-is. Falls
+//     back to [] when there's no prior saved entry (a service the client
+//     just added this session, never saved before).
+const buildQuoteAdditionalServicesInPackages = ({
+  quoteTypeID,
   recurringSelections,
   oneOffSelections,
   recurringServices,
   oneOffServices,
   servicePackageID,
+  savedQuoteAdditionalServicesInPackages,
 }) => {
   const recurringDefs = buildServiceDefMap(recurringServices);
   const oneOffDefs = buildServiceDefMap(oneOffServices);
-  const servicePackageIDs = Array.isArray(servicePackageID)
+  const isCustomPackage = quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
+
+  const savedList = Array.isArray(savedQuoteAdditionalServicesInPackages)
+    ? savedQuoteAdditionalServicesInPackages
+    : [];
+  // Standard Package: every additional service belongs to every package
+  // this quote has configured (see the comment above) — unchanged from
+  // before this function grew a Custom Package branch.
+  const standardPackageServicePackageIDs = Array.isArray(servicePackageID)
     ? servicePackageID
     : [];
+
+  const membershipFor = (serviceID, serviceChargeTypeID) =>
+    isCustomPackage
+      ? (savedList.find(
+          (row) =>
+            row.serviceID === serviceID &&
+            Number(row.serviceChargeTypeID) === serviceChargeTypeID,
+        )?.servicePackageIDs ?? [])
+      : standardPackageServicePackageIDs;
 
   const buildRows = (selections, defs, serviceChargeTypeID) =>
     Object.values(selections || {})
@@ -2304,7 +2467,7 @@ const buildQuoteAdditionalServicesInPackagesForPackageType = ({
         serviceID: selection.serviceID,
         serviceCatID: selection.serviceCatID,
         serviceChargeTypeID,
-        servicePackageIDs,
+        servicePackageIDs: membershipFor(selection.serviceID, serviceChargeTypeID),
       }));
 
   return [
@@ -2425,29 +2588,36 @@ export const buildAddUpdateQuotePayload = (
     ? quoteModel.servicePackageID
     : [];
 
-  // AddUpdateProposal.jsx never sends GetQuoteModel's own saved
-  // serviceMappingWithPackagesList copy back — its ServiceMappingWithPackagesList
-  // state is populated straight from GetCalculatedServicesPriceByPackages'
-  // own response (AddUpdateProposal.jsx:19520-19559:
-  // serviceMappingWithPackagesList off responseData, mapped into
-  // ServiceMappingWithPackagesList state, sent as-is at
-  // AddUpdateProposal.jsx:23170) — i.e. always this quote's current
-  // pricing-engine output, never a stale saved one. The web proposal
-  // already fetches that exact same data live (getCalculatedServicesPriceByPackages,
-  // state.webProposalServices.serviceMappingWithPackagesList) for the
-  // Pricing Table step, so prefer it here too; falls back to the
-  // GetQuoteModel passthrough only when the live list isn't available
-  // (e.g. a Service-type quote, which has no packages and never populates
-  // this at all). Field casing differs between the two
-  // (serviceMappingWithPackagesList vs ServiceMappingWithPackagesList) —
-  // also non-nullable, so default to [] like the other array fields above.
-  payload.ServiceMappingWithPackagesList = Array.isArray(
-    serviceSelectionsForTotals?.serviceMappingWithPackagesList,
-  )
-    ? serviceSelectionsForTotals.serviceMappingWithPackagesList
-    : Array.isArray(quoteModel.serviceMappingWithPackagesList)
-      ? quoteModel.serviceMappingWithPackagesList
-      : [];
+  // ServiceMappingWithPackagesList's admin-side source genuinely differs by
+  // type, verified against AddUpdateProposal.jsx directly:
+  //   - Standard Package: its ServiceMappingWithPackagesList state is only
+  //     ever populated inside GetCalculatedServicesPriceByPackagesData
+  //     (selectedProposalTypeValue === 2), from that response's own
+  //     serviceMappingWithPackagesList, frequency-rescaled
+  //     (AddUpdateProposal.jsx:19520-19559) — always this quote's current
+  //     pricing-engine output, never a stale saved one. Sent as-is at
+  //     AddUpdateProposal.jsx:23170.
+  //   - Custom Package: GetCalculatedServicesPriceData (the consumer used
+  //     for selectedProposalTypeValue === 4 — see priceForSelectedPackage's
+  //     comment in ProposalPricingTableStep.jsx) never calls
+  //     setServiceMappingWithPackagesList at all (that call only exists,
+  //     commented out, inside the Standard Package function at
+  //     AddUpdateProposal.jsx:18898). The state stays at its useState([])
+  //     initial value for the whole Custom Package flow, so
+  //     AddUpdateProposal.jsx:23170 genuinely sends [] for Custom Package,
+  //     regardless of what the live pricing response's own
+  //     serviceMappingWithPackagesList contains.
+  // Package (and Service, which never populates this at all) keep preferring
+  // the live list over the GetQuoteModel passthrough, same as before; Custom
+  // Package always sends [] to match.
+  payload.ServiceMappingWithPackagesList =
+    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage
+      ? []
+      : Array.isArray(serviceSelectionsForTotals?.serviceMappingWithPackagesList)
+        ? serviceSelectionsForTotals.serviceMappingWithPackagesList
+        : Array.isArray(quoteModel.serviceMappingWithPackagesList)
+          ? quoteModel.serviceMappingWithPackagesList
+          : [];
 
   payload.globalPricingDriverIDsWithValues =
     buildGlobalPricingDriverIDsWithValues(quoteModel, inputFieldsList);
@@ -2479,21 +2649,33 @@ export const buildAddUpdateQuotePayload = (
   // non-empty — force it to [] to match, same as the admin flow always does
   // for this proposal type.
   //
-  // Package quotes rebuild it live from the current selections the same way
-  // admin does at submit time, instead of forwarding GetQuoteModel's stale
-  // saved copy — see buildQuoteAdditionalServicesInPackagesForPackageType.
-  // Custom Package keeps the quoteModel passthrough untouched (out of scope
-  // here; its own client-added-service handling is elsewhere).
+  // Package and Custom Package both rebuild it live from the current
+  // selections the same way admin does at submit time, instead of
+  // forwarding GetQuoteModel's stale saved copy — see
+  // buildQuoteAdditionalServicesInPackages for how servicePackageIDs is
+  // sourced for each (Package: unchanged, out of scope; Custom Package:
+  // carried forward from this quote's own previously-saved
+  // quoteAdditionalServicesInPackages).
   if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Service) {
     payload.quoteAdditionalServicesInPackages = [];
-  } else if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package) {
+  } else if (
+    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package ||
+    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage
+  ) {
     payload.quoteAdditionalServicesInPackages =
-      buildQuoteAdditionalServicesInPackagesForPackageType({
+      buildQuoteAdditionalServicesInPackages({
+        quoteTypeID: quoteModel.quoteTypeID,
         recurringSelections: serviceSelectionsForTotals?.recurringSelections,
         oneOffSelections: serviceSelectionsForTotals?.oneOffSelections,
         recurringServices: serviceSelectionsForTotals?.recurringServices,
         oneOffServices: serviceSelectionsForTotals?.oneOffServices,
         servicePackageID: payload.servicePackageID,
+        // GetQuoteModel's own saved copy — mirrors admin's
+        // QuotationAdditionalServices, itself seeded from
+        // ModelData.quoteAdditionalServicesInPackages
+        // (AddUpdateProposal.jsx:21732-21734).
+        savedQuoteAdditionalServicesInPackages:
+          quoteModel?.quoteAdditionalServicesInPackages,
       });
   }
 

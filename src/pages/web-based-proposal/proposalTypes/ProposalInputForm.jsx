@@ -19,6 +19,7 @@ import {
   selectOneOffSelections,
   selectRecurringServices,
   selectOneOffServices,
+  selectServiceMappingWithPackagesList,
 } from "../../../redux/reducer/webProposal/services";
 import {
   getAdditionalInformationList,
@@ -58,6 +59,9 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
   const oneOffSelections = useSelector(selectOneOffSelections);
   const recurringServices = useSelector(selectRecurringServices);
   const oneOffServices = useSelector(selectOneOffServices);
+  const serviceMappingWithPackagesList = useSelector(
+    selectServiceMappingWithPackagesList,
+  );
 
   const isPackageType = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
   const isCustomPackageType =
@@ -281,11 +285,10 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     // globalPricingDriverIDsWithValues entries the client actually filled in
     // on the Input Fields step are patched on top — the package selection
     // and everything else stays exactly as GetQuoteModel returned it.
-    // serviceSelectionsForTotals is only actually read for a Package-type
-    // quote's quoteAdditionalServicesInPackages rebuild (see
-    // buildQuoteAdditionalServicesInPackagesForPackageType) — Custom Package
-    // ignores these fields, same as Service ignores them here since it never
-    // reaches handleAccept (isPackageBased-gated) at all.
+    // serviceSelectionsForTotals is only actually read for a Package/Custom
+    // Package quote's quoteAdditionalServicesInPackages rebuild (see
+    // buildQuoteAdditionalServicesInPackages) — Service ignores these fields
+    // since it never reaches handleAccept (isPackageBased-gated) at all.
     try {
       await dispatch(
         addUpdateQuote(
@@ -299,6 +302,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
               oneOffSelections,
               recurringServices,
               oneOffServices,
+              serviceMappingWithPackagesList,
             },
           ),
         ),
