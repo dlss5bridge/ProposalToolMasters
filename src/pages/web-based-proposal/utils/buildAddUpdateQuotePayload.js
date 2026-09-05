@@ -287,14 +287,20 @@ export const buildQuotationFinalAmountListForServiceType = ({
 // Service (see buildQuotationFinalAmountListForServiceType above); every
 // other type (Package, Custom Package) keeps the quoteModel passthrough,
 // since neither lets the client change which services are priced into it
-// here.
+// here. isAmend gates the Service rebuild too: an unamended Service
+// Amendment (client changed nothing from the admin defaults) has nothing to
+// rebuild either, so it keeps the same quoteModel passthrough as Package/
+// Custom Package. Defaults to true so callers that never pass it (the
+// non-Amendment Accept/Save flows in ProposalInputForm.jsx) keep their
+// existing always-rebuild behavior unchanged.
 export const buildQuotationFinalAmountList = ({
   quoteModel,
   recurringSelections,
   oneOffSelections,
   pricing,
+  isAmend = true,
 }) => {
-  if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Service) {
+  if (isAmend && quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Service) {
     return buildQuotationFinalAmountListForServiceType({
       quoteModel,
       recurringSelections,
@@ -2051,6 +2057,16 @@ export const buildPricingVariablesListForPackageType = ({
 // (buildPricingVariablesListForPackageType — the admin flow itself never
 // distinguishes the two here either); any other/unrecognised type keeps the
 // plain quoteModel passthrough.
+// Unlike buildQuotationFinalAmountList/selectedServicesList/
+// additionalInformationList, this is NOT gated by isAmend: GetQuoteModel's
+// own pricingVariablesList is a write-only template-substitution field that
+// AddUpdateQuote itself populates on save, not something GetQuoteModel
+// reliably returns already populated — falling back to the raw
+// quoteModel.pricingVariablesList passthrough for an unamended Service
+// quote would silently send an empty list and drop every $Variable$ the PDF
+// template relies on. So Service rebuilds this from the current (unchanged,
+// when unamended) live selections/pricing regardless of isAmend, exactly
+// like Package/Custom Package's branch below already does unconditionally.
 export const buildPricingVariablesList = ({
   quoteModel,
   quotationFinalAmountRows,
@@ -2142,6 +2158,56 @@ const normalizeSelectedServicesListFromQuoteModel = (selectedServicesList) => {
       service.finalCalculatedServicePrice,
     ),
     moduleServicesGPDList: normalizeModuleServicesGPDList(
+      service.moduleServicesGPDList,
+    ),
+  }));
+};
+
+// isAmend: false counterpart to normalizeModuleServicesGPDList/
+// normalizeSelectedServicesListFromQuoteModel above — same field
+// projection/type coercion (AddUpdateQuote's accepted shape), but keeps
+// each row's actual driverValue/msMapID/servicePackageID/msgMapID exactly
+// as GetQuoteModel returned them instead of forcing them to null. Nulling
+// those IDs so the backend assigns fresh ones only makes sense while
+// actually submitting new/changed amendment data (see the comment above
+// normalizeSelectedServicesListFromQuoteModel) — an unamended resubmission
+// has nothing new to assign fresh IDs for, so the previously-saved IDs are
+// preserved as-is.
+const preserveModuleServicesGPDList = (moduleServicesGPDList) => {
+  if (!Array.isArray(moduleServicesGPDList) || moduleServicesGPDList.length === 0) {
+    return null;
+  }
+
+  return moduleServicesGPDList.map((driver) => ({
+    driverValue: toNullableNumber(driver.driverValue),
+    msgMapID: driver.msgMapID ?? null,
+    msMapID: driver.msMapID ?? null,
+    globalPricingDriverID: driver.globalPricingDriverID,
+    variationID: driver.variationID ?? null,
+    slabID: driver.slabID ?? null,
+    dateID: driver.dateID ?? null,
+    textID: driver.textID ?? null,
+    enteredText: driver.enteredText ?? null,
+    enteredDate: driver.enteredDate ?? null,
+    enteredDateFormat: driver.enteredDateFormat ?? null,
+  }));
+};
+
+const preserveSelectedServicesListFromQuoteModel = (selectedServicesList) => {
+  if (!Array.isArray(selectedServicesList)) return selectedServicesList ?? null;
+
+  return selectedServicesList.map((service) => ({
+    driverValue: service.driverValue ?? null,
+    msMapID: service.msMapID ?? null,
+    serviceID: service.serviceID,
+    proposedServiceName: service.proposedServiceName ?? null,
+    serviceCatID: service.serviceCatID,
+    serviceChargeTypeID: service.serviceChargeTypeID,
+    servicePackageID: service.servicePackageID ?? null,
+    finalCalculatedServicePrice: toNullableNumber(
+      service.finalCalculatedServicePrice,
+    ),
+    moduleServicesGPDList: preserveModuleServicesGPDList(
       service.moduleServicesGPDList,
     ),
   }));
@@ -2315,6 +2381,37 @@ const normalizeAdditionalInformationListFromQuoteModel = (
   });
 };
 
+// isAmend: false counterpart to normalizeAdditionalInformationListFromQuoteModel
+// above — same field projection, but keeps each row's actual msgMapID/
+// msMapID exactly as GetQuoteModel returned them instead of forcing them to
+// null (see preserveSelectedServicesListFromQuoteModel's comment for why).
+// No fixCorruptedQuantityDefault correction either: that fix exists to
+// repair a value the live redux state disagrees with, which only matters
+// while actually submitting a live-derived amendment — an unamended
+// resubmission has no live-derived value to compare against, so the saved
+// driverValue is forwarded exactly as GetQuoteModel returned it.
+const preserveAdditionalInformationListFromQuoteModel = (
+  additionalInformationList,
+) => {
+  if (!Array.isArray(additionalInformationList)) {
+    return additionalInformationList ?? null;
+  }
+
+  return additionalInformationList.map((item) => ({
+    msgMapID: item.msgMapID ?? null,
+    msMapID: item.msMapID ?? null,
+    globalPricingDriverID: item.globalPricingDriverID,
+    driverValue: toNullableNumber(item.driverValue) ?? item.driverValue ?? null,
+    variationID: item.variationID ?? null,
+    slabID: item.slabID ?? null,
+    dateID: item.dateID ?? null,
+    textID: item.textID ?? null,
+    enteredText: item.enteredText ?? null,
+    enteredDate: item.enteredDate ?? null,
+    enteredDateFormat: item.enteredDateFormat ?? null,
+  }));
+};
+
 // Merges the live-rebuilt rows (fresher — reflect whatever the client just
 // edited) with GetQuoteModel's own saved rows (normalized), keyed by
 // globalPricingDriverID: a driver present in both takes the live version; a
@@ -2366,11 +2463,27 @@ const mergeAdditionalInformationLists = (
 // mergeAdditionalInformationLists above), since it's the one type that can
 // have drivers — an admin-added, locked default service among them — the
 // live fetch's scope never covers.
+//
+// isAmend (defaults to true — see buildAddUpdateQuotePayload's matching
+// default) gates all of the above: those branches all null out msgMapID/
+// msMapID (directly, or via buildAdditionalInformationListForPayload/
+// normalizeAdditionalInformationListFromQuoteModel), which is only correct
+// while actually submitting new/changed amendment data. An unamended
+// Service/Custom Package proposal, and Package's always-unamended one, use
+// preserveAdditionalInformationListFromQuoteModel instead — the plain
+// GetQuoteModel passthrough with those IDs left exactly as returned.
 const buildAdditionalInformationList = ({
   quoteModel,
   additionalInformationList,
   quoteModelAdditionalInformationList,
+  isAmend = true,
 }) => {
+  if (!isAmend) {
+    return preserveAdditionalInformationListFromQuoteModel(
+      quoteModelAdditionalInformationList,
+    );
+  }
+
   if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package) {
     return normalizeAdditionalInformationListFromQuoteModel(
       quoteModelAdditionalInformationList,
@@ -2553,12 +2666,27 @@ const ADD_UPDATE_QUOTE_FIELD_MAP = [
 // Package/Custom Package only read servicePackageList and
 // serviceMappingWithPackagesList — so a caller can omit whichever fields
 // its proposal type never needs.
+//
+// isAmend (defaults to true so callers that never pass it — the
+// non-Amendment Accept/Save flows in ProposalInputForm.jsx — keep their
+// existing behavior unchanged) additionally gates selectedServicesList,
+// additionalInformationList, and the Service-type quotationFinalAmountList
+// rebuild: an unamended Service/Custom Package Amendment (client changed
+// nothing from the admin defaults) has nothing to rebuild, so those three
+// use the plain GetQuoteModel-sourced values (IDs preserved, not nulled —
+// see preserveSelectedServicesListFromQuoteModel/
+// preserveAdditionalInformationListFromQuoteModel) with the caller expected
+// to pass isAmend: false and no selectedServicesListOverride in that case.
+// pricingVariablesList is the one exception — see the comment on
+// buildPricingVariablesList for why it always rebuilds regardless of
+// isAmend.
 export const buildAddUpdateQuotePayload = (
   quoteModel,
   inputFieldsList,
   selectedServicesListOverride,
   additionalInformationList,
   serviceSelectionsForTotals,
+  isAmend = true,
 ) => {
   if (!quoteModel) return null;
 
@@ -2626,17 +2754,28 @@ export const buildAddUpdateQuotePayload = (
     quoteModel,
     additionalInformationList,
     quoteModelAdditionalInformationList: payload.additionalInformationList,
+    isAmend,
   });
 
-  payload.selectedServicesList = selectedServicesListOverride
-    ? selectedServicesListOverride
-    : normalizeSelectedServicesListFromQuoteModel(payload.selectedServicesList);
+  // isAmend gates which normalization is used for the non-override path
+  // too: true (and no override — the non-Amendment Accept/Save callers)
+  // keeps the existing null-heavy normalizeSelectedServicesListFromQuoteModel
+  // behavior unchanged; false (an unamended Amendment) preserves the actual
+  // GetQuoteModel IDs via preserveSelectedServicesListFromQuoteModel instead
+  // of nulling them.
+  payload.selectedServicesList =
+    isAmend && selectedServicesListOverride
+      ? selectedServicesListOverride
+      : isAmend
+        ? normalizeSelectedServicesListFromQuoteModel(payload.selectedServicesList)
+        : preserveSelectedServicesListFromQuoteModel(payload.selectedServicesList);
 
   payload.quotationFinalAmountList = buildQuotationFinalAmountList({
     quoteModel,
     recurringSelections: serviceSelectionsForTotals?.recurringSelections,
     oneOffSelections: serviceSelectionsForTotals?.oneOffSelections,
     pricing: serviceSelectionsForTotals?.pricing,
+    isAmend,
   });
 
   // AddUpdateProposal.jsx's quoteAdditionalServicesInPackages is built by

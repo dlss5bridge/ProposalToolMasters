@@ -397,30 +397,16 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       return;
     }
 
-    // Base request is the complete GetQuoteModel response. Package
-    // Amendment never lets the client add/remove services, so its
-    // selectedServicesList is left exactly as GetQuoteModel returned it —
-    // Service-based and Custom Package Amendment, by contrast, let the
-    // client add/remove services on the Services step, so their
-    // selectedServicesList is rebuilt from the live, currently-committed
-    // selections instead of the stale quoteModel copy (fetched once at page
-    // load, before any edits) — see buildSelectedServicesListFromSelections.
-    // Every other field, and additionalInformationList, on top.
-    const selectedServicesListOverride = isPackageType
-      ? undefined
-      : buildSelectedServicesListFromSelections({
-          recurringSelections,
-          oneOffSelections,
-          recurringServices,
-          oneOffServices,
-          pricing: servicesPricing,
-        });
-
-    // isAmend must only be true when the client actually changed something
-    // from the admin's defaults — a service selection/driver value or an
-    // Additional Information driver value. Submitting the unedited default
-    // proposal (e.g. just picking a package and accepting) is not an
-    // amendment.
+    // isAmend is decided independently per proposal type, per the table in
+    // buildAddUpdateQuotePayload.js's doc comment:
+    //   - Package never lets the client change anything on this proposal
+    //     (no Services step, no Additional Information step), so it's
+    //     always false — no comparison needed.
+    //   - Service and Custom Package are amendments only when the client
+    //     actually changed something from the admin's defaults — a service
+    //     selection/driver value or an Additional Information driver value.
+    //     Submitting the unedited default proposal (e.g. just picking a
+    //     package and accepting) is not an amendment.
     const hasBeenAmended =
       !selectionsMatch(recurringSelections, defaultRecurringSelections) ||
       !selectionsMatch(oneOffSelections, defaultOneOffSelections) ||
@@ -428,6 +414,26 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         additionalInformationList,
         defaultAdditionalInformationList,
       );
+    const isAmend = isPackageType ? false : hasBeenAmended;
+
+    // Base request is the complete GetQuoteModel response. Package
+    // Amendment never lets the client add/remove services, and an unamended
+    // Service/Custom Package proposal has nothing to rebuild either — both
+    // cases leave selectedServicesList exactly as GetQuoteModel returned it
+    // (see buildAddUpdateQuotePayload's isAmend gate). Only an actually
+    // amended Service/Custom Package proposal rebuilds it from the live,
+    // currently-committed selections instead of the stale quoteModel copy
+    // (fetched once at page load, before any edits) — see
+    // buildSelectedServicesListFromSelections.
+    const selectedServicesListOverride = isAmend
+      ? buildSelectedServicesListFromSelections({
+          recurringSelections,
+          oneOffSelections,
+          recurringServices,
+          oneOffServices,
+          pricing: servicesPricing,
+        })
+      : undefined;
 
     let amendedQuoteKeyID;
     try {
@@ -453,8 +459,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
               servicePackageList: servicesPackageList,
               serviceMappingWithPackagesList,
             },
+            isAmend,
           ),
-          isAmend: hasBeenAmended,
+          isAmend,
         }),
       ).unwrap();
     } catch (err) {
