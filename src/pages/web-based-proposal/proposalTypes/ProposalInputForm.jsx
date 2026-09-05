@@ -184,6 +184,19 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
   // generate-contract redirect too, since this is the "finish" action for
   // this (non-package) proposal type just as handleAccept is for package
   // ones.
+  //
+  // isAmend: false — this "Slideshow with Input Fields" web proposal type
+  // (webProposalTypeID 2, see index.jsx's WEB_PROPOSAL_TYPE_ID) never gives
+  // the client a Services or Additional Information step (see the `steps`
+  // array below — only Proposal/Pricing Table/Input Fields ever appear), so
+  // there's nothing here that qualifies as an amendment the way
+  // ProposalAmendment.jsx's Service/Custom Package flows do. Passing
+  // isAmend: false makes buildAddUpdateQuotePayload preserve
+  // selectedServicesList/additionalInformationList exactly as GetQuoteModel
+  // returned them (see preserveSelectedServicesListFromQuoteModel/
+  // preserveAdditionalInformationListFromQuoteModel) instead of applying
+  // the amendment-only null-ID transformations meant for actual amendment
+  // submissions.
   const handleSave = async () => {
     const quoteKeyID = quoteModel?.quoteKeyID;
     // themeSettings was already fetched by GetOrganisationThemeSettings on
@@ -207,14 +220,17 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
 
     try {
       await dispatch(
-        addUpdateQuote(
-          buildAddUpdateQuotePayload(
+        addUpdateQuote({
+          ...buildAddUpdateQuotePayload(
             quoteModel,
             inputFieldsList,
             undefined,
             additionalInformationList,
+            undefined,
+            false,
           ),
-        ),
+          isAmend: false,
+        }),
       ).unwrap();
     } catch (err) {
       setAcceptError("Failed to save proposal. Please try again.");
@@ -289,10 +305,18 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     // Package quote's quoteAdditionalServicesInPackages rebuild (see
     // buildQuoteAdditionalServicesInPackages) — Service ignores these fields
     // since it never reaches handleAccept (isPackageBased-gated) at all.
+    //
+    // isAmend: false — same reasoning as handleSave above: this proposal
+    // type never gives the client a Services or Additional Information step
+    // for any quote type (Package, Custom Package included — the `steps`
+    // array below only ever shows Proposal/Pricing Table/Input Fields), so
+    // selectedServicesList/additionalInformationList should preserve
+    // GetQuoteModel's own values rather than the amendment-only null-ID
+    // transformations.
     try {
       await dispatch(
-        addUpdateQuote(
-          buildAddUpdateQuotePayload(
+        addUpdateQuote({
+          ...buildAddUpdateQuotePayload(
             quoteModel,
             inputFieldsList,
             undefined,
@@ -304,8 +328,10 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
               oneOffServices,
               serviceMappingWithPackagesList,
             },
+            false,
           ),
-        ),
+          isAmend: false,
+        }),
       ).unwrap();
     } catch (err) {
       setAcceptError("Failed to accept proposal. Please try again.");
