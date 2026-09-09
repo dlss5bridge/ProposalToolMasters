@@ -30,6 +30,7 @@ import {
   selectOneOffServices,
   selectServicesPricing,
   selectServicesCurrencyID,
+  selectServicesVatPercentage,
   selectServicesPackageList,
   selectServiceMappingWithPackagesList,
   setServicesSelectionError,
@@ -59,6 +60,7 @@ import {
   buildSelectedServicesListFromSelections,
 } from "../utils/buildAddUpdateQuotePayload";
 import { selectionsMatch } from "../steps/ProposalPricingTableStep";
+import { generateAmendmentPdfUrl } from "../pdf/generateAmendmentPdf";
 
 export default function ProposalAmendment({ theme, proposal, services }) {
   const dispatch = useDispatch();
@@ -92,6 +94,11 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const oneOffServices = useSelector(selectOneOffServices);
   const servicesPricing = useSelector(selectServicesPricing);
   const servicesCurrencyID = useSelector(selectServicesCurrencyID);
+  // Same source ProposalPricingTableStep.jsx already falls back to
+  // (recurringVatPercentage/oneOffVatPercentage) when a charge type has no
+  // existing quotationFinalAmountList row of its own yet — see
+  // buildQuotationFinalAmountListForServiceType's matching fallback.
+  const servicesVatPercentage = useSelector(selectServicesVatPercentage);
   const servicesPackageList = useSelector(selectServicesPackageList);
   const serviceMappingWithPackagesList = useSelector(
     selectServiceMappingWithPackagesList,
@@ -435,6 +442,71 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         })
       : undefined;
 
+    // Existing amendment payload logic, untouched — built once, before any
+    // PDF work.
+    const amendmentPayload = buildAddUpdateQuotePayload(
+      quoteModel,
+      inputFieldsList,
+      selectedServicesListOverride,
+      additionalInformationList,
+      {
+        recurringSelections,
+        oneOffSelections,
+        recurringServices,
+        oneOffServices,
+        pricing: servicesPricing,
+        currencyID: servicesCurrencyID,
+        vatPercentage: servicesVatPercentage,
+        servicePackageList: servicesPackageList,
+        serviceMappingWithPackagesList,
+      },
+      isAmend,
+    );
+
+    // Regenerate the PDF only for an actual Service/Custom Package
+    // amendment — mirrors AddUpdateProposal.jsx/PreviewComponentpdf.jsx's
+    // own generate → merge → quotePDFUrl sequence (generateAmendmentPdf.js:
+    // one generatePdfUrl call per updated-content page — Recurring Fees,
+    // One-Off Fees, Additional Information — then a single mergePdfApiUrl
+    // call), using the correctly-totalled live selections
+    // (quotationFinalAmountList, now falling back to the live VAT rate for
+    // a charge type with no prior row). Must finish and update
+    // amendmentPayload.quotePDFUrl before the single addUpdateQuote call
+    // below — Package never reaches this (isAmend is always false for it),
+    // and an unamended Service/Custom Package proposal (isAmend: false)
+    // skips it too, leaving quotePDFUrl exactly as buildAddUpdateQuotePayload
+    // already set it.
+    let finalPayload = amendmentPayload;
+    if (isAmend) {
+      let mergedPdfUrl;
+      try {
+        mergedPdfUrl = await generateAmendmentPdfUrl({
+          quoteModel,
+          accentColor: theme?.primary,
+          quotationFinalAmountList: amendmentPayload.quotationFinalAmountList,
+          recurringSelections,
+          oneOffSelections,
+          recurringServices,
+          oneOffServices,
+          additionalInformationList,
+          pricing: servicesPricing,
+          currencyID: servicesCurrencyID,
+        });
+      } catch (err) {
+        mergedPdfUrl = null;
+      }
+
+      if (!mergedPdfUrl) {
+        setAcceptError("Failed to generate the amendment PDF. Please try again.");
+        return;
+      }
+
+      // Same field AddUpdateProposal.jsx assigns MergePdfUrl to
+      // (quotePDFUrl: MergePdfUrl || null) — every other key from the
+      // existing amendment payload is passed through unchanged.
+      finalPayload = { ...amendmentPayload, quotePDFUrl: mergedPdfUrl };
+    }
+
     let amendedQuoteKeyID;
     try {
       // On success, AddUpdateQuote's responseData.data is the new
@@ -444,23 +516,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       // amendment persists as a new quote record.
       amendedQuoteKeyID = await dispatch(
         addUpdateQuote({
-          ...buildAddUpdateQuotePayload(
-            quoteModel,
-            inputFieldsList,
-            selectedServicesListOverride,
-            additionalInformationList,
-            {
-              recurringSelections,
-              oneOffSelections,
-              recurringServices,
-              oneOffServices,
-              pricing: servicesPricing,
-              currencyID: servicesCurrencyID,
-              servicePackageList: servicesPackageList,
-              serviceMappingWithPackagesList,
-            },
-            isAmend,
-          ),
+          ...finalPayload,
           isAmend,
         }),
       ).unwrap();

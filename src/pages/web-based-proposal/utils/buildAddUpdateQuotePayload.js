@@ -216,6 +216,15 @@ export const buildQuotationFinalAmountListForServiceType = ({
   recurringSelections,
   oneOffSelections,
   pricing,
+  // Same fallback ProposalPricingTableStep.jsx's recurringVatPercentage/
+  // oneOffVatPercentage already use (selectServicesVatPercentage — the
+  // live rate from GetCalculatedServicesPriceByPackages, shared across
+  // charge types) — needed when a charge type has no existingRow of its
+  // own yet, e.g. the admin's original quote only had One-Off services and
+  // the client just added a Recurring one on the Amendment's Services step.
+  // Without it, that charge type's vatPercentage/vat/grandTotal would come
+  // out null even though a real, already-known VAT rate applies.
+  vatPercentage: fallbackVatPercentage,
 }) => {
   const priceByServiceID = new Map();
   (pricing || []).forEach((item) => {
@@ -247,7 +256,8 @@ export const buildQuotationFinalAmountListForServiceType = ({
     const existingRow = findExistingRow(serviceChargeTypeID);
     const discountPercentage =
       Number(existingRow?.discountPercentageWithAllDecimal) || 0;
-    const vatPercentage = existingRow?.vatPercentage ?? null;
+    const vatPercentage =
+      existingRow?.vatPercentage ?? fallbackVatPercentage ?? null;
 
     const discounted = (netTotal * discountPercentage) / 100;
     const discountedTotal = netTotal - discounted;
@@ -298,6 +308,7 @@ export const buildQuotationFinalAmountList = ({
   recurringSelections,
   oneOffSelections,
   pricing,
+  vatPercentage,
   isAmend = true,
 }) => {
   if (isAmend && quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Service) {
@@ -306,6 +317,7 @@ export const buildQuotationFinalAmountList = ({
       recurringSelections,
       oneOffSelections,
       pricing,
+      vatPercentage,
     });
   }
 
@@ -2775,6 +2787,7 @@ export const buildAddUpdateQuotePayload = (
     recurringSelections: serviceSelectionsForTotals?.recurringSelections,
     oneOffSelections: serviceSelectionsForTotals?.oneOffSelections,
     pricing: serviceSelectionsForTotals?.pricing,
+    vatPercentage: serviceSelectionsForTotals?.vatPercentage,
     isAmend,
   });
 

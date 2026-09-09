@@ -83,6 +83,65 @@ export const GetGlobalProspectVariablesByPricingSettingsForWebProposal = async (
   );
   return res;
 };
+
+// Same endpoint AddUpdateProposal.jsx calls (GetTemplateModelData in
+// TemplateApi.jsx, TemplateTypeID: 1) for its ModelData.templateElementListWithRequiredData
+// (organisationLogoUrl/clientNameOnFirstPage — used to build the PDF's
+// first/cover page, AddUpdateProposal.jsx:21537-21565) — verified directly
+// against the live API that it doesn't require an auth token, so it's
+// callable from the unauthenticated web proposal route the same way
+// GetProposalModelWithoutToken is.
+export const GetTemplateModelDataWithoutToken = async ({
+  templateKeyID,
+  clientID,
+  moduleKeyID,
+}) => {
+  const url =
+    `${Base_Url}/Template/GetMasterTemplateDetailsWithVariableValues` +
+    `?TemplateKeyID=${templateKeyID}&clientID=${clientID}&TemplateTypeID=1` +
+    (moduleKeyID ? `&ModuleKeyID=${moduleKeyID}` : "");
+  const res = await getList(url);
+  return res;
+};
+
+// Same endpoint AddUpdateProposal.jsx calls (GetTemplateListLookupList in
+// TemplateApi.jsx, via GetProposalEngLetterTemplateLookUpList) for each
+// template's headerContent/footerContent/headerImage/footerImage/
+// headerHeight/footerHeight/watermarkImage/showSeparatorLines
+// (AddUpdateProposal.jsx:20830-20894, saved into state at :21036-21043) —
+// verified directly against the live API with no token that it returns 200
+// (TemplateApi.jsx's own GetTemplateListLookupList uses
+// getListWithAuthenticated, but the backend doesn't actually require a
+// token for it — same situation as GetMasterTemplateDetailsWithVariableValues
+// above).
+export const GetTemplateHeaderFooterLookupWithoutToken = async ({
+  organisationKeyID,
+  clientID,
+  quoteKeyID,
+}) => {
+  const url =
+    clientID != null
+      ? `${Base_Url}/Template/GetProposalEnggLetterTemplateLookUpList?OrganisationKeyID=${organisationKeyID}&TemplateTypeID=1&clientID=${clientID}`
+      : `${Base_Url}/Template/GetProposalEnggLetterTemplateLookUpList?OrganisationKeyID=${organisationKeyID}&TemplateTypeID=1&QuoteKeyID=${quoteKeyID}`;
+  const res = await getList(url);
+  return res;
+};
+
+// Same endpoint AddUpdateProposal.jsx calls (GetOrganisationInformationModel,
+// AddUpdateProposal.jsx:20754-20804) for the organisation's email/phone/
+// address/website — used to build the PDF's per-page header/footer contact
+// line (email/mobile/fullAddress/webSite in sendDataToBackend's postData).
+// Previously required an auth token (confirmed via a live 401); that
+// requirement has since been removed, so this is now callable the same way
+// GetProposalModelWithoutToken is.
+export const GetOrganisationInformationModelWithoutToken = async (
+  organisationKeyID,
+) => {
+  const res = await getList(
+    `${Base_Url}/Organisation/GetOrganisationInformationModel/?OrganisationKeyID=${organisationKeyID}`,
+  );
+  return res;
+};
 //AddUpdate Service Category Callback function
 export const AddUpdateProposal = async (url, params) => {
   const res = await postApiWithAuthenticated(
