@@ -486,11 +486,11 @@ export default function ProposalAmendment({ theme, proposal, services }) {
           quotationFinalAmountList: amendmentPayload.quotationFinalAmountList,
           recurringSelections,
           oneOffSelections,
-          recurringServices,
-          oneOffServices,
           additionalInformationList,
           pricing: servicesPricing,
           currencyID: servicesCurrencyID,
+          servicePackageList: servicesPackageList,
+          serviceMappingWithPackagesList,
         });
       } catch (err) {
         mergedPdfUrl = null;
