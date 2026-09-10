@@ -5161,7 +5161,7 @@ const Add_Update_Service = (props) => {
           } else {
             AddUpdateServiceData(ApiRequest_ParamsObj);
           }
-        }
+        } else AddUpdateServiceData(ApiRequest_ParamsObj);
       } else if (NextTab == "ConfirmedToSave") {
         AddUpdateServiceData(ApiRequest_ParamsObj);
       } else {
@@ -8640,7 +8640,7 @@ const Add_Update_Service = (props) => {
                     GlobalPricingDriverEditBtnClicked
                   }
                   DeclineSuperAdminChangesData={DeclineSuperAdminChangesData}
-                  modelRequestData={location.state}
+                  // modelRequestData={location.state}
                   getCrudButtonTextName={getCrudButtonTextName}
                   getCrudPopUpTitleName={getCrudPopUpTitleName}
                   setErrorMessage={setErrorMessage}
