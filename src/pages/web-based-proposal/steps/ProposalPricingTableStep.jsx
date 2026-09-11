@@ -184,8 +184,20 @@ const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
   });
 };
 
+// Mirrors AuthContext.jsx's GetTwoDecimalValueWithoutRoundOff exactly — used
+// for every VAT amount in AddUpdateProposal.jsx's own totals functions
+// (GetNetTotalValueByRecurring/GetNetTotalValueByRecurringPackage, Service
+// and Package/Custom Package alike): truncates to 2 decimals rather than
+// rounding to the nearest cent. Left unrounded, this component's own VAT
+// figure could come out a cent higher than admin's whenever the raw VAT's
+// third decimal digit is 5 or more, since formatAmount's toFixed(2) rounds
+// at display time instead of truncating.
+const truncateToTwoDecimals = (value) => Math.floor(value * 100) / 100;
+
 const applyVat = (netTotal, vatPercentage) => {
-  const vatAmount = (netTotal * (Number(vatPercentage) || 0)) / 100;
+  const vatAmount = truncateToTwoDecimals(
+    (netTotal * (Number(vatPercentage) || 0)) / 100,
+  );
   return { vatAmount, grandTotal: netTotal + vatAmount };
 };
 
@@ -387,12 +399,15 @@ const buildChargeTypeTotals = ({
   // this mirrors) exactly rather than a single symmetric formula: a surcharge
   // (negative %) is added at full precision (its addOnValue is never
   // rounded), while a discount (positive %) is rounded to 2 decimals via
-  // Math.floor before being subtracted — package/custom-package only, so
-  // Review Package/the PDF and this live recompute land on the same cent.
+  // nearest-cent rounding (toFixed(2), matching GetNetTotalValueByRecurringPackage's
+  // own `Number(discountAmount)?.toFixed(2)`) before being subtracted —
+  // package/custom-package only, so Review Package/the PDF and this live
+  // recompute land on the same cent. Math.floor here would truncate instead
+  // of round, coming out a cent low whenever the third decimal is >= 5.
   const discountAmount = isPackageBased
     ? discountPercentage < 0
       ? (liveNetTotal * discountPercentage) / 100
-      : Math.floor(((liveNetTotal * discountPercentage) / 100) * 100) / 100
+      : Number(((liveNetTotal * discountPercentage) / 100).toFixed(2))
     : (liveNetTotal * discountPercentage) / 100;
   const discountedTotal = liveNetTotal - discountAmount;
   const { vatAmount, grandTotal } = applyVat(discountedTotal, vatPercentage);
@@ -1487,13 +1502,15 @@ export default function ProposalPricingTableStep({
 
   // Each charge type is billed (and VAT'd) independently, same as the
   // recurring/one-off fee tables the backend generates for the final quote.
-  const recurringLiveVatAmount =
-    (recurringLiveNetTotal * (Number(vatPercentage) || 0)) / 100;
+  const recurringLiveVatAmount = truncateToTwoDecimals(
+    (recurringLiveNetTotal * (Number(vatPercentage) || 0)) / 100,
+  );
   const recurringLiveGrandTotal =
     recurringLiveNetTotal + recurringLiveVatAmount;
 
-  const oneOffLiveVatAmount =
-    (oneOffLiveNetTotal * (Number(vatPercentage) || 0)) / 100;
+  const oneOffLiveVatAmount = truncateToTwoDecimals(
+    (oneOffLiveNetTotal * (Number(vatPercentage) || 0)) / 100,
+  );
   const oneOffLiveGrandTotal = oneOffLiveNetTotal + oneOffLiveVatAmount;
 
   // When the user hasn't added/updated any services since this proposal was
@@ -1554,7 +1571,9 @@ export default function ProposalPricingTableStep({
           ) || 0),
         0,
       );
-      const liveVatAmount = (liveNetTotal * (Number(vatPercentage) || 0)) / 100;
+      const liveVatAmount = truncateToTwoDecimals(
+        (liveNetTotal * (Number(vatPercentage) || 0)) / 100,
+      );
 
       const totals = buildChargeTypeTotals({
         finalAmount: unchanged ? finalAmountRow : null,

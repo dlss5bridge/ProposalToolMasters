@@ -261,8 +261,13 @@ export const buildQuotationFinalAmountListForServiceType = ({
 
     const discounted = (netTotal * discountPercentage) / 100;
     const discountedTotal = netTotal - discounted;
+    // Truncated to 2 decimals (not rounded) to match AuthContext.jsx's
+    // GetTwoDecimalValueWithoutRoundOff, which AddUpdateProposal.jsx's own
+    // totals functions use for every VAT amount.
     const vat =
-      vatPercentage == null ? null : (discountedTotal * Number(vatPercentage)) / 100;
+      vatPercentage == null
+        ? null
+        : Math.floor((discountedTotal * Number(vatPercentage)) / 100 * 100) / 100;
     const grandTotal = vat == null ? null : discountedTotal + vat;
 
     return {

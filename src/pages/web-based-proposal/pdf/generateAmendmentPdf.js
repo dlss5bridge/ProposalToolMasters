@@ -1404,10 +1404,23 @@ export const generateAmendmentPdfUrl = async ({
         const discountPercentage =
           Number(packageRow?.discountPercentageWithAllDecimal) || 0;
         const vatPercentage = packageRow?.vatPercentage ?? null;
-        const discounted = (liveNetTotal * discountPercentage) / 100;
+        // Rounded to the nearest cent (toFixed(2)) to match
+        // AddUpdateProposal.jsx's GetNetTotalValueByRecurringPackage —
+        // mirrors the same fix applied to ProposalPricingTableStep.jsx's
+        // buildChargeTypeTotals; this was the same discountAmount formula,
+        // just never rounded at all here, so it could drift from the live
+        // Pricing Table/admin figure by more than the Math.floor case did.
+        const discounted = Number(
+          ((liveNetTotal * discountPercentage) / 100).toFixed(2),
+        );
         const discountedTotal = liveNetTotal - discounted;
+        // Truncated to 2 decimals (not rounded) to match AuthContext.jsx's
+        // GetTwoDecimalValueWithoutRoundOff, which
+        // GetNetTotalValueByRecurringPackage uses for every VAT amount.
         const vat =
-          vatPercentage == null ? null : (discountedTotal * Number(vatPercentage)) / 100;
+          vatPercentage == null
+            ? null
+            : Math.floor((discountedTotal * Number(vatPercentage)) / 100 * 100) / 100;
         const grandTotal = vat == null ? null : discountedTotal + vat;
 
         return {
