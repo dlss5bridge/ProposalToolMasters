@@ -602,23 +602,46 @@ function FeeSection({
     0,
   );
 
+  // Service (non-package) proposals only: the Services title gets the same
+  // dark-theme treatment as the Package Name headers in the Package/Custom
+  // Package comparison grid, so a Service quote's pricing table reads with
+  // the same premium, on-brand look. Package/Custom Package's own title row
+  // (isPackageBased true, both the grid and the single-package layout) is
+  // untouched — every token below resolves to exactly what it already was
+  // before this branch existed.
+  const isServiceTitle = !isPackageBased;
+  const titleWrapperClassName = isServiceTitle
+    ? "mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-3 sm:px-5 sm:py-3.5"
+    : "flex flex-wrap items-center justify-between gap-2 pb-3";
+  const titleWrapperStyle = isServiceTitle
+    ? { backgroundColor: theme.secondary }
+    : undefined;
+  const titleIconBg = isServiceTitle ? "rgba(255,255,255,0.16)" : `${accent}1F`;
+  const titleColor = isServiceTitle ? theme.headerText : accent;
+  const titleBadgeBg = isServiceTitle ? "rgba(255,255,255,0.16)" : `${accent}1A`;
+  const titleCountBg = isServiceTitle
+    ? "rgba(255,255,255,0.16)"
+    : theme.background;
+  const titleCountColor = isServiceTitle ? theme.headerText : theme.textSecondary;
+
   return (
-    // No card box, no filled header background — just a plain accent-icon
-    // title row on the page's own white surface. The dark theme is reserved
-    // for the Package Name headers only (see the comparison grid below).
+    // Package/Custom Package: no card box, no filled header background —
+    // just a plain accent-icon title row (unchanged). Service: a dark
+    // theme-background title bar, matching the Package Name headers'
+    // styling (see the comparison grid below and titleWrapperStyle above).
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
+      <div className={titleWrapperClassName} style={titleWrapperStyle}>
         <div className="flex items-center gap-2.5">
           <span
             className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
-            style={{ backgroundColor: `${accent}1F` }}
+            style={{ backgroundColor: titleIconBg }}
           >
-            <Icon size={15} style={{ color: accent }} />
+            <Icon size={15} style={{ color: titleColor }} />
           </span>
           <div className="flex flex-wrap items-center gap-2">
             <span
               className="text-sm font-bold uppercase tracking-wide"
-              style={{ color: accent }}
+              style={{ color: titleColor }}
             >
               {title}
             </span>
@@ -631,8 +654,8 @@ function FeeSection({
               <span
                 className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
                 style={{
-                  backgroundColor: `${accent}1A`,
-                  color: accent,
+                  backgroundColor: titleBadgeBg,
+                  color: titleColor,
                 }}
               >
                 {frequencyLabel}
@@ -648,8 +671,8 @@ function FeeSection({
             <span
               className="inline-flex max-w-[45vw] items-center gap-1 truncate rounded-full px-2.5 py-1 text-xs font-semibold sm:max-w-xs"
               style={{
-                backgroundColor: `${accent}1A`,
-                color: accent,
+                backgroundColor: titleBadgeBg,
+                color: titleColor,
               }}
               title={selectedPackageName}
             >
@@ -660,8 +683,8 @@ function FeeSection({
           <span
             className="rounded-full px-2.5 py-1 text-xs font-medium"
             style={{
-              backgroundColor: theme.background,
-              color: theme.textSecondary,
+              backgroundColor: titleCountBg,
+              color: titleCountColor,
             }}
           >
             {visibleServiceCount} service{visibleServiceCount === 1 ? "" : "s"}

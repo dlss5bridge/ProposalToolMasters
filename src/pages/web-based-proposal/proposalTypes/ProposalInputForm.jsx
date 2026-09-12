@@ -432,18 +432,18 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
           backgroundColor: theme.background,
         }}
       >
-        {/* Sidebar for the PDF step and the Pricing Table step */}
-        {(activeStep === 0 || activeStep === PRICING_STEP_INDEX) && (
-          <aside
-            className="hidden lg:flex lg:w-80 lg:flex-shrink-0 overflow-y-auto border-r"
-            style={{
-              backgroundColor: theme.background,
-              borderColor: theme.border,
-            }}
-          >
-            <ProposalSidebar theme={theme} proposal={proposal} />
-          </aside>
-        )}
+        {/* Sidebar (logo/description) — shown on every step, including
+            Additional Information and Input Fields, not just Proposal and
+            Pricing Table. */}
+        <aside
+          className="hidden lg:flex lg:w-80 lg:flex-shrink-0 overflow-y-auto border-r"
+          style={{
+            backgroundColor: theme.background,
+            borderColor: theme.border,
+          }}
+        >
+          <ProposalSidebar theme={theme} proposal={proposal} />
+        </aside>
 
         {/* Step Content */}
         <main
