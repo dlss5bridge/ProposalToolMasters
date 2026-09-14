@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import CommonButtonComponent from "../../components/CommonButtonComponent";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Proposals.css";
+import "./Proposals-redesign-v9.css";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Utils from "../../Middleware/Utils";
@@ -21,7 +22,7 @@ import {
   GetOldProposalList,
   GetProposalList,
   ResendProposal,
-  ArchiveQuotation
+  ArchiveQuotation,
 } from "../../redux/Services/Proposal/ProposalApi";
 import DropDown from "../../components/DropDown";
 import { useSelector } from "react-redux";
@@ -65,7 +66,7 @@ const Proposals = () => {
     SearchKeyword: "",
     quoteKeyID: null,
     RefId: null,
-    contracts: []
+    contracts: [],
   });
 
   const [openEmailFailurePopUp, setOpenEmailFailurePopUp] = useState(false);
@@ -81,7 +82,8 @@ const Proposals = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isAddUpdateActionDone, setIsAddUpdateActionDone] = useState(false);
   const [ProposalList, setProposalList] = useState([]);
-  const [remainingProposalsPerMonth, setRemainingProposalsPerMonth] = useState(null);
+  const [remainingProposalsPerMonth, setRemainingProposalsPerMonth] =
+    useState(null);
   const [SingleProposalList, setSingleProposalList] = useState([]);
   const [oldProposalList, setOldProposalList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -100,7 +102,8 @@ const Proposals = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [isHovered, setIsHovered] = useState(false);
   const [ProposalSearchKeyword, setSearchOldProposalKeyword] = useState("");
-  const [SingleProposalSearchKeyword, setSearchSingleProposalKeyword] = useState("");
+  const [SingleProposalSearchKeyword, setSearchSingleProposalKeyword] =
+    useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [totalRecords, setTotalRecords] = useState(-1);
   const [OldtotalRecords, setOldTotalRecords] = useState(-1);
@@ -250,13 +253,7 @@ const Proposals = () => {
     const searchKeywordValue = e.target.value;
     setSearchSingleProposalKeyword(searchKeywordValue);
     setSingleProposalCurrentPage(1);
-    GetProposalListSingleApiData(
-      1,
-      searchKeywordValue,
-      null,
-      null,
-      null,
-    );
+    GetProposalListSingleApiData(1, searchKeywordValue, null, null, null);
   };
 
   // Handle Close the  Model
@@ -352,13 +349,18 @@ const Proposals = () => {
         if (data.data.responseData.data.length > 0) {
           const ProposalListData = data.data.responseData.data;
           const statusName =
-            Utils.ProposalStatus.find((option) => option.value === status)?.label || "";
+            Utils.ProposalStatus.find((option) => option.value === status)
+              ?.label || "";
           const reportingPeriod =
-            Utils.CalenderFilter.find((option) => option.value === selectedOption.value)?.label || "";
+            Utils.CalenderFilter.find(
+              (option) => option.value === selectedOption.value,
+            )?.label || "";
           const businessTypeName =
-            BusinessTypeListData.find((item) => item.value == prospectType)?.label || "";
+            BusinessTypeListData.find((item) => item.value == prospectType)
+              ?.label || "";
           const businessNatureName =
-            NoBTypeListData.find((item) => item.value == businessNatureID)?.label || "";
+            NoBTypeListData.find((item) => item.value == businessNatureID)
+              ?.label || "";
 
           const headers = {
             "Practice Name": orgName.organisationName,
@@ -412,7 +414,8 @@ const Proposals = () => {
           const setColWidths = (sheet, sheetData) => {
             const widths = sheetData.reduce((w, row) => {
               row.forEach((cell, i) => {
-                const val = cell !== null && cell !== undefined ? String(cell) : "";
+                const val =
+                  cell !== null && cell !== undefined ? String(cell) : "";
                 w[i] = Math.max(w[i] || 0, val.length);
               });
               return w;
@@ -423,7 +426,10 @@ const Proposals = () => {
           const workbook = XLSX.utils.book_new();
 
           // Sheet 1: Summary/filters
-          const headersArray = Object.entries(headers).map(([key, value]) => [key, value]);
+          const headersArray = Object.entries(headers).map(([key, value]) => [
+            key,
+            value,
+          ]);
           const summarySheet = XLSX.utils.aoa_to_sheet(headersArray);
           setColWidths(summarySheet, headersArray);
           XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
@@ -433,22 +439,42 @@ const Proposals = () => {
           const proposalSheetData = [proposalHeaderRow, ...proposalRows];
           const proposalSheet = XLSX.utils.aoa_to_sheet(proposalSheetData);
           setColWidths(proposalSheet, proposalSheetData);
-          XLSX.utils.book_append_sheet(workbook, proposalSheet, "Proposal Data");
+          XLSX.utils.book_append_sheet(
+            workbook,
+            proposalSheet,
+            "Proposal Data",
+          );
 
           // Sheet 3: API (SingleApi) proposal data
-          if (singleApiData?.data?.statusCode === 200 && singleApiData?.data?.responseData?.data?.length > 0) {
-            const singleApiRows = toRows(mapProposalRows(singleApiData.data.responseData.data));
+          if (
+            singleApiData?.data?.statusCode === 200 &&
+            singleApiData?.data?.responseData?.data?.length > 0
+          ) {
+            const singleApiRows = toRows(
+              mapProposalRows(singleApiData.data.responseData.data),
+            );
             const singleApiSheetData = [proposalHeaderRow, ...singleApiRows];
             const singleApiSheet = XLSX.utils.aoa_to_sheet(singleApiSheetData);
             setColWidths(singleApiSheet, singleApiSheetData);
-            XLSX.utils.book_append_sheet(workbook, singleApiSheet, "API Proposal Data");
+            XLSX.utils.book_append_sheet(
+              workbook,
+              singleApiSheet,
+              "API Proposal Data",
+            );
           }
 
           const fileName = `${proposalName}_Data_${orgName.organisationName}_${reportingPeriod}.xlsx`;
           XLSX.writeFile(workbook, fileName);
 
           await GetProposalListData(
-            1, searchKeyword, status, fromDate, toDate, businessNatureID, prospectType, false,
+            1,
+            searchKeyword,
+            status,
+            fromDate,
+            toDate,
+            businessNatureID,
+            prospectType,
+            false,
           );
         } else {
           console.error("No data available for export");
@@ -545,7 +571,8 @@ const Proposals = () => {
           if (data?.data?.responseData?.data) {
             const totalCount = data.data.totalCount;
             const ProposalListData = data.data.responseData.data;
-            const remainingProposals = data.data.responseData.remainingQuotesPerMonth;
+            const remainingProposals =
+              data.data.responseData.remainingQuotesPerMonth;
             if (pageNoList > 0 && ProposalListData.length === 0) {
               let newPaneNo = Number(pageNoList);
               if (newPaneNo > 1) {
@@ -730,7 +757,11 @@ const Proposals = () => {
 
   //Click Add Proposal
   const ProposalAddBtnClicked = () => {
-    if (activeOrganizationSubscriptionPlan?.prepareQuote !== true || (remainingProposalsPerMonth === undefined || remainingProposalsPerMonth === 0)) {
+    if (
+      activeOrganizationSubscriptionPlan?.prepareQuote !== true ||
+      remainingProposalsPerMonth === undefined ||
+      remainingProposalsPerMonth === 0
+    ) {
       setShowModal(true);
       return;
     }
@@ -1285,7 +1316,7 @@ const Proposals = () => {
           setOpenErrorModal(true);
         }
       } else {
-        debugger
+        debugger;
         const data = await DeleteQuotation(
           modelRequestData.quoteKeyID,
           common.userKeyID,
@@ -1305,8 +1336,8 @@ const Proposals = () => {
       console.error(error);
     }
   };
-  
-  const ArchiveQuotationData = async() => {
+
+  const ArchiveQuotationData = async () => {
     try {
       // show popup saying all linked ELs will be archived too.
       // if(modelRequestData.Action === "ArchiveLinkedELs") {
@@ -1327,25 +1358,34 @@ const Proposals = () => {
       const data = await ArchiveQuotation(
         modelRequestData.quoteKeyID,
         common.userKeyID,
-        modelRequestData.Action === "Archive" || modelRequestData.Action === "ArchiveLinkedELs" ? true
-        : modelRequestData.Action === "Unarchive" ? false : null
+        modelRequestData.Action === "Archive" ||
+          modelRequestData.Action === "ArchiveLinkedELs"
+          ? true
+          : modelRequestData.Action === "Unarchive"
+            ? false
+            : null,
       );
-      if(data?.data?.statusCode === 200) {
+      if (data?.data?.statusCode === 200) {
         setLoader(false);
         setOpenSuccessModal(true);
       } else {
-          setLoader(false);
-          setErrorMessage(data?.data?.errorMessage);
-          setOpenErrorModal(true);
+        setLoader(false);
+        setErrorMessage(data?.data?.errorMessage);
+        setOpenErrorModal(true);
       }
       GetProposalListData(
-        currentPage,null,status,fromDate,toDate,businessNatureID,prospectType,
+        currentPage,
+        null,
+        status,
+        fromDate,
+        toDate,
+        businessNatureID,
+        prospectType,
       );
-    }
-    catch(error) {
+    } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const ApplyFilter = () => {
     if (
@@ -1414,7 +1454,7 @@ const Proposals = () => {
 
   return (
     <>
-      <div className="container-fluid">
+      <div className="container-fluid proposal-list-v4">
         {/* <div class="main-content"> */}
         <div class="services page-background">
           <div class="">
@@ -1468,7 +1508,8 @@ const Proposals = () => {
                                   </a>
                                 </li>
                               )}
-                              {(hasWebPLData || SingleProposalList?.length > 0) && (
+                              {(hasWebPLData ||
+                                SingleProposalList?.length > 0) && (
                                 <li className="nav-item">
                                   <a
                                     className={`nav-link tab_nav ${
@@ -1641,7 +1682,9 @@ const Proposals = () => {
                                                 <input
                                                   type="text"
                                                   class="form-control search"
-                                                  value={SingleProposalSearchKeyword}
+                                                  value={
+                                                    SingleProposalSearchKeyword
+                                                  }
                                                   onChange={(e) => {
                                                     handleSearchSinglePL(e);
                                                   }}
@@ -1805,196 +1848,155 @@ const Proposals = () => {
                                       id="base-justified-home"
                                     >
                                       {activeTab === "Old Proposal" && (
-                                        <table
-                                          class="table align-middle table-nowrap"
-                                          id="customerTable"
-                                        >
-                                          <thead class="table-light table-header-font">
-                                            <tr className="head-row">
-                                              <td className="tr-table-class text-white">
-                                                Ref ID
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                {prospectName} Name
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Status
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Value
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Documents
-                                              </td>
-                                              {/* <td className="tr-table-class text-white text-center">
+                                        <div className="proposal-table-scroll">
+                                          <table
+                                            class="table align-middle table-nowrap"
+                                            id="customerTable"
+                                          >
+                                            <thead class="table-light table-header-font">
+                                              <tr className="head-row">
+                                                <td className="tr-table-class text-white">
+                                                  Ref ID
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  {prospectName} Name
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Status
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Value
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Documents
+                                                </td>
+                                                {/* <td className="tr-table-class text-white text-center">
                                   {userAccessData.Admin_Proposal_CanView && (
                                     <>Action</>
                                   )}
                                 </td> */}
-                                            </tr>
-                                          </thead>
-                                          <tbody class="list form-check-all">
-                                            {oldProposalList
-                                              .slice(
-                                                0,
-                                                isMobile
-                                                  ? isMobileRecords
-                                                  : desktopRecords,
-                                              )
-                                              .map((item) => {
-                                                return (
-                                                  <tr class="table_new">
-                                                    <td className="table-content-font">
-                                                      {item.refID}
-                                                    </td>
-                                                    <td className="table-content-font">
-                                                      {item.clientName}
-                                                    </td>
+                                              </tr>
+                                            </thead>
+                                            <tbody class="list form-check-all">
+                                              {oldProposalList
+                                                .slice(
+                                                  0,
+                                                  isMobile
+                                                    ? isMobileRecords
+                                                    : desktopRecords,
+                                                )
+                                                .map((item) => {
+                                                  return (
+                                                    <tr class="table_new">
+                                                      <td className="table-content-font">
+                                                        {item.refID}
+                                                      </td>
+                                                      <td className="table-content-font">
+                                                        {item.clientName}
+                                                      </td>
 
-                                                    {item.status ===
-                                                      statusNames.Draft && (
-                                                      <>
-                                                        <td className="table-content-font ">
-                                                          <p
-                                                            className="  p-1 text-center text-white rounded"
-                                                            style={{
-                                                              background:
-                                                                "#DAA520",
-                                                            }}
-                                                          >
-                                                            {item.status
-                                                              ?.charAt(0)
-                                                              ?.toUpperCase() +
-                                                              item.status?.slice(
-                                                                1,
-                                                              )}
-                                                          </p>
-                                                        </td>
-                                                      </>
-                                                    )}
-                                                    {item.status ===
-                                                      statusNames.Sent && (
-                                                      <>
-                                                        <td className="table-content-font">
-                                                          <p
-                                                            className=" p-1 text-center text-white rounded"
-                                                            style={{
-                                                              background:
-                                                                " #626ED4",
-                                                            }}
-                                                          >
-                                                            {item.status
-                                                              ?.charAt(0)
-                                                              ?.toUpperCase() +
-                                                              item.status?.slice(
-                                                                1,
-                                                              )}
-                                                          </p>
-                                                        </td>
-                                                      </>
-                                                    )}
-                                                    {item.status ===
-                                                      statusNames.Accepted && (
-                                                      <>
-                                                        <td className="table-content-font">
-                                                          <p
-                                                            className=" p-1 text-center text-white rounded"
-                                                            style={{
-                                                              background:
-                                                                "#008000",
-                                                            }}
-                                                          >
-                                                            {item.status
-                                                              ?.charAt(0)
-                                                              ?.toUpperCase() +
-                                                              item.status?.slice(
-                                                                1,
-                                                              )}
-                                                          </p>
-                                                        </td>
-                                                      </>
-                                                    )}
-                                                    {item.status ===
-                                                      statusNames.Awaiting_Signature && (
-                                                      <>
-                                                        <td className="table-content-font">
-                                                          <p
-                                                            className=" p-1 text-center text-white rounded"
-                                                            style={{
-                                                              background:
-                                                                "#626ED4",
-                                                            }}
-                                                          >
-                                                            {/* Awaiting Response */}
-                                                            {item.statusName}
-                                                          </p>
-                                                        </td>
-                                                      </>
-                                                    )}
-                                                    {item.status ===
-                                                      statusNames.Declined && (
-                                                      <>
-                                                        <td className="table-content-font">
-                                                          <p
-                                                            className=" p-1 text-center text-white rounded"
-                                                            style={{
-                                                              background:
-                                                                "#FF0000",
-                                                            }}
-                                                          >
-                                                            {item.status
-                                                              ?.charAt(0)
-                                                              ?.toUpperCase() +
-                                                              item.status?.slice(
-                                                                1,
-                                                              )}
-                                                          </p>
-                                                        </td>
-                                                      </>
-                                                    )}
-                                                    {item.status ===
-                                                      statusNames.Signed && (
-                                                      <>
-                                                        <td className="table-content-font">
-                                                          <p
-                                                            className=" p-1 text-center text-white rounded"
-                                                            style={{
-                                                              background:
-                                                                "#008000",
-                                                            }}
-                                                          >
-                                                            {item.status
-                                                              ?.charAt(0)
-                                                              ?.toUpperCase() +
-                                                              item.status?.slice(
-                                                                1,
-                                                              )}
-                                                          </p>
-                                                        </td>
-                                                      </>
-                                                    )}
-                                                    {item.status ===
-                                                      statusNames.Skipped && (
-                                                      <>
-                                                        <td className="table-content-font">
-                                                          <p
-                                                            className=" p-1 text-center text-white rounded"
-                                                            style={{
-                                                              background:
-                                                                "#38A4F8",
-                                                            }}
-                                                          >
-                                                            {item.status
-                                                              ?.charAt(0)
-                                                              ?.toUpperCase() +
-                                                              item.status?.slice(
-                                                                1,
-                                                              )}
-                                                          </p>
-                                                        </td>
-                                                      </>
-                                                    )}
-                                                    {/* {item.packagesNames !== null && (
+                                                      {item.status ===
+                                                        statusNames.Draft && (
+                                                        <>
+                                                          <td className="table-content-font ">
+                                                            <p className="p-1 text-center rounded proposal-status-pill proposal-status-draft">
+                                                              {item.status
+                                                                ?.charAt(0)
+                                                                ?.toUpperCase() +
+                                                                item.status?.slice(
+                                                                  1,
+                                                                )}
+                                                            </p>
+                                                          </td>
+                                                        </>
+                                                      )}
+                                                      {item.status ===
+                                                        statusNames.Sent && (
+                                                        <>
+                                                          <td className="table-content-font">
+                                                            <p className="p-1 text-center rounded proposal-status-pill proposal-status-sent">
+                                                              {item.status
+                                                                ?.charAt(0)
+                                                                ?.toUpperCase() +
+                                                                item.status?.slice(
+                                                                  1,
+                                                                )}
+                                                            </p>
+                                                          </td>
+                                                        </>
+                                                      )}
+                                                      {item.status ===
+                                                        statusNames.Accepted && (
+                                                        <>
+                                                          <td className="table-content-font">
+                                                            <p className="p-1 text-center rounded proposal-status-pill proposal-status-accepted">
+                                                              {item.status
+                                                                ?.charAt(0)
+                                                                ?.toUpperCase() +
+                                                                item.status?.slice(
+                                                                  1,
+                                                                )}
+                                                            </p>
+                                                          </td>
+                                                        </>
+                                                      )}
+                                                      {item.status ===
+                                                        statusNames.Awaiting_Signature && (
+                                                        <>
+                                                          <td className="table-content-font">
+                                                            <p className="p-1 text-center rounded proposal-status-pill proposal-status-awaiting">
+                                                              {/* Awaiting Response */}
+                                                              {item.statusName}
+                                                            </p>
+                                                          </td>
+                                                        </>
+                                                      )}
+                                                      {item.status ===
+                                                        statusNames.Declined && (
+                                                        <>
+                                                          <td className="table-content-font">
+                                                            <p className="p-1 text-center rounded proposal-status-pill proposal-status-declined">
+                                                              {item.status
+                                                                ?.charAt(0)
+                                                                ?.toUpperCase() +
+                                                                item.status?.slice(
+                                                                  1,
+                                                                )}
+                                                            </p>
+                                                          </td>
+                                                        </>
+                                                      )}
+                                                      {item.status ===
+                                                        statusNames.Signed && (
+                                                        <>
+                                                          <td className="table-content-font">
+                                                            <p className="p-1 text-center rounded proposal-status-pill proposal-status-signed">
+                                                              {item.status
+                                                                ?.charAt(0)
+                                                                ?.toUpperCase() +
+                                                                item.status?.slice(
+                                                                  1,
+                                                                )}
+                                                            </p>
+                                                          </td>
+                                                        </>
+                                                      )}
+                                                      {item.status ===
+                                                        statusNames.Skipped && (
+                                                        <>
+                                                          <td className="table-content-font">
+                                                            <p className="p-1 text-center rounded proposal-status-pill proposal-status-skipped">
+                                                              {item.status
+                                                                ?.charAt(0)
+                                                                ?.toUpperCase() +
+                                                                item.status?.slice(
+                                                                  1,
+                                                                )}
+                                                            </p>
+                                                          </td>
+                                                        </>
+                                                      )}
+                                                      {/* {item.packagesNames !== null && (
                                         <td>
                                           <p className="mb-0">
                                             <b>
@@ -2025,47 +2027,379 @@ const Proposals = () => {
                                         </td>
                                       )} */}
 
-                                                    <td>
-                                                      {item.status !==
-                                                        statusNames.Draft && (
-                                                        <p className="mb-0">
-                                                          Recurring:{" "}
-                                                          <b>
-                                                            {formatValue(
-                                                              item.recurringTotal,
-                                                            )}
-                                                          </b>
-                                                        </p>
-                                                      )}
-                                                      {item.status !==
-                                                        statusNames.Draft && (
-                                                        <p className="mb-0">
-                                                          {" "}
-                                                          OneOff :{" "}
-                                                          <b>
-                                                            {formatValue(
-                                                              item.oneOffTotal,
-                                                            )}
-                                                          </b>
-                                                        </p>
-                                                      )}
-                                                    </td>
+                                                      <td>
+                                                        {item.status !==
+                                                          statusNames.Draft && (
+                                                          <p className="mb-0">
+                                                            Recurring:{" "}
+                                                            <b>
+                                                              {formatValue(
+                                                                item.recurringTotal,
+                                                              )}
+                                                            </b>
+                                                          </p>
+                                                        )}
+                                                        {item.status !==
+                                                          statusNames.Draft && (
+                                                          <p className="mb-0">
+                                                            {" "}
+                                                            OneOff :{" "}
+                                                            <b>
+                                                              {formatValue(
+                                                                item.oneOffTotal,
+                                                              )}
+                                                            </b>
+                                                          </p>
+                                                        )}
+                                                      </td>
 
-                                                    <td className="table-content-font">
-                                                      {/* <a
+                                                      <td className="table-content-font">
+                                                        {/* <a
                                         // href="https://teststaging.outbooks.com/api/quote/preview-pdf/b8c4365d-d32a-40ef-9835-f90800aa476b"
                                         href={item.quotePDFUrl}
                                         target="_blank"
                                       > */}{" "}
-                                                      {item.status !==
-                                                        statusNames.Draft &&
-                                                        item.pdfUrl &&
-                                                        item.status !==
-                                                          statusNames.Signed && (
+                                                        {item.status !==
+                                                          statusNames.Draft &&
+                                                          item.pdfUrl &&
+                                                          item.status !==
+                                                            statusNames.Signed && (
+                                                            <p
+                                                              onClick={() => {
+                                                                handleViewOldProposalPdf(
+                                                                  item.pdfUrl,
+                                                                );
+                                                                setTitle(
+                                                                  "View proposals",
+                                                                );
+                                                              }}
+                                                              style={{
+                                                                cursor:
+                                                                  "pointer",
+                                                                color: "blue",
+                                                              }}
+                                                            >
+                                                              {proposalName} PDF
+                                                            </p>
+                                                          )}
+                                                        {item.status !==
+                                                          statusNames.Draft &&
+                                                          item.pdfUrl &&
+                                                          item.status ===
+                                                            statusNames.Signed && (
+                                                            <p
+                                                              onClick={() => {
+                                                                handleViewOldProposalPdf(
+                                                                  item.pdfUrl,
+                                                                );
+                                                                setTitle(
+                                                                  "View proposals",
+                                                                );
+                                                              }}
+                                                              style={{
+                                                                cursor:
+                                                                  "pointer",
+                                                              }}
+                                                            >
+                                                              {proposalName} PDF
+                                                            </p>
+                                                          )}
+                                                        {/* </a> */}
+                                                      </td>
+                                                    </tr>
+                                                  );
+                                                })}
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div
+                                      className={`tab-pane ${
+                                        activeTab === "Proposal" ? "active" : ""
+                                      }`}
+                                      id="base-justified-home"
+                                    >
+                                      {activeTab === "Proposal" && (
+                                        <div className="proposal-table-scroll">
+                                          <table
+                                            class="table align-middle table-nowrap"
+                                            id="customerTable"
+                                          >
+                                            <thead class="table-light table-header-font">
+                                              <tr className="head-row">
+                                                <td className="tr-table-class text-white">
+                                                  Ref ID
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  {prospectName} Name
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Status
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Value
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Documents
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Last Updated
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Send Reminder
+                                                </td>
+                                                <td className="tr-table-class text-white proposal-action-column">
+                                                  {userAccessData.Admin_Proposal_CanView && (
+                                                    <>Action</>
+                                                  )}
+                                                </td>
+                                              </tr>
+                                            </thead>
+                                            <tbody class="list form-check-all">
+                                              {ProposalList?.slice(
+                                                0,
+                                                isMobile
+                                                  ? isMobileRecords
+                                                  : desktopRecords,
+                                              )?.map((item, index) => {
+                                                return (
+                                                  <tr class="table_new">
+                                                    <td className="table-content-font">
+                                                      {item.prefix}
+                                                    </td>
+                                                    <td className="table-content-font">
+                                                      {item.clientName}
+                                                    </td>
+
+                                                    {item.statusID ===
+                                                      statusID.Draft && (
+                                                      <>
+                                                        <td className="table-content-font ">
+                                                          <p
+                                                            className="  p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#DAA520",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Sent && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                " #626ED4",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Accepted && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#008000",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Awaiting_Signature && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#626ED4",
+                                                            }}
+                                                          >
+                                                            {/* Awaiting Response */}
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Declined && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#FF0000",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Signed && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#008000",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Skipped && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#38A4F8",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.packagesNames !==
+                                                      null && (
+                                                      <td class="table-content-font">
+                                                        <p className="mb-0">
+                                                          <b>
+                                                            {item.packagesNames
+                                                              .split(",")
+                                                              .map(
+                                                                (
+                                                                  name,
+                                                                  index,
+                                                                  array,
+                                                                ) => {
+                                                                  // Remove extra spaces and trim the name
+                                                                  name =
+                                                                    name.trim();
+
+                                                                  // Check if there's only one package
+                                                                  const isSinglePackage =
+                                                                    array.length ===
+                                                                    1;
+                                                                  const isDoublePackage =
+                                                                    array.length ===
+                                                                    2;
+                                                                  // Define the length limit based on the number of packages
+                                                                  const maxLength =
+                                                                    isSinglePackage
+                                                                      ? 45
+                                                                      : isDoublePackage
+                                                                        ? 25
+                                                                        : 15;
+
+                                                                  return name.length >
+                                                                    maxLength ? (
+                                                                    <Tooltip
+                                                                      key={
+                                                                        index
+                                                                      }
+                                                                      title={
+                                                                        name
+                                                                      }
+                                                                    >
+                                                                      <span>
+                                                                        {name.substring(
+                                                                          0,
+                                                                          maxLength,
+                                                                        ) +
+                                                                          "..."}
+                                                                      </span>
+                                                                    </Tooltip>
+                                                                  ) : (
+                                                                    name
+                                                                  );
+                                                                },
+                                                              )
+                                                              .reduce(
+                                                                (
+                                                                  prev,
+                                                                  curr,
+                                                                ) => [
+                                                                  prev,
+                                                                  ", ",
+                                                                  curr,
+                                                                ],
+                                                              )}
+                                                          </b>
+                                                        </p>
+                                                      </td>
+                                                    )}
+
+                                                    {item.packagesNames ===
+                                                      null && (
+                                                      <td class="table-content-font">
+                                                        {item.statusID !==
+                                                          statusID.Draft && (
+                                                          <p className="mb-0">
+                                                            Recurring:{" "}
+                                                            <b>
+                                                              {formatValue(
+                                                                item.recurringPrice,
+                                                              )}
+                                                            </b>
+                                                          </p>
+                                                        )}
+                                                        {item.statusID !==
+                                                          statusID.Draft && (
+                                                          <p className="mb-0">
+                                                            {" "}
+                                                            OneOff :{" "}
+                                                            <b>
+                                                              {formatValue(
+                                                                item.oneOffPrice,
+                                                              )}
+                                                            </b>
+                                                          </p>
+                                                        )}
+                                                      </td>
+                                                    )}
+
+                                                    {/* Document download */}
+                                                    <td className="table-content-font">
+                                                      {/* <a
+                                      // href="https://teststaging.outbooks.com/api/quote/preview-pdf/b8c4365d-d32a-40ef-9835-f90800aa476b"
+                                      href={item.quotePDFUrl}
+                                      target="_blank"
+                                    > */}{" "}
+                                                      {item.statusID !==
+                                                        statusID.Draft &&
+                                                        item.quotePDFUrl &&
+                                                        item.statusID !==
+                                                          statusID.Signed && (
                                                           <p
                                                             onClick={() => {
-                                                              handleViewOldProposalPdf(
-                                                                item.pdfUrl,
+                                                              handleViewPdf(
+                                                                item,
                                                               );
                                                               setTitle(
                                                                 "View proposals",
@@ -2079,19 +2413,18 @@ const Proposals = () => {
                                                             {proposalName} PDF
                                                           </p>
                                                         )}
-                                                      {item.status !==
-                                                        statusNames.Draft &&
-                                                        item.pdfUrl &&
-                                                        item.status ===
-                                                          statusNames.Signed && (
+                                                      {item.statusID !==
+                                                        statusID.Draft &&
+                                                        item.quotePDFUrl &&
+                                                        item.statusID ===
+                                                          statusID.Signed && (
                                                           <p
                                                             onClick={() => {
-                                                              handleViewOldProposalPdf(
-                                                                item.pdfUrl,
+                                                              handleDownload(
+                                                                item,
+                                                                "zip",
                                                               );
-                                                              setTitle(
-                                                                "View proposals",
-                                                              );
+                                                              // downloadPdfFromAws(item.quotePDFUrl);
                                                             }}
                                                             style={{
                                                               cursor: "pointer",
@@ -2102,588 +2435,243 @@ const Proposals = () => {
                                                         )}
                                                       {/* </a> */}
                                                     </td>
-                                                  </tr>
-                                                );
-                                              })}
-                                          </tbody>
-                                        </table>
-                                      )}
-                                    </div>
-                                    <div
-                                      className={`tab-pane ${
-                                        activeTab === "Proposal" ? "active" : ""
-                                      }`}
-                                      id="base-justified-home"
-                                    >
-                                      {activeTab === "Proposal" && (
-                                        <table
-                                          class="table align-middle table-nowrap"
-                                          id="customerTable"
-                                        >
-                                          <thead class="table-light table-header-font">
-                                            <tr className="head-row">
-                                              <td className="tr-table-class text-white">
-                                                Ref ID
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                {prospectName} Name
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Status
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Value
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Documents
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Last Updated
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Send Reminder
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                {userAccessData.Admin_Proposal_CanView && (
-                                                  <>Action</>
-                                                )}
-                                              </td>
-                                            </tr>
-                                          </thead>
-                                          <tbody class="list form-check-all">
-                                            {ProposalList?.slice(
-                                              0,
-                                              isMobile
-                                                ? isMobileRecords
-                                                : desktopRecords,
-                                            )?.map((item, index) => {
-                                              return (
-                                                <tr class="table_new">
-                                                  <td className="table-content-font">
-                                                    {item.prefix}
-                                                  </td>
-                                                  <td className="table-content-font">
-                                                    {item.clientName}
-                                                  </td>
+                                                    {/* Status updated on */}
 
-                                                  {item.statusID ===
-                                                    statusID.Draft && (
-                                                    <>
-                                                      <td className="table-content-font ">
-                                                        <p
-                                                          className="  p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#DAA520",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Sent && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              " #626ED4",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Accepted && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#008000",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Awaiting_Signature && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#626ED4",
-                                                          }}
-                                                        >
-                                                          {/* Awaiting Response */}
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Declined && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#FF0000",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Signed && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#008000",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Skipped && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#38A4F8",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.packagesNames !==
-                                                    null && (
-                                                    <td class="table-content-font">
-                                                      <p className="mb-0">
-                                                        <b>
-                                                          {item.packagesNames
-                                                            .split(",")
-                                                            .map(
-                                                              (
-                                                                name,
-                                                                index,
-                                                                array,
-                                                              ) => {
-                                                                // Remove extra spaces and trim the name
-                                                                name =
-                                                                  name.trim();
-
-                                                                // Check if there's only one package
-                                                                const isSinglePackage =
-                                                                  array.length ===
-                                                                  1;
-                                                                const isDoublePackage =
-                                                                  array.length ===
-                                                                  2;
-                                                                // Define the length limit based on the number of packages
-                                                                const maxLength =
-                                                                  isSinglePackage
-                                                                    ? 45
-                                                                    : isDoublePackage
-                                                                      ? 25
-                                                                      : 15;
-
-                                                                return name.length >
-                                                                  maxLength ? (
-                                                                  <Tooltip
-                                                                    key={index}
-                                                                    title={name}
-                                                                  >
-                                                                    <span>
-                                                                      {name.substring(
-                                                                        0,
-                                                                        maxLength,
-                                                                      ) + "..."}
-                                                                    </span>
-                                                                  </Tooltip>
-                                                                ) : (
-                                                                  name
-                                                                );
-                                                              },
-                                                            )
-                                                            .reduce(
-                                                              (prev, curr) => [
-                                                                prev,
-                                                                ", ",
-                                                                curr,
-                                                              ],
-                                                            )}
-                                                        </b>
-                                                      </p>
-                                                    </td>
-                                                  )}
-
-                                                  {item.packagesNames ===
-                                                    null && (
-                                                    <td class="table-content-font">
-                                                      {item.statusID !==
-                                                        statusID.Draft && (
-                                                        <p className="mb-0">
-                                                          Recurring:{" "}
-                                                          <b>
-                                                            {formatValue(
-                                                              item.recurringPrice,
-                                                            )}
-                                                          </b>
-                                                        </p>
-                                                      )}
-                                                      {item.statusID !==
-                                                        statusID.Draft && (
-                                                        <p className="mb-0">
-                                                          {" "}
-                                                          OneOff :{" "}
-                                                          <b>
-                                                            {formatValue(
-                                                              item.oneOffPrice,
-                                                            )}
-                                                          </b>
-                                                        </p>
-                                                      )}
-                                                    </td>
-                                                  )}
-
-                                                  {/* Document download */}
-                                                  <td className="table-content-font">
-                                                    {/* <a
-                                      // href="https://teststaging.outbooks.com/api/quote/preview-pdf/b8c4365d-d32a-40ef-9835-f90800aa476b"
-                                      href={item.quotePDFUrl}
-                                      target="_blank"
-                                    > */}{" "}
-                                                    {item.statusID !==
-                                                      statusID.Draft &&
-                                                      item.quotePDFUrl &&
-                                                      item.statusID !==
-                                                        statusID.Signed && (
-                                                        <p
-                                                          onClick={() => {
-                                                            handleViewPdf(item);
-                                                            setTitle(
-                                                              "View proposals",
-                                                            );
-                                                          }}
-                                                          style={{
-                                                            cursor: "pointer",
-                                                            color: "blue",
-                                                          }}
-                                                        >
-                                                          {proposalName} PDF
-                                                        </p>
-                                                      )}
-                                                    {item.statusID !==
-                                                      statusID.Draft &&
-                                                      item.quotePDFUrl &&
-                                                      item.statusID ===
-                                                        statusID.Signed && (
-                                                        <p
-                                                          onClick={() => {
-                                                            handleDownload(
-                                                              item,
-                                                              "zip",
-                                                            );
-                                                            // downloadPdfFromAws(item.quotePDFUrl);
-                                                          }}
-                                                          style={{
-                                                            cursor: "pointer",
-                                                          }}
-                                                        >
-                                                          {proposalName} PDF
-                                                        </p>
-                                                      )}
-                                                    {/* </a> */}
-                                                  </td>
-                                                  {/* Status updated on */}
-
-                                                  <td className="table-content-font">
-                                                    {item.statusID ===
-                                                    statusID.Accepted ? (
-                                                      <span>
-                                                        Accepted on:{" "}
-                                                        {GetOnlyDate(
-                                                          item.acceptDeclineDate,
-                                                        )}
-                                                      </span>
-                                                    ) : item.statusID ===
-                                                      statusID.Sent ? (
-                                                      <span>
-                                                        Sent on:{" "}
-                                                        {GetOnlyDate(
-                                                          item.sentOn,
-                                                        )}
-                                                      </span>
-                                                    ) : item.statusID ===
-                                                      statusID.Draft ? (
-                                                      <span>
-                                                        Drafted on:{" "}
-                                                        {GetOnlyDate(
-                                                          item.createdOn,
-                                                        )}
-                                                      </span>
-                                                    ) : item.statusID ===
-                                                      statusID.Skipped ? (
-                                                      <span>
-                                                        Skipped on:{" "}
-                                                        {GetOnlyDate(
-                                                          item.sentOn,
-                                                        )}
-                                                      </span>
-                                                    ) : null}
-                                                  </td>
-
-                                                  <td className="table-content-font">
-                                                    {item.statusID !==
-                                                      statusID.Draft && (
-                                                      <div
-                                                        style={{
-                                                          alignItems: "none",
-                                                        }}
-                                                        class="d-flex gap-2"
-                                                      >
-                                                        <Tooltip
-                                                          title={
-                                                            item.enableReminder
-                                                              ? item.reminderName
-                                                                ? getCrudButtonToolTipName(
-                                                                    item.reminderName,
-                                                                  )
-                                                                : "No reminder found"
-                                                              : ""
-                                                          }
-                                                        >
-                                                          <div
-                                                            style={{
-                                                              width: "40px",
-                                                            }}
-                                                          >
-                                                            {item.enableReminder
-                                                              ? "Enable"
-                                                              : "Disable"}
-                                                          </div>
-                                                        </Tooltip>
-                                                        <Tooltip
-                                                          title={getCrudButtonToolTipName(
-                                                            "Change Status",
+                                                    <td className="table-content-font">
+                                                      {item.statusID ===
+                                                      statusID.Accepted ? (
+                                                        <span>
+                                                          Accepted on:{" "}
+                                                          {GetOnlyDate(
+                                                            item.acceptDeclineDate,
                                                           )}
-                                                        >
-                                                          <FormGroup>
-                                                            <FormControlLabel
-                                                              control={
-                                                                <Android12Switch
-                                                                  onClick={() =>
-                                                                    setModelRequestData(
-                                                                      {
-                                                                        ...modelRequestData,
-                                                                        status:
-                                                                          item.enableReminder
-                                                                            ? "Enable"
-                                                                            : "Disable",
-                                                                        quoteKeyID:
-                                                                          item?.quoteKeyID,
-                                                                        userKeyID:
-                                                                          common.userKeyID,
-                                                                        StatusType:
-                                                                          null,
-                                                                        Action:
-                                                                          "ReminderStatus",
-                                                                      },
-                                                                    )
-                                                                  }
-                                                                  checked={
-                                                                    item.enableReminder
-                                                                  }
-                                                                  data-bs-toggle="modal"
-                                                                  data-bs-target="#ConfirmModel"
-                                                                />
-                                                              }
-                                                            />
-                                                          </FormGroup>
-                                                        </Tooltip>
-                                                      </div>
-                                                    )}
-                                                  </td>
-                                                  {/*buttons */}
-                                                  <td className="table-content-font">
-                                                    <div class="d-flex gap-2">
-                                                      {/* Dropdown for all actions */}
-                                                      <div class="dropdown">
-                                                        <button
-                                                          class="btn btn-md btn-success create-item-btn"
-                                                          type="button"
-                                                          id="dropdownMenuButton"
-                                                          data-bs-toggle="dropdown"
-                                                          aria-expanded="false"
-                                                        >
-                                                          <span>
-                                                            Actions
-                                                            <ExpandMoreIcon />
-                                                          </span>
-                                                        </button>
-                                                        <ul
+                                                        </span>
+                                                      ) : item.statusID ===
+                                                        statusID.Sent ? (
+                                                        <span>
+                                                          Sent on:{" "}
+                                                          {GetOnlyDate(
+                                                            item.sentOn,
+                                                          )}
+                                                        </span>
+                                                      ) : item.statusID ===
+                                                        statusID.Draft ? (
+                                                        <span>
+                                                          Drafted on:{" "}
+                                                          {GetOnlyDate(
+                                                            item.createdOn,
+                                                          )}
+                                                        </span>
+                                                      ) : item.statusID ===
+                                                        statusID.Skipped ? (
+                                                        <span>
+                                                          Skipped on:{" "}
+                                                          {GetOnlyDate(
+                                                            item.sentOn,
+                                                          )}
+                                                        </span>
+                                                      ) : null}
+                                                    </td>
+
+                                                    <td className="table-content-font">
+                                                      {item.statusID !==
+                                                        statusID.Draft && (
+                                                        <div
                                                           style={{
-                                                            padding: `${
-                                                              item.statusID ===
-                                                              statusID.Draft
-                                                                ? "2px 0px 2px 0px"
-                                                                : "6px 8px"
-                                                            }`,
-                                                            inset:
-                                                              "auto 0px 0px auto",
+                                                            alignItems: "none",
                                                           }}
-                                                          class="dropdown-menu"
-                                                          aria-labelledby="dropdownMenuButton"
+                                                          class="d-flex gap-2"
                                                         >
-                                                          {/* Draft button */}
-                                                          {item.statusID ===
-                                                            statusID.Draft &&
-                                                            userAccessData.Admin_Proposal_CanEdit && (
-                                                              <>
-                                                                <li>
-                                                                  {/* <Tooltip title={`Edit ${proposalName}`} placement="right"> */}
-                                                                  <a
-                                                                    className="dropdown-item"
-                                                                    onClick={() => {
-                                                                      handleEditProposal(
-                                                                        item,
-                                                                      );
-                                                                      setTitle(
-                                                                        "Edit proposals",
-                                                                      );
-                                                                    }}
-                                                                  >
-                                                                    <i
-                                                                      className="ri-pencil-fill custom-pencil-icon"
-                                                                      style={{
-                                                                        marginRight:
-                                                                          "2px",
+                                                          <Tooltip
+                                                            title={
+                                                              item.enableReminder
+                                                                ? item.reminderName
+                                                                  ? getCrudButtonToolTipName(
+                                                                      item.reminderName,
+                                                                    )
+                                                                  : "No reminder found"
+                                                                : ""
+                                                            }
+                                                          >
+                                                            <div
+                                                              style={{
+                                                                width: "40px",
+                                                              }}
+                                                            >
+                                                              {item.enableReminder
+                                                                ? "Enable"
+                                                                : "Disable"}
+                                                            </div>
+                                                          </Tooltip>
+                                                          <Tooltip
+                                                            title={getCrudButtonToolTipName(
+                                                              "Change Status",
+                                                            )}
+                                                          >
+                                                            <FormGroup>
+                                                              <FormControlLabel
+                                                                control={
+                                                                  <Android12Switch
+                                                                    onClick={() =>
+                                                                      setModelRequestData(
+                                                                        {
+                                                                          ...modelRequestData,
+                                                                          status:
+                                                                            item.enableReminder
+                                                                              ? "Enable"
+                                                                              : "Disable",
+                                                                          quoteKeyID:
+                                                                            item?.quoteKeyID,
+                                                                          userKeyID:
+                                                                            common.userKeyID,
+                                                                          StatusType:
+                                                                            null,
+                                                                          Action:
+                                                                            "ReminderStatus",
+                                                                        },
+                                                                      )
+                                                                    }
+                                                                    checked={
+                                                                      item.enableReminder
+                                                                    }
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#ConfirmModel"
+                                                                  />
+                                                                }
+                                                              />
+                                                            </FormGroup>
+                                                          </Tooltip>
+                                                        </div>
+                                                      )}
+                                                    </td>
+                                                    {/*buttons */}
+                                                    <td className="table-content-font proposal-action-column">
+                                                      <div class="d-flex gap-2">
+                                                        {/* Dropdown for all actions */}
+                                                        <div class="dropdown">
+                                                          <button
+                                                            class="btn btn-md btn-success create-item-btn"
+                                                            type="button"
+                                                            id="dropdownMenuButton"
+                                                            data-bs-toggle="dropdown"
+                                                            aria-expanded="false"
+                                                          >
+                                                            <span>
+                                                              Actions
+                                                              <ExpandMoreIcon />
+                                                            </span>
+                                                          </button>
+                                                          <ul
+                                                            style={{
+                                                              padding: `${
+                                                                item.statusID ===
+                                                                statusID.Draft
+                                                                  ? "2px 0px 2px 0px"
+                                                                  : "6px 8px"
+                                                              }`,
+                                                              inset:
+                                                                "auto 0px 0px auto",
+                                                            }}
+                                                            class="dropdown-menu"
+                                                            aria-labelledby="dropdownMenuButton"
+                                                          >
+                                                            {/* Draft button */}
+                                                            {item.statusID ===
+                                                              statusID.Draft &&
+                                                              userAccessData.Admin_Proposal_CanEdit && (
+                                                                <>
+                                                                  <li>
+                                                                    {/* <Tooltip title={`Edit ${proposalName}`} placement="right"> */}
+                                                                    <a
+                                                                      className="dropdown-item"
+                                                                      onClick={() => {
+                                                                        handleEditProposal(
+                                                                          item,
+                                                                        );
+                                                                        setTitle(
+                                                                          "Edit proposals",
+                                                                        );
                                                                       }}
-                                                                    ></i>{" "}
-                                                                    Edit{" "}
+                                                                    >
+                                                                      <i
+                                                                        className="ri-pencil-fill custom-pencil-icon"
+                                                                        style={{
+                                                                          marginRight:
+                                                                            "2px",
+                                                                        }}
+                                                                      ></i>{" "}
+                                                                      Edit{" "}
+                                                                      {
+                                                                        proposalName
+                                                                      }
+                                                                    </a>
+                                                                    {/* </Tooltip> */}
+                                                                  </li>
+                                                                </>
+                                                              )}
+
+                                                            {/* View button */}
+                                                            {(item.statusID ===
+                                                              statusID.Accepted ||
+                                                              item.statusID ===
+                                                                statusID.Declined ||
+                                                              item.statusID ===
+                                                                statusID.Sent ||
+                                                              item.statusID ===
+                                                                statusID.Skipped) &&
+                                                              userAccessData.Admin_Proposal_CanView && (
+                                                                <li>
+                                                                  <a
+                                                                    class="dropdown-item"
+                                                                    onClick={() =>
+                                                                      handleView(
+                                                                        item,
+                                                                      )
+                                                                    }
+                                                                  >
+                                                                    <i class="bi bi-eye"></i>{" "}
+                                                                    View{" "}
                                                                     {
                                                                       proposalName
                                                                     }
                                                                   </a>
-                                                                  {/* </Tooltip> */}
                                                                 </li>
-                                                              </>
-                                                            )}
+                                                              )}
 
-                                                          {/* View button */}
-                                                          {(item.statusID ===
-                                                            statusID.Accepted ||
-                                                            item.statusID ===
-                                                              statusID.Declined ||
-                                                            item.statusID ===
+                                                            {/* Generate Contract button */}
+                                                            {(item.statusID ===
                                                               statusID.Sent ||
-                                                            item.statusID ===
-                                                              statusID.Skipped) &&
-                                                            userAccessData.Admin_Proposal_CanView && (
-                                                              <li>
-                                                                <a
-                                                                  class="dropdown-item"
-                                                                  onClick={() =>
-                                                                    handleView(
-                                                                      item,
-                                                                    )
-                                                                  }
-                                                                >
-                                                                  <i class="bi bi-eye"></i>{" "}
-                                                                  View{" "}
-                                                                  {proposalName}
-                                                                </a>
-                                                              </li>
-                                                            )}
-
-                                                          {/* Generate Contract button */}
-                                                          {(item.statusID ===
-                                                            statusID.Sent ||
-                                                            item.statusID ===
-                                                              statusID.Skipped) &&
-                                                            common.enableEL ==
-                                                              1 &&
-                                                            userAccessData.Admin_Engagement_Latter_CanAdd &&
-                                                            userAccessData.Admin_Engagement_Latter_CanView && (
-                                                              <li>
-                                                                <a
-                                                                  class="dropdown-item"
-                                                                  onClick={() => {
-                                                                    HandleSkippedToEL(
-                                                                      item,
-                                                                      false,
-                                                                    );
-                                                                    setTitle(
-                                                                      "Skipped To Engagement_letter",
-                                                                    );
-                                                                  }}
-                                                                >
-                                                                  <i class="bi bi-gear-fill"></i>{" "}
-                                                                  Generate{" "}
-                                                                  {
-                                                                    EngagementName
-                                                                  }
-                                                                </a>
-                                                              </li>
-                                                            )}
-
-                                                          {/* Copy button */}
-                                                          {item.statusID !==
-                                                            statusID.Draft && (
-                                                            <li>
-                                                              <a
-                                                                class="dropdown-item"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#ConfirmModel"
-                                                                onClick={() => {
-                                                                  setModelRequestData(
+                                                              item.statusID ===
+                                                                statusID.Skipped) &&
+                                                              common.enableEL ==
+                                                                1 &&
+                                                              userAccessData.Admin_Engagement_Latter_CanAdd &&
+                                                              userAccessData.Admin_Engagement_Latter_CanView && (
+                                                                <li>
+                                                                  <a
+                                                                    class="dropdown-item"
+                                                                    onClick={() => {
+                                                                      HandleSkippedToEL(
+                                                                        item,
+                                                                        false,
+                                                                      );
+                                                                      setTitle(
+                                                                        "Skipped To Engagement_letter",
+                                                                      );
+                                                                    }}
+                                                                  >
+                                                                    <i class="bi bi-gear-fill"></i>{" "}
+                                                                    Generate{" "}
                                                                     {
-                                                                      ...modelRequestData,
-                                                                      Action:
-                                                                        "Copy",
-                                                                      quoteKeyID:
-                                                                        item.quoteKeyID,
-                                                                      RefId:
-                                                                        item.prefix,
-                                                                    },
-                                                                  );
-                                                                }}
-                                                              >
-                                                                <i class="fa-solid fa-copy"></i>{" "}
-                                                                Copy{" "}
-                                                                {proposalName}
-                                                              </a>
-                                                            </li>
-                                                          )}
+                                                                      EngagementName
+                                                                    }
+                                                                  </a>
+                                                                </li>
+                                                              )}
 
-                                                          {/* Resend Proposal */}
-                                                          {item.statusID ===
-                                                            statusID.Sent &&
-                                                            userAccessData.Admin_Proposal_CanEdit && (
+                                                            {/* Copy button */}
+                                                            {item.statusID !==
+                                                              statusID.Draft && (
                                                               <li>
                                                                 <a
                                                                   class="dropdown-item"
@@ -2693,109 +2681,159 @@ const Proposals = () => {
                                                                     setModelRequestData(
                                                                       {
                                                                         ...modelRequestData,
+                                                                        Action:
+                                                                          "Copy",
                                                                         quoteKeyID:
                                                                           item.quoteKeyID,
-                                                                        message: `Are you sure you want to re-send ${proposalName}`,
                                                                         RefId:
                                                                           item.prefix,
-                                                                        Action:
-                                                                          "Resend",
                                                                       },
                                                                     );
                                                                   }}
                                                                 >
-                                                                  <i class="fas fa-redo"></i>{" "}
-                                                                  Re-send{" "}
+                                                                  <i class="fa-solid fa-copy"></i>{" "}
+                                                                  Copy{" "}
                                                                   {proposalName}
                                                                 </a>
                                                               </li>
                                                             )}
-                                                            {/*Archive*/}
-                                                          {!item.isArchived && (
-                                                            <li>
-                                                              {/* <Tooltip title={`Delete ${proposalName}`} placement="right"> */}
-                                                              <a
-                                                                class="dropdown-item"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#ConfirmModel"
-                                                                onClick={() => {
-                                                                  setModelRequestData(
-                                                                    {
-                                                                      ...modelRequestData,
-                                                                      Action: item.contracts?.length === 0
-                                                                      ? "Archive" : "ArchiveLinkedELs",
-                                                                      RefId:
-                                                                        item.prefix,
-                                                                      quoteKeyID:
-                                                                        item.quoteKeyID,
-                                                                      userKeyID:
-                                                                        common.userKeyID,
-                                                                      contracts:
-                                                                        item.contracts,
-                                                                      message: item?.contracts?.length === 0
-                                                                       ? "Are you sure you want to archive this quote?"
-                                                                        : `Archiving this record would archive all the linked ${EngagementName} too:`,
-                                                                    },
-                                                                  );
-                                                                }}
-                                                              >
-                                                                <i
-                                                                  className="ri-archive-fill"
-                                                                  style={{
-                                                                    marginRight:
-                                                                      "2px",
-                                                                  }}
-                                                                ></i>{" "}
-                                                                Archive{" "}
-                                                                {proposalName}
-                                                              </a>
-                                                              {/* </Tooltip> */}
-                                                            </li>
-                                                          )}
-                                                          {item?.isArchived && (
-                                                            <li>
-                                                              <a
-                                                                class="dropdown-item"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#ConfirmModel"
-                                                                onClick={() => {
-                                                                  setModelRequestData(
-                                                                    {
-                                                                      ...modelRequestData,
-                                                                      Action: "Unarchive",
-                                                                      RefId:
-                                                                        item.prefix,
-                                                                      quoteKeyID:
-                                                                        item.quoteKeyID,
-                                                                      userKeyID:
-                                                                        common.userKeyID,
-                                                                      contracts:
-                                                                        item.contracts,
-                                                                      message: "Are you sure you want to Unarchive this quote?",
-                                                                    },
-                                                                  );
-                                                                }}
-                                                              >
-                                                                <i
-                                                                  className="ri-archive-fill"
-                                                                  style={{
-                                                                    marginRight:
-                                                                      "2px",
-                                                                  }}
-                                                                ></i>
-                                                                Unarchive{" "}
-                                                                {proposalName}
-                                                              </a>
-                                                            </li>
-                                                          )}
 
-                                                          {(
-                                                              item.statusID === statusID.Draft ||
-                                                              (item.statusID === statusID.Sent && (
-                                                                item.contracts?.length === 0 ||
-                                                                !item.contracts?.some(c => c.StatusID === statusID.Signed || c.StatusID === statusID.Declined)
-                                                              ))
-                                                              ) && (
+                                                            {/* Resend Proposal */}
+                                                            {item.statusID ===
+                                                              statusID.Sent &&
+                                                              userAccessData.Admin_Proposal_CanEdit && (
+                                                                <li>
+                                                                  <a
+                                                                    class="dropdown-item"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#ConfirmModel"
+                                                                    onClick={() => {
+                                                                      setModelRequestData(
+                                                                        {
+                                                                          ...modelRequestData,
+                                                                          quoteKeyID:
+                                                                            item.quoteKeyID,
+                                                                          message: `Are you sure you want to re-send ${proposalName}`,
+                                                                          RefId:
+                                                                            item.prefix,
+                                                                          Action:
+                                                                            "Resend",
+                                                                        },
+                                                                      );
+                                                                    }}
+                                                                  >
+                                                                    <i class="fas fa-redo"></i>{" "}
+                                                                    Re-send{" "}
+                                                                    {
+                                                                      proposalName
+                                                                    }
+                                                                  </a>
+                                                                </li>
+                                                              )}
+                                                            {/*Archive*/}
+                                                            {!item.isArchived && (
+                                                              <li>
+                                                                {/* <Tooltip title={`Delete ${proposalName}`} placement="right"> */}
+                                                                <a
+                                                                  class="dropdown-item"
+                                                                  data-bs-toggle="modal"
+                                                                  data-bs-target="#ConfirmModel"
+                                                                  onClick={() => {
+                                                                    setModelRequestData(
+                                                                      {
+                                                                        ...modelRequestData,
+                                                                        Action:
+                                                                          item
+                                                                            .contracts
+                                                                            ?.length ===
+                                                                          0
+                                                                            ? "Archive"
+                                                                            : "ArchiveLinkedELs",
+                                                                        RefId:
+                                                                          item.prefix,
+                                                                        quoteKeyID:
+                                                                          item.quoteKeyID,
+                                                                        userKeyID:
+                                                                          common.userKeyID,
+                                                                        contracts:
+                                                                          item.contracts,
+                                                                        message:
+                                                                          item
+                                                                            ?.contracts
+                                                                            ?.length ===
+                                                                          0
+                                                                            ? "Are you sure you want to archive this quote?"
+                                                                            : `Archiving this record would archive all the linked ${EngagementName} too:`,
+                                                                      },
+                                                                    );
+                                                                  }}
+                                                                >
+                                                                  <i
+                                                                    className="ri-archive-fill"
+                                                                    style={{
+                                                                      marginRight:
+                                                                        "2px",
+                                                                    }}
+                                                                  ></i>{" "}
+                                                                  Archive{" "}
+                                                                  {proposalName}
+                                                                </a>
+                                                                {/* </Tooltip> */}
+                                                              </li>
+                                                            )}
+                                                            {item?.isArchived && (
+                                                              <li>
+                                                                <a
+                                                                  class="dropdown-item"
+                                                                  data-bs-toggle="modal"
+                                                                  data-bs-target="#ConfirmModel"
+                                                                  onClick={() => {
+                                                                    setModelRequestData(
+                                                                      {
+                                                                        ...modelRequestData,
+                                                                        Action:
+                                                                          "Unarchive",
+                                                                        RefId:
+                                                                          item.prefix,
+                                                                        quoteKeyID:
+                                                                          item.quoteKeyID,
+                                                                        userKeyID:
+                                                                          common.userKeyID,
+                                                                        contracts:
+                                                                          item.contracts,
+                                                                        message:
+                                                                          "Are you sure you want to Unarchive this quote?",
+                                                                      },
+                                                                    );
+                                                                  }}
+                                                                >
+                                                                  <i
+                                                                    className="ri-archive-fill"
+                                                                    style={{
+                                                                      marginRight:
+                                                                        "2px",
+                                                                    }}
+                                                                  ></i>
+                                                                  Unarchive{" "}
+                                                                  {proposalName}
+                                                                </a>
+                                                              </li>
+                                                            )}
+
+                                                            {(item.statusID ===
+                                                              statusID.Draft ||
+                                                              (item.statusID ===
+                                                                statusID.Sent &&
+                                                                (item.contracts
+                                                                  ?.length ===
+                                                                  0 ||
+                                                                  !item.contracts?.some(
+                                                                    (c) =>
+                                                                      c.StatusID ===
+                                                                        statusID.Signed ||
+                                                                      c.StatusID ===
+                                                                        statusID.Declined,
+                                                                  )))) && (
                                                               <li>
                                                                 {/* <Tooltip title={`Delete ${proposalName}`} placement="right"> */}
                                                                 <a
@@ -2833,15 +2871,16 @@ const Proposals = () => {
                                                                 {/* </Tooltip> */}
                                                               </li>
                                                             )}
-                                                        </ul>
+                                                          </ul>
+                                                        </div>
                                                       </div>
-                                                    </div>
-                                                  </td>
-                                                </tr>
-                                              );
-                                            })}
-                                          </tbody>
-                                        </table>
+                                                    </td>
+                                                  </tr>
+                                                );
+                                              })}
+                                            </tbody>
+                                          </table>
+                                        </div>
                                       )}
                                     </div>
                                     <div
@@ -2853,366 +2892,378 @@ const Proposals = () => {
                                       id="base-justified-home"
                                     >
                                       {activeTab === "Web Proposal" && (
-                                        <table
-                                          class="table align-middle table-nowrap"
-                                          id="customerTable"
-                                        >
-                                          <thead class="table-light table-header-font">
-                                            <tr className="head-row">
-                                              <td className="tr-table-class text-white">
-                                                <input
-                                                  type="checkbox"
-                                                  className="me-2"
-                                                  checked={
-                                                    selectedRows.length ===
-                                                    visibleRows.length
-                                                  }
-                                                  onChange={handleSelectAll}
-                                                />{" "}
-                                                Ref ID
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                {prospectName} Name
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Status
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Value
-                                              </td>
-                                              <td className="tr-table-class text-white">
-                                                Documents
-                                              </td>
+                                        <div className="proposal-table-scroll">
+                                          <table
+                                            class="table align-middle table-nowrap"
+                                            id="customerTable"
+                                          >
+                                            <thead class="table-light table-header-font">
+                                              <tr className="head-row">
+                                                <td className="tr-table-class text-white">
+                                                  <input
+                                                    type="checkbox"
+                                                    className="me-2"
+                                                    checked={
+                                                      selectedRows.length ===
+                                                      visibleRows.length
+                                                    }
+                                                    onChange={handleSelectAll}
+                                                  />{" "}
+                                                  Ref ID
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  {prospectName} Name
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Status
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Value
+                                                </td>
+                                                <td className="tr-table-class text-white">
+                                                  Documents
+                                                </td>
 
-                                              <td className="tr-table-class text-white">
-                                                {userAccessData.Admin_Proposal_CanView && (
-                                                  <>Action</>
-                                                )}
-                                              </td>
-                                            </tr>
-                                          </thead>
-                                          <tbody class="list form-check-all">
-                                            {SingleProposalList.slice(
-                                              0,
-                                              isMobile
-                                                ? isMobileRecords
-                                                : desktopRecords,
-                                            ).map((item, index) => {
-                                              return (
-                                                <tr class="table_new">
-                                                  <td className="table-content-font">
-                                                    <input
-                                                      type="checkbox"
-                                                      className="me-2"
-                                                      checked={selectedRows.includes(
-                                                        item.quoteKeyID,
-                                                      )}
-                                                      onChange={() =>
-                                                        handleRowSelect(
+                                                <td className="tr-table-class text-white proposal-action-column">
+                                                  {userAccessData.Admin_Proposal_CanView && (
+                                                    <>Action</>
+                                                  )}
+                                                </td>
+                                              </tr>
+                                            </thead>
+                                            <tbody class="list form-check-all">
+                                              {SingleProposalList.slice(
+                                                0,
+                                                isMobile
+                                                  ? isMobileRecords
+                                                  : desktopRecords,
+                                              ).map((item, index) => {
+                                                return (
+                                                  <tr class="table_new">
+                                                    <td className="table-content-font">
+                                                      <input
+                                                        type="checkbox"
+                                                        className="me-2"
+                                                        checked={selectedRows.includes(
                                                           item.quoteKeyID,
-                                                        )
-                                                      }
-                                                    />{" "}
-                                                    {item.prefix}
-                                                  </td>
-                                                  <td className="table-content-font">
-                                                    {item.clientName}
-                                                  </td>
-
-                                                  {item.statusID ===
-                                                    statusID.Draft && (
-                                                    <>
-                                                      <td className="table-content-font ">
-                                                        <p
-                                                          className="  p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#DAA520",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Sent && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              " #626ED4",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Accepted && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#008000",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Awaiting_Signature && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#626ED4",
-                                                          }}
-                                                        >
-                                                          {/* Awaiting Response */}
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Declined && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#FF0000",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Signed && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#008000",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.statusID ===
-                                                    statusID.Skipped && (
-                                                    <>
-                                                      <td className="table-content-font">
-                                                        <p
-                                                          className=" p-1 text-center text-white rounded"
-                                                          style={{
-                                                            background:
-                                                              "#38A4F8",
-                                                          }}
-                                                        >
-                                                          {item.statusName}
-                                                        </p>
-                                                      </td>
-                                                    </>
-                                                  )}
-                                                  {item.packagesNames !==
-                                                    null && (
-                                                    <td class="table-content-font">
-                                                      <p className="mb-0">
-                                                        <b>
-                                                          {item.packagesNames
-                                                            .split(",")
-                                                            .map(
-                                                              (
-                                                                name,
-                                                                index,
-                                                                array,
-                                                              ) => {
-                                                                // Remove extra spaces and trim the name
-                                                                name =
-                                                                  name.trim();
-
-                                                                // Check if there's only one package
-                                                                const isSinglePackage =
-                                                                  array.length ===
-                                                                  1;
-                                                                const isDoublePackage =
-                                                                  array.length ===
-                                                                  2;
-                                                                // Define the length limit based on the number of packages
-                                                                const maxLength =
-                                                                  isSinglePackage
-                                                                    ? 45
-                                                                    : isDoublePackage
-                                                                      ? 25
-                                                                      : 15;
-
-                                                                return name.length >
-                                                                  maxLength ? (
-                                                                  <Tooltip
-                                                                    key={index}
-                                                                    title={name}
-                                                                  >
-                                                                    <span>
-                                                                      {name.substring(
-                                                                        0,
-                                                                        maxLength,
-                                                                      ) + "..."}
-                                                                    </span>
-                                                                  </Tooltip>
-                                                                ) : (
-                                                                  name
-                                                                );
-                                                              },
-                                                            )
-                                                            .reduce(
-                                                              (prev, curr) => [
-                                                                prev,
-                                                                ", ",
-                                                                curr,
-                                                              ],
-                                                            )}
-                                                        </b>
-                                                      </p>
+                                                        )}
+                                                        onChange={() =>
+                                                          handleRowSelect(
+                                                            item.quoteKeyID,
+                                                          )
+                                                        }
+                                                      />{" "}
+                                                      {item.prefix}
                                                     </td>
-                                                  )}
+                                                    <td className="table-content-font">
+                                                      {item.clientName}
+                                                    </td>
 
-                                                  {item.packagesNames ===
-                                                    null && (
-                                                    <td class="table-content-font">
-                                                      {item.statusID !==
-                                                        statusID.Draft && (
+                                                    {item.statusID ===
+                                                      statusID.Draft && (
+                                                      <>
+                                                        <td className="table-content-font ">
+                                                          <p
+                                                            className="  p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#DAA520",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Sent && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                " #626ED4",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Accepted && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#008000",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Awaiting_Signature && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#626ED4",
+                                                            }}
+                                                          >
+                                                            {/* Awaiting Response */}
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Declined && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#FF0000",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Signed && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#008000",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.statusID ===
+                                                      statusID.Skipped && (
+                                                      <>
+                                                        <td className="table-content-font">
+                                                          <p
+                                                            className=" p-1 text-center text-white rounded"
+                                                            style={{
+                                                              background:
+                                                                "#38A4F8",
+                                                            }}
+                                                          >
+                                                            {item.statusName}
+                                                          </p>
+                                                        </td>
+                                                      </>
+                                                    )}
+                                                    {item.packagesNames !==
+                                                      null && (
+                                                      <td class="table-content-font">
                                                         <p className="mb-0">
-                                                          Recurring:{" "}
                                                           <b>
-                                                            {formatValue(
-                                                              item.recurringPrice,
-                                                            )}
+                                                            {item.packagesNames
+                                                              .split(",")
+                                                              .map(
+                                                                (
+                                                                  name,
+                                                                  index,
+                                                                  array,
+                                                                ) => {
+                                                                  // Remove extra spaces and trim the name
+                                                                  name =
+                                                                    name.trim();
+
+                                                                  // Check if there's only one package
+                                                                  const isSinglePackage =
+                                                                    array.length ===
+                                                                    1;
+                                                                  const isDoublePackage =
+                                                                    array.length ===
+                                                                    2;
+                                                                  // Define the length limit based on the number of packages
+                                                                  const maxLength =
+                                                                    isSinglePackage
+                                                                      ? 45
+                                                                      : isDoublePackage
+                                                                        ? 25
+                                                                        : 15;
+
+                                                                  return name.length >
+                                                                    maxLength ? (
+                                                                    <Tooltip
+                                                                      key={
+                                                                        index
+                                                                      }
+                                                                      title={
+                                                                        name
+                                                                      }
+                                                                    >
+                                                                      <span>
+                                                                        {name.substring(
+                                                                          0,
+                                                                          maxLength,
+                                                                        ) +
+                                                                          "..."}
+                                                                      </span>
+                                                                    </Tooltip>
+                                                                  ) : (
+                                                                    name
+                                                                  );
+                                                                },
+                                                              )
+                                                              .reduce(
+                                                                (
+                                                                  prev,
+                                                                  curr,
+                                                                ) => [
+                                                                  prev,
+                                                                  ", ",
+                                                                  curr,
+                                                                ],
+                                                              )}
                                                           </b>
                                                         </p>
-                                                      )}
-                                                      {item.statusID !==
-                                                        statusID.Draft && (
-                                                        <p className="mb-0">
-                                                          {" "}
-                                                          OneOff :{" "}
-                                                          <b>
-                                                            {formatValue(
-                                                              item.oneOffPrice,
-                                                            )}
-                                                          </b>
-                                                        </p>
-                                                      )}
-                                                    </td>
-                                                  )}
+                                                      </td>
+                                                    )}
 
-                                                  <td className="table-content-font">
-                                                    {/* <a
+                                                    {item.packagesNames ===
+                                                      null && (
+                                                      <td class="table-content-font">
+                                                        {item.statusID !==
+                                                          statusID.Draft && (
+                                                          <p className="mb-0">
+                                                            Recurring:{" "}
+                                                            <b>
+                                                              {formatValue(
+                                                                item.recurringPrice,
+                                                              )}
+                                                            </b>
+                                                          </p>
+                                                        )}
+                                                        {item.statusID !==
+                                                          statusID.Draft && (
+                                                          <p className="mb-0">
+                                                            {" "}
+                                                            OneOff :{" "}
+                                                            <b>
+                                                              {formatValue(
+                                                                item.oneOffPrice,
+                                                              )}
+                                                            </b>
+                                                          </p>
+                                                        )}
+                                                      </td>
+                                                    )}
+
+                                                    <td className="table-content-font">
+                                                      {/* <a
                                       // href="https://teststaging.outbooks.com/api/quote/preview-pdf/b8c4365d-d32a-40ef-9835-f90800aa476b"
                                       href={item.quotePDFUrl}
                                       target="_blank"
                                     > */}{" "}
-                                                    {item.statusID !==
-                                                      statusID.Draft &&
-                                                      item.quotePDFUrl &&
-                                                      item.statusID !==
-                                                        statusID.Signed && (
-                                                        <p
-                                                          onClick={() => {
-                                                            handleViewPdf(item);
-                                                            setTitle(
-                                                              "View proposals",
-                                                            );
-                                                          }}
-                                                          style={{
-                                                            cursor: "pointer",
-                                                            color: "blue",
-                                                          }}
-                                                        >
-                                                          {proposalName} PDF
-                                                        </p>
-                                                      )}
-                                                    {item.statusID !==
-                                                      statusID.Draft &&
-                                                      item.quotePDFUrl &&
-                                                      item.statusID ===
-                                                        statusID.Signed && (
-                                                        <p
-                                                          onClick={() => {
-                                                            handleDownload(
-                                                              item,
-                                                              "zip",
-                                                            );
-                                                            // downloadPdfFromAws(item.quotePDFUrl);
-                                                          }}
-                                                          style={{
-                                                            cursor: "pointer",
-                                                          }}
-                                                        >
-                                                          {proposalName} PDF
-                                                        </p>
-                                                      )}
-                                                    {/* </a> */}
-                                                  </td>
-                                                  {/*Delete buttons */}
-
-                                                  <td>
-                                                    <div class="d-flex gap-2">
-                                                      <Tooltip
-                                                        title={getCrudButtonToolTipName(
-                                                          "Delete",
-                                                          { proposalName },
-                                                        )}
-                                                      >
-                                                        <div class="remove">
-                                                          <button
-                                                            class="btn btn-sm btn-danger remove-item-btn actionButtonsStyle"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#ConfirmModel"
-                                                            onClick={() =>
-                                                              setModelRequestData(
-                                                                {
-                                                                  ...modelRequestData,
-                                                                  quoteKeyID:
-                                                                    item.quoteKeyID,
-                                                                  clientName:
-                                                                    item.clientName,
-                                                                  userKeyID:
-                                                                    common.userKeyID,
-                                                                  Action:
-                                                                    "Delete",
-                                                                },
-                                                              )
-                                                            }
+                                                      {item.statusID !==
+                                                        statusID.Draft &&
+                                                        item.quotePDFUrl &&
+                                                        item.statusID !==
+                                                          statusID.Signed && (
+                                                          <p
+                                                            onClick={() => {
+                                                              handleViewPdf(
+                                                                item,
+                                                              );
+                                                              setTitle(
+                                                                "View proposals",
+                                                              );
+                                                            }}
+                                                            style={{
+                                                              cursor: "pointer",
+                                                              color: "blue",
+                                                            }}
                                                           >
-                                                            <i class="ri-delete-bin-5-fill"></i>
-                                                          </button>
-                                                        </div>
-                                                      </Tooltip>
-                                                    </div>
-                                                  </td>
-                                                </tr>
-                                              );
-                                            })}
-                                          </tbody>
-                                        </table>
+                                                            {proposalName} PDF
+                                                          </p>
+                                                        )}
+                                                      {item.statusID !==
+                                                        statusID.Draft &&
+                                                        item.quotePDFUrl &&
+                                                        item.statusID ===
+                                                          statusID.Signed && (
+                                                          <p
+                                                            onClick={() => {
+                                                              handleDownload(
+                                                                item,
+                                                                "zip",
+                                                              );
+                                                              // downloadPdfFromAws(item.quotePDFUrl);
+                                                            }}
+                                                            style={{
+                                                              cursor: "pointer",
+                                                            }}
+                                                          >
+                                                            {proposalName} PDF
+                                                          </p>
+                                                        )}
+                                                      {/* </a> */}
+                                                    </td>
+                                                    {/*Delete buttons */}
+
+                                                    <td className="proposal-action-column">
+                                                      <div class="d-flex gap-2">
+                                                        <Tooltip
+                                                          title={getCrudButtonToolTipName(
+                                                            "Delete",
+                                                            { proposalName },
+                                                          )}
+                                                        >
+                                                          <div class="remove">
+                                                            <button
+                                                              class="btn btn-sm btn-danger remove-item-btn actionButtonsStyle"
+                                                              data-bs-toggle="modal"
+                                                              data-bs-target="#ConfirmModel"
+                                                              onClick={() =>
+                                                                setModelRequestData(
+                                                                  {
+                                                                    ...modelRequestData,
+                                                                    quoteKeyID:
+                                                                      item.quoteKeyID,
+                                                                    clientName:
+                                                                      item.clientName,
+                                                                    userKeyID:
+                                                                      common.userKeyID,
+                                                                    Action:
+                                                                      "Delete",
+                                                                  },
+                                                                )
+                                                              }
+                                                            >
+                                                              <i class="ri-delete-bin-5-fill"></i>
+                                                            </button>
+                                                          </div>
+                                                        </Tooltip>
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                );
+                                              })}
+                                            </tbody>
+                                          </table>
+                                        </div>
                                       )}
                                     </div>
                                     {activeTab === "Proposal" && (
@@ -3359,9 +3410,12 @@ const Proposals = () => {
                                       },
                                       true,
                                     )
-                                  : modelRequestData.Action === "Archive" || modelRequestData.Action === "Unarchive"
-                                  || modelRequestData.Action === "ArchiveLinkedELs" ? ArchiveQuotationData
-                                : DeleteQuotationData
+                                : modelRequestData.Action === "Archive" ||
+                                    modelRequestData.Action === "Unarchive" ||
+                                    modelRequestData.Action ===
+                                      "ArchiveLinkedELs"
+                                  ? ArchiveQuotationData
+                                  : DeleteQuotationData
                     }
                   />
                   <SuccessModal
@@ -3380,12 +3434,12 @@ const Proposals = () => {
                             ? "Status has been changed successfully!"
                             : modelRequestData.Action === "Resend"
                               ? proposalName
-                              : modelRequestData.Action === "Archive"
-                              || modelRequestData.Action === "Unarchive"
+                              : modelRequestData.Action === "Archive" ||
+                                  modelRequestData.Action === "Unarchive"
                                 ? proposalName
                                 : modelRequestData.Action === "ArchiveLinkedELs"
                                   ? `${proposalName} and all the linked ${EngagementName} have been archived successfully`
-                              : ""
+                                  : ""
                     }
                     refIdStore={modelRequestData.RefId}
                   />
@@ -3434,8 +3488,10 @@ const Proposals = () => {
             </div>
           </div>
         </div>
+        <div className="proposal-list-v4-footer-wrap">
+          <Footer />
+        </div>
       </div>
-      <Footer />
     </>
   );
 };

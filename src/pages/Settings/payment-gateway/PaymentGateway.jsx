@@ -855,7 +855,7 @@ const Payment_Gateway = () => {
                     <i className="bi bi-currency-pound"></i>
                   </span>
 
-                  <h2>Bank Transfer (BACS)</h2>
+                  <h2>Bank Transfer</h2>
                 </div>
 
                 <div className="gateway-header-actions">

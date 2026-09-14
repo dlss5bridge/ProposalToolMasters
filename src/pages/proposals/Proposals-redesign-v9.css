@@ -1,0 +1,2206 @@
+/* =========================================================
+   PROPOSAL LIST REDESIGN V4
+   VISUAL CHANGES ONLY.
+   Existing functionality is intentionally untouched.
+   ========================================================= */
+
+.proposal-list-v4 {
+  --pl4-bg: #f7f9fc;
+  --pl4-card: #ffffff;
+  --pl4-heading: #14243a;
+  --pl4-text: #344258;
+  --pl4-muted: #7b8798;
+  --pl4-border: #dce4ed;
+  --pl4-border-soft: #e8edf3;
+  --pl4-navy: #0f1b33;
+  --pl4-cyan: #18b5d1;
+  --pl4-cyan-hover: #0ea8c3;
+
+  width: calc(100% - 18px) !important;
+  min-height: 100vh;
+  margin-left: 18px !important;
+  padding: 28px 16px 0 !important;
+
+  background: var(--pl4-bg) !important;
+  color: var(--pl4-text);
+}
+
+.proposal-list-v4,
+.proposal-list-v4 * {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   LEGACY LAYOUT RESET
+   ========================================================= */
+
+.proposal-list-v4 .services.page-background {
+  background: transparent !important;
+}
+
+.proposal-list-v4 .services > div > .row {
+  margin: 0 !important;
+}
+
+.proposal-list-v4 .services > div > .row > .col-lg-12 {
+  padding: 0 !important;
+}
+
+.proposal-list-v4
+  .services
+  > div
+  > .row
+  > .col-lg-12
+  > .card {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.proposal-list-v4
+  .services
+  > div
+  > .row
+  > .col-lg-12
+  > .card
+  > .card-body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.proposal-list-v4 #customerList[style] {
+  margin-top: 0 !important;
+}
+
+.proposal-list-v4 .row.g-4.mb-3 {
+  display: none !important;
+}
+
+/* =========================================================
+   TABS
+   Same visual pattern as Prospect / API Prospect screens.
+   ========================================================= */
+
+.proposal-list-v4 .bg-light.border-bottom.px-2 {
+  min-height: 86px;
+  margin: 0 !important;
+  padding: 10px 28px 0 !important;
+
+  display: flex;
+  align-items: flex-end;
+
+  border: 0 !important;
+  border-bottom: 1px solid #e1e7ee !important;
+
+  background: transparent !important;
+}
+
+.proposal-list-v4 .bg-light.border-bottom.px-2 > .row,
+.proposal-list-v4 .bg-light.border-bottom.px-2 .col-md-12 {
+  width: 100%;
+  margin: 0 !important;
+}
+
+.proposal-list-v4 .nav.nav-tabs {
+  min-height: 70px;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 30px;
+
+  border: 0 !important;
+}
+
+.proposal-list-v4 .nav-tabs .nav-item {
+  margin: 0 !important;
+}
+
+.proposal-list-v4 .nav-tabs .nav-link {
+  position: relative;
+
+  min-height: 70px;
+  padding: 0 6px 23px !important;
+
+  display: inline-flex;
+  align-items: flex-end;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  color: #505a69 !important;
+
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap;
+
+  box-shadow: none !important;
+}
+
+.proposal-list-v4 .nav-tabs .nav-link b {
+  font-weight: 600 !important;
+}
+
+.proposal-list-v4 .nav-tabs .nav-link::after {
+  content: "";
+
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  height: 3px;
+  border-radius: 4px 4px 0 0;
+
+  background: transparent;
+}
+
+.proposal-list-v4 .nav-tabs .nav-link:hover {
+  color: #213149 !important;
+}
+
+.proposal-list-v4 .nav-tabs .nav-link.active {
+  color: #17263d !important;
+}
+
+.proposal-list-v4 .nav-tabs .nav-link.active::after {
+  background: var(--pl4-cyan);
+}
+
+/* =========================================================
+   LIST CARD
+   ========================================================= */
+
+.proposal-list-v4
+  .bg-light.border-bottom.px-2
+  + div
+  > .row {
+  margin: 16px 0 0 !important;
+}
+
+.proposal-list-v4
+  .bg-light.border-bottom.px-2
+  + div
+  > .row
+  > .col-lg-12 {
+  padding: 0 !important;
+}
+
+.proposal-list-v4
+  .bg-light.border-bottom.px-2
+  + div
+  > .row
+  > .col-lg-12
+  > .card {
+  overflow: visible !important;
+
+  border: 1px solid var(--pl4-border) !important;
+  border-radius: 14px !important;
+
+  background: var(--pl4-card) !important;
+
+  box-shadow:
+    0 4px 14px rgba(15, 27, 51, 0.035),
+    0 12px 30px rgba(15, 27, 51, 0.025) !important;
+}
+
+.proposal-list-v4
+  .bg-light.border-bottom.px-2
+  + div
+  .card-body {
+  padding: 0 !important;
+}
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.proposal-list-v4 .table-responsive.table-card {
+  width: 100%;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+
+  border: 0 !important;
+  border-radius: 14px !important;
+
+  background: #ffffff;
+
+  scrollbar-width: thin;
+  scrollbar-color: #cbd4df #f7f9fc;
+}
+
+.proposal-list-v4 .table-responsive.table-card > .row {
+  min-height: 88px;
+
+  margin: 0 !important;
+  padding: 16px 20px !important;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid var(--pl4-border);
+
+  background: #ffffff;
+}
+
+.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  > [class*="col-"] {
+  margin-bottom: 0 !important;
+}
+
+/* Search */
+
+.proposal-list-v4 .search-box {
+  position: relative;
+}
+
+.proposal-list-v4 .search-box.width-searchbox,
+.proposal-list-v4 .search-box.col-md-5 {
+  width: 390px !important;
+  max-width: 390px !important;
+}
+
+.proposal-list-v4 .search-box .search-icon {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  z-index: 2;
+
+  transform: translateY(-50%);
+
+  color: #55657b;
+  font-size: 19px;
+
+  pointer-events: none;
+}
+
+.proposal-list-v4 .search-box input.search {
+  width: 100% !important;
+  min-height: 52px !important;
+
+  padding: 10px 14px 10px 46px !important;
+
+  border: 1px solid #ced9e5 !important;
+  border-radius: 10px !important;
+
+  background: #ffffff !important;
+  color: #314056 !important;
+
+  font-size: 14px !important;
+
+  box-shadow: none !important;
+}
+
+.proposal-list-v4 .search-box input.search::placeholder {
+  color: #7f8a99;
+}
+
+.proposal-list-v4 .search-box input.search:focus {
+  border-color: #74cfdf !important;
+  box-shadow: 0 0 0 3px rgba(24, 181, 209, 0.08) !important;
+}
+
+/* Export / filter / selected-delete buttons */
+
+.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  .filter {
+  width: 52px !important;
+  min-width: 52px !important;
+  max-width: 52px !important;
+
+  height: 52px !important;
+  min-height: 52px !important;
+  max-height: 52px !important;
+
+  padding: 0 !important;
+  margin-right: 8px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 1px solid #ced9e5 !important;
+  border-radius: 10px !important;
+
+  background: #ffffff !important;
+  color: #53647a !important;
+
+  box-shadow: none !important;
+}
+
+.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  .filter:hover {
+  border-color: #b7dfe7 !important;
+
+  background: #f1fafc !important;
+  color: #087f98 !important;
+}
+
+.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  .create-item-btn.filter {
+  border-color: #a9dbe4 !important;
+
+  background: #eef9fb !important;
+  color: #087f98 !important;
+}
+
+.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  .filter
+  > span[style] {
+  display: none !important;
+}
+
+.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  .filter
+  i {
+  margin: 0 !important;
+  color: inherit !important;
+  font-size: 18px !important;
+}
+
+/* Disabled API selected-delete button remains visually disabled. */
+.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  button.filter:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+}
+
+/* Clear filter */
+
+.proposal-list-v4 .create-Filter-item-btn {
+  min-height: 52px !important;
+  padding: 0 14px !important;
+
+  border: 1px solid #d8e0e8 !important;
+  border-radius: 10px !important;
+
+  background: #ffffff !important;
+  color: #59687b !important;
+
+  font-size: 12px !important;
+  font-weight: 600 !important;
+
+  box-shadow: none !important;
+}
+
+.proposal-list-v4 .create-Filter-item-btn:hover {
+  border-color: #edcbd0 !important;
+
+  background: #fff5f6 !important;
+  color: #c64352 !important;
+}
+
+/* Add Proposal */
+
+.proposal-list-v4 .add-new-btn .create-item-btn,
+.proposal-list-v4 .add-new-btn .btn-success,
+.proposal-list-v4 .add-new-btn button {
+  min-height: 52px !important;
+  padding: 0 24px !important;
+
+  border: 1px solid var(--pl4-cyan) !important;
+  border-radius: 10px !important;
+
+  background: var(--pl4-cyan) !important;
+  color: #ffffff !important;
+
+  font-size: 14px !important;
+  font-weight: 600 !important;
+
+  white-space: nowrap;
+
+  box-shadow: none !important;
+}
+
+.proposal-list-v4 .add-new-btn .create-item-btn:hover,
+.proposal-list-v4 .add-new-btn .btn-success:hover,
+.proposal-list-v4 .add-new-btn button:hover {
+  border-color: var(--pl4-cyan-hover) !important;
+  background: var(--pl4-cyan-hover) !important;
+}
+
+/* API toolbar uses full width so delete-selected stays on the right. */
+.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  > .col-md-3.col-lg-3 {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+}
+
+/* =========================================================
+   TABLE
+   Dark navy header + clean white rows.
+   No vertical cell grid lines.
+   ========================================================= */
+
+.proposal-list-v4 #customerTable {
+  width: 100% !important;
+  min-width: 1240px;
+
+  margin: 0 !important;
+
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+}
+
+.proposal-list-v4 #customerTable.table {
+  margin-bottom: 0 !important;
+}
+
+.proposal-list-v4 #customerTable thead,
+.proposal-list-v4 #customerTable .table-light {
+  background: var(--pl4-navy) !important;
+}
+
+.proposal-list-v4 #customerTable thead td {
+  height: 58px !important;
+  padding: 0 22px !important;
+
+  border: 0 !important;
+
+  background: var(--pl4-navy) !important;
+  color: #ffffff !important;
+
+  font-size: 11px !important;
+  font-weight: 600 !important;
+
+  text-transform: uppercase;
+  vertical-align: middle !important;
+  white-space: nowrap;
+}
+
+.proposal-list-v4 #customerTable tbody td {
+  height: 78px !important;
+  padding: 13px 22px !important;
+
+  overflow: hidden;
+
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 1px solid var(--pl4-border-soft) !important;
+
+  background: #ffffff !important;
+  color: #46566b !important;
+
+  font-size: 12px !important;
+  vertical-align: middle !important;
+}
+
+.proposal-list-v4 #customerTable tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+.proposal-list-v4 #customerTable tbody tr:hover td {
+  background: #fbfdff !important;
+}
+
+/* Explicitly prevent spreadsheet-style vertical grid lines. */
+.proposal-list-v4 #customerTable th,
+.proposal-list-v4 #customerTable td {
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+/* Ref / Prospect name */
+.proposal-list-v4 #customerTable tbody td:nth-child(1),
+.proposal-list-v4 #customerTable tbody td:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.proposal-list-v4 #customerTable tbody td:nth-child(1) {
+  color: #1b2a40 !important;
+  font-weight: 600;
+}
+
+.proposal-list-v4 #customerTable tbody td:nth-child(2) {
+  color: #24364d !important;
+  font-weight: 600;
+}
+
+/* =========================================================
+   COLUMN WIDTHS
+   ========================================================= */
+
+/* Proposal: 8 columns */
+.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(1),
+.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(1) {
+  width: 9%;
+}
+
+.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(2),
+.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(2) {
+  width: 15%;
+}
+
+.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(3),
+.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(3) {
+  width: 10%;
+}
+
+.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(4),
+.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(4) {
+  width: 21%;
+}
+
+.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(5),
+.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(5) {
+  width: 10%;
+}
+
+.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(6),
+.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(6) {
+  width: 14%;
+}
+
+.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(7),
+.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(7) {
+  width: 13%;
+}
+
+.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(8),
+.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(8) {
+  width: 8%;
+  overflow: visible;
+  text-align: center;
+}
+
+/* API Proposal: 6 columns */
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(1),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(1) {
+  width: 15%;
+}
+
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(2),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(2) {
+  width: 25%;
+}
+
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(3),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(3) {
+  width: 14%;
+}
+
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(4),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(4) {
+  width: 27%;
+}
+
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(5),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(5) {
+  width: 12%;
+}
+
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(6),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(6) {
+  width: 7%;
+  overflow: visible;
+  text-align: center;
+}
+
+/* Migrated Proposal: 5 columns */
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(1),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(1) {
+  width: 14%;
+}
+
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(2),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(2) {
+  width: 28%;
+}
+
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(3),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(3) {
+  width: 15%;
+}
+
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(4),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(4) {
+  width: 26%;
+}
+
+.proposal-list-v4
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(5),
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(5) {
+  width: 17%;
+}
+
+/* =========================================================
+   STATUS PILLS
+   Existing conditions/values remain exactly the same.
+   ========================================================= */
+
+.proposal-list-v4 #customerTable tbody td:nth-child(3) > p {
+  width: fit-content;
+  min-width: 68px;
+  min-height: 27px;
+
+  margin: 0 !important;
+  padding: 0 10px !important;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px !important;
+
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap;
+}
+
+.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="DAA520"] {
+  background: #fff6df !important;
+  color: #9b7118 !important;
+}
+
+.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="626ED4"] {
+  background: #f0eefc !important;
+  color: #6255af !important;
+}
+
+.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="008000"] {
+  background: #eaf8f3 !important;
+  color: #18845f !important;
+}
+
+.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="FF0000"] {
+  background: #fff0f2 !important;
+  color: #cf4052 !important;
+}
+
+.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="38A4F8"] {
+  background: #eaf7fb !important;
+  color: #177d9a !important;
+}
+
+/* =========================================================
+   VALUE / DOCUMENT / LAST UPDATED
+   ========================================================= */
+
+.proposal-list-v4 #customerTable tbody p.mb-0 {
+  margin-bottom: 2px !important;
+
+  color: #536176;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.proposal-list-v4 #customerTable tbody p.mb-0:last-child {
+  margin-bottom: 0 !important;
+}
+
+.proposal-list-v4 #customerTable tbody p.mb-0 b {
+  color: #20314a;
+  font-weight: 700;
+}
+
+.proposal-list-v4 #customerTable tbody td:nth-child(5) > p[style] {
+  width: fit-content;
+  min-height: 28px;
+
+  margin: 0 !important;
+  padding: 0 9px;
+
+  display: inline-flex;
+  align-items: center;
+
+  border-radius: 7px;
+
+  background: #eef8fa !important;
+  color: #087f98 !important;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.proposal-list-v4 #customerTable tbody td:nth-child(6) span {
+  color: #657386;
+
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   SEND REMINDER
+   ========================================================= */
+
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(7)
+  > .d-flex {
+  width: 100%;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+
+  white-space: nowrap;
+}
+
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(7)
+  > .d-flex
+  > div:first-child {
+  width: auto !important;
+  min-width: 45px !important;
+
+  color: #526176;
+
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.proposal-list-v4 #customerTable tbody td .MuiFormGroup-root,
+.proposal-list-v4 #customerTable tbody td .MuiFormControlLabel-root {
+  width: auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  flex: 0 0 auto;
+}
+
+/* =========================================================
+   ACTIONS
+   Turn the existing Actions button into the same compact
+   ellipsis control visually, without changing its click/dropdown logic.
+   ========================================================= */
+
+.proposal-list-v4 #customerTable .dropdown {
+  display: inline-flex;
+}
+
+.proposal-list-v4 #customerTable .dropdown > button.create-item-btn {
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+
+  padding: 0 !important;
+
+  position: relative;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  color: #59677a !important;
+
+  box-shadow: none !important;
+}
+
+.proposal-list-v4
+  #customerTable
+  .dropdown
+  > button.create-item-btn
+  > span {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  font-size: 0 !important;
+  color: transparent !important;
+}
+
+.proposal-list-v4
+  #customerTable
+  .dropdown
+  > button.create-item-btn
+  > span
+  svg {
+  display: none !important;
+}
+
+.proposal-list-v4
+  #customerTable
+  .dropdown
+  > button.create-item-btn::before {
+  content: "\22EE";
+
+  color: #59677a;
+
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.proposal-list-v4
+  #customerTable
+  .dropdown
+  > button.create-item-btn:hover,
+.proposal-list-v4
+  #customerTable
+  .dropdown.show
+  > button.create-item-btn {
+  border-color: #d9e3eb !important;
+
+  background: #f4f8fa !important;
+}
+
+.proposal-list-v4
+  #customerTable
+  .dropdown
+  > button.create-item-btn:hover::before,
+.proposal-list-v4
+  #customerTable
+  .dropdown.show
+  > button.create-item-btn::before {
+  color: #087f98;
+}
+
+/* Dropdown itself */
+.proposal-list-v4 #customerTable .dropdown-menu {
+  min-width: 220px;
+  padding: 6px !important;
+
+  z-index: 2200;
+
+  border: 1px solid #dce4ed;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
+}
+
+.proposal-list-v4 #customerTable .dropdown-item {
+  min-height: 36px;
+  padding: 8px 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  border-radius: 7px;
+
+  color: #465970;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.proposal-list-v4 #customerTable .dropdown-item:hover {
+  background: #f1f9fb;
+  color: #087f98;
+}
+
+.proposal-list-v4 #customerTable .dropdown-item i {
+  width: 16px;
+
+  margin: 0 !important;
+
+  color: #75849a;
+
+  text-align: center;
+}
+
+.proposal-list-v4 #customerTable .dropdown-item:hover i {
+  color: #087f98;
+}
+
+/* =========================================================
+   API PROPOSAL CHECKBOX / DELETE ACTION
+   ========================================================= */
+
+.proposal-list-v4 #customerTable input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+
+  margin-top: 0 !important;
+
+  border-color: #bfcbd7;
+  border-radius: 4px;
+
+  accent-color: var(--pl4-cyan);
+}
+
+.proposal-list-v4 .actionButtonsStyle {
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+
+  padding: 0 !important;
+  margin: 0 auto !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 1px solid #e5dadd !important;
+  border-radius: 8px !important;
+
+  background: #ffffff !important;
+  color: #d44a59 !important;
+
+  font-size: 13px !important;
+
+  box-shadow: none !important;
+}
+
+.proposal-list-v4 .actionButtonsStyle:hover {
+  border-color: #efc4c9 !important;
+
+  background: #fff3f4 !important;
+  color: #c53a49 !important;
+}
+
+.proposal-list-v4 .actionButtonsStyle i {
+  margin: 0 !important;
+  color: inherit !important;
+}
+
+/* =========================================================
+   PAGINATION
+   Shared component may use .fixed-bottom.
+   Keep it in normal flow for this page.
+   ========================================================= */
+
+.proposal-list-v4 .fixed-bottom {
+  position: static !important;
+
+  inset: auto !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin: 14px 0 18px !important;
+  padding: 0 14px !important;
+
+  background: transparent !important;
+
+  transform: none !important;
+  z-index: auto !important;
+}
+
+.proposal-list-v4 .fixed-bottom .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.proposal-list-v4 .pagination {
+  margin-bottom: 0 !important;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.proposal-list-v4-footer-wrap {
+  width: 100%;
+  margin-top: auto;
+
+  position: relative !important;
+
+  background: var(--pl4-bg, #f7f9fc);
+}
+
+.proposal-list-v4-footer-wrap > *,
+.proposal-list-v4-footer-wrap footer,
+.proposal-list-v4-footer-wrap .footer,
+.proposal-list-v4-footer-wrap .fixed-bottom {
+  position: static !important;
+
+  inset: auto !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin: 0 !important;
+
+  transform: none !important;
+  z-index: auto !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (min-width: 1500px) {
+  .proposal-list-v4 #customerTable {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 1499px) {
+  .proposal-list-v4 #customerTable {
+    min-width: 1260px;
+  }
+}
+
+@media (max-width: 991px) {
+  .proposal-list-v4 {
+    width: calc(100% - 12px) !important;
+
+    margin-left: 12px !important;
+    padding-right: 10px !important;
+  }
+
+  .proposal-list-v4 .table-responsive.table-card > .row {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 767px) {
+  .proposal-list-v4 {
+    width: 100% !important;
+
+    margin-left: 0 !important;
+    padding: 18px 8px 0 !important;
+  }
+
+  .proposal-list-v4 .bg-light.border-bottom.px-2 {
+    min-height: auto;
+    padding: 6px 8px 0 !important;
+  }
+
+  .proposal-list-v4 .nav.nav-tabs {
+    min-height: auto;
+
+    gap: 18px;
+
+    overflow-x: auto;
+  }
+
+  .proposal-list-v4 .nav-tabs .nav-link {
+    min-height: 58px;
+    padding-bottom: 18px !important;
+
+    font-size: 17px !important;
+  }
+
+  .proposal-list-v4 .table-responsive.table-card > .row {
+    min-height: auto;
+
+    padding: 12px !important;
+
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .proposal-list-v4
+    .table-responsive.table-card
+    > .row
+    > [class*="col-"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  .proposal-list-v4 .search-box.width-searchbox,
+  .proposal-list-v4 .search-box.col-md-5 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .proposal-list-v4 .add-new-btn,
+  .proposal-list-v4 .add-new-btn > * {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   TYPOGRAPHY BALANCE FIX
+   UI-only: reduce oversized tab headings and increase table
+   content readability. No functionality is changed.
+   ========================================================= */
+
+/* Top tabs: closer to Prospect List proportions */
+.proposal-list-v4 .nav-tabs .nav-link {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  line-height: 1.15 !important;
+}
+
+/* Table headings: readable without feeling oversized */
+.proposal-list-v4 #customerTable thead td {
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Main row content */
+.proposal-list-v4 #customerTable tbody td {
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+
+/* Ref ID / Prospect Name */
+.proposal-list-v4 #customerTable tbody td:nth-child(1),
+.proposal-list-v4 #customerTable tbody td:nth-child(2) {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+/* Status pill */
+.proposal-list-v4 #customerTable tbody td:nth-child(3) > p {
+  min-height: 30px !important;
+  padding: 0 11px !important;
+
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+}
+
+/* Value / package / recurring text */
+.proposal-list-v4 #customerTable tbody p.mb-0 {
+  font-size: 11.5px !important;
+  line-height: 1.5 !important;
+}
+
+.proposal-list-v4 #customerTable tbody p.mb-0 b {
+  font-size: 11.75px !important;
+}
+
+/* Documents pill */
+.proposal-list-v4 #customerTable tbody td:nth-child(5) > p[style] {
+  min-height: 30px !important;
+  padding: 0 10px !important;
+
+  font-size: 10.5px !important;
+}
+
+/* Last updated */
+.proposal-list-v4 #customerTable tbody td:nth-child(6),
+.proposal-list-v4 #customerTable tbody td:nth-child(6) span {
+  font-size: 11.5px !important;
+  line-height: 1.45 !important;
+}
+
+/* Send reminder label */
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(7)
+  > .d-flex
+  > div:first-child {
+  font-size: 11px !important;
+}
+
+/* Dropdown menu content */
+.proposal-list-v4 #customerTable .dropdown-item {
+  font-size: 11.5px !important;
+}
+
+/* Toolbar search text */
+.proposal-list-v4 .search-box input.search {
+  font-size: 13.5px !important;
+}
+
+/* Keep mobile tab text proportionate */
+@media (max-width: 767px) {
+  .proposal-list-v4 .nav-tabs .nav-link {
+    font-size: 16px !important;
+  }
+
+  .proposal-list-v4 #customerTable tbody td {
+    font-size: 12.5px !important;
+  }
+}
+
+
+/* =========================================================
+   V6 — FOOTER FLOW FIX
+   The shared Footer component uses legacy fixed/sticky styles.
+   Keep the footer strictly AFTER the complete table/pagination.
+   UI/layout only — no Proposal functionality is changed.
+   ========================================================= */
+
+/* The whole Proposal screen is one normal-flow column. */
+.proposal-list-v4 {
+  display: flex !important;
+  flex-direction: column !important;
+
+  min-height: 100vh !important;
+  height: auto !important;
+
+  overflow: visible !important;
+}
+
+/* Legacy wrappers must expand to the real content height. */
+.proposal-list-v4 .services,
+.proposal-list-v4 .services > div,
+.proposal-list-v4 .services > div > .row,
+.proposal-list-v4 .services > div > .row > .col-lg-12,
+.proposal-list-v4 .services > div > .row > .col-lg-12 > .card,
+.proposal-list-v4 .services > div > .row > .col-lg-12 > .card > .card-body,
+.proposal-list-v4 #customerList,
+.proposal-list-v4 .tab-content,
+.proposal-list-v4 .tab-pane {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+/* Table/list content must contribute its full height to document flow. */
+.proposal-list-v4 .table-responsive.table-card {
+  position: relative !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.proposal-list-v4 #customerTable {
+  position: static !important;
+}
+
+/* Pagination must never be viewport-fixed. */
+.proposal-list-v4 .fixed-bottom,
+.proposal-list-v4 [class*="fixed-bottom"] {
+  position: static !important;
+
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  inset: auto !important;
+
+  transform: none !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  z-index: auto !important;
+}
+
+/* Dedicated footer wrapper starts only after list + pagination. */
+.proposal-list-v4 .proposal-list-v4-footer-wrap {
+  position: static !important;
+
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  inset: auto !important;
+
+  flex: 0 0 auto !important;
+
+  display: block !important;
+  clear: both !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  transform: none !important;
+
+  z-index: auto !important;
+
+  background: var(--pl4-bg, #f7f9fc) !important;
+}
+
+/* Neutralize every known legacy positioning variant inside Footer. */
+.proposal-list-v4 .proposal-list-v4-footer-wrap > *,
+.proposal-list-v4 .proposal-list-v4-footer-wrap footer,
+.proposal-list-v4 .proposal-list-v4-footer-wrap .footer,
+.proposal-list-v4 .proposal-list-v4-footer-wrap .fixed-bottom,
+.proposal-list-v4 .proposal-list-v4-footer-wrap [class*="footer"],
+.proposal-list-v4 .proposal-list-v4-footer-wrap [id*="footer"] {
+  position: static !important;
+
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  inset: auto !important;
+
+  float: none !important;
+
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+
+  margin: 0 !important;
+
+  transform: none !important;
+
+  z-index: auto !important;
+}
+
+/* Keep a normal footer height and stop legacy viewport calculations. */
+.proposal-list-v4 .proposal-list-v4-footer-wrap .footer,
+.proposal-list-v4 .proposal-list-v4-footer-wrap footer {
+  min-height: 52px !important;
+}
+
+/* The list/card itself must not create a clipped height context. */
+.proposal-list-v4
+  .bg-light.border-bottom.px-2
+  + div
+  > .row
+  > .col-lg-12
+  > .card {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Ensure the last table row has breathing room before pagination/footer. */
+.proposal-list-v4 .table-responsive.table-card {
+  margin-bottom: 0 !important;
+}
+
+.proposal-list-v4 .proposal-list-v4-footer-wrap {
+  margin-top: 0 !important;
+}
+
+
+/* =========================================================
+   V7 — LIGHTER PROSPECT-LIST VISUAL BALANCE
+   UI-only adjustments:
+   - lighter typography
+   - softer status pills
+   - reduced vertical density
+   - Prospect-list sized controls
+   - no vertical grid lines
+   ========================================================= */
+
+/* Overall page should feel less padded/heavy. */
+.proposal-list-v4 {
+  padding-top: 20px !important;
+}
+
+/* Tabs: same compact scale as Prospect / API Prospect. */
+.proposal-list-v4 .bg-light.border-bottom.px-2 {
+  min-height: 70px !important;
+  padding: 6px 18px 0 !important;
+}
+
+.proposal-list-v4 .nav.nav-tabs {
+  min-height: 58px !important;
+  gap: 26px !important;
+}
+
+.proposal-list-v4 .nav-tabs .nav-link {
+  min-height: 58px !important;
+  padding: 0 5px 17px !important;
+
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  line-height: 1.15 !important;
+}
+
+.proposal-list-v4 .nav-tabs .nav-link::after {
+  height: 3px !important;
+}
+
+/* Card: slightly tighter radius/shadow like Prospect list. */
+.proposal-list-v4
+  .bg-light.border-bottom.px-2
+  + div
+  > .row {
+  margin-top: 14px !important;
+}
+
+.proposal-list-v4
+  .bg-light.border-bottom.px-2
+  + div
+  > .row
+  > .col-lg-12
+  > .card {
+  border-radius: 12px !important;
+
+  box-shadow:
+    0 2px 10px rgba(15, 27, 51, 0.025),
+    0 8px 22px rgba(15, 27, 51, 0.02) !important;
+}
+
+/* Toolbar: compact like Prospect list. */
+.proposal-list-v4 .table-responsive.table-card > .row {
+  min-height: 76px !important;
+  padding: 11px 16px !important;
+}
+
+.proposal-list-v4 .search-box.width-searchbox,
+.proposal-list-v4 .search-box.col-md-5 {
+  width: 365px !important;
+  max-width: 365px !important;
+}
+
+.proposal-list-v4 .search-box input.search {
+  min-height: 46px !important;
+  padding: 9px 13px 9px 42px !important;
+
+  border-radius: 9px !important;
+
+  font-size: 12.5px !important;
+}
+
+.proposal-list-v4 .search-box .search-icon {
+  left: 14px !important;
+  font-size: 17px !important;
+}
+
+.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  .filter {
+  width: 46px !important;
+  min-width: 46px !important;
+  max-width: 46px !important;
+
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+
+  border-radius: 9px !important;
+}
+
+.proposal-list-v4 .create-Filter-item-btn {
+  min-height: 46px !important;
+  padding: 0 12px !important;
+
+  border-radius: 9px !important;
+
+  font-size: 10.5px !important;
+}
+
+.proposal-list-v4 .add-new-btn .create-item-btn,
+.proposal-list-v4 .add-new-btn .btn-success,
+.proposal-list-v4 .add-new-btn button {
+  min-height: 46px !important;
+  padding: 0 20px !important;
+
+  border-radius: 9px !important;
+
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+}
+
+/* =========================================================
+   TABLE TYPOGRAPHY + DENSITY
+   ========================================================= */
+
+.proposal-list-v4 #customerTable thead td {
+  height: 52px !important;
+  padding: 0 18px !important;
+
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+
+.proposal-list-v4 #customerTable tbody td {
+  height: 68px !important;
+  padding: 10px 18px !important;
+
+  font-size: 11.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+}
+
+/* Keep only the subtle horizontal row divider. */
+.proposal-list-v4 #customerTable th,
+.proposal-list-v4 #customerTable td {
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+.proposal-list-v4 #customerTable tbody td {
+  border-bottom: 1px solid #e8edf3 !important;
+}
+
+/* Key identifiers can remain slightly stronger, without looking heavy. */
+.proposal-list-v4 #customerTable tbody td:nth-child(1),
+.proposal-list-v4 #customerTable tbody td:nth-child(2) {
+  font-size: 11.75px !important;
+  font-weight: 600 !important;
+}
+
+/* Value column should be normal-weight unless the original markup explicitly
+   marks an amount as bold. */
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(4) {
+  color: #43536a !important;
+
+  font-size: 11.25px !important;
+  font-weight: 400 !important;
+}
+
+/* Existing bold numeric values retain hierarchy, but not oversized weight. */
+.proposal-list-v4 #customerTable tbody p.mb-0 {
+  font-size: 10.75px !important;
+  line-height: 1.45 !important;
+}
+
+.proposal-list-v4 #customerTable tbody p.mb-0 b {
+  font-size: 10.9px !important;
+  font-weight: 600 !important;
+}
+
+/* Documents — compact cyan soft pill. */
+.proposal-list-v4 #customerTable tbody td:nth-child(5) > p[style] {
+  min-height: 28px !important;
+  padding: 0 9px !important;
+
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+}
+
+/* Last updated text should be readable but visually secondary. */
+.proposal-list-v4 #customerTable tbody td:nth-child(6),
+.proposal-list-v4 #customerTable tbody td:nth-child(6) span {
+  color: #68778b !important;
+
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+}
+
+/* Send Reminder: lighter typography, same switch/functionality. */
+.proposal-list-v4
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(7)
+  > .d-flex
+  > div:first-child {
+  min-width: 42px !important;
+
+  color: #5f6e82 !important;
+
+  font-size: 10px !important;
+  font-weight: 400 !important;
+}
+
+/* =========================================================
+   SOFT STATUS PILLS
+   Same states, lighter styling like Prospect list.
+   ========================================================= */
+
+.proposal-list-v4 .proposal-status-pill {
+  width: auto !important;
+  min-width: 62px !important;
+  min-height: 26px !important;
+
+  margin: 0 !important;
+  padding: 0 9px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 999px !important;
+
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap;
+}
+
+.proposal-list-v4 .proposal-status-draft {
+  background: #fff6df !important;
+  color: #9b7118 !important;
+}
+
+.proposal-list-v4 .proposal-status-sent,
+.proposal-list-v4 .proposal-status-awaiting {
+  background: #f0eefc !important;
+  color: #6255af !important;
+}
+
+.proposal-list-v4 .proposal-status-accepted,
+.proposal-list-v4 .proposal-status-signed {
+  background: #eaf8f3 !important;
+  color: #18845f !important;
+}
+
+.proposal-list-v4 .proposal-status-declined {
+  background: #fff0f2 !important;
+  color: #cf4052 !important;
+}
+
+.proposal-list-v4 .proposal-status-skipped {
+  background: #eaf7fb !important;
+  color: #177d9a !important;
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.proposal-list-v4 #customerTable .dropdown > button.create-item-btn {
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+}
+
+.proposal-list-v4
+  #customerTable
+  .dropdown
+  > button.create-item-btn::before {
+  font-size: 22px !important;
+}
+
+.proposal-list-v4 #customerTable .dropdown-menu {
+  min-width: 205px !important;
+}
+
+.proposal-list-v4 #customerTable .dropdown-item {
+  min-height: 34px !important;
+  padding: 7px 9px !important;
+
+  font-size: 10px !important;
+}
+
+/* API delete action remains compact. */
+.proposal-list-v4 .actionButtonsStyle {
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+}
+
+/* =========================================================
+   WIDE TABLE BEHAVIOUR
+   Avoid making the page look oversized on common desktop widths.
+   ========================================================= */
+
+@media (min-width: 1500px) {
+  .proposal-list-v4 #customerTable {
+    min-width: 100% !important;
+  }
+}
+
+@media (max-width: 1499px) {
+  .proposal-list-v4 #customerTable {
+    min-width: 1180px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .proposal-list-v4 .nav-tabs .nav-link {
+    font-size: 15px !important;
+  }
+
+  .proposal-list-v4 #customerTable tbody td {
+    font-size: 11px !important;
+  }
+}
+
+
+/* =========================================================
+   V8 — TABLE-ONLY HORIZONTAL SCROLL + STICKY ACTION COLUMN
+   UI/layout only.
+   - Search / Export / Filter / Add buttons never scroll horizontally.
+   - Only the table area scrolls horizontally.
+   - Action column remains visible at the right edge.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   IMPORTANT:
+   The old .table-responsive wrapper contains BOTH toolbar and table.
+   It must NOT be the horizontal scroll container anymore.
+   --------------------------------------------------------- */
+
+.proposal-list-v4 .table-responsive.table-card {
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Keep toolbar fixed in the card while the table below scrolls. */
+.proposal-list-v4 .table-responsive.table-card > .row {
+  position: relative !important;
+  z-index: 20;
+
+  width: 100% !important;
+  max-width: 100% !important;
+
+  overflow: visible !important;
+}
+
+/* ---------------------------------------------------------
+   NEW TABLE SCROLL CONTAINER
+   Only this section moves horizontally.
+   --------------------------------------------------------- */
+
+.proposal-list-v4 .proposal-table-scroll {
+  position: relative;
+
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: thin;
+  scrollbar-color: #cbd4df #f5f7fa;
+}
+
+.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar-track {
+  background: #f5f7fa;
+}
+
+.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #cbd4df;
+}
+
+.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #aebbc9;
+}
+
+/* The actual table may be wider than the viewport. */
+.proposal-list-v4 .proposal-table-scroll #customerTable {
+  margin: 0 !important;
+
+  width: 100% !important;
+}
+
+/* ---------------------------------------------------------
+   STICKY ACTION COLUMN
+   Applies only to cells explicitly marked in JSX.
+   --------------------------------------------------------- */
+
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column {
+  position: sticky !important;
+  right: 0 !important;
+
+  width: 78px !important;
+  min-width: 78px !important;
+  max-width: 78px !important;
+
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+
+  overflow: visible !important;
+
+  text-align: center !important;
+
+  background: #ffffff !important;
+
+  z-index: 8;
+
+  box-shadow: -10px 0 14px -14px rgba(15, 27, 51, 0.55);
+}
+
+/* Sticky header must stay above the scrolling body cells. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  thead
+  .proposal-action-column {
+  background: var(--pl4-navy) !important;
+  color: #ffffff !important;
+
+  z-index: 12;
+
+  box-shadow: -10px 0 14px -14px rgba(0, 0, 0, 0.7);
+}
+
+/* Keep sticky cell visually consistent when a row is hovered. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  tr:hover
+  .proposal-action-column {
+  background: #fbfdff !important;
+}
+
+/* Keep the action controls centered inside the pinned column. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column
+  > .d-flex {
+  width: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Dropdown must render above the neighbouring scrolling cells. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column
+  .dropdown {
+  position: relative;
+  z-index: 30;
+}
+
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column
+  .dropdown-menu {
+  z-index: 3000 !important;
+}
+
+/* Raise the pinned cell when its action menu is open. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column:has(.dropdown.show) {
+  z-index: 40;
+}
+
+/* API Proposal delete button remains centered in the pinned column. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column
+  .remove {
+  margin: 0 auto;
+}
+
+/* ---------------------------------------------------------
+   COLUMN-WIDTH OVERRIDES
+   Previous percentage width rules should not enlarge Action.
+   --------------------------------------------------------- */
+
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  thead
+  tr:has(td:nth-child(8))
+  td.proposal-action-column,
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td.proposal-action-column,
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td.proposal-action-column,
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td.proposal-action-column {
+  width: 78px !important;
+  min-width: 78px !important;
+  max-width: 78px !important;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   Toolbar remains independent of table scrolling.
+   --------------------------------------------------------- */
+
+@media (max-width: 991px) {
+  .proposal-list-v4 .proposal-table-scroll {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .proposal-list-v4
+    .proposal-table-scroll
+    #customerTable
+    .proposal-action-column {
+    width: 68px !important;
+    min-width: 68px !important;
+    max-width: 68px !important;
+
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+  }
+}
+
+
+/* =========================================================
+   V9 — ACTION DROPDOWN STACKING FIX
+   UI only.
+   Ensures an opened Action dropdown always renders above
+   sticky Action cells from the rows below it.
+   ========================================================= */
+
+/* Default sticky Action cells stay low in the stacking order. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  .proposal-action-column {
+  z-index: 3 !important;
+}
+
+/* Keep the sticky Action header above normal body cells. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  thead
+  .proposal-action-column {
+  z-index: 20 !important;
+}
+
+/* Bootstrap places .show on the dropdown menu/button.
+   Raise the CURRENT action cell when its menu is open. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  .proposal-action-column:has(.dropdown-menu.show),
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  .proposal-action-column:has(.dropdown-toggle.show),
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  .proposal-action-column:has(button.show) {
+  z-index: 5000 !important;
+}
+
+/* Raise the dropdown wrapper itself. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column
+  .dropdown {
+  position: relative !important;
+  z-index: 5001 !important;
+}
+
+/* The actual popup must be above all sticky cells and row content. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column
+  .dropdown-menu {
+  z-index: 9999 !important;
+}
+
+/* When open, make the popup stacking explicit. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column
+  .dropdown-menu.show {
+  position: absolute !important;
+  z-index: 99999 !important;
+}
+
+/* Also raise the row that owns the open dropdown so later rows
+   cannot paint over the menu. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  tr:has(.dropdown-menu.show) {
+  position: relative;
+  z-index: 4000 !important;
+}
+
+/* Other rows stay below the currently opened menu. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  tr:not(:has(.dropdown-menu.show)) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Avoid neighbouring sticky action buttons appearing on top
+   of the open menu. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  tr:not(:has(.dropdown-menu.show))
+  .proposal-action-column {
+  z-index: 2 !important;
+}
+
+/* Keep the open row's action column + menu at the top. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  tbody
+  tr:has(.dropdown-menu.show)
+  .proposal-action-column {
+  z-index: 9998 !important;
+}
+
+/* Slightly stronger shadow so the popup reads clearly above the table. */
+.proposal-list-v4
+  .proposal-table-scroll
+  #customerTable
+  .proposal-action-column
+  .dropdown-menu.show {
+  box-shadow:
+    0 16px 36px rgba(15, 23, 42, 0.18),
+    0 4px 12px rgba(15, 23, 42, 0.08) !important;
+}
