@@ -1,0 +1,1522 @@
+/* =========================================================
+   ENGAGEMENT LETTER LIST REDESIGN
+   UI / layout only.
+   Existing APIs, handlers, routes, permissions, filters,
+   status/reminder logic, actions, pagination and modals remain
+   exactly as implemented in Engagement_Letter.jsx.
+   ========================================================= */
+
+.engagement-list-redesign {
+  --el-bg: #f7f9fc;
+  --el-card: #ffffff;
+  --el-heading: #14243a;
+  --el-text: #344258;
+  --el-muted: #7b8798;
+  --el-border: #dce4ed;
+  --el-border-soft: #e8edf3;
+  --el-navy: #0f1b33;
+  --el-cyan: #18b5d1;
+  --el-cyan-hover: #0da7c2;
+
+  width: calc(100% - 18px) !important;
+  min-height: 100vh;
+
+  margin-left: 18px !important;
+  padding: 20px 16px 0 !important;
+
+  background: var(--el-bg) !important;
+  color: var(--el-text);
+}
+
+.engagement-list-redesign,
+.engagement-list-redesign * {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   LEGACY PAGE RESET
+   ========================================================= */
+
+.engagement-list-redesign .services.page-background {
+  background: transparent !important;
+}
+
+.engagement-list-redesign .services > div > .row {
+  margin: 0 !important;
+}
+
+.engagement-list-redesign .services > div > .row > .col-lg-12 {
+  padding: 0 !important;
+}
+
+.engagement-list-redesign
+  .services
+  > div
+  > .row
+  > .col-lg-12
+  > .card {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.engagement-list-redesign
+  .services
+  > div
+  > .row
+  > .col-lg-12
+  > .card
+  > .card-body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.engagement-list-redesign #customerList[style] {
+  margin-top: 0 !important;
+}
+
+.engagement-list-redesign .row.g-4.mb-3 {
+  display: none !important;
+}
+
+/* =========================================================
+   TOP TABS
+   Matches Prospect / Proposal visual system.
+   ========================================================= */
+
+.engagement-list-redesign .bg-light.border-bottom.px-2 {
+  min-height: 70px;
+  margin: 0 !important;
+  padding: 6px 18px 0 !important;
+
+  display: flex;
+  align-items: flex-end;
+
+  border: 0 !important;
+  border-bottom: 1px solid #e1e7ee !important;
+
+  background: transparent !important;
+}
+
+.engagement-list-redesign .bg-light.border-bottom.px-2 > .row,
+.engagement-list-redesign .bg-light.border-bottom.px-2 .col-md-12 {
+  width: 100%;
+  margin: 0 !important;
+}
+
+.engagement-list-redesign .nav.nav-tabs {
+  min-height: 58px;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 26px;
+
+  border: 0 !important;
+}
+
+.engagement-list-redesign .nav-tabs .nav-item {
+  margin: 0 !important;
+}
+
+.engagement-list-redesign .nav-tabs .nav-link {
+  position: relative;
+
+  min-height: 58px;
+  padding: 0 5px 17px !important;
+
+  display: inline-flex;
+  align-items: flex-end;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  color: #505a69 !important;
+
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  line-height: 1.15 !important;
+
+  white-space: nowrap;
+
+  box-shadow: none !important;
+}
+
+.engagement-list-redesign .nav-tabs .nav-link b {
+  font-weight: 600 !important;
+}
+
+.engagement-list-redesign .nav-tabs .nav-link::after {
+  content: "";
+
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  height: 3px;
+
+  border-radius: 4px 4px 0 0;
+
+  background: transparent;
+}
+
+.engagement-list-redesign .nav-tabs .nav-link:hover {
+  color: #213149 !important;
+}
+
+.engagement-list-redesign .nav-tabs .nav-link.active {
+  color: #17263d !important;
+}
+
+.engagement-list-redesign .nav-tabs .nav-link.active::after {
+  background: var(--el-cyan);
+}
+
+/* =========================================================
+   LIST CARD
+   ========================================================= */
+
+.engagement-list-redesign
+  .bg-light.border-bottom.px-2
+  + div
+  > .row {
+  margin: 14px 0 0 !important;
+}
+
+.engagement-list-redesign
+  .bg-light.border-bottom.px-2
+  + div
+  > .row
+  > .col-lg-12 {
+  padding: 0 !important;
+}
+
+.engagement-list-redesign
+  .bg-light.border-bottom.px-2
+  + div
+  > .row
+  > .col-lg-12
+  > .card {
+  overflow: visible !important;
+
+  border: 1px solid var(--el-border) !important;
+  border-radius: 12px !important;
+
+  background: var(--el-card) !important;
+
+  box-shadow:
+    0 2px 10px rgba(15, 27, 51, 0.025),
+    0 8px 22px rgba(15, 27, 51, 0.02) !important;
+}
+
+.engagement-list-redesign
+  .bg-light.border-bottom.px-2
+  + div
+  .card-body {
+  padding: 0 !important;
+}
+
+/* =========================================================
+   TOOLBAR
+   IMPORTANT: this outer wrapper DOES NOT scroll horizontally.
+   Only .engagement-table-scroll below it does.
+   ========================================================= */
+
+.engagement-list-redesign .table-responsive.table-card {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+
+  border: 0 !important;
+  border-radius: 12px !important;
+
+  background: #ffffff;
+}
+
+.engagement-list-redesign .table-responsive.table-card > .row {
+  position: relative;
+  z-index: 20;
+
+  min-height: 76px;
+
+  margin: 0 !important;
+  padding: 11px 16px !important;
+
+  display: flex;
+  align-items: center;
+
+  overflow: visible !important;
+
+  border-bottom: 1px solid var(--el-border);
+
+  background: #ffffff;
+}
+
+.engagement-list-redesign
+  .table-responsive.table-card
+  > .row
+  > [class*="col-"] {
+  margin-bottom: 0 !important;
+}
+
+/* Search */
+
+.engagement-list-redesign .search-box {
+  position: relative;
+}
+
+.engagement-list-redesign .search-box.width-searchbox,
+.engagement-list-redesign .search-box.col-md-5 {
+  width: 365px !important;
+  max-width: 365px !important;
+}
+
+.engagement-list-redesign .search-box .search-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  z-index: 2;
+
+  transform: translateY(-50%);
+
+  color: #55657b;
+  font-size: 17px;
+
+  pointer-events: none;
+}
+
+.engagement-list-redesign .search-box input.search {
+  width: 100% !important;
+  min-height: 46px !important;
+
+  padding: 9px 13px 9px 42px !important;
+
+  border: 1px solid #ced9e5 !important;
+  border-radius: 9px !important;
+
+  background: #ffffff !important;
+  color: #314056 !important;
+
+  font-size: 12.5px !important;
+
+  box-shadow: none !important;
+}
+
+.engagement-list-redesign .search-box input.search::placeholder {
+  color: #7f8a99;
+}
+
+.engagement-list-redesign .search-box input.search:focus {
+  border-color: #74cfdf !important;
+  box-shadow: 0 0 0 3px rgba(24, 181, 209, 0.08) !important;
+}
+
+/* Export / filter / delete-selected */
+
+.engagement-list-redesign
+  .table-responsive.table-card
+  > .row
+  .filter {
+  width: 46px !important;
+  min-width: 46px !important;
+  max-width: 46px !important;
+
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+
+  padding: 0 !important;
+  margin-right: 8px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 1px solid #ced9e5 !important;
+  border-radius: 9px !important;
+
+  background: #ffffff !important;
+  color: #53647a !important;
+
+  box-shadow: none !important;
+}
+
+.engagement-list-redesign
+  .table-responsive.table-card
+  > .row
+  .filter:hover {
+  border-color: #b7dfe7 !important;
+
+  background: #f1fafc !important;
+  color: #087f98 !important;
+}
+
+.engagement-list-redesign
+  .table-responsive.table-card
+  > .row
+  .create-item-btn.filter {
+  border-color: #a9dbe4 !important;
+
+  background: #eef9fb !important;
+  color: #087f98 !important;
+}
+
+.engagement-list-redesign
+  .table-responsive.table-card
+  > .row
+  .filter
+  > span[style] {
+  display: none !important;
+}
+
+.engagement-list-redesign
+  .table-responsive.table-card
+  > .row
+  .filter
+  i {
+  margin: 0 !important;
+  color: inherit !important;
+  font-size: 17px !important;
+}
+
+.engagement-list-redesign
+  .table-responsive.table-card
+  > .row
+  button.filter:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+}
+
+/* Clear filter */
+
+.engagement-list-redesign .create-Filter-item-btn {
+  min-height: 46px !important;
+  padding: 0 12px !important;
+
+  border: 1px solid #d8e0e8 !important;
+  border-radius: 9px !important;
+
+  background: #ffffff !important;
+  color: #59687b !important;
+
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+
+  box-shadow: none !important;
+}
+
+.engagement-list-redesign .create-Filter-item-btn:hover {
+  border-color: #edcbd0 !important;
+
+  background: #fff5f6 !important;
+  color: #c64352 !important;
+}
+
+/* Add Engagement Letter */
+
+.engagement-list-redesign .add-new-btn .create-item-btn,
+.engagement-list-redesign .add-new-btn .btn-success,
+.engagement-list-redesign .add-new-btn button {
+  min-height: 46px !important;
+  padding: 0 20px !important;
+
+  border: 1px solid var(--el-cyan) !important;
+  border-radius: 9px !important;
+
+  background: var(--el-cyan) !important;
+  color: #ffffff !important;
+
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+
+  white-space: nowrap;
+
+  box-shadow: none !important;
+}
+
+.engagement-list-redesign .add-new-btn .create-item-btn:hover,
+.engagement-list-redesign .add-new-btn .btn-success:hover,
+.engagement-list-redesign .add-new-btn button:hover {
+  border-color: var(--el-cyan-hover) !important;
+  background: var(--el-cyan-hover) !important;
+}
+
+/* =========================================================
+   TABLE-ONLY HORIZONTAL SCROLL
+   ========================================================= */
+
+.engagement-list-redesign .engagement-table-scroll {
+  position: relative;
+
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: thin;
+  scrollbar-color: #cbd4df #f5f7fa;
+}
+
+.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar-track {
+  background: #f5f7fa;
+}
+
+.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #cbd4df;
+}
+
+.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #aebbc9;
+}
+
+/* =========================================================
+   TABLE BASE
+   Prospect-style: navy header, clean white rows,
+   horizontal separators only.
+   ========================================================= */
+
+.engagement-list-redesign .engagement-table-scroll #customerTable {
+  width: 100% !important;
+  min-width: 1180px;
+
+  margin: 0 !important;
+
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+}
+
+.engagement-list-redesign #customerTable.table {
+  margin-bottom: 0 !important;
+}
+
+.engagement-list-redesign #customerTable thead,
+.engagement-list-redesign #customerTable .table-light {
+  background: var(--el-navy) !important;
+}
+
+.engagement-list-redesign #customerTable thead td {
+  height: 52px !important;
+  padding: 0 18px !important;
+
+  border: 0 !important;
+
+  background: var(--el-navy) !important;
+  color: #ffffff !important;
+
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+
+  text-transform: uppercase;
+  vertical-align: middle !important;
+
+  white-space: nowrap;
+}
+
+.engagement-list-redesign #customerTable tbody td {
+  height: 68px !important;
+  padding: 10px 18px !important;
+
+  overflow: hidden;
+
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 1px solid var(--el-border-soft) !important;
+
+  background: #ffffff !important;
+  color: #46566b !important;
+
+  font-size: 11.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+
+  vertical-align: middle !important;
+}
+
+.engagement-list-redesign #customerTable tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+.engagement-list-redesign #customerTable tbody tr:hover td {
+  background: #fbfdff !important;
+}
+
+/* No vertical grid lines anywhere. */
+.engagement-list-redesign #customerTable th,
+.engagement-list-redesign #customerTable td {
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+/* Main identifiers */
+
+.engagement-list-redesign #customerTable tbody td:nth-child(1),
+.engagement-list-redesign #customerTable tbody td:nth-child(2) {
+  overflow: hidden;
+
+  color: #1f3047 !important;
+
+  font-size: 11.75px !important;
+  font-weight: 600 !important;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   COLUMN WIDTHS
+   ========================================================= */
+
+/* Current Engagement Letter: 8 columns */
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(8))
+  td:nth-child(1),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(1) {
+  width: 9%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(8))
+  td:nth-child(2),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(2) {
+  width: 15%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(8))
+  td:nth-child(3),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(3) {
+  width: 10%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(8))
+  td:nth-child(4),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(4) {
+  width: 18%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(8))
+  td:nth-child(5),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(5) {
+  width: 11%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(8))
+  td:nth-child(6),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(6) {
+  width: 14%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(8))
+  td:nth-child(7),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(7) {
+  width: 14%;
+}
+
+/* API Engagement: 6 columns */
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(1),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(1) {
+  width: 16%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(2),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(2) {
+  width: 25%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(3),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(3) {
+  width: 15%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(4),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(4) {
+  width: 25%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(5),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td:nth-child(5) {
+  width: 12%;
+}
+
+/* Migrated Engagement: 5 columns */
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(1),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(1) {
+  width: 14%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(2),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(2) {
+  width: 28%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(3),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(3) {
+  width: 16%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(4),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(4) {
+  width: 25%;
+}
+
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(5),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(5):last-child)
+  td:nth-child(5) {
+  width: 17%;
+}
+
+/* =========================================================
+   SOFT STATUS PILLS
+   Conditions and values are unchanged; only colors are softened.
+   ========================================================= */
+
+.engagement-list-redesign #customerTable tbody td:nth-child(3) > p {
+  width: fit-content;
+  min-width: 62px;
+  min-height: 26px;
+
+  margin: 0 !important;
+  padding: 0 9px !important;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px !important;
+
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap;
+}
+
+/* Draft */
+.engagement-list-redesign
+  #customerTable
+  tbody
+  td:nth-child(3)
+  > p[style*="DAA520"] {
+  background: #fff6df !important;
+  color: #9b7118 !important;
+}
+
+/* Sent / Awaiting */
+.engagement-list-redesign
+  #customerTable
+  tbody
+  td:nth-child(3)
+  > p[style*="626ED4"] {
+  background: #f0eefc !important;
+  color: #6255af !important;
+}
+
+/* Accepted / Signed */
+.engagement-list-redesign
+  #customerTable
+  tbody
+  td:nth-child(3)
+  > p[style*="008000"] {
+  background: #eaf8f3 !important;
+  color: #18845f !important;
+}
+
+/* Declined */
+.engagement-list-redesign
+  #customerTable
+  tbody
+  td:nth-child(3)
+  > p[style*="FF0000"] {
+  background: #fff0f2 !important;
+  color: #cf4052 !important;
+}
+
+/* Skipped */
+.engagement-list-redesign
+  #customerTable
+  tbody
+  td:nth-child(3)
+  > p[style*="38A4F8"] {
+  background: #eaf7fb !important;
+  color: #177d9a !important;
+}
+
+/* Void */
+.engagement-list-redesign
+  #customerTable
+  tbody
+  td:nth-child(3)
+  > p[style*="1897ad"] {
+  background: #eaf7fb !important;
+  color: #177d9a !important;
+}
+
+/* =========================================================
+   VALUE / DOCUMENTS / DATES
+   ========================================================= */
+
+.engagement-list-redesign #customerTable tbody p.mb-0 {
+  margin-bottom: 2px !important;
+
+  color: #536176;
+
+  font-size: 10.75px;
+  line-height: 1.45;
+}
+
+.engagement-list-redesign #customerTable tbody p.mb-0:last-child {
+  margin-bottom: 0 !important;
+}
+
+.engagement-list-redesign #customerTable tbody p.mb-0 b {
+  color: #20314a;
+
+  font-size: 10.9px;
+  font-weight: 600;
+}
+
+/* Engagement PDF link */
+.engagement-list-redesign #customerTable tbody td:nth-child(5) > p[style] {
+  width: fit-content;
+  min-height: 28px;
+
+  margin: 0 !important;
+  padding: 0 9px;
+
+  display: inline-flex;
+  align-items: center;
+
+  border-radius: 7px;
+
+  background: #eef8fa !important;
+  color: #087f98 !important;
+
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+
+  cursor: pointer;
+}
+
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(6),
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(6)
+  span {
+  color: #68778b !important;
+
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+}
+
+/* =========================================================
+   SEND REMINDER
+   ========================================================= */
+
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(7)
+  > .d-flex {
+  width: 100%;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+
+  white-space: nowrap;
+}
+
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td:nth-child(7)
+  > .d-flex
+  > div:first-child {
+  width: auto !important;
+  min-width: 42px !important;
+
+  color: #5f6e82 !important;
+
+  font-size: 10px !important;
+  font-weight: 400 !important;
+}
+
+.engagement-list-redesign #customerTable tbody td .MuiFormGroup-root,
+.engagement-list-redesign #customerTable tbody td .MuiFormControlLabel-root {
+  width: auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  flex: 0 0 auto;
+}
+
+/* =========================================================
+   STICKY ACTION COLUMN
+   Current + API Engagement only.
+   Always remains visible while table scrolls horizontally.
+   ========================================================= */
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  .engagement-action-column {
+  position: sticky !important;
+  right: 0 !important;
+
+  width: 78px !important;
+  min-width: 78px !important;
+  max-width: 78px !important;
+
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+
+  overflow: visible !important;
+
+  text-align: center !important;
+
+  background: #ffffff !important;
+
+  z-index: 3;
+
+  box-shadow: -10px 0 14px -14px rgba(15, 27, 51, 0.55);
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  thead
+  .engagement-action-column {
+  background: var(--el-navy) !important;
+  color: #ffffff !important;
+
+  z-index: 20;
+
+  box-shadow: -10px 0 14px -14px rgba(0, 0, 0, 0.65);
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  tbody
+  tr:hover
+  .engagement-action-column {
+  background: #fbfdff !important;
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  .engagement-action-column
+  > .d-flex {
+  width: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Force percentage width rules not to enlarge Action. */
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(8))
+  td.engagement-action-column,
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(8))
+  td.engagement-action-column,
+.engagement-list-redesign
+  #customerTable
+  thead
+  tr:has(td:nth-child(6):last-child)
+  td.engagement-action-column,
+.engagement-list-redesign
+  #customerTable
+  tbody
+  tr:has(td:nth-child(6):last-child)
+  td.engagement-action-column {
+  width: 78px !important;
+  min-width: 78px !important;
+  max-width: 78px !important;
+}
+
+/* =========================================================
+   ACTION TRIGGER — compact ellipsis
+   Existing Bootstrap dropdown functionality is unchanged.
+   ========================================================= */
+
+.engagement-list-redesign #customerTable .dropdown {
+  display: inline-flex;
+}
+
+.engagement-list-redesign
+  #customerTable
+  .dropdown
+  > button.create-item-btn {
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+
+  padding: 0 !important;
+
+  position: relative;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  color: #59677a !important;
+
+  box-shadow: none !important;
+}
+
+.engagement-list-redesign
+  #customerTable
+  .dropdown
+  > button.create-item-btn
+  > span {
+  width: 0;
+  height: 0;
+
+  overflow: hidden;
+
+  color: transparent !important;
+  font-size: 0 !important;
+}
+
+.engagement-list-redesign
+  #customerTable
+  .dropdown
+  > button.create-item-btn
+  > span
+  svg {
+  display: none !important;
+}
+
+.engagement-list-redesign
+  #customerTable
+  .dropdown
+  > button.create-item-btn::before {
+  content: "\22EE";
+
+  color: #59677a;
+
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.engagement-list-redesign
+  #customerTable
+  .dropdown
+  > button.create-item-btn:hover,
+.engagement-list-redesign
+  #customerTable
+  .dropdown.show
+  > button.create-item-btn {
+  border-color: #d9e3eb !important;
+
+  background: #f4f8fa !important;
+}
+
+.engagement-list-redesign
+  #customerTable
+  .dropdown
+  > button.create-item-btn:hover::before,
+.engagement-list-redesign
+  #customerTable
+  .dropdown.show
+  > button.create-item-btn::before {
+  color: #087f98;
+}
+
+/* Dropdown menu */
+
+.engagement-list-redesign #customerTable .dropdown-menu {
+  min-width: 210px;
+  padding: 6px !important;
+
+  border: 1px solid #dce4ed;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 16px 36px rgba(15, 23, 42, 0.16),
+    0 4px 12px rgba(15, 23, 42, 0.07);
+}
+
+.engagement-list-redesign #customerTable .dropdown-item {
+  min-height: 34px;
+  padding: 7px 9px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  border-radius: 7px;
+
+  color: #465970;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.engagement-list-redesign #customerTable .dropdown-item:hover {
+  background: #f1f9fb;
+  color: #087f98;
+}
+
+.engagement-list-redesign #customerTable .dropdown-item i {
+  width: 16px;
+
+  margin: 0 !important;
+
+  color: #75849a;
+
+  text-align: center;
+}
+
+.engagement-list-redesign #customerTable .dropdown-item:hover i {
+  color: #087f98;
+}
+
+/* =========================================================
+   ACTION DROPDOWN Z-INDEX
+   Open menu always appears over sticky cells / lower rows.
+   ========================================================= */
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  tbody
+  .engagement-action-column {
+  z-index: 3 !important;
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  tbody
+  .engagement-action-column:has(.dropdown-menu.show),
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  tbody
+  .engagement-action-column:has(.dropdown-toggle.show),
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  tbody
+  .engagement-action-column:has(button.show) {
+  z-index: 5000 !important;
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  .engagement-action-column
+  .dropdown {
+  position: relative !important;
+  z-index: 5001 !important;
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  .engagement-action-column
+  .dropdown-menu {
+  z-index: 9999 !important;
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  .engagement-action-column
+  .dropdown-menu.show {
+  position: absolute !important;
+  z-index: 99999 !important;
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  tbody
+  tr:has(.dropdown-menu.show) {
+  position: relative;
+  z-index: 4000 !important;
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  tbody
+  tr:not(:has(.dropdown-menu.show)) {
+  position: relative;
+  z-index: 1;
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  tbody
+  tr:not(:has(.dropdown-menu.show))
+  .engagement-action-column {
+  z-index: 2 !important;
+}
+
+.engagement-list-redesign
+  .engagement-table-scroll
+  #customerTable
+  tbody
+  tr:has(.dropdown-menu.show)
+  .engagement-action-column {
+  z-index: 9998 !important;
+}
+
+/* =========================================================
+   API CHECKBOXES
+   ========================================================= */
+
+.engagement-list-redesign #customerTable input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+
+  margin-top: 0 !important;
+
+  border-color: #bfcbd7;
+  border-radius: 4px;
+
+  accent-color: var(--el-cyan);
+}
+
+/* =========================================================
+   PAGINATION
+   Shared component may contain fixed-bottom.
+   Keep it in normal page flow.
+   ========================================================= */
+
+.engagement-list-redesign .fixed-bottom {
+  position: static !important;
+
+  inset: auto !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin: 14px 0 18px !important;
+  padding: 0 14px !important;
+
+  background: transparent !important;
+
+  transform: none !important;
+  z-index: auto !important;
+}
+
+.engagement-list-redesign .fixed-bottom .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.engagement-list-redesign .pagination {
+  margin-bottom: 0 !important;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.engagement-list-footer-wrap {
+  width: 100%;
+
+  position: relative !important;
+
+  background: var(--el-bg, #f7f9fc);
+}
+
+.engagement-list-footer-wrap > *,
+.engagement-list-footer-wrap footer,
+.engagement-list-footer-wrap .footer,
+.engagement-list-footer-wrap .fixed-bottom,
+.engagement-list-footer-wrap [class*="footer"],
+.engagement-list-footer-wrap [id*="footer"] {
+  position: static !important;
+
+  inset: auto !important;
+
+  float: none !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin: 0 !important;
+
+  transform: none !important;
+  z-index: auto !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (min-width: 1500px) {
+  .engagement-list-redesign .engagement-table-scroll #customerTable {
+    min-width: 100% !important;
+  }
+}
+
+@media (max-width: 1499px) {
+  .engagement-list-redesign .engagement-table-scroll #customerTable {
+    min-width: 1180px !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .engagement-list-redesign {
+    width: calc(100% - 12px) !important;
+
+    margin-left: 12px !important;
+    padding-right: 10px !important;
+  }
+
+  .engagement-list-redesign .table-responsive.table-card > .row {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 767px) {
+  .engagement-list-redesign {
+    width: 100% !important;
+
+    margin-left: 0 !important;
+    padding: 18px 8px 0 !important;
+  }
+
+  .engagement-list-redesign .bg-light.border-bottom.px-2 {
+    min-height: auto;
+    padding: 6px 8px 0 !important;
+  }
+
+  .engagement-list-redesign .nav.nav-tabs {
+    min-height: auto;
+
+    gap: 18px;
+
+    overflow-x: auto;
+  }
+
+  .engagement-list-redesign .nav-tabs .nav-link {
+    min-height: 54px;
+    padding-bottom: 16px !important;
+
+    font-size: 15px !important;
+  }
+
+  .engagement-list-redesign .table-responsive.table-card > .row {
+    min-height: auto;
+
+    padding: 12px !important;
+
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .engagement-list-redesign
+    .table-responsive.table-card
+    > .row
+    > [class*="col-"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  .engagement-list-redesign .search-box.width-searchbox,
+  .engagement-list-redesign .search-box.col-md-5 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .engagement-list-redesign .add-new-btn,
+  .engagement-list-redesign .add-new-btn > * {
+    width: 100%;
+  }
+
+  .engagement-list-redesign
+    .engagement-table-scroll
+    #customerTable
+    .engagement-action-column {
+    width: 68px !important;
+    min-width: 68px !important;
+    max-width: 68px !important;
+
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+  }
+}
