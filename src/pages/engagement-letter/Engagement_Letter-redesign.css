@@ -49,12 +49,7 @@
   padding: 0 !important;
 }
 
-.engagement-list-redesign
-  .services
-  > div
-  > .row
-  > .col-lg-12
-  > .card {
+.engagement-list-redesign .services > div > .row > .col-lg-12 > .card {
   border: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
@@ -177,10 +172,7 @@
    LIST CARD
    ========================================================= */
 
-.engagement-list-redesign
-  .bg-light.border-bottom.px-2
-  + div
-  > .row {
+.engagement-list-redesign .bg-light.border-bottom.px-2 + div > .row {
   margin: 14px 0 0 !important;
 }
 
@@ -210,10 +202,7 @@
     0 8px 22px rgba(15, 27, 51, 0.02) !important;
 }
 
-.engagement-list-redesign
-  .bg-light.border-bottom.px-2
-  + div
-  .card-body {
+.engagement-list-redesign .bg-light.border-bottom.px-2 + div .card-body {
   padding: 0 !important;
 }
 
@@ -323,10 +312,7 @@
 
 /* Export / filter / delete-selected */
 
-.engagement-list-redesign
-  .table-responsive.table-card
-  > .row
-  .filter {
+.engagement-list-redesign .table-responsive.table-card > .row .filter {
   width: 46px !important;
   min-width: 46px !important;
   max-width: 46px !important;
@@ -351,10 +337,7 @@
   box-shadow: none !important;
 }
 
-.engagement-list-redesign
-  .table-responsive.table-card
-  > .row
-  .filter:hover {
+.engagement-list-redesign .table-responsive.table-card > .row .filter:hover {
   border-color: #b7dfe7 !important;
 
   background: #f1fafc !important;
@@ -379,11 +362,7 @@
   display: none !important;
 }
 
-.engagement-list-redesign
-  .table-responsive.table-card
-  > .row
-  .filter
-  i {
+.engagement-list-redesign .table-responsive.table-card > .row .filter i {
   margin: 0 !important;
   color: inherit !important;
   font-size: 17px !important;
@@ -483,7 +462,8 @@
   background: #cbd4df;
 }
 
-.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar-thumb:hover {
+.engagement-list-redesign
+  .engagement-table-scroll::-webkit-scrollbar-thumb:hover {
   background: #aebbc9;
 }
 
@@ -926,7 +906,7 @@
   min-height: 28px;
 
   margin: 0 !important;
-  padding: 0 9px;
+  padding: 0 2px;
 
   display: inline-flex;
   align-items: center;
@@ -1105,10 +1085,7 @@
   display: inline-flex;
 }
 
-.engagement-list-redesign
-  #customerTable
-  .dropdown
-  > button.create-item-btn {
+.engagement-list-redesign #customerTable .dropdown > button.create-item-btn {
   width: 32px !important;
   min-width: 32px !important;
   max-width: 32px !important;
