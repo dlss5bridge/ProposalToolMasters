@@ -1,0 +1,2079 @@
+/* VIEW PROPOSAL — UI-only redesign */
+.view-proposal-redesign {
+  --vp-bg: #f7f9fc;
+  --vp-card: #fff;
+  --vp-heading: #14243a;
+  --vp-text: #344258;
+  --vp-muted: #7a8798;
+  --vp-border: #dce4ed;
+  --vp-soft: #e8edf3;
+  --vp-navy: #0f1b33;
+  --vp-cyan: #18b5d1;
+  --vp-cyan-hover: #0da7c2;
+  width: calc(100% - 18px) !important;
+  max-width: none !important;
+  min-height: 100vh;
+  margin-left: 18px !important;
+  padding: 18px 18px 0 !important;
+  background: var(--vp-bg) !important;
+  color: var(--vp-text);
+}
+.view-proposal-redesign,
+.view-proposal-redesign * {
+  box-sizing: border-box;
+}
+.view-proposal-redesign .page-content.page-background,
+.view-proposal-redesign .prospect-bg {
+  min-height: 100vh;
+  padding: 0 !important;
+  background: var(--vp-bg) !important;
+}
+.view-proposal-redesign > .page-content > .container,
+.view-proposal-redesign > .page-content > .container-fluid {
+  max-width: none !important;
+}
+.view-proposal-redesign .container,
+.view-proposal-redesign .container-fluid {
+  width: 100%;
+}
+
+/* Header */
+.view-proposal-redesign .view-proposal-header {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 18px 4px 16px !important;
+  border-bottom: 1px solid #e1e7ee;
+}
+.view-proposal-redesign .view-proposal-header-row {
+  min-height: 58px;
+  margin: 0 !important;
+  align-items: center;
+}
+.view-proposal-redesign .prospects-title h5 {
+  margin: 0 !important;
+  color: var(--vp-heading) !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+.view-proposal-redesign .prospects-title h5:before {
+  content: "\f15c";
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #eaf8fb;
+  color: #0788a3;
+  font-family: "Font Awesome 6 Free";
+  font-size: 16px;
+  font-weight: 900;
+  vertical-align: middle;
+}
+.view-proposal-redesign .add-new-prospect {
+  gap: 8px;
+}
+.view-proposal-redesign .add-new-prospect .create-item-btn {
+  min-height: 42px !important;
+  padding: 0 15px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px;
+  border: 1px solid #d2dce7 !important;
+  border-radius: 9px !important;
+  background: #fff !important;
+  color: #47576d !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+.view-proposal-redesign .add-new-prospect .create-item-btn:hover {
+  border-color: #a8dce5 !important;
+  background: #f1fafc !important;
+  color: #087f98 !important;
+}
+.view-proposal-redesign .add-new-prospect .create-item-btn:first-child {
+  border-color: var(--vp-cyan) !important;
+  background: var(--vp-cyan) !important;
+  color: #fff !important;
+}
+.view-proposal-redesign .add-new-prospect .create-item-btn:first-child:hover {
+  border-color: var(--vp-cyan-hover) !important;
+  background: var(--vp-cyan-hover) !important;
+}
+
+/* Main card */
+.view-proposal-redesign .view-proposal-main-card {
+  margin-top: 18px !important;
+  margin-bottom: 22px !important;
+  overflow: visible !important;
+  border: 1px solid var(--vp-border) !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  box-shadow:
+    0 2px 10px rgba(15, 27, 51, 0.025),
+    0 9px 24px rgba(15, 27, 51, 0.025) !important;
+}
+.view-proposal-redesign .view-proposal-main-card > .card-body {
+  padding: 0 !important;
+}
+.view-proposal-redesign .row.g-4.mb-3 {
+  display: none !important;
+}
+
+/* Tabs shell */
+.view-proposal-redesign .view-proposal-tabs-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.view-proposal-redesign .Height_View_scroll {
+  width: 100% !important;
+  margin: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.view-proposal-redesign .view-proposal-tabs-shell > .table-card > .nav-tabs {
+  min-height: 62px;
+  margin: 0 !important;
+  padding: 0 20px !important;
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 0 !important;
+  border-bottom: 1px solid var(--vp-border) !important;
+  background: #fff;
+  scrollbar-width: none;
+}
+.view-proposal-redesign
+  .view-proposal-tabs-shell
+  > .table-card
+  > .nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+.view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-link {
+  position: relative;
+  min-height: 62px;
+  padding: 0 3px 18px !important;
+  display: inline-flex;
+  align-items: flex-end;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #5e6978 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  box-shadow: none !important;
+}
+.view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-link:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+}
+.view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-link.active {
+  color: var(--vp-heading) !important;
+}
+.view-proposal-redesign
+  .view-proposal-tabs-shell
+  .nav-tabs
+  .nav-link.active:after {
+  background: var(--vp-cyan);
+}
+.view-proposal-redesign .view-proposal-tabs-shell > .table-card > .tab-content {
+  padding: 20px !important;
+  background: #f9fbfd;
+}
+
+/* Details */
+.view-proposal-redesign .view-proposal-details-table {
+  margin: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--vp-border) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+.view-proposal-redesign .view-proposal-details-table tbody tr:first-child {
+  display: none;
+}
+.view-proposal-redesign .view-proposal-details-table tbody tr:nth-child(2) th {
+  padding: 16px 18px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--vp-border) !important;
+  background: #fff !important;
+  color: var(--vp-heading) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+.view-proposal-redesign
+  .view-proposal-details-table
+  tbody
+  tr:not(:nth-child(2))
+  td {
+  height: 52px;
+  padding: 12px 18px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--vp-soft) !important;
+  background: #fff !important;
+  color: #56657a !important;
+  font-size: 12px !important;
+}
+.view-proposal-redesign
+  .view-proposal-details-table
+  tbody
+  tr:not(:nth-child(2))
+  td:first-child {
+  width: 42%;
+  color: #6e7b8d !important;
+  font-weight: 500;
+}
+.view-proposal-redesign
+  .view-proposal-details-table
+  tbody
+  tr:not(:nth-child(2))
+  td:last-child {
+  color: #22334b !important;
+  font-weight: 600;
+}
+.view-proposal-redesign .view-proposal-details-table tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+.view-proposal-redesign .view-proposal-details-table td[style*="blue"] {
+  color: #0788a3 !important;
+  font-weight: 600 !important;
+}
+.view-proposal-redesign #base-justified-home .btn-primary {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #cce2e8 !important;
+  border-radius: 8px !important;
+  background: #eef9fb !important;
+  color: #087f98 !important;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: none !important;
+}
+
+/* Selected services summary */
+.view-proposal-redesign #product .tab-pane.p-3.active {
+  padding: 16px !important;
+  border: 1px solid var(--vp-border);
+  border-radius: 12px;
+  background: #fff;
+}
+.view-proposal-redesign #product .fieldset {
+  min-height: 52px;
+  margin: 0 !important;
+  padding: 7px 0 !important;
+  align-items: center;
+  /* border-bottom: 1px solid #edf1f5; */
+}
+.view-proposal-redesign #product .fieldset:last-child {
+  border-bottom: 0;
+}
+.view-proposal-redesign #product .fieldset-label,
+.view-proposal-redesign #product .form-label {
+  margin: 0 !important;
+  color: #657388 !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+}
+.view-proposal-redesign #product .selectDropDown {
+  width: 100%;
+}
+.view-proposal-redesign #product .selectDropDown > div {
+  min-height: 40px;
+  border-color: #d7e0e9 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+.view-proposal-redesign #product .input-text {
+  min-height: 40px !important;
+  width: 100%;
+  padding: 8px 10px !important;
+  border: 1px solid #d7e0e9 !important;
+  border-radius: 8px !important;
+  background: #f8fafc !important;
+  color: #2f4057 !important;
+  font-size: 11px !important;
+  box-shadow: none !important;
+}
+.view-proposal-redesign #product input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--vp-cyan);
+}
+.view-proposal-redesign #product h6 {
+  margin: 0 !important;
+  padding: 14px 0 10px !important;
+  color: var(--vp-heading) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+.view-proposal-redesign #product .separator {
+  height: 1px !important;
+  border: 0 !important;
+  background: #e8edf3 !important;
+}
+
+/* Pricing tables */
+.view-proposal-redesign #product .table-responsive {
+  width: 100%;
+  overflow-x: auto !important;
+  border: 1px solid var(--vp-border);
+  border-radius: 10px;
+  background: #fff;
+  scrollbar-width: thin;
+  scrollbar-color: #c9d3df #f6f8fb;
+}
+.view-proposal-redesign #product .table-responsive::-webkit-scrollbar {
+  height: 8px;
+}
+.view-proposal-redesign #product .table-responsive::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #c9d3df;
+}
+.view-proposal-redesign #product .table {
+  min-width: 720px;
+  margin-bottom: 0 !important;
+  border-collapse: collapse !important;
+}
+.view-proposal-redesign #product .table thead,
+.view-proposal-redesign #product .table .head-row {
+  background: var(--vp-navy) !important;
+}
+.view-proposal-redesign #product .table thead th,
+.view-proposal-redesign #product .table thead td,
+.view-proposal-redesign #product .table .head-row > th,
+.view-proposal-redesign #product .table .head-row > td {
+  padding: 12px 14px !important;
+  border: 0 !important;
+  background: var(--vp-navy) !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  vertical-align: middle !important;
+}
+.view-proposal-redesign #product .table tbody td,
+.view-proposal-redesign #product .table tbody th {
+  padding: 11px 14px !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 1px solid var(--vp-soft) !important;
+  background: #fff;
+  color: #44546a;
+  font-size: 10.5px !important;
+  line-height: 1.45;
+  vertical-align: middle;
+}
+.view-proposal-redesign #product .table th,
+.view-proposal-redesign #product .table td {
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+.view-proposal-redesign #product .a-la-carte-services-review-head-row th {
+  padding: 9px 14px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #dfe8f0 !important;
+  background: #eef8fa !important;
+  color: #087f98 !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+}
+.view-proposal-redesign #product .head-grey-row td,
+.view-proposal-redesign #product .head-grey-row th {
+  background: #34445c !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+.view-proposal-redesign #product .table .fa-check {
+  color: #1a9a72;
+}
+.view-proposal-redesign #product .table .fa-times {
+  color: #d05261;
+}
+.view-proposal-redesign #product .table .text-right {
+  text-align: right !important;
+}
+
+/* Rich HTML sections */
+.view-proposal-redesign #service_description .shadow-sm,
+.view-proposal-redesign #sof .shadow-sm {
+  border: 1px solid var(--vp-border) !important;
+  border-radius: 12px !important;
+  background: #fff;
+  box-shadow: none !important;
+}
+.view-proposal-redesign #service_description .card-body,
+.view-proposal-redesign #sof .card-body {
+  padding: 22px !important;
+  color: #43536a;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+/* Officers */
+.view-proposal-redesign .view-proposal-officer-table {
+  margin: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--vp-border);
+  border-radius: 12px;
+  background: #fff;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+.view-proposal-redesign .view-proposal-officer-table tr th[colspan="2"] {
+  padding: 14px 18px !important;
+  border: 0 !important;
+  border-top: 12px solid #f9fbfd !important;
+  border-bottom: 1px solid var(--vp-border) !important;
+  background: #fff !important;
+  color: var(--vp-heading) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+.view-proposal-redesign
+  .view-proposal-officer-table
+  tr:first-child
+  th[colspan="2"] {
+  border-top: 0 !important;
+}
+.view-proposal-redesign .view-proposal-officer-table td {
+  height: 48px;
+  padding: 10px 18px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--vp-soft) !important;
+  background: #fff !important;
+  color: #657388 !important;
+  font-size: 11px !important;
+}
+.view-proposal-redesign .view-proposal-officer-table td.text-end {
+  color: #26384f !important;
+  font-weight: 600;
+}
+.view-proposal-redesign .view-proposal-officer-table .break-table {
+  height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: #f9fbfd !important;
+}
+
+/* Footer */
+.view-proposal-redesign .view-proposal-footer-wrap {
+  width: 100%;
+  margin-top: 20px;
+  position: relative !important;
+  background: var(--vp-bg);
+}
+.view-proposal-redesign .view-proposal-footer-wrap > *,
+.view-proposal-redesign .view-proposal-footer-wrap footer,
+.view-proposal-redesign .view-proposal-footer-wrap .footer,
+.view-proposal-redesign .view-proposal-footer-wrap .fixed-bottom,
+.view-proposal-redesign .view-proposal-footer-wrap [class*="footer"] {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  z-index: auto !important;
+}
+.view-proposal-redesign #back-to-top {
+  z-index: 20;
+}
+
+@media (max-width: 991px) {
+  .view-proposal-redesign {
+    width: calc(100% - 12px) !important;
+    margin-left: 12px !important;
+    padding: 14px 10px 0 !important;
+  }
+  .view-proposal-redesign
+    .view-proposal-tabs-shell
+    > .table-card
+    > .tab-content {
+    padding: 14px !important;
+  }
+  .view-proposal-redesign #product .tab-pane.p-3.active {
+    padding: 12px !important;
+  }
+}
+@media (max-width: 767px) {
+  .view-proposal-redesign {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 10px 8px 0 !important;
+  }
+  .view-proposal-redesign .prospects-title h5 {
+    font-size: 15px !important;
+  }
+  .view-proposal-redesign .prospects-title h5:before {
+    width: 34px;
+    height: 34px;
+    margin-right: 8px;
+  }
+  .view-proposal-redesign .add-new-prospect .create-item-btn {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0 11px !important;
+  }
+  .view-proposal-redesign .view-proposal-tabs-shell > .table-card > .nav-tabs {
+    min-height: 54px;
+    padding: 0 12px !important;
+    gap: 18px;
+  }
+  .view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-link {
+    min-height: 54px;
+    padding-bottom: 15px !important;
+    font-size: 12px !important;
+  }
+  .view-proposal-redesign
+    .view-proposal-tabs-shell
+    > .table-card
+    > .tab-content {
+    padding: 10px !important;
+  }
+  .view-proposal-redesign
+    .view-proposal-details-table
+    tbody
+    tr:not(:nth-child(2))
+    td {
+    padding: 10px 12px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* =========================================================
+   V2 — SUPER ADMIN DETAIL-PAGE CONSISTENCY
+   Card-based visual treatment inspired by Organisation /
+   Practice Details. UI only; functionality remains untouched.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   PAGE HEADER
+   --------------------------------------------------------- */
+
+.view-proposal-redesign .view-proposal-page-header {
+  min-height: 128px;
+  padding: 24px 28px 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  border-bottom: 1px solid #dfe6ee;
+
+  background: var(--vp-bg);
+}
+
+.view-proposal-redesign .view-proposal-page-heading {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.view-proposal-redesign .view-proposal-back-btn {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d2dce7;
+  border-radius: 9px;
+
+  background: #ffffff;
+  color: #0788a3;
+
+  font-size: 21px;
+
+  box-shadow: none;
+}
+
+.view-proposal-redesign .view-proposal-back-btn:hover {
+  border-color: #9fd9e4;
+  background: #eef9fb;
+}
+
+.view-proposal-redesign .view-proposal-page-title {
+  min-width: 0;
+}
+
+.view-proposal-redesign .view-proposal-page-title h1 {
+  margin: 0;
+
+  color: #17263d;
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.view-proposal-redesign .view-proposal-page-title p {
+  max-width: 720px;
+
+  margin: 7px 0 0;
+
+  color: #7b889a;
+
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.view-proposal-redesign .view-proposal-page-actions {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.view-proposal-redesign .view-proposal-primary-action {
+  min-height: 46px;
+  padding: 0 17px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border: 1px solid var(--vp-cyan);
+  border-radius: 9px;
+
+  background: var(--vp-cyan);
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  box-shadow: none;
+}
+
+.view-proposal-redesign .view-proposal-primary-action:hover {
+  border-color: var(--vp-cyan-hover);
+  background: var(--vp-cyan-hover);
+}
+
+.view-proposal-redesign .view-proposal-reference-card {
+  min-width: 220px;
+  min-height: 66px;
+  padding: 12px 16px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  border: 1px solid #d6e0e9;
+  border-radius: 11px;
+
+  background: #ffffff;
+}
+
+.view-proposal-redesign .view-proposal-reference-card span {
+  color: #8793a3;
+
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.view-proposal-redesign .view-proposal-reference-card strong {
+  margin-top: 4px;
+
+  overflow: hidden;
+
+  color: #23334b;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Hide the old header-specific styling because V2 uses its own markup. */
+.view-proposal-redesign .view-proposal-header {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------
+   MAIN CARD / TABS
+   --------------------------------------------------------- */
+
+.view-proposal-redesign .view-proposal-main-card {
+  margin-top: 26px !important;
+
+  border-radius: 13px !important;
+}
+
+.view-proposal-redesign .view-proposal-tabs-shell > .table-card {
+  overflow: hidden;
+
+  border-radius: 13px;
+
+  background: #ffffff;
+}
+
+.view-proposal-redesign .view-proposal-tabs-shell > .table-card > .nav-tabs {
+  min-height: 74px;
+
+  padding: 0 24px !important;
+
+  gap: 8px;
+
+  align-items: stretch;
+
+  background: #ffffff;
+}
+
+.view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-item {
+  display: flex;
+  align-items: stretch;
+}
+
+.view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-link {
+  min-height: 74px;
+  padding: 0 15px !important;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  color: #637086 !important;
+
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+}
+
+.view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-link::after {
+  right: 8px;
+  left: 8px;
+
+  height: 2px;
+}
+
+.view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-link.active {
+  color: #1b2c43 !important;
+}
+
+.view-proposal-redesign .view-proposal-tab-icon {
+  width: 25px;
+  height: 25px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #607187;
+
+  font-size: 15px;
+}
+
+.view-proposal-redesign
+  .view-proposal-tabs-shell
+  .nav-tabs
+  .nav-link.active
+  .view-proposal-tab-icon {
+  color: #0788a3;
+}
+
+.view-proposal-redesign .view-proposal-tabs-shell > .table-card > .tab-content {
+  padding: 22px !important;
+
+  background: #f8fafc;
+}
+
+/* ---------------------------------------------------------
+   BASIC INFORMATION — CARD GRID
+   --------------------------------------------------------- */
+
+.view-proposal-redesign .view-proposal-info-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.view-proposal-redesign .view-proposal-info-card {
+  overflow: hidden;
+
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+
+  background: #ffffff;
+}
+
+.view-proposal-redesign .view-proposal-info-card-head {
+  min-height: 88px;
+  padding: 18px 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  border-bottom: 1px solid #e1e7ee;
+
+  background: #ffffff;
+}
+
+.view-proposal-redesign .view-proposal-info-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #eaf8fb;
+  color: #0788a3;
+
+  font-size: 18px;
+}
+
+.view-proposal-redesign .view-proposal-info-card-head h3 {
+  margin: 0;
+
+  color: #213149;
+
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.view-proposal-redesign .view-proposal-info-card-head p {
+  margin: 5px 0 0;
+
+  color: #8995a5;
+
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.view-proposal-redesign .view-proposal-info-card-body {
+  padding: 16px 20px 18px;
+}
+
+.view-proposal-redesign .view-proposal-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+  row-gap: 0;
+}
+
+.view-proposal-redesign .view-proposal-field {
+  min-width: 0;
+  min-height: 68px;
+  padding: 10px 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  border-bottom: 1px solid #e8edf3;
+}
+
+.view-proposal-redesign .view-proposal-field:nth-last-child(-n + 2) {
+  border-bottom-color: transparent;
+}
+
+.view-proposal-redesign .view-proposal-field span {
+  margin-bottom: 6px;
+
+  color: #8692a3;
+
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.view-proposal-redesign .view-proposal-field strong {
+  overflow-wrap: anywhere;
+
+  color: #273850;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Linked Engagement Letter card occupies full width, like lower cards
+   in the Super Admin organisation details screen. */
+.view-proposal-redesign .view-proposal-linked-card {
+  grid-column: 1 / -1;
+}
+
+.view-proposal-redesign .view-proposal-linked-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.view-proposal-redesign .view-proposal-linked-item {
+  min-height: 62px;
+  padding: 10px 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 1px solid #dde5ed;
+  border-radius: 9px;
+
+  background: #fbfdff;
+  color: #344258;
+
+  text-align: left;
+
+  box-shadow: none;
+}
+
+.view-proposal-redesign .view-proposal-linked-item:hover {
+  border-color: #a9dce5;
+
+  background: #f0fafc;
+}
+
+.view-proposal-redesign .view-proposal-linked-item-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: #eaf8fb;
+  color: #0788a3;
+
+  font-size: 15px;
+}
+
+.view-proposal-redesign .view-proposal-linked-item-copy {
+  min-width: 0;
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.view-proposal-redesign .view-proposal-linked-item-copy small {
+  color: #8a96a6;
+
+  font-size: 9px;
+}
+
+.view-proposal-redesign .view-proposal-linked-item-copy strong {
+  margin-top: 2px;
+
+  color: #26384f;
+
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.view-proposal-redesign .view-proposal-linked-item > i:last-child {
+  color: #7d8999;
+  font-size: 16px;
+}
+
+.view-proposal-redesign .view-proposal-show-more {
+  min-height: 34px;
+  margin-top: 12px;
+  padding: 0 12px;
+
+  border: 1px solid #c6e3e9;
+  border-radius: 7px;
+
+  background: #eef9fb;
+  color: #087f98;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------
+   SELECTED SERVICES — MAKE NESTED CONTENT FEEL LIKE DETAIL CARDS
+   --------------------------------------------------------- */
+
+.view-proposal-redesign #product {
+  width: 100% !important;
+}
+
+.view-proposal-redesign #product > .tab-content,
+.view-proposal-redesign #product > div > .tab-content,
+.view-proposal-redesign #product .tab-content {
+  margin-bottom: 14px !important;
+}
+
+.view-proposal-redesign #product .tab-pane.p-3.active {
+  padding: 18px !important;
+
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  box-shadow: none;
+}
+
+.view-proposal-redesign #product h6 {
+  position: relative;
+
+  min-height: 48px;
+
+  margin: 0 0 12px !important;
+  padding: 0 0 0 42px !important;
+
+  display: flex;
+  align-items: center;
+
+  color: #213149 !important;
+
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.view-proposal-redesign #product h6::before {
+  content: "\f0ae";
+
+  position: absolute;
+  left: 0;
+
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: #eaf8fb;
+  color: #0788a3;
+
+  font-family: "Font Awesome 6 Free";
+  font-size: 13px;
+  font-weight: 900;
+}
+
+/* ---------------------------------------------------------
+   SERVICE DESCRIPTION / SOF — DETAIL CARD TREATMENT
+   --------------------------------------------------------- */
+
+.view-proposal-redesign #service_description .shadow-sm,
+.view-proposal-redesign #sof .shadow-sm {
+  overflow: hidden;
+
+  border-radius: 11px !important;
+}
+
+.view-proposal-redesign #service_description .shadow-sm::before,
+.view-proposal-redesign #sof .shadow-sm::before {
+  min-height: 68px;
+  padding: 0 20px;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid #e1e7ee;
+
+  background: #ffffff;
+  color: #213149;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.view-proposal-redesign #service_description .shadow-sm::before {
+  content: "Service Description";
+}
+
+.view-proposal-redesign #sof .shadow-sm::before {
+  content: "Statement Of Facts";
+}
+
+.view-proposal-redesign #service_description .card-body,
+.view-proposal-redesign #sof .card-body {
+  background: #ffffff;
+}
+
+/* ---------------------------------------------------------
+   OFFICERS — CARD-LIKE SECTIONS
+   --------------------------------------------------------- */
+
+.view-proposal-redesign .view-proposal-officer-table {
+  border: 0 !important;
+
+  background: transparent !important;
+}
+
+.view-proposal-redesign .view-proposal-officer-table tbody {
+  display: block;
+}
+
+.view-proposal-redesign .view-proposal-officer-table tbody > tr {
+  display: table;
+  width: 100%;
+
+  table-layout: fixed;
+}
+
+.view-proposal-redesign .view-proposal-officer-table tr th[colspan="2"] {
+  margin-top: 14px;
+
+  border: 1px solid #d7e1ea !important;
+  border-bottom: 0 !important;
+  border-radius: 10px 10px 0 0;
+
+  background: #ffffff !important;
+}
+
+.view-proposal-redesign .view-proposal-officer-table td {
+  border-left: 1px solid #d7e1ea !important;
+  border-right: 1px solid #d7e1ea !important;
+}
+
+.view-proposal-redesign .view-proposal-officer-table .break-table {
+  height: 12px !important;
+
+  border: 0 !important;
+
+  background: transparent !important;
+}
+
+/* ---------------------------------------------------------
+   FOOTER
+   --------------------------------------------------------- */
+
+.view-proposal-redesign {
+  display: flex;
+  flex-direction: column;
+}
+
+.view-proposal-redesign .page-content {
+  flex: 1 0 auto;
+}
+
+.view-proposal-redesign .view-proposal-footer-wrap {
+  flex: 0 0 auto;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .view-proposal-redesign .view-proposal-page-header {
+    align-items: flex-start;
+  }
+
+  .view-proposal-redesign .view-proposal-page-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .view-proposal-redesign .view-proposal-reference-card {
+    min-width: 190px;
+  }
+}
+
+@media (max-width: 767px) {
+  .view-proposal-redesign .view-proposal-page-header {
+    padding: 16px 10px;
+
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .view-proposal-redesign .view-proposal-page-heading {
+    align-items: flex-start;
+  }
+
+  .view-proposal-redesign .view-proposal-page-title h1 {
+    font-size: 20px;
+  }
+
+  .view-proposal-redesign .view-proposal-page-actions {
+    width: 100%;
+
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .view-proposal-redesign .view-proposal-primary-action {
+    flex: 1 1 auto;
+  }
+
+  .view-proposal-redesign .view-proposal-reference-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .view-proposal-redesign .view-proposal-tabs-shell > .table-card > .nav-tabs {
+    min-height: 58px;
+
+    padding: 0 10px !important;
+    gap: 4px;
+  }
+
+  .view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-link {
+    min-height: 58px;
+    padding: 0 10px !important;
+
+    font-size: 10.5px !important;
+  }
+
+  .view-proposal-redesign .view-proposal-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .view-proposal-redesign .view-proposal-linked-card {
+    grid-column: auto;
+  }
+
+  .view-proposal-redesign .view-proposal-field-grid,
+  .view-proposal-redesign .view-proposal-linked-list {
+    grid-template-columns: 1fr;
+  }
+
+  .view-proposal-redesign .view-proposal-field:nth-last-child(-n + 2) {
+    border-bottom: 1px solid #e8edf3;
+  }
+
+  .view-proposal-redesign .view-proposal-field:last-child {
+    border-bottom: 0;
+  }
+}
+
+/* =========================================================
+   V3 — SPACE UTILISATION + OFFICERS UI UPGRADE
+   UI only. Existing handlers, APIs, data and conditions remain unchanged.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   USE THE TOP SPACE MORE EFFICIENTLY
+   --------------------------------------------------------- */
+
+.view-proposal-redesign {
+  padding-top: 0 !important;
+}
+
+.view-proposal-redesign .page-content.page-background,
+.view-proposal-redesign .prospect-bg {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.view-proposal-redesign .view-proposal-page-header {
+  min-height: 94px !important;
+  padding: 14px 18px !important;
+
+  align-items: center !important;
+}
+
+.view-proposal-redesign .view-proposal-page-heading {
+  gap: 11px !important;
+}
+
+.view-proposal-redesign .view-proposal-back-btn {
+  width: 40px !important;
+  height: 40px !important;
+  flex-basis: 40px !important;
+
+  border-radius: 8px !important;
+
+  font-size: 18px !important;
+}
+
+.view-proposal-redesign .view-proposal-page-title h1 {
+  font-size: 24px !important;
+  line-height: 1.2 !important;
+}
+
+.view-proposal-redesign .view-proposal-page-title p {
+  margin-top: 4px !important;
+
+  font-size: 11.5px !important;
+}
+
+.view-proposal-redesign .view-proposal-page-actions {
+  gap: 9px !important;
+}
+
+.view-proposal-redesign .view-proposal-primary-action {
+  min-height: 40px !important;
+  padding: 0 14px !important;
+
+  border-radius: 8px !important;
+
+  font-size: 11px !important;
+}
+
+.view-proposal-redesign .view-proposal-reference-card {
+  min-width: 205px !important;
+  min-height: 56px !important;
+  padding: 9px 13px !important;
+
+  border-radius: 9px !important;
+}
+
+.view-proposal-redesign .view-proposal-reference-card span {
+  font-size: 8px !important;
+}
+
+.view-proposal-redesign .view-proposal-reference-card strong {
+  margin-top: 3px !important;
+
+  font-size: 11px !important;
+}
+
+/* Main content begins much closer to the header. */
+.view-proposal-redesign .view-proposal-main-card {
+  margin-top: 14px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Tabs become slightly denser while staying comfortable. */
+.view-proposal-redesign .view-proposal-tabs-shell > .table-card > .nav-tabs {
+  min-height: 62px !important;
+  padding: 0 16px !important;
+  gap: 2px !important;
+}
+
+.view-proposal-redesign .view-proposal-tabs-shell .nav-tabs .nav-link {
+  min-height: 62px !important;
+  padding: 0 12px !important;
+
+  gap: 7px !important;
+
+  font-size: 11px !important;
+}
+
+.view-proposal-redesign .view-proposal-tab-icon {
+  width: 22px !important;
+  height: 22px !important;
+
+  font-size: 14px !important;
+}
+
+.view-proposal-redesign .view-proposal-tabs-shell > .table-card > .tab-content {
+  padding: 16px !important;
+}
+
+/* Basic Information cards use less vertical space. */
+.view-proposal-redesign .view-proposal-info-grid {
+  gap: 14px !important;
+}
+
+.view-proposal-redesign .view-proposal-info-card-head {
+  min-height: 72px !important;
+  padding: 13px 16px !important;
+
+  gap: 10px !important;
+}
+
+.view-proposal-redesign .view-proposal-info-icon {
+  width: 36px !important;
+  height: 36px !important;
+  flex-basis: 36px !important;
+
+  border-radius: 9px !important;
+
+  font-size: 16px !important;
+}
+
+.view-proposal-redesign .view-proposal-info-card-head h3 {
+  font-size: 12px !important;
+}
+
+.view-proposal-redesign .view-proposal-info-card-head p {
+  margin-top: 3px !important;
+
+  font-size: 9.5px !important;
+}
+
+.view-proposal-redesign .view-proposal-info-card-body {
+  padding: 12px 16px 14px !important;
+}
+
+.view-proposal-redesign .view-proposal-field-grid {
+  column-gap: 20px !important;
+}
+
+.view-proposal-redesign .view-proposal-field {
+  min-height: 58px !important;
+  padding: 8px 0 !important;
+}
+
+.view-proposal-redesign .view-proposal-field span {
+  margin-bottom: 4px !important;
+
+  font-size: 8.5px !important;
+}
+
+.view-proposal-redesign .view-proposal-field strong {
+  font-size: 10.5px !important;
+}
+
+/* ---------------------------------------------------------
+   OFFICERS — MODERN DETAIL CARDS
+   --------------------------------------------------------- */
+
+.view-proposal-redesign .view-proposal-officers-wrap {
+  width: 100%;
+}
+
+.view-proposal-redesign .view-proposal-officers-intro {
+  min-height: 58px;
+  margin-bottom: 12px;
+  padding: 0 2px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.view-proposal-redesign .view-proposal-officers-intro h3 {
+  margin: 0;
+
+  color: #213149;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.view-proposal-redesign .view-proposal-officers-intro p {
+  margin: 4px 0 0;
+
+  color: #8591a2;
+
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.view-proposal-redesign .view-proposal-officers-count {
+  min-height: 28px;
+  padding: 0 10px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  background: #eef8fa;
+  color: #087f98;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.view-proposal-redesign .view-proposal-officers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.view-proposal-redesign .view-proposal-officer-card {
+  overflow: hidden;
+
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  box-shadow: 0 3px 12px rgba(15, 27, 51, 0.025);
+}
+
+.view-proposal-redesign .view-proposal-officer-head {
+  min-height: 74px;
+  padding: 13px 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  border-bottom: 1px solid #e4eaf0;
+
+  background: #fbfcfe;
+}
+
+.view-proposal-redesign .view-proposal-officer-identity {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.view-proposal-redesign .view-proposal-officer-avatar {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e8f7fa;
+  color: #0788a3;
+
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.view-proposal-redesign .view-proposal-officer-title-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.view-proposal-redesign .view-proposal-officer-title-copy span {
+  color: #8a96a6;
+
+  font-size: 8.5px;
+  font-weight: 500;
+}
+
+.view-proposal-redesign .view-proposal-officer-title-copy strong {
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color: #22334b;
+
+  font-size: 11.5px;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.view-proposal-redesign .view-proposal-authorised-wrap {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.view-proposal-redesign .view-proposal-authorised-wrap .MuiSwitch-root {
+  transform: scale(0.78);
+  transform-origin: center;
+}
+
+.view-proposal-redesign .view-proposal-authorised-pill {
+  min-height: 25px;
+  padding: 0 8px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  font-size: 8px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.view-proposal-redesign .view-proposal-authorised-pill.is-authorised {
+  background: #eaf8f3;
+  color: #18845f;
+}
+
+.view-proposal-redesign .view-proposal-authorised-pill.is-not-authorised {
+  background: #f1f4f7;
+  color: #718095;
+}
+
+.view-proposal-redesign .view-proposal-officer-body {
+  padding: 8px 15px 12px;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+.view-proposal-redesign .view-proposal-officer-field {
+  min-width: 0;
+  min-height: 62px;
+  padding: 9px 0;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  border-bottom: 1px solid #e8edf3;
+}
+
+.view-proposal-redesign .view-proposal-officer-field:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.view-proposal-redesign .view-proposal-officer-field-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  background: #f0f8fa;
+  color: #0788a3;
+
+  font-size: 13px;
+}
+
+.view-proposal-redesign .view-proposal-officer-field > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.view-proposal-redesign .view-proposal-officer-field small {
+  color: #8a96a6;
+
+  font-size: 8.5px;
+  font-weight: 500;
+}
+
+.view-proposal-redesign .view-proposal-officer-field strong {
+  margin-top: 3px;
+
+  overflow-wrap: anywhere;
+
+  color: #2a3b52;
+
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Old officer table styles are no longer visually needed. */
+.view-proposal-redesign .view-proposal-officer-table {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 1050px) {
+  .view-proposal-redesign .view-proposal-officers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .view-proposal-redesign .view-proposal-page-header {
+    min-height: auto !important;
+    padding: 12px 8px !important;
+  }
+
+  .view-proposal-redesign .view-proposal-page-title h1 {
+    font-size: 20px !important;
+  }
+
+  .view-proposal-redesign .view-proposal-main-card {
+    margin-top: 10px !important;
+  }
+
+  .view-proposal-redesign .view-proposal-officers-intro {
+    min-height: auto;
+
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .view-proposal-redesign .view-proposal-officer-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .view-proposal-redesign .view-proposal-authorised-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .view-proposal-redesign .view-proposal-officer-body {
+    grid-template-columns: 1fr;
+  }
+
+  .view-proposal-redesign .view-proposal-officer-field:nth-last-child(-n + 2) {
+    border-bottom: 1px solid #e8edf3;
+  }
+
+  .view-proposal-redesign .view-proposal-officer-field:last-child {
+    border-bottom: 0;
+  }
+}
+
+/* =========================================================
+   V4 — SELECTED SERVICES CONTAINMENT / ALIGNMENT FIX
+   UI only.
+   Keeps Recurring Services and One-Off Services fully inside
+   their cards and prevents Bootstrap row gutters from pushing
+   headings/fields/tables outside rounded containers.
+   ========================================================= */
+
+/* Keep the entire Selected Services tab inside the available width. */
+.view-proposal-redesign #product {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: visible !important;
+}
+
+/* Each nested pricing/service block becomes a self-contained card. */
+.view-proposal-redesign #product .tab-content > .tab-pane.p-3.active {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+
+  border: 1px solid #d7e1ea !important;
+  border-radius: 11px !important;
+
+  background: #ffffff !important;
+
+  box-shadow: none !important;
+}
+
+/* Bootstrap .row negative gutters were causing content to leave the card.
+   Neutralise them only inside Selected Services. */
+.view-proposal-redesign #product .tab-content > .tab-pane.p-3.active > .row {
+  width: 100% !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.view-proposal-redesign
+  #product
+  .tab-content
+  > .tab-pane.p-3.active
+  > .row
+  > [class*="col-"] {
+  max-width: 100%;
+
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Recurring / One-Off section content gets proper internal padding. */
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  > .row
+  > .col-lg-12 {
+  width: 100% !important;
+
+  padding: 0 16px 16px !important;
+}
+
+/* Turn section title into a real card header instead of letting
+   the icon/heading sit loose between separators. */
+.view-proposal-redesign #product .tab-pane.p-3.active:has(h6) h6 {
+  min-height: 68px !important;
+
+  margin: 0 0px 14px !important;
+  padding: 0 18px 0 62px !important;
+
+  position: relative;
+
+  display: flex !important;
+  align-items: center !important;
+
+  /* border-bottom: 1px solid #e1e7ee; */
+
+  background: #fbfcfe;
+
+  color: #213149 !important;
+
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+/* Keep the section icon safely inside the header shape. */
+.view-proposal-redesign #product .tab-pane.p-3.active:has(h6) h6::before {
+  left: 18px !important;
+
+  width: 34px !important;
+  height: 34px !important;
+
+  border-radius: 8px !important;
+}
+
+/* The old separator lines are redundant once the heading is a card header. */
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  > .row
+  > .col-lg-12
+  > .separator {
+  display: none !important;
+}
+
+/* Pricing summary rows stay inside the card. */
+.view-proposal-redesign #product #recurring_Default,
+.view-proposal-redesign #product #OneOff_Default,
+.view-proposal-redesign #product .tab-pane.p-3.active:has(h6) .row.fieldset {
+  width: 100% !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Give each pricing field predictable gutters so labels/inputs line up. */
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  #recurring_Default
+  > [class*="col-"],
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  #OneOff_Default
+  > [class*="col-"],
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .row.fieldset
+  > [class*="col-"] {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+/* Labels are vertically centered and never poke outside the row. */
+.view-proposal-redesign #product .tab-pane.p-3.active:has(h6) .fieldset-label,
+.view-proposal-redesign #product .tab-pane.p-3.active:has(h6) .form-label {
+  display: block;
+
+  margin: 0 !important;
+
+  line-height: 1.35 !important;
+}
+
+/* Inputs/selects stay within their columns. */
+.view-proposal-redesign #product .tab-pane.p-3.active:has(h6) .input-text,
+.view-proposal-redesign #product .tab-pane.p-3.active:has(h6) .selectDropDown,
+.view-proposal-redesign #product .tab-pane.p-3.active:has(h6) .input-group {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* React Select can otherwise retain a wider inherited min-width. */
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .selectDropDown
+  > div {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Keep the service pricing table inside the rounded section.
+   Horizontal scrolling happens inside this wrapper only. */
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .table-responsive {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 14px 0 0 !important;
+
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
+  border: 1px solid #d9e2eb !important;
+  border-radius: 9px !important;
+
+  background: #ffffff !important;
+
+  scrollbar-width: thin;
+}
+
+/* Prevent the table itself from stretching the parent card. */
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .table-responsive
+  > table {
+  min-width: 720px !important;
+  width: 100% !important;
+
+  margin: 0 !important;
+}
+
+/* Header remains contained by the table wrapper's rounded corners. */
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .table-responsive
+  thead {
+  overflow: hidden;
+}
+
+/* Remove legacy empty spacer rows that create awkward extra height. */
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .row.fieldset:empty {
+  display: none !important;
+}
+
+/* Tighten standalone spacer blocks inside service sections. */
+.view-proposal-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  > .row
+  > .col-lg-12
+  > .mb-3 {
+  height: 4px !important;
+  margin: 0 !important;
+}
+
+/* The first Selected Services configuration block should keep padding,
+   but should not inherit the service-section zero-padding treatment. */
+.view-proposal-redesign
+  #product
+  .tab-content
+  > .tab-pane.p-3.active:not(:has(h6)) {
+  padding: 16px !important;
+  overflow: visible !important;
+}
+
+.view-proposal-redesign
+  #product
+  .tab-content
+  > .tab-pane.p-3.active:not(:has(h6))
+  > .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.view-proposal-redesign
+  #product
+  .tab-content
+  > .tab-pane.p-3.active:not(:has(h6))
+  .row.fieldset {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* =========================================================
+   RESPONSIVE SELECTED SERVICES
+   ========================================================= */
+
+@media (max-width: 991px) {
+  .view-proposal-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    > .row
+    > .col-lg-12 {
+    padding: 0 12px 12px !important;
+  }
+
+  .view-proposal-redesign #product .tab-pane.p-3.active:has(h6) h6 {
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+
+    padding-left: 56px !important;
+  }
+
+  .view-proposal-redesign #product .tab-pane.p-3.active:has(h6) h6::before {
+    left: 14px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .view-proposal-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    #recurring_Default
+    > [class*="col-"],
+  .view-proposal-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    #OneOff_Default
+    > [class*="col-"],
+  .view-proposal-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    .row.fieldset
+    > [class*="col-"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .view-proposal-redesign #product .tab-pane.p-3.active:has(h6) .text-md-end,
+  .view-proposal-redesign #product .tab-pane.p-3.active:has(h6) .text-lg-right {
+    margin-bottom: 5px;
+
+    text-align: left !important;
+  }
+
+  .view-proposal-redesign #product .tab-pane.p-3.active:has(h6) .input-text,
+  .view-proposal-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    .selectDropDown {
+    margin-bottom: 10px;
+  }
+}

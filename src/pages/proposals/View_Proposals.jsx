@@ -10,6 +10,7 @@ import { GetProposalModelList } from "../../redux/Services/Proposal/ProposalApi"
 import { useSelector } from "react-redux";
 import Utils from "../../Middleware/Utils";
 import "../configure/packages/Package.css";
+import "./View_Proposals-redesign-v4.css";
 import { fieldToIdMap, statusID } from "../../Middleware/enums";
 import { Base_Url } from "../../Base-Url/Base_Url";
 
@@ -2785,76 +2786,80 @@ const View_Proposals = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container view-proposal-redesign">
       {/* <div class="main-content"> */}
       <div class="page-content page-background prospect-bg">
         {/* <div class="page-info-header page-info-strip"> */}
-        <div class="container">
-          <div className="row">
-            <div className="col-md-6 col-sm-6 col-6">
-              <div class="prospects-title">
-                <h5>
-                  {/* {proposalName}:{" "} */}
-                  Reference ID:
-                  {isMobile
-                    ? ProposalObject?.quotationName &&
-                      ProposalObject?.quotationName.length > 15
-                      ? `${ProposalObject?.quotationName.substring(0, 15)}...`
-                      : ProposalObject?.quotationName
-                    : ProposalObject?.quotationName}
-                </h5>
-              </div>
-            </div>
+        <div className="view-proposal-page-header">
+          <div className="view-proposal-page-heading">
+            <Tooltip title="Back">
+              <button
+                type="button"
+                className="view-proposal-back-btn"
+                onClick={handleBack}
+              >
+                <i className="ri-arrow-left-line"></i>
+              </button>
+            </Tooltip>
 
-            <div className="col-md-6 col-sm-6 col-6">
-              <div className="d-flex justify-content-md-end justify-content-sm-end justify-content-end add-new-prospect">
-                {ProposalObject.statusID == statusID.Signed && (
-                  <Tooltip title={`Download ${proposalName} `}>
-                    <button
-                      className="btn btn-md btn-success create-item-btn"
-                      onClick={handleDownload}
-                    >
-                      <i className="bi bi-download"></i>{" "}
-                      <span className="d-none d-sm-inline">
-                        Download {proposalName}
-                      </span>
-                    </button>
-                  </Tooltip>
-                )}
-                {ProposalObject.statusID !== null &&
-                  ProposalObject.statusID !== statusID.Signed && (
-                    <Tooltip title={`View Pdf`}>
-                      <button
-                        className="btn btn-md btn-success create-item-btn"
-                        onClick={handleDownload}
-                      >
-                        <i class="bi bi-eye"></i>{" "}
-                        <span className="d-none d-sm-inline">View Pdf</span>
-                      </button>
-                    </Tooltip>
-                  )}
-                <Tooltip title={`Back`}>
+            <div className="view-proposal-page-title">
+              <h1>{proposalName} Details</h1>
+              <p>
+                Review proposal information, selected services, pricing,
+                documents and officers.
+              </p>
+            </div>
+          </div>
+
+          <div className="view-proposal-page-actions">
+            {ProposalObject.statusID == statusID.Signed && (
+              <Tooltip title={`Download ${proposalName}`}>
+                <button
+                  type="button"
+                  className="view-proposal-primary-action"
+                  onClick={handleDownload}
+                >
+                  <i className="bi bi-download"></i>
+                  <span>Download {proposalName}</span>
+                </button>
+              </Tooltip>
+            )}
+
+            {ProposalObject.statusID !== null &&
+              ProposalObject.statusID !== statusID.Signed && (
+                <Tooltip title="View Pdf">
                   <button
-                    className="btn btn-md btn-success create-item-btn"
-                    onClick={handleBack}
-                    style={{ marginLeft: "10px" }}
+                    type="button"
+                    className="view-proposal-primary-action"
+                    onClick={handleDownload}
                   >
-                    <i className="fa fa-arrow-left d-md-none"></i>
-                    <span className="d-none d-sm-inline">Back</span>
+                    <i className="bi bi-eye"></i>
+                    <span>View Pdf</span>
                   </button>
                 </Tooltip>
-              </div>
+              )}
+
+            <div className="view-proposal-reference-card">
+              <span>REFERENCE ID</span>
+              <strong>
+                {isMobile
+                  ? ProposalObject?.quotationName &&
+                    ProposalObject?.quotationName.length > 18
+                    ? `${ProposalObject?.quotationName.substring(0, 18)}...`
+                    : ProposalObject?.quotationName
+                  : ProposalObject?.quotationName}
+              </strong>
             </div>
           </div>
         </div>
         <div class="container-fluid ">
           <div class="row">
             <div class="col-lg-12">
-              <div class="card" style={{ marginTop: "75px" }}>
+              <div className="card view-proposal-main-card">
                 <div class="card-body">
                   <div id="customerList">
                     <div class="row g-4 mb-3"></div>
-                    <div class="search-box ms-2 width-searchbox prospect-form">
+                    <div class="search-box ms-2 width-searchbox prospect-form view-proposal-tabs-shell">
                       <div class=" table-card  mb-3 Height_View_scroll scroll-hidden">
                         <ul class="nav nav-tabs mb-3" role="tablist">
                           <li class="nav-item">
@@ -2865,7 +2870,10 @@ const View_Proposals = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              Basic Information
+                              <span className="view-proposal-tab-icon">
+                                <i className="ri-file-info-line"></i>
+                              </span>
+                              <span>Basic Information</span>
                             </a>
                           </li>
                           <li class="nav-item">
@@ -2876,7 +2884,10 @@ const View_Proposals = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              Selected Services
+                              <span className="view-proposal-tab-icon">
+                                <i className="ri-list-check-2"></i>
+                              </span>
+                              <span>Selected Services</span>
                             </a>
                           </li>
                           <li class="nav-item">
@@ -2887,7 +2898,10 @@ const View_Proposals = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              Service Description
+                              <span className="view-proposal-tab-icon">
+                                <i className="ri-file-text-line"></i>
+                              </span>
+                              <span>Service Description</span>
                             </a>
                           </li>
                           <li class="nav-item">
@@ -2898,7 +2912,10 @@ const View_Proposals = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              Statment Of Facts
+                              <span className="view-proposal-tab-icon">
+                                <i className="ri-survey-line"></i>
+                              </span>
+                              <span>Statement Of Facts</span>
                             </a>
                           </li>
                           <li class="nav-item">
@@ -2909,7 +2926,10 @@ const View_Proposals = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              All Officers
+                              <span className="view-proposal-tab-icon">
+                                <i className="ri-user-star-line"></i>
+                              </span>
+                              <span>All Officers</span>
                             </a>
                           </li>
                         </ul>
@@ -2920,101 +2940,162 @@ const View_Proposals = () => {
                             id="base-justified-home"
                             role="tabpanel"
                           >
-                            <table class="table table-striped fs-13 view-details-table">
-                              <tbody>
-                                <tr>
-                                  <td class="break-table" colspan="2"></td>
-                                </tr>
-                                <tr>
-                                  <th colspan="2">Basic Information</th>
-                                </tr>
-                                <tr>
-                                  <td>{prospectName} Name</td>
-                                  <td class="text-end">
-                                    {ProposalObject.clientName}
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>Template</td>
-                                  <td class="text-end">
-                                    {ProposalObject.templateName}
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>Proposal Type</td>
-                                  <td class="text-end">
-                                    {ProposalObject.quoteTypeName}
-                                  </td>
-                                </tr>
-                                {ProposalObject.draftOn && (
-                                  <tr>
-                                    <td>Drafted On</td>
-                                    <td class="text-end">
-                                      {GetOnlyDate(ProposalObject.draftOn)}
-                                    </td>
-                                  </tr>
-                                )}
-                                {ProposalObject.sentOn && (
-                                  <tr>
-                                    <td>Sent On</td>
-                                    <td class="text-end">
-                                      {GetOnlyDate(ProposalObject.sentOn)}
-                                    </td>
-                                  </tr>
-                                )}
-                                {ProposalObject.AcceptedOn && (
-                                  <tr>
-                                    <td>Accepted On</td>
-                                    <td class="text-end">
-                                      {GetOnlyDate(ProposalObject.AcceptedOn)}
-                                    </td>
-                                  </tr>
-                                )}
+                            <div className="view-proposal-info-grid">
+                              <section className="view-proposal-info-card">
+                                <div className="view-proposal-info-card-head">
+                                  <span className="view-proposal-info-icon">
+                                    <i className="ri-file-info-line"></i>
+                                  </span>
+                                  <div>
+                                    <h3>Proposal Information</h3>
+                                    <p>
+                                      Core proposal, client and template
+                                      details.
+                                    </p>
+                                  </div>
+                                </div>
 
-                                {ProposalObject.SkippedOn && (
-                                  <tr>
-                                    <td>Skipped On</td>
-                                    <td class="text-end">
-                                      {GetOnlyDate(ProposalObject.SkippedOn)}
-                                    </td>
-                                  </tr>
-                                )}
-                                {ProposalObject.contractKeyID
-                                  ?.slice(0, visibleCount)
-                                  .map((contract) => (
-                                    <tr>
-                                      <td>Linked Engagement Letter</td>
-                                      <td
-                                        class="text-end"
-                                        style={{
-                                          color: "blue",
-                                          cursor: "pointer",
-                                        }}
-                                        onClick={() =>
-                                          navigate("/view-letter", {
-                                            state: {
-                                              contractKeyID: contract,
-                                            },
-                                          })
-                                        }
+                                <div className="view-proposal-info-card-body view-proposal-field-grid">
+                                  <div className="view-proposal-field">
+                                    <span>{prospectName} Name</span>
+                                    <strong>
+                                      {ProposalObject.clientName || "-"}
+                                    </strong>
+                                  </div>
+
+                                  <div className="view-proposal-field">
+                                    <span>Template</span>
+                                    <strong>
+                                      {ProposalObject.templateName || "-"}
+                                    </strong>
+                                  </div>
+
+                                  <div className="view-proposal-field">
+                                    <span>Proposal Type</span>
+                                    <strong>
+                                      {ProposalObject.quoteTypeName || "-"}
+                                    </strong>
+                                  </div>
+                                </div>
+                              </section>
+
+                              <section className="view-proposal-info-card">
+                                <div className="view-proposal-info-card-head">
+                                  <span className="view-proposal-info-icon">
+                                    <i className="ri-calendar-check-line"></i>
+                                  </span>
+                                  <div>
+                                    <h3>Proposal Timeline</h3>
+                                    <p>
+                                      Important proposal activity and status
+                                      dates.
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="view-proposal-info-card-body view-proposal-field-grid">
+                                  {ProposalObject.draftOn && (
+                                    <div className="view-proposal-field">
+                                      <span>Drafted On</span>
+                                      <strong>
+                                        {GetOnlyDate(ProposalObject.draftOn)}
+                                      </strong>
+                                    </div>
+                                  )}
+
+                                  {ProposalObject.sentOn && (
+                                    <div className="view-proposal-field">
+                                      <span>Sent On</span>
+                                      <strong>
+                                        {GetOnlyDate(ProposalObject.sentOn)}
+                                      </strong>
+                                    </div>
+                                  )}
+
+                                  {ProposalObject.AcceptedOn && (
+                                    <div className="view-proposal-field">
+                                      <span>Accepted On</span>
+                                      <strong>
+                                        {GetOnlyDate(ProposalObject.AcceptedOn)}
+                                      </strong>
+                                    </div>
+                                  )}
+
+                                  {ProposalObject.SkippedOn && (
+                                    <div className="view-proposal-field">
+                                      <span>Skipped On</span>
+                                      <strong>
+                                        {GetOnlyDate(ProposalObject.SkippedOn)}
+                                      </strong>
+                                    </div>
+                                  )}
+                                </div>
+                              </section>
+
+                              {ProposalObject.contractKeyID?.length > 0 && (
+                                <section className="view-proposal-info-card view-proposal-linked-card">
+                                  <div className="view-proposal-info-card-head">
+                                    <span className="view-proposal-info-icon">
+                                      <i className="ri-links-line"></i>
+                                    </span>
+                                    <div>
+                                      <h3>Linked Engagement Letters</h3>
+                                      <p>
+                                        Engagement letters created from this
+                                        proposal.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <div className="view-proposal-info-card-body">
+                                    <div className="view-proposal-linked-list">
+                                      {ProposalObject.contractKeyID
+                                        ?.slice(0, visibleCount)
+                                        .map((contract, index) => (
+                                          <button
+                                            type="button"
+                                            className="view-proposal-linked-item"
+                                            key={contract || index}
+                                            onClick={() =>
+                                              navigate("/view-letter", {
+                                                state: {
+                                                  contractKeyID: contract,
+                                                },
+                                              })
+                                            }
+                                          >
+                                            <span className="view-proposal-linked-item-icon">
+                                              <i className="ri-file-list-3-line"></i>
+                                            </span>
+
+                                            <span className="view-proposal-linked-item-copy">
+                                              <small>
+                                                Engagement Letter {index + 1}
+                                              </small>
+                                              <strong>
+                                                View Engagement Letter
+                                              </strong>
+                                            </span>
+
+                                            <i className="ri-arrow-right-line"></i>
+                                          </button>
+                                        ))}
+                                    </div>
+
+                                    {visibleCount <
+                                      ProposalObject.contractKeyID?.length && (
+                                      <button
+                                        type="button"
+                                        onClick={handleShowMore}
+                                        className="view-proposal-show-more"
                                       >
-                                        View EL
-                                      </td>
-                                    </tr>
-                                  ))}
-                              </tbody>
-                            </table>
-                            {visibleCount <
-                              ProposalObject.contractKeyID?.length && (
-                              <div className="text-left mt-3">
-                                <button
-                                  onClick={handleShowMore}
-                                  className="btn btn-primary"
-                                >
-                                  Show More
-                                </button>
-                              </div>
-                            )}
+                                        Show More
+                                      </button>
+                                    )}
+                                  </div>
+                                </section>
+                              )}
+                            </div>
                           </div>
 
                           <div
@@ -7769,125 +7850,164 @@ const View_Proposals = () => {
                               />
                             </div>
                           </div>
-                          <div class="tab-pane" id="Officer" role="tabpanel">
-                            <div
-                              class="tab-pane active"
-                              id="Officer"
-                              role="tabpanel"
-                            >
-                              <table className="table table-striped fs-13 view-details-table">
-                                <tbody>
-                                  {officersForm.map((prospect, index) => (
-                                    <React.Fragment key={index}>
-                                      <tr>
-                                        <th colspan="2">Officer {index + 1}</th>
-                                      </tr>
+                          <div
+                            className="tab-pane"
+                            id="Officer"
+                            role="tabpanel"
+                          >
+                            <div className="view-proposal-officers-wrap">
+                              <div className="view-proposal-officers-intro">
+                                <div>
+                                  <h3>Officers Details</h3>
+                                  <p>
+                                    Review officer contact, role and appointment
+                                    information.
+                                  </p>
+                                </div>
 
-                                      <tr>
-                                        {(ProposalObject.clientMasterBusinessTypeID ===
-                                          3 ||
-                                          ProposalObject.clientMasterBusinessTypeID ===
-                                            4 ||
-                                          ProposalObject.clientMasterBusinessTypeID ===
-                                            5) && (
-                                          <>
-                                            <td>Authorised </td>
-                                            <td className="text-end">
-                                              {officersForm[index]
+                                <span className="view-proposal-officers-count">
+                                  {officersForm.length}{" "}
+                                  {officersForm.length === 1
+                                    ? "Officer"
+                                    : "Officers"}
+                                </span>
+                              </div>
+
+                              <div className="view-proposal-officers-grid">
+                                {officersForm.map((prospect, index) => (
+                                  <section
+                                    className="view-proposal-officer-card"
+                                    key={index}
+                                  >
+                                    <div className="view-proposal-officer-head">
+                                      <div className="view-proposal-officer-identity">
+                                        <span className="view-proposal-officer-avatar">
+                                          {officersForm[
+                                            index
+                                          ].firstName?.charAt(0)}
+                                          {officersForm[index].lastName?.charAt(
+                                            0,
+                                          )}
+                                        </span>
+
+                                        <div className="view-proposal-officer-title-copy">
+                                          <span>Officer {index + 1}</span>
+                                          <strong>
+                                            {officersForm[index].firstName}{" "}
+                                            {officersForm[index].lastName}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      {(ProposalObject.clientMasterBusinessTypeID ===
+                                        3 ||
+                                        ProposalObject.clientMasterBusinessTypeID ===
+                                          4 ||
+                                        ProposalObject.clientMasterBusinessTypeID ===
+                                          5) && (
+                                        <div className="view-proposal-authorised-wrap">
+                                          <span
+                                            className={`view-proposal-authorised-pill ${
+                                              officersForm[index]
                                                 ?.isAuthorisedSignatory
-                                                ? "Yes"
-                                                : "NO"}
-                                              <Switch
-                                                checked={
-                                                  officersForm[index]
-                                                    ?.isAuthorisedSignatory
-                                                }
-                                                disabled
-                                                color="primary"
-                                              />
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
+                                                ? "is-authorised"
+                                                : "is-not-authorised"
+                                            }`}
+                                          >
+                                            {officersForm[index]
+                                              ?.isAuthorisedSignatory
+                                              ? "Authorised"
+                                              : "Not Authorised"}
+                                          </span>
 
-                                      <tr>
-                                        <td>First Name</td>
-                                        <td className="text-end">
-                                          {officersForm[index].firstName}
-                                        </td>
-                                      </tr>
-
-                                      <tr>
-                                        <td>Last Name</td>
-                                        <td className="text-end">
-                                          {officersForm[index].lastName}
-                                        </td>
-                                      </tr>
-
-                                      <tr>
-                                        <td>Phone</td>
-                                        <td className="text-end">
-                                          {officersForm[index].phoneNo}
-                                        </td>
-                                      </tr>
-
-                                      <tr>
-                                        <td>Email</td>
-                                        <td className="text-end">
-                                          {officersForm[index].emailID}
-                                        </td>
-                                      </tr>
-
-                                      <>
-                                        {" "}
-                                        <tr>
-                                          <td>Role</td>
-                                          <td className="text-end">
-                                            {officersForm[index].officerRole}
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>Appointed On</td>
-                                          <td className="text-end">
-                                            {officersForm[index].appointedOn}
-                                          </td>
-                                        </tr>
-                                      </>
-
-                                      {/* <tr>
-                                          {(basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Sole_Trader ||
-                                            basicInfo.originalBusinessTypeID ===
-                                              CLIENT_TYPES.Other ||
-                                            basicInfo.originalBusinessTypeID ===
-                                              CLIENT_TYPES.Partnership) && (
-                                            <td>Residential Address</td>
-                                          )}
-                                          {(basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Company ||
-                                            basicInfo.originalBusinessTypeID ===
-                                              CLIENT_TYPES.LLP) && (
-                                            <td>Correspondence Address</td>
-                                          )}
-
-                                          <td className="text-right">
-                                            {
-                                              concatenatedResidentialAddress[
-                                                index
-                                              ]?.officersFullAddress
+                                          <Switch
+                                            checked={
+                                              officersForm[index]
+                                                ?.isAuthorisedSignatory
                                             }
-                                          </td>
-                                        </tr> */}
-                                      <tr>
-                                        <td
-                                          class="break-table"
-                                          colspan="2"
-                                        ></td>
-                                      </tr>
-                                    </React.Fragment>
-                                  ))}
-                                </tbody>
-                              </table>
+                                            disabled
+                                            color="primary"
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="view-proposal-officer-body">
+                                      <div className="view-proposal-officer-field">
+                                        <span className="view-proposal-officer-field-icon">
+                                          <i className="ri-user-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>First Name</small>
+                                          <strong>
+                                            {officersForm[index].firstName}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-proposal-officer-field">
+                                        <span className="view-proposal-officer-field-icon">
+                                          <i className="ri-user-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Last Name</small>
+                                          <strong>
+                                            {officersForm[index].lastName}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-proposal-officer-field">
+                                        <span className="view-proposal-officer-field-icon">
+                                          <i className="ri-phone-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Phone</small>
+                                          <strong>
+                                            {officersForm[index].phoneNo}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-proposal-officer-field">
+                                        <span className="view-proposal-officer-field-icon">
+                                          <i className="ri-mail-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Email</small>
+                                          <strong>
+                                            {officersForm[index].emailID}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-proposal-officer-field">
+                                        <span className="view-proposal-officer-field-icon">
+                                          <i className="ri-shield-user-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Role</small>
+                                          <strong>
+                                            {officersForm[index].officerRole}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-proposal-officer-field">
+                                        <span className="view-proposal-officer-field-icon">
+                                          <i className="ri-calendar-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Appointed On</small>
+                                          <strong>
+                                            {officersForm[index].appointedOn}
+                                          </strong>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </section>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -7909,7 +8029,9 @@ const View_Proposals = () => {
 
         {/* End Page-content */}
 
-        <Footer />
+        <div className="view-proposal-footer-wrap">
+          <Footer />
+        </div>
 
         {/* start back-to-top */}
         <button
