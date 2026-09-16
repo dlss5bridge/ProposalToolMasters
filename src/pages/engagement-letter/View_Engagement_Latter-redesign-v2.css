@@ -1,0 +1,1705 @@
+/* =========================================================
+   VIEW ENGAGEMENT LETTER REDESIGN
+   Consistent with View Proposal + Super Admin detail screens.
+   UI only: no API, calculation, route, upload or modal logic.
+   ========================================================= */
+
+.view-engagement-redesign {
+  --ve-bg: #f7f9fc;
+  --ve-card: #ffffff;
+  --ve-heading: #17263d;
+  --ve-text: #344258;
+  --ve-muted: #8290a2;
+  --ve-border: #d8e2eb;
+  --ve-border-soft: #e8edf3;
+  --ve-navy: #0f1b33;
+  --ve-cyan: #18b5d1;
+  --ve-cyan-hover: #0da7c2;
+
+  width: calc(100% - 18px) !important;
+  max-width: none !important;
+  min-height: 100vh;
+  margin-left: 18px !important;
+  padding: 0 18px !important;
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--ve-bg) !important;
+  color: var(--ve-text);
+}
+
+.view-engagement-redesign,
+.view-engagement-redesign * {
+  box-sizing: border-box;
+}
+
+.view-engagement-redesign .page-content.page-background,
+.view-engagement-redesign .prospect-bg {
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--ve-bg) !important;
+}
+
+/* ------------------------- Header ------------------------- */
+
+.view-engagement-page-header {
+  min-height: 94px;
+  padding: 14px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  border-bottom: 1px solid #dfe6ee;
+  background: var(--ve-bg);
+}
+
+.view-engagement-page-heading {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.view-engagement-back-btn {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d2dce7;
+  border-radius: 8px;
+  background: #fff;
+  color: #0788a3;
+  font-size: 18px;
+}
+
+.view-engagement-back-btn:hover {
+  border-color: #9fd9e4;
+  background: #eef9fb;
+}
+
+.view-engagement-page-title h1 {
+  margin: 0;
+  color: var(--ve-heading);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.view-engagement-page-title p {
+  max-width: 720px;
+  margin: 4px 0 0;
+  color: var(--ve-muted);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.view-engagement-page-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.view-engagement-primary-action {
+  min-height: 40px;
+  padding: 0 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: 1px solid var(--ve-cyan);
+  border-radius: 8px;
+  background: var(--ve-cyan);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.view-engagement-primary-action:hover {
+  border-color: var(--ve-cyan-hover);
+  background: var(--ve-cyan-hover);
+}
+
+.view-engagement-reference-card {
+  min-width: 205px;
+  max-width: 300px;
+  min-height: 56px;
+  padding: 9px 13px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  border: 1px solid #d6e0e9;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.view-engagement-reference-card span {
+  color: #8894a4;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.view-engagement-reference-card strong {
+  margin-top: 3px;
+  overflow: hidden;
+  color: #23334b;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --------------------- Main card/tabs --------------------- */
+
+.view-engagement-redesign > .page-content > .container-fluid {
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.view-engagement-redesign > .page-content > .container-fluid > .row {
+  margin: 0 !important;
+}
+
+.view-engagement-redesign
+  > .page-content
+  > .container-fluid
+  > .row
+  > .col-lg-12 {
+  padding: 0 !important;
+}
+
+.view-engagement-main-card {
+  margin-top: 14px !important;
+  margin-bottom: 16px !important;
+  overflow: visible !important;
+
+  border: 1px solid var(--ve-border) !important;
+  border-radius: 13px !important;
+  background: #fff !important;
+
+  box-shadow:
+    0 2px 10px rgba(15, 27, 51, 0.025),
+    0 8px 22px rgba(15, 27, 51, 0.02) !important;
+}
+
+.view-engagement-main-card > .card-body {
+  padding: 0 !important;
+}
+
+.view-engagement-customer-list {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.view-engagement-redesign .row.g-4.mb-3 {
+  display: none !important;
+}
+
+.view-engagement-tabs-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.view-engagement-tab-card {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+.view-engagement-tab-card > .nav-tabs {
+  min-height: 62px;
+  margin: 0 !important;
+  padding: 0 16px !important;
+
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  border: 0 !important;
+  border-bottom: 1px solid var(--ve-border) !important;
+  background: #fff;
+  scrollbar-width: thin;
+}
+
+.view-engagement-tab-card .nav-tabs .nav-item {
+  display: flex;
+  align-items: stretch;
+  margin: 0 !important;
+}
+
+.view-engagement-tab-card .nav-tabs .nav-link {
+  position: relative;
+  min-height: 62px;
+  padding: 0 12px !important;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #637086 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+  box-shadow: none !important;
+}
+
+.view-engagement-tab-card .nav-tabs .nav-link::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  bottom: 0;
+  left: 8px;
+  height: 2px;
+  border-radius: 3px 3px 0 0;
+  background: transparent;
+}
+
+.view-engagement-tab-card .nav-tabs .nav-link.active {
+  color: #1b2c43 !important;
+}
+
+.view-engagement-tab-card .nav-tabs .nav-link.active::after {
+  background: var(--ve-cyan);
+}
+
+.view-engagement-tab-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #607187;
+  font-size: 14px;
+}
+
+.view-engagement-tab-card .nav-link.active .view-engagement-tab-icon {
+  color: #0788a3;
+}
+
+.view-engagement-tab-card > .tab-content {
+  padding: 16px !important;
+  background: #f8fafc;
+}
+
+/* ------------------- Basic information ------------------- */
+
+.view-engagement-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.view-engagement-info-card {
+  overflow: hidden;
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.view-engagement-info-card-head {
+  min-height: 72px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #e1e7ee;
+}
+
+.view-engagement-info-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+  background: #eaf8fb;
+  color: #0788a3;
+  font-size: 16px;
+}
+
+.view-engagement-info-card-head h3 {
+  margin: 0;
+  color: #213149;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.view-engagement-info-card-head p {
+  margin: 3px 0 0;
+  color: #8995a5;
+  font-size: 9.5px;
+}
+
+.view-engagement-info-card-body {
+  padding: 12px 16px 14px;
+}
+
+.view-engagement-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+}
+
+.view-engagement-field {
+  min-width: 0;
+  min-height: 58px;
+  padding: 8px 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  border-bottom: 1px solid var(--ve-border-soft);
+}
+
+.view-engagement-field span {
+  margin-bottom: 4px;
+  color: #8692a3;
+  font-size: 8.5px;
+}
+
+.view-engagement-field strong {
+  overflow-wrap: anywhere;
+  color: #273850;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.view-engagement-linked-proposal {
+  grid-column: 1 / -1;
+  min-height: 54px;
+  padding: 8px 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  border: 1px solid #dde5ed;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #344258;
+  text-align: left;
+}
+
+.view-engagement-linked-proposal:hover {
+  border-color: #a9dce5;
+  background: #f0fafc;
+}
+
+.view-engagement-linked-proposal-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+  background: #eaf8fb;
+  color: #0788a3;
+}
+
+.view-engagement-linked-proposal-copy {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.view-engagement-linked-proposal-copy small {
+  color: #8a96a6;
+  font-size: 8.5px;
+}
+
+.view-engagement-linked-proposal-copy strong {
+  margin-top: 2px;
+  color: #26384f;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+/* ------------------ Selected Services -------------------- */
+
+.view-engagement-redesign #product {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.view-engagement-redesign #product > .separator {
+  display: none !important;
+}
+
+.view-engagement-redesign #product > .row.fieldset {
+  width: 100% !important;
+  margin: 0 0 8px !important;
+  padding: 10px 12px !important;
+  align-items: center;
+
+  border: 1px solid #dce4ed;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.view-engagement-redesign #product .fieldset-label,
+.view-engagement-redesign #product .form-label {
+  margin: 0 !important;
+  color: #657388;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.view-engagement-redesign #product .input-group,
+.view-engagement-redesign #product .selectDropDown,
+.view-engagement-redesign #product .input-text {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.view-engagement-redesign #product .selectDropDown > div {
+  min-height: 40px;
+  border-color: #d7e0e9 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.view-engagement-redesign #product .input-text {
+  min-height: 40px !important;
+  padding: 8px 10px !important;
+
+  border: 1px solid #d7e0e9 !important;
+  border-radius: 8px !important;
+  background: #f8fafc !important;
+  color: #2f4057 !important;
+  font-size: 10.5px !important;
+}
+
+.view-engagement-redesign #product .tab-content {
+  margin: 14px 0 0 !important;
+}
+
+.view-engagement-redesign #product .tab-content > .tab-pane.p-3.active {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.view-engagement-redesign #product .tab-content > .tab-pane.p-3.active > .row {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.view-engagement-redesign
+  #product
+  .tab-content
+  > .tab-pane.p-3.active
+  > .row
+  > .col-lg-12 {
+  width: 100% !important;
+  padding: 0 16px 16px !important;
+}
+
+.view-engagement-redesign #product .tab-pane.p-3.active h6 {
+  min-height: 68px !important;
+  margin: 0 -16px 14px !important;
+  padding: 0 18px 0 62px !important;
+
+  position: relative;
+  display: flex !important;
+  align-items: center !important;
+
+  border-bottom: 1px solid #e1e7ee;
+  background: #fbfcfe;
+  color: #213149 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.view-engagement-redesign #product .tab-pane.p-3.active h6::before {
+  content: "\f0ae";
+  position: absolute;
+  left: 18px;
+
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+  background: #eaf8fb;
+  color: #0788a3;
+  font-family: "Font Awesome 6 Free";
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active
+  > .row
+  > .col-lg-12
+  > .separator {
+  display: none !important;
+}
+
+.view-engagement-redesign #product .tab-pane.p-3.active .row.fieldset,
+.view-engagement-redesign #product #recurring_Default,
+.view-engagement-redesign #product #OneOff_Default {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active
+  .row.fieldset
+  > [class*="col-"],
+.view-engagement-redesign #product #recurring_Default > [class*="col-"],
+.view-engagement-redesign #product #OneOff_Default > [class*="col-"] {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+.view-engagement-redesign #product .tab-pane.p-3.active .table-responsive {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 14px 0 0 !important;
+
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
+  border: 1px solid #d9e2eb;
+  border-radius: 9px;
+  background: #fff;
+  scrollbar-width: thin;
+}
+
+.view-engagement-redesign #product .table-responsive > table {
+  width: 100% !important;
+  min-width: 720px !important;
+  margin: 0 !important;
+  border-collapse: collapse !important;
+}
+
+.view-engagement-redesign #product .table thead,
+.view-engagement-redesign #product .table .head-row {
+  background: var(--ve-navy) !important;
+}
+
+.view-engagement-redesign #product .table thead th,
+.view-engagement-redesign #product .table thead td,
+.view-engagement-redesign #product .table .head-row > th,
+.view-engagement-redesign #product .table .head-row > td {
+  padding: 11px 13px !important;
+  border: 0 !important;
+
+  background: var(--ve-navy) !important;
+  color: #fff !important;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+}
+
+.view-engagement-redesign #product .table tbody td,
+.view-engagement-redesign #product .table tbody th {
+  padding: 10px 13px !important;
+
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 1px solid var(--ve-border-soft) !important;
+
+  background: #fff;
+  color: #44546a;
+  font-size: 10px !important;
+}
+
+.view-engagement-redesign #product .a-la-carte-services-review-head-row th {
+  background: #eef8fa !important;
+  color: #087f98 !important;
+}
+
+.view-engagement-redesign #product .head-grey-row td,
+.view-engagement-redesign #product .head-grey-row th {
+  background: #34445c !important;
+  color: #fff !important;
+}
+
+/* ------------- Description / Statement of Facts ---------- */
+
+.view-engagement-redesign #service_description .shadow-sm,
+.view-engagement-redesign #sof .shadow-sm {
+  overflow: hidden;
+
+  border: 1px solid var(--ve-border) !important;
+  border-radius: 11px !important;
+  background: #fff;
+  box-shadow: none !important;
+}
+
+.view-engagement-redesign #service_description .shadow-sm::before,
+.view-engagement-redesign #sof .shadow-sm::before {
+  min-height: 64px;
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid #e1e7ee;
+  color: #213149;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.view-engagement-redesign #service_description .shadow-sm::before {
+  content: "Service Description";
+}
+
+.view-engagement-redesign #sof .shadow-sm::before {
+  content: "Statement Of Facts";
+}
+
+.view-engagement-redesign #service_description .card-body,
+.view-engagement-redesign #sof .card-body {
+  padding: 20px !important;
+  color: #43536a;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+/* ---------------- Officers / Signatories ----------------- */
+
+.view-engagement-section-intro {
+  min-height: 52px;
+  margin-bottom: 10px;
+  padding: 0 2px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.view-engagement-section-intro h3 {
+  margin: 0;
+  color: #213149;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.view-engagement-section-intro p {
+  margin: 3px 0 0;
+  color: #8591a2;
+  font-size: 9.5px;
+}
+
+.view-engagement-count-pill {
+  min-height: 27px;
+  padding: 0 9px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: #eef8fa;
+  color: #087f98;
+  font-size: 8.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.view-engagement-people-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.view-engagement-person-card {
+  overflow: hidden;
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(15, 27, 51, 0.025);
+}
+
+.view-engagement-person-head {
+  min-height: 72px;
+  padding: 12px 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  border-bottom: 1px solid #e4eaf0;
+  background: #fbfcfe;
+}
+
+.view-engagement-person-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.view-engagement-person-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: #e8f7fa;
+  color: #0788a3;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.view-engagement-person-title {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.view-engagement-person-title small {
+  color: #8a96a6;
+  font-size: 8px;
+}
+
+.view-engagement-person-title strong {
+  margin-top: 2px;
+  overflow: hidden;
+  color: #22334b;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.view-engagement-authorised-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.view-engagement-authorised-wrap .MuiSwitch-root {
+  transform: scale(0.78);
+  transform-origin: center;
+}
+
+.view-engagement-authorised-pill {
+  min-height: 25px;
+  padding: 0 8px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.view-engagement-authorised-pill.is-authorised {
+  background: #eaf8f3;
+  color: #18845f;
+}
+
+.view-engagement-authorised-pill.is-not-authorised {
+  background: #f1f4f7;
+  color: #718095;
+}
+
+.view-engagement-person-body {
+  padding: 8px 15px 12px;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+.view-engagement-person-field {
+  min-width: 0;
+  min-height: 60px;
+  padding: 8px 0;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  border-bottom: 1px solid var(--ve-border-soft);
+}
+
+.view-engagement-person-field:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.view-engagement-person-field-icon {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+  background: #f0f8fa;
+  color: #0788a3;
+  font-size: 12px;
+}
+
+.view-engagement-person-field > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.view-engagement-person-field small {
+  color: #8a96a6;
+  font-size: 8px;
+}
+
+.view-engagement-person-field strong {
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+  color: #2a3b52;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* --------------------- Declined Reason -------------------- */
+
+.view-engagement-declined-tab {
+  padding: 18px !important;
+  border: 1px solid #f0d5da;
+  border-radius: 10px;
+  background: #fff8f9;
+  color: #5d4a50;
+}
+
+/* ---------------------- Sign Manually --------------------- */
+
+.view-engagement-sign-manually {
+  margin-top: 0 !important;
+  padding: 4px !important;
+}
+
+.view-engagement-sign-manually > div:first-child {
+  overflow: hidden;
+  border: 1px solid var(--ve-border);
+  border-radius: 11px;
+  background: #fff;
+}
+
+.view-engagement-sign-manually .text-muted.p-2 {
+  display: block;
+  margin: 0 !important;
+  padding: 12px 14px !important;
+
+  border-bottom: 1px solid #e8edf3;
+  background: #fffaf0;
+  color: #746548 !important;
+}
+
+.view-engagement-sign-manually .text-muted.p-2 p {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.view-engagement-sign-manually .box12 {
+  width: min(620px, 100%);
+  padding: 20px !important;
+
+  border: 1px dashed #b8d7df;
+  border-radius: 10px;
+  background: #f7fbfc;
+}
+
+.view-engagement-sign-manually label[for="PdfUpload"],
+.view-engagement-sign-manually .create-item-btn {
+  border-color: var(--ve-cyan) !important;
+  border-radius: 8px !important;
+  background: var(--ve-cyan) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+/* ------------------------- Footer ------------------------- */
+
+.view-engagement-footer-wrap {
+  width: 100%;
+  margin-top: auto;
+  position: relative !important;
+  background: var(--ve-bg);
+}
+
+.view-engagement-footer-wrap > *,
+.view-engagement-footer-wrap footer,
+.view-engagement-footer-wrap .footer,
+.view-engagement-footer-wrap .fixed-bottom,
+.view-engagement-footer-wrap [class*="footer"] {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  z-index: auto !important;
+}
+
+.view-engagement-redesign #back-to-top {
+  z-index: 20;
+}
+
+/* ----------------------- Responsive ----------------------- */
+
+@media (max-width: 1100px) {
+  .view-engagement-page-header {
+    align-items: flex-start;
+  }
+
+  .view-engagement-page-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .view-engagement-reference-card {
+    min-width: 190px;
+  }
+
+  .view-engagement-people-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .view-engagement-redesign {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 0 8px !important;
+  }
+
+  .view-engagement-page-header {
+    min-height: auto;
+    padding: 12px 8px;
+
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .view-engagement-page-title h1 {
+    font-size: 20px;
+  }
+
+  .view-engagement-page-actions {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .view-engagement-primary-action {
+    flex: 1 1 auto;
+  }
+
+  .view-engagement-reference-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .view-engagement-tab-card > .nav-tabs {
+    min-height: 56px;
+    padding: 0 8px !important;
+  }
+
+  .view-engagement-tab-card .nav-tabs .nav-link {
+    min-height: 56px;
+    padding: 0 9px !important;
+    font-size: 10px !important;
+  }
+
+  .view-engagement-tab-card > .tab-content {
+    padding: 10px !important;
+  }
+
+  .view-engagement-info-grid,
+  .view-engagement-field-grid,
+  .view-engagement-person-body {
+    grid-template-columns: 1fr;
+  }
+
+  .view-engagement-person-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .view-engagement-authorised-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .view-engagement-person-field:nth-last-child(-n + 2) {
+    border-bottom: 1px solid var(--ve-border-soft);
+  }
+
+  .view-engagement-person-field:last-child {
+    border-bottom: 0;
+  }
+
+  .view-engagement-redesign
+    #product
+    .tab-content
+    > .tab-pane.p-3.active
+    > .row
+    > .col-lg-12 {
+    padding: 0 12px 12px !important;
+  }
+
+  .view-engagement-redesign #product .tab-pane.p-3.active h6 {
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+    padding-left: 56px !important;
+  }
+
+  .view-engagement-redesign #product .tab-pane.p-3.active h6::before {
+    left: 14px;
+  }
+
+  .view-engagement-redesign
+    #product
+    .tab-pane.p-3.active
+    .row.fieldset
+    > [class*="col-"],
+  .view-engagement-redesign #product #recurring_Default > [class*="col-"],
+  .view-engagement-redesign #product #OneOff_Default > [class*="col-"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+/* =========================================================
+   V2 — VIEW ENGAGEMENT LETTER LAYOUT CORRECTION
+   UI only.
+   - Aligns Selected Services with View Proposal.
+   - Keeps service sections inside their cards.
+   - Removes legacy fixed-height/overflow behaviour.
+   - Forces shared Footer into normal document flow.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   PAGE FLOW
+   No fixed content heights on this detail screen.
+   --------------------------------------------------------- */
+
+html body .view-engagement-redesign,
+html body .view-engagement-redesign .page-content,
+html body .view-engagement-redesign .prospect-bg,
+html body .view-engagement-redesign .view-engagement-main-card,
+html body .view-engagement-redesign .view-engagement-main-card > .card-body,
+html body .view-engagement-redesign .view-engagement-customer-list,
+html body .view-engagement-redesign .view-engagement-tabs-shell,
+html body .view-engagement-redesign .view-engagement-tab-card,
+html body .view-engagement-redesign .view-engagement-tab-card > .tab-content,
+html body .view-engagement-redesign #product,
+html body .view-engagement-redesign #product > .tab-content,
+html body .view-engagement-redesign #product .tab-content {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+html body .view-engagement-redesign .page-content,
+html body .view-engagement-redesign .prospect-bg,
+html body .view-engagement-redesign .view-engagement-main-card,
+html body .view-engagement-redesign .view-engagement-main-card > .card-body,
+html body .view-engagement-redesign .view-engagement-customer-list,
+html body .view-engagement-redesign .view-engagement-tabs-shell,
+html body .view-engagement-redesign .view-engagement-tab-card,
+html body .view-engagement-redesign .view-engagement-tab-card > .tab-content {
+  overflow: visible !important;
+}
+
+/* Legacy Height_View_scroll / scroll-hidden classes must not establish
+   a clipped 60/70vh viewport on this page. */
+html body .view-engagement-redesign .Height_View_scroll,
+html body .view-engagement-redesign .scroll-hidden,
+html body .view-engagement-redesign .Height_View_scroll.scroll-hidden {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Let the detail page determine its real height before the Footer begins. */
+html body .view-engagement-redesign {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+}
+
+html body .view-engagement-redesign > .page-content {
+  flex: 1 0 auto !important;
+  width: 100% !important;
+}
+
+/* ---------------------------------------------------------
+   SELECTED SERVICES — TOP CONFIGURATION CARD
+   Match the View Proposal screen: ONE card containing all rows.
+   --------------------------------------------------------- */
+
+.view-engagement-redesign #product > .separator.mb-3 {
+  display: none !important;
+}
+
+.view-engagement-redesign .view-engagement-service-config-card {
+  width: 100%;
+  max-width: 100%;
+
+  margin: 0 0 14px !important;
+  padding: 8px 18px !important;
+
+  overflow: visible;
+
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+
+  background: #ffffff;
+}
+
+/* Override V1's individual rounded cards. */
+.view-engagement-redesign .view-engagement-service-config-card > .row.fieldset {
+  width: 100% !important;
+  min-height: 64px !important;
+
+  margin: 0 !important;
+  padding: 9px 0 !important;
+
+  align-items: center !important;
+
+  border: 0 !important;
+  /* border-bottom: 1px solid #e8edf3 !important; */
+  border-radius: 0 !important;
+
+  background: transparent !important;
+}
+
+.view-engagement-redesign
+  .view-engagement-service-config-card
+  > .row.fieldset:last-child {
+  border-bottom: 0 !important;
+}
+
+.view-engagement-redesign
+  .view-engagement-service-config-card
+  > .row.fieldset
+  > [class*="col-"] {
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.view-engagement-redesign .view-engagement-service-config-card .fieldset-label {
+  color: #586a80 !important;
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+}
+
+.view-engagement-redesign .view-engagement-service-config-card .input-group {
+  min-height: 42px;
+
+  display: flex !important;
+  align-items: center !important;
+}
+
+.view-engagement-redesign .view-engagement-service-config-card .selectDropDown {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.view-engagement-redesign
+  .view-engagement-service-config-card
+  .selectDropDown
+  > div {
+  min-height: 42px !important;
+
+  border-color: #d5dfe9 !important;
+  border-radius: 8px !important;
+
+  background: #ffffff !important;
+
+  box-shadow: none !important;
+}
+
+.view-engagement-redesign
+  .view-engagement-service-config-card
+  .selectDropDown
+  > div:hover {
+  border-color: #afdbe4 !important;
+}
+
+.view-engagement-redesign
+  .view-engagement-service-config-card
+  .selectDropDown
+  [class*="singleValue"] {
+  color: #273850 !important;
+  font-size: 11px !important;
+}
+
+.view-engagement-redesign .view-engagement-service-config-card b {
+  color: #273850;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.view-engagement-redesign
+  .view-engagement-service-config-card
+  input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+
+  margin: 0 !important;
+
+  accent-color: var(--ve-cyan);
+}
+
+/* ---------------------------------------------------------
+   RECURRING / ONE-OFF SERVICE CARDS
+   Re-apply the same containment rules used on View Proposal.
+   --------------------------------------------------------- */
+
+.view-engagement-redesign #product > .tab-content {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 14px 0 0 !important;
+  padding: 0 !important;
+
+  overflow: visible !important;
+}
+
+.view-engagement-redesign #product > .tab-content > .tab-pane.p-3.active {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+
+  border: 1px solid #d7e1ea !important;
+  border-radius: 11px !important;
+
+  background: #ffffff !important;
+
+  box-shadow: none !important;
+}
+
+.view-engagement-redesign
+  #product
+  > .tab-content
+  > .tab-pane.p-3.active
+  > .row {
+  width: 100% !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.view-engagement-redesign
+  #product
+  > .tab-content
+  > .tab-pane.p-3.active
+  > .row
+  > [class*="col-"] {
+  max-width: 100%;
+
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  > .row
+  > .col-lg-12 {
+  width: 100% !important;
+
+  padding: 0 16px 16px !important;
+}
+
+.view-engagement-redesign #product .tab-pane.p-3.active:has(h6) h6 {
+  min-height: 68px !important;
+
+  margin: 0 0 14px !important;
+  padding: 0 18px 0 62px !important;
+
+  position: relative;
+
+  display: flex !important;
+  align-items: center !important;
+
+  border-bottom: 1px solid #e1e7ee !important;
+
+  background: #fbfcfe !important;
+
+  color: #213149 !important;
+
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.view-engagement-redesign #product .tab-pane.p-3.active:has(h6) h6::before {
+  left: 18px !important;
+
+  width: 34px !important;
+  height: 34px !important;
+
+  border-radius: 8px !important;
+}
+
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  > .row
+  > .col-lg-12
+  > .separator {
+  display: none !important;
+}
+
+/* Price / frequency summary uses one clean 2-column grid. */
+.view-engagement-redesign #product .tab-pane.p-3.active:has(h6) .row.fieldset,
+.view-engagement-redesign #product #recurring_Default,
+.view-engagement-redesign #product #OneOff_Default {
+  width: 100% !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 10px !important;
+
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+}
+
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .row.fieldset
+  > [class*="col-"],
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  #recurring_Default
+  > [class*="col-"],
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  #OneOff_Default
+  > [class*="col-"] {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+.view-engagement-redesign #product .tab-pane.p-3.active:has(h6) .fieldset-label,
+.view-engagement-redesign #product .tab-pane.p-3.active:has(h6) .form-label {
+  display: block !important;
+
+  margin: 0 !important;
+
+  color: #586a80 !important;
+
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+}
+
+.view-engagement-redesign #product .tab-pane.p-3.active:has(h6) .input-text,
+.view-engagement-redesign #product .tab-pane.p-3.active:has(h6) .selectDropDown,
+.view-engagement-redesign #product .tab-pane.p-3.active:has(h6) .input-group {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.view-engagement-redesign #product .tab-pane.p-3.active:has(h6) .input-text {
+  min-height: 42px !important;
+
+  padding: 8px 11px !important;
+
+  border: 1px solid #d5dfe9 !important;
+  border-radius: 8px !important;
+
+  background: #f8fafc !important;
+  color: #26384f !important;
+
+  font-size: 10.5px !important;
+}
+
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .selectDropDown
+  > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 42px !important;
+
+  border-color: #d5dfe9 !important;
+  border-radius: 8px !important;
+
+  box-shadow: none !important;
+}
+
+/* Table scroll stays INSIDE its service card. */
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .table-responsive {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 14px 0 0 !important;
+
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
+  border: 1px solid #d9e2eb !important;
+  border-radius: 9px !important;
+
+  background: #ffffff !important;
+
+  scrollbar-width: thin;
+}
+
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  .table-responsive
+  > table {
+  width: 100% !important;
+  min-width: 720px !important;
+
+  margin: 0 !important;
+}
+
+.view-engagement-redesign
+  #product
+  .tab-pane.p-3.active:has(h6)
+  > .row
+  > .col-lg-12
+  > .mb-3 {
+  height: 4px !important;
+  margin: 0 !important;
+}
+
+/* ---------------------------------------------------------
+   FOOTER — FORCE NORMAL FLOW
+   The shared Footer uses legacy fixed positioning in some pages.
+   These highly scoped rules win only on View Engagement Letter.
+   --------------------------------------------------------- */
+
+html body .view-engagement-redesign .view-engagement-footer-wrap {
+  position: static !important;
+
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  inset: auto !important;
+
+  flex: 0 0 auto !important;
+
+  display: block !important;
+  clear: both !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  transform: none !important;
+
+  z-index: auto !important;
+
+  background: var(--ve-bg) !important;
+}
+
+html body .view-engagement-redesign .view-engagement-footer-wrap > *,
+html body .view-engagement-redesign .view-engagement-footer-wrap footer,
+html body .view-engagement-redesign .view-engagement-footer-wrap .footer,
+html body .view-engagement-redesign .view-engagement-footer-wrap .fixed-bottom,
+html
+  body
+  .view-engagement-redesign
+  .view-engagement-footer-wrap
+  [class*="footer"],
+html
+  body
+  .view-engagement-redesign
+  .view-engagement-footer-wrap
+  [id*="footer"] {
+  position: static !important;
+
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  inset: auto !important;
+
+  float: none !important;
+
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+
+  margin: 0 !important;
+
+  transform: none !important;
+
+  z-index: auto !important;
+}
+
+html body .view-engagement-redesign .view-engagement-footer-wrap .footer,
+html body .view-engagement-redesign .view-engagement-footer-wrap footer {
+  min-height: 52px !important;
+}
+
+/* Catch shared fixed-bottom styles without affecting modal components. */
+html body .view-engagement-redesign .view-engagement-footer-wrap .fixed-bottom {
+  position: static !important;
+  bottom: auto !important;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 991px) {
+  .view-engagement-redesign .view-engagement-service-config-card {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .view-engagement-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    > .row
+    > .col-lg-12 {
+    padding: 0 12px 12px !important;
+  }
+
+  .view-engagement-redesign #product .tab-pane.p-3.active:has(h6) h6 {
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+
+    padding-left: 56px !important;
+  }
+
+  .view-engagement-redesign #product .tab-pane.p-3.active:has(h6) h6::before {
+    left: 14px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .view-engagement-redesign
+    .view-engagement-service-config-card
+    > .row.fieldset {
+    padding: 12px 0 !important;
+  }
+
+  .view-engagement-redesign
+    .view-engagement-service-config-card
+    > .row.fieldset
+    > [class*="col-"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  .view-engagement-redesign .view-engagement-service-config-card .text-md-end,
+  .view-engagement-redesign #product .tab-pane.p-3.active:has(h6) .text-md-end,
+  .view-engagement-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    .text-lg-right {
+    margin-bottom: 5px !important;
+
+    text-align: left !important;
+  }
+
+  .view-engagement-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    .row.fieldset
+    > [class*="col-"],
+  .view-engagement-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    #recurring_Default
+    > [class*="col-"],
+  .view-engagement-redesign
+    #product
+    .tab-pane.p-3.active:has(h6)
+    #OneOff_Default
+    > [class*="col-"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}

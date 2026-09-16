@@ -4,6 +4,7 @@ import CommonButtonComponent from "../../components/CommonButtonComponent";
 import { useLocation, useNavigate } from "react-router-dom";
 import Tooltip from "@mui/material/Tooltip";
 import "./Engagement_Letter.css";
+import "./View_Engagement_Latter-redesign-v2.css";
 import Select from "react-select";
 import { AuthContextProvider } from "../../AuthContext/AuthContext";
 import Footer from "../../components/Footer";
@@ -1492,84 +1493,79 @@ const View_Engagement_Latter = () => {
     hasPositiveOneOffDiscount && Boolean(EngagementObj?.DiscountLines);
 
   return (
-    <div className="container">
+    <div className="container view-engagement-redesign">
       {/* <div class="main-content"> */}
       <div class="page-content page-background prospect-bg">
         {/* <div class="page-info-header page-info-strip"> */}
-        <div class="container">
-          <div className="row">
-            <div className="col-md-6 col-sm-6 col-6">
-              <div class="prospects-title">
-                <h5>Reference ID: {EngagementObj.contractName}</h5>
-                {/* <h5>
-                      {EngagementName}:{" "}
-                      {isMobile
-                        ? EngagementObj.clientName &&
-                          EngagementObj.clientName.length > 15
-                          ? `${EngagementObj.clientName.substring(0, 15)}...`
-                          : EngagementObj.clientName
-                        : EngagementObj.clientName}
-                    </h5> */}
-              </div>
+        <div className="view-engagement-page-header">
+          <div className="view-engagement-page-heading">
+            <Tooltip title="Back">
+              <button
+                type="button"
+                className="view-engagement-back-btn"
+                onClick={handleBack}
+              >
+                <i className="ri-arrow-left-line"></i>
+              </button>
+            </Tooltip>
+
+            <div className="view-engagement-page-title">
+              <h1>{EngagementName} Details</h1>
+              <p>
+                Review engagement information, selected services, pricing,
+                officers, signatories and document status.
+              </p>
             </div>
+          </div>
 
-            <div className="col-md-6 col-sm-6 col-6">
-              <div className="d-flex justify-content-md-end justify-content-sm-end justify-content-end add-new-prospect">
-                {EngagementObj.statusID == statusID.Signed &&
-                  EngagementObj.manuallySignedContractDocUrl === null && (
-                    <Tooltip title={`Download ${EngagementName} `}>
-                      <button
-                        className="btn btn-md btn-success create-item-btn"
-                        onClick={handleDownload}
-                      >
-                        <i className="bi bi-download"></i>{" "}
-                        <span className="d-none d-sm-inline">
-                          Download {EngagementName}
-                        </span>
-                      </button>
-                    </Tooltip>
-                  )}
-                {(EngagementObj.statusID !== statusID.Signed ||
-                  (EngagementObj.statusID === statusID.Signed &&
-                    EngagementObj.manuallySignedContractDocUrl !== null)) && (
-                  <Tooltip title={`View Pdf`}>
-                    <button
-                      className="btn btn-md btn-success create-item-btn"
-                      onClick={handleDownload}
-                    >
-                      <i class="bi bi-eye"></i>{" "}
-                      <span className="d-none d-sm-inline">View Pdf</span>
-                    </button>
-                  </Tooltip>
-                )}
-
-                <Tooltip title={`Back`}>
+          <div className="view-engagement-page-actions">
+            {EngagementObj.statusID == statusID.Signed &&
+              EngagementObj.manuallySignedContractDocUrl === null && (
+                <Tooltip title={`Download ${EngagementName} `}>
                   <button
-                    className="btn btn-md btn-success create-item-btn "
-                    onClick={handleBack}
-                    style={{ marginLeft: "10px" }}
+                    type="button"
+                    className="view-engagement-primary-action"
+                    onClick={handleDownload}
                   >
-                    <i className="fa fa-arrow-left d-md-none"></i>
-                    <span className="d-none d-md-inline">Back</span>
+                    <i className="bi bi-download"></i>
+                    <span>Download {EngagementName}</span>
                   </button>
                 </Tooltip>
-              </div>
+              )}
+
+            {(EngagementObj.statusID !== statusID.Signed ||
+              (EngagementObj.statusID === statusID.Signed &&
+                EngagementObj.manuallySignedContractDocUrl !== null)) && (
+              <Tooltip title="View Pdf">
+                <button
+                  type="button"
+                  className="view-engagement-primary-action"
+                  onClick={handleDownload}
+                >
+                  <i className="bi bi-eye"></i>
+                  <span>View Pdf</span>
+                </button>
+              </Tooltip>
+            )}
+
+            <div className="view-engagement-reference-card">
+              <span>REFERENCE ID</span>
+              <strong>{EngagementObj.contractName}</strong>
             </div>
           </div>
         </div>
-        {/* </div> */}
         <div class="container-fluid ">
           <div class="row">
             <div class="col-lg-12">
-              <div class="card" style={{ marginTop: "75px" }}>
+              <div className="card view-engagement-main-card">
                 <div class="card-body">
-                  <div style={{ height: "60vh" }} id="customerList">
+                  <div
+                    id="customerList"
+                    className="view-engagement-customer-list"
+                  >
                     <div class="row g-4 mb-3"></div>
-                    <div class="search-box ms-2 width-searchbox prospect-form">
-                      <div
-                        style={{ height: "70vh" }}
-                        class=" table-card  mb-3 Height_View_scroll scroll-hidden"
-                      >
+                    <div className="search-box ms-2 width-searchbox prospect-form view-engagement-tabs-shell">
+                      <div className="table-card mb-3 Height_View_scroll scroll-hidden view-engagement-tab-card">
                         <ul class="nav nav-tabs mb-3" role="tablist">
                           <li class="nav-item">
                             <a
@@ -1579,7 +1575,10 @@ const View_Engagement_Latter = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              Basic Information
+                              <span className="view-engagement-tab-icon">
+                                <i className="ri-file-info-line"></i>
+                              </span>
+                              <span>Basic Information</span>
                             </a>
                           </li>
                           <li class="nav-item">
@@ -1590,7 +1589,10 @@ const View_Engagement_Latter = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              Selected Services
+                              <span className="view-engagement-tab-icon">
+                                <i className="ri-list-check-2"></i>
+                              </span>
+                              <span>Selected Services</span>
                             </a>
                           </li>
 
@@ -1602,7 +1604,10 @@ const View_Engagement_Latter = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              Service Description
+                              <span className="view-engagement-tab-icon">
+                                <i className="ri-file-text-line"></i>
+                              </span>
+                              <span>Service Description</span>
                             </a>
                           </li>
                           <li class="nav-item">
@@ -1613,7 +1618,10 @@ const View_Engagement_Latter = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              Statment Of Facts
+                              <span className="view-engagement-tab-icon">
+                                <i className="ri-survey-line"></i>
+                              </span>
+                              <span>Statement Of Facts</span>
                             </a>
                           </li>
 
@@ -1625,7 +1633,10 @@ const View_Engagement_Latter = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              All Officers
+                              <span className="view-engagement-tab-icon">
+                                <i className="ri-user-star-line"></i>
+                              </span>
+                              <span>All Officers</span>
                             </a>
                           </li>
                           <li class="nav-item">
@@ -1636,7 +1647,10 @@ const View_Engagement_Latter = () => {
                               role="tab"
                               aria-selected="false"
                             >
-                              Authorised Signatories
+                              <span className="view-engagement-tab-icon">
+                                <i className="ri-user-follow-line"></i>
+                              </span>
+                              <span>Authorised Signatories</span>
                             </a>
                           </li>
                           {EngagementObj.declinedReason !== null && (
@@ -1648,7 +1662,10 @@ const View_Engagement_Latter = () => {
                                 role="tab"
                                 aria-selected="false"
                               >
-                                Declined Reason
+                                <span className="view-engagement-tab-icon">
+                                  <i className="ri-close-circle-line"></i>
+                                </span>
+                                <span>Declined Reason</span>
                               </a>
                             </li>
                           )}
@@ -1665,7 +1682,10 @@ const View_Engagement_Latter = () => {
                                 role="tab"
                                 aria-selected="false"
                               >
-                                Sign Manually
+                                <span className="view-engagement-tab-icon">
+                                  <i className="ri-upload-cloud-2-line"></i>
+                                </span>
+                                <span>Sign Manually</span>
                               </a>
                             </li>
                           )}
@@ -1673,77 +1693,43 @@ const View_Engagement_Latter = () => {
 
                         <div class="tab-content  text-muted">
                           <div
-                            class="tab-pane active"
+                            className="tab-pane active"
                             id="base-justified-home"
                             role="tabpanel"
                           >
-                            <table class="table table-striped fs-13 view-details-table">
-                              <tbody>
-                                <tr>
-                                  <td class="break-table" colspan="2"></td>
-                                </tr>
-                                <tr>
-                                  <th colspan="2">Basic Information</th>
-                                </tr>
-                                <tr>
-                                  <td> {prospectName} Name</td>
-                                  <td class="text-end">
-                                    {EngagementObj.clientName}
-                                  </td>
-                                </tr>
-                                {/* <tr>
-                                    <td>Reference ID:</td>
-                                    <td class="text-end">
-                                      {EngagementObj.contractName}
-                                    </td>
-                                  </tr> */}
-                                <tr>
-                                  <td>Template</td>
-                                  <td class="text-end">
-                                    {EngagementObj.templateName}
-                                  </td>
-                                </tr>
-                                {EngagementObj.draftOn && (
-                                  <tr>
-                                    <td>Drafted On</td>
-                                    <td class="text-end">
-                                      {GetOnlyDate(EngagementObj.draftOn)}
-                                    </td>
-                                  </tr>
-                                )}
-                                {EngagementObj.sentOn && (
-                                  <tr>
-                                    <td>Sent On</td>
-                                    <td class="text-end">
-                                      {GetOnlyDate(EngagementObj.sentOn)}
-                                    </td>
-                                  </tr>
-                                )}
-                                {EngagementObj.signedOn && isSignedStatus && (
-                                  <tr>
-                                    <td>Signed On</td>
-                                    <td class="text-end">
-                                      {GetOnlyDate(EngagementObj.signedOn)}
-                                    </td>
-                                  </tr>
-                                )}
+                            <div className="view-engagement-info-grid">
+                              <section className="view-engagement-info-card">
+                                <div className="view-engagement-info-card-head">
+                                  <span className="view-engagement-info-icon">
+                                    <i className="ri-file-info-line"></i>
+                                  </span>
+                                  <div>
+                                    <h3>Engagement Information</h3>
+                                    <p>
+                                      Core client and engagement template
+                                      details.
+                                    </p>
+                                  </div>
+                                </div>
 
-                                {EngagementObj.VoidOn && !isSignedStatus && (
-                                  <tr>
-                                    <td>Void On</td>
-                                    <td class="text-end">
-                                      {GetOnlyDate(EngagementObj.VoidOn)}
-                                    </td>
-                                  </tr>
-                                )}
-                                <tr>
-                                  <td>Linked Proposal</td>
-                                  <td
-                                    class="text-end"
-                                    style={{
-                                      color: "blue",
-                                      cursor: "pointer",
-                                    }}
+                                <div className="view-engagement-info-card-body view-engagement-field-grid">
+                                  <div className="view-engagement-field">
+                                    <span>{prospectName} Name</span>
+                                    <strong>
+                                      {EngagementObj.clientName || "-"}
+                                    </strong>
+                                  </div>
+
+                                  <div className="view-engagement-field">
+                                    <span>Template</span>
+                                    <strong>
+                                      {EngagementObj.templateName || "-"}
+                                    </strong>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    className="view-engagement-linked-proposal"
                                     onClick={() =>
                                       navigate("/view-proposal", {
                                         state: {
@@ -1752,19 +1738,75 @@ const View_Engagement_Latter = () => {
                                       })
                                     }
                                   >
-                                    View Proposal
-                                  </td>
-                                </tr>
+                                    <span className="view-engagement-linked-proposal-icon">
+                                      <i className="ri-links-line"></i>
+                                    </span>
 
-                                {/* <tr>
-                                    <td>Select ProposalType</td>
-                                    <td class="text-end">
-                                      {EngagementObj.contractTypeName}
-                                    </td>
-                                  </tr> */}
-                              </tbody>
-                            </table>
+                                    <span className="view-engagement-linked-proposal-copy">
+                                      <small>Linked Proposal</small>
+                                      <strong>View Proposal</strong>
+                                    </span>
+
+                                    <i className="ri-arrow-right-line"></i>
+                                  </button>
+                                </div>
+                              </section>
+
+                              <section className="view-engagement-info-card">
+                                <div className="view-engagement-info-card-head">
+                                  <span className="view-engagement-info-icon">
+                                    <i className="ri-calendar-check-line"></i>
+                                  </span>
+                                  <div>
+                                    <h3>Engagement Timeline</h3>
+                                    <p>
+                                      Important engagement activity and document
+                                      dates.
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="view-engagement-info-card-body view-engagement-field-grid">
+                                  {EngagementObj.draftOn && (
+                                    <div className="view-engagement-field">
+                                      <span>Drafted On</span>
+                                      <strong>
+                                        {GetOnlyDate(EngagementObj.draftOn)}
+                                      </strong>
+                                    </div>
+                                  )}
+
+                                  {EngagementObj.sentOn && (
+                                    <div className="view-engagement-field">
+                                      <span>Sent On</span>
+                                      <strong>
+                                        {GetOnlyDate(EngagementObj.sentOn)}
+                                      </strong>
+                                    </div>
+                                  )}
+
+                                  {EngagementObj.signedOn && isSignedStatus && (
+                                    <div className="view-engagement-field">
+                                      <span>Signed On</span>
+                                      <strong>
+                                        {GetOnlyDate(EngagementObj.signedOn)}
+                                      </strong>
+                                    </div>
+                                  )}
+
+                                  {EngagementObj.VoidOn && !isSignedStatus && (
+                                    <div className="view-engagement-field">
+                                      <span>Void On</span>
+                                      <strong>
+                                        {GetOnlyDate(EngagementObj.VoidOn)}
+                                      </strong>
+                                    </div>
+                                  )}
+                                </div>
+                              </section>
+                            </div>
                           </div>
+
                           <div
                             style={{ width: "98%" }}
                             class="tab-pane"
@@ -1773,76 +1815,81 @@ const View_Engagement_Latter = () => {
                           >
                             <div className="separator mb-3"></div>
                             <>
-                              <div className="row fieldset">
-                                <div className="col-md-2 mb-2 text-md-end">
-                                  <label className="fieldset-label required">
-                                    Fees in the {proposalName}
-                                  </label>
-                                </div>
-                                <div className="col-md-10 mb-2">
-                                  <div className="input-group">
-                                    {/* Add your Select component here */}
-                                    <Select
-                                      // isDisabled
-                                      className="phone-input-country-code selectDropDown Drop-down-width"
-                                      value={feeTypeValue}
-                                      options={Utils.feeInProposal}
-                                      onChange={handleChangeFeesType}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="row fieldset">
-                                <div className="col-md-2 mb-2 text-md-end">
-                                  <label className="fieldset-label required">
-                                    Payment Gateway
-                                    <span className="text-danger">*</span>
-                                  </label>
-                                </div>
-                                <div className="col-md-10 mb-2">
-                                  <div className="input-group">
-                                    {/* Adjust the Select component as needed */}
-                                    <Select
-                                      isDisabled
-                                      className="phone-input-country-code selectDropDown Drop-down-width"
-                                      value={PaymentGatewayValue}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="row fieldset">
-                                <div className="col-md-2 mb-2 text-md-end">
-                                  <label className="fieldset-label required">
-                                    Show Discount
-                                  </label>
-                                </div>
-                                <div className="col-md-10 mb-2">
-                                  <div className="input-group">
-                                    {/* Replace Select with Checkbox */}
-                                    <input
-                                      type="checkbox"
-                                      disabled
-                                      checked={EngagementObj.DiscountLines}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                              {packageList.length > 0 && (
+                              <div className="view-engagement-service-config-card">
                                 <div className="row fieldset">
                                   <div className="col-md-2 mb-2 text-md-end">
                                     <label className="fieldset-label required">
-                                      Package Name
+                                      Fees in the {proposalName}
                                     </label>
                                   </div>
                                   <div className="col-md-10 mb-2">
                                     <div className="input-group">
                                       {/* Add your Select component here */}
-                                      <b>{packageList[0].servicePackageName}</b>
+                                      <Select
+                                        // isDisabled
+                                        className="phone-input-country-code selectDropDown Drop-down-width"
+                                        value={feeTypeValue}
+                                        options={Utils.feeInProposal}
+                                        onChange={handleChangeFeesType}
+                                      />
                                     </div>
                                   </div>
                                 </div>
-                              )}
+
+                                <div className="row fieldset">
+                                  <div className="col-md-2 mb-2 text-md-end">
+                                    <label className="fieldset-label required">
+                                      Payment Gateway
+                                      <span className="text-danger">*</span>
+                                    </label>
+                                  </div>
+                                  <div className="col-md-10 mb-2">
+                                    <div className="input-group">
+                                      {/* Adjust the Select component as needed */}
+                                      <Select
+                                        isDisabled
+                                        className="phone-input-country-code selectDropDown Drop-down-width"
+                                        value={PaymentGatewayValue}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="row fieldset">
+                                  <div className="col-md-2 mb-2 text-md-end">
+                                    <label className="fieldset-label required">
+                                      Show Discount
+                                    </label>
+                                  </div>
+                                  <div className="col-md-10 mb-2">
+                                    <div className="input-group">
+                                      {/* Replace Select with Checkbox */}
+                                      <input
+                                        type="checkbox"
+                                        disabled
+                                        checked={EngagementObj.DiscountLines}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                {packageList.length > 0 && (
+                                  <div className="row fieldset">
+                                    <div className="col-md-2 mb-2 text-md-end">
+                                      <label className="fieldset-label required">
+                                        Package Name
+                                      </label>
+                                    </div>
+                                    <div className="col-md-10 mb-2">
+                                      <div className="input-group">
+                                        {/* Add your Select component here */}
+                                        <b>
+                                          {packageList[0].servicePackageName}
+                                        </b>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
                               {selectedRecurringServiceList?.length !== 0 && (
                                 <div className="tab-content">
                                   <div className="tab-pane p-3 active">
@@ -3249,185 +3296,276 @@ const View_Engagement_Latter = () => {
                             </div>
                           </div>
                           <div
-                            style={{ width: "98%" }}
-                            class="tab-pane"
+                            className="tab-pane"
                             id="Signatory"
                             role="tabpanel"
                           >
-                            {contractSignatoriesList.map((signatory, index) => (
-                              <table
-                                key={signatory.contractSignatoryID}
-                                className="table table-striped fs-13 view-details-table"
-                              >
-                                <tbody>
-                                  <tr>
-                                    <td>
-                                      <b>
-                                        {Utils.stringifyNumber(index + 1)}{" "}
-                                        Signatory
-                                      </b>
-                                    </td>
-                                    <td className="text-right">
-                                      {/* {basicInfo.businessTypeName} */}
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>First Name</td>
-                                    <td className="text-right">
-                                      {signatory.firstName}
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Last Name</td>
-                                    <td className="text-right">
-                                      {signatory.lastName}
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Email</td>
-                                    <td className="text-right">
-                                      {signatory.emailID}
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Signed on</td>
-                                    <td className="text-right">
-                                      {signatory.isSigned
-                                        ? formatDateToDDMMYYYY(
-                                            signatory.isSigned,
-                                          )
-                                        : "-"}
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            ))}
-                          </div>
-                          <div class="tab-pane" id="Officer" role="tabpanel">
-                            <div
-                              class="tab-pane active"
-                              id="Officer"
-                              role="tabpanel"
-                            >
-                              <table className="table table-striped fs-13 view-details-table">
-                                <tbody>
-                                  {officersForm.map((prospect, index) => (
-                                    <React.Fragment key={index}>
-                                      <tr>
-                                        <th colspan="2">Officer {index + 1}</th>
-                                      </tr>
+                            <div className="view-engagement-people-wrap">
+                              <div className="view-engagement-section-intro">
+                                <div>
+                                  <h3>Authorised Signatories</h3>
+                                  <p>
+                                    Review the people authorised to sign this
+                                    engagement letter.
+                                  </p>
+                                </div>
 
-                                      <tr>
-                                        {(EngagementObj.clientMasterBusinessTypeID ===
-                                          3 ||
-                                          EngagementObj.clientMasterBusinessTypeID ===
-                                            4 ||
-                                          EngagementObj.clientMasterBusinessTypeID ===
-                                            5) && (
-                                          <>
-                                            <td>Authorised </td>
-                                            <td className="text-end">
-                                              {officersForm[index]
-                                                ?.isAuthorisedSignatory
-                                                ? "Yes"
-                                                : "NO"}
-                                              <Switch
-                                                checked={
-                                                  officersForm[index]
-                                                    ?.isAuthorisedSignatory
-                                                }
-                                                disabled
-                                                color="primary"
-                                              />
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
+                                <span className="view-engagement-count-pill">
+                                  {contractSignatoriesList.length}{" "}
+                                  {contractSignatoriesList.length === 1
+                                    ? "Signatory"
+                                    : "Signatories"}
+                                </span>
+                              </div>
 
-                                      <tr>
-                                        <td>First Name</td>
-                                        <td className="text-end">
-                                          {officersForm[index].firstName}
-                                        </td>
-                                      </tr>
+                              <div className="view-engagement-people-grid">
+                                {contractSignatoriesList.map(
+                                  (signatory, index) => (
+                                    <section
+                                      key={signatory.contractSignatoryID}
+                                      className="view-engagement-person-card"
+                                    >
+                                      <div className="view-engagement-person-head">
+                                        <div className="view-engagement-person-identity">
+                                          <span className="view-engagement-person-avatar">
+                                            {signatory.firstName?.charAt(0)}
+                                            {signatory.lastName?.charAt(0)}
+                                          </span>
 
-                                      <tr>
-                                        <td>Last Name</td>
-                                        <td className="text-end">
-                                          {officersForm[index].lastName}
-                                        </td>
-                                      </tr>
+                                          <div className="view-engagement-person-title">
+                                            <small>
+                                              {Utils.stringifyNumber(index + 1)}{" "}
+                                              Signatory
+                                            </small>
+                                            <strong>
+                                              {signatory.firstName}{" "}
+                                              {signatory.lastName}
+                                            </strong>
+                                          </div>
+                                        </div>
+                                      </div>
 
-                                      <tr>
-                                        <td>Phone</td>
-                                        <td className="text-end">
-                                          {officersForm[index].phoneNo}
-                                        </td>
-                                      </tr>
+                                      <div className="view-engagement-person-body view-engagement-signatory-body">
+                                        <div className="view-engagement-person-field">
+                                          <span className="view-engagement-person-field-icon">
+                                            <i className="ri-user-line"></i>
+                                          </span>
+                                          <div>
+                                            <small>First Name</small>
+                                            <strong>
+                                              {signatory.firstName}
+                                            </strong>
+                                          </div>
+                                        </div>
 
-                                      <tr>
-                                        <td>Email</td>
-                                        <td className="text-end">
-                                          {officersForm[index].emailID}
-                                        </td>
-                                      </tr>
+                                        <div className="view-engagement-person-field">
+                                          <span className="view-engagement-person-field-icon">
+                                            <i className="ri-user-line"></i>
+                                          </span>
+                                          <div>
+                                            <small>Last Name</small>
+                                            <strong>
+                                              {signatory.lastName}
+                                            </strong>
+                                          </div>
+                                        </div>
 
-                                      <>
-                                        {" "}
-                                        <tr>
-                                          <td>Role</td>
-                                          <td className="text-end">
-                                            {officersForm[index].officerRole}
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>Appointed On</td>
-                                          <td className="text-end">
-                                            {formatDateToDDMMYYYY(
-                                              officersForm[index].appointedOn,
-                                            )}
-                                          </td>
-                                        </tr>
-                                      </>
+                                        <div className="view-engagement-person-field">
+                                          <span className="view-engagement-person-field-icon">
+                                            <i className="ri-mail-line"></i>
+                                          </span>
+                                          <div>
+                                            <small>Email</small>
+                                            <strong>{signatory.emailID}</strong>
+                                          </div>
+                                        </div>
 
-                                      {/* <tr>
-                                          {(basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Sole_Trader ||
-                                            basicInfo.originalBusinessTypeID ===
-                                              CLIENT_TYPES.Other ||
-                                            basicInfo.originalBusinessTypeID ===
-                                              CLIENT_TYPES.Partnership) && (
-                                            <td>Residential Address</td>
-                                          )}
-                                          {(basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Company ||
-                                            basicInfo.originalBusinessTypeID ===
-                                              CLIENT_TYPES.LLP) && (
-                                            <td>Correspondence Address</td>
-                                          )}
-
-                                          <td className="text-right">
-                                            {
-                                              concatenatedResidentialAddress[
-                                                index
-                                              ]?.officersFullAddress
-                                            }
-                                          </td>
-                                        </tr> */}
-                                      <tr>
-                                        <td
-                                          class="break-table"
-                                          colspan="2"
-                                        ></td>
-                                      </tr>
-                                    </React.Fragment>
-                                  ))}
-                                </tbody>
-                              </table>
+                                        <div className="view-engagement-person-field">
+                                          <span className="view-engagement-person-field-icon">
+                                            <i className="ri-calendar-check-line"></i>
+                                          </span>
+                                          <div>
+                                            <small>Signed On</small>
+                                            <strong>
+                                              {signatory.isSigned
+                                                ? formatDateToDDMMYYYY(
+                                                    signatory.isSigned,
+                                                  )
+                                                : "-"}
+                                            </strong>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  ),
+                                )}
+                              </div>
                             </div>
                           </div>
                           <div
-                            class="tab-pane"
+                            className="tab-pane"
+                            id="Officer"
+                            role="tabpanel"
+                          >
+                            <div className="view-engagement-people-wrap">
+                              <div className="view-engagement-section-intro">
+                                <div>
+                                  <h3>Officers Details</h3>
+                                  <p>
+                                    Review officer contact, role and appointment
+                                    information.
+                                  </p>
+                                </div>
+
+                                <span className="view-engagement-count-pill">
+                                  {officersForm.length}{" "}
+                                  {officersForm.length === 1
+                                    ? "Officer"
+                                    : "Officers"}
+                                </span>
+                              </div>
+
+                              <div className="view-engagement-people-grid">
+                                {officersForm.map((prospect, index) => (
+                                  <section
+                                    className="view-engagement-person-card"
+                                    key={index}
+                                  >
+                                    <div className="view-engagement-person-head">
+                                      <div className="view-engagement-person-identity">
+                                        <span className="view-engagement-person-avatar">
+                                          {officersForm[
+                                            index
+                                          ].firstName?.charAt(0)}
+                                          {officersForm[index].lastName?.charAt(
+                                            0,
+                                          )}
+                                        </span>
+
+                                        <div className="view-engagement-person-title">
+                                          <small>Officer {index + 1}</small>
+                                          <strong>
+                                            {officersForm[index].firstName}{" "}
+                                            {officersForm[index].lastName}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      {(EngagementObj.clientMasterBusinessTypeID ===
+                                        3 ||
+                                        EngagementObj.clientMasterBusinessTypeID ===
+                                          4 ||
+                                        EngagementObj.clientMasterBusinessTypeID ===
+                                          5) && (
+                                        <div className="view-engagement-authorised-wrap">
+                                          <span
+                                            className={`view-engagement-authorised-pill ${
+                                              officersForm[index]
+                                                ?.isAuthorisedSignatory
+                                                ? "is-authorised"
+                                                : "is-not-authorised"
+                                            }`}
+                                          >
+                                            {officersForm[index]
+                                              ?.isAuthorisedSignatory
+                                              ? "Authorised"
+                                              : "Not Authorised"}
+                                          </span>
+
+                                          <Switch
+                                            checked={
+                                              officersForm[index]
+                                                ?.isAuthorisedSignatory
+                                            }
+                                            disabled
+                                            color="primary"
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="view-engagement-person-body">
+                                      <div className="view-engagement-person-field">
+                                        <span className="view-engagement-person-field-icon">
+                                          <i className="ri-user-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>First Name</small>
+                                          <strong>
+                                            {officersForm[index].firstName}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-engagement-person-field">
+                                        <span className="view-engagement-person-field-icon">
+                                          <i className="ri-user-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Last Name</small>
+                                          <strong>
+                                            {officersForm[index].lastName}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-engagement-person-field">
+                                        <span className="view-engagement-person-field-icon">
+                                          <i className="ri-phone-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Phone</small>
+                                          <strong>
+                                            {officersForm[index].phoneNo}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-engagement-person-field">
+                                        <span className="view-engagement-person-field-icon">
+                                          <i className="ri-mail-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Email</small>
+                                          <strong>
+                                            {officersForm[index].emailID}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-engagement-person-field">
+                                        <span className="view-engagement-person-field-icon">
+                                          <i className="ri-shield-user-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Role</small>
+                                          <strong>
+                                            {officersForm[index].officerRole}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      <div className="view-engagement-person-field">
+                                        <span className="view-engagement-person-field-icon">
+                                          <i className="ri-calendar-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Appointed On</small>
+                                          <strong>
+                                            {formatDateToDDMMYYYY(
+                                              officersForm[index].appointedOn,
+                                            )}
+                                          </strong>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </section>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            className="tab-pane view-engagement-declined-tab"
                             id="DeclinedReason"
                             role="tabpanel"
                           >
@@ -3441,10 +3579,9 @@ const View_Engagement_Latter = () => {
                             {EngagementObj.declinedReason}
                           </div>
                           <div
-                            class="tab-pane"
+                            className="tab-pane view-engagement-sign-manually"
                             id="SignManually"
                             role="tabpanel"
-                            style={{ marginTop: "-30px" }}
                           >
                             {" "}
                             <div>
@@ -3675,7 +3812,9 @@ const View_Engagement_Latter = () => {
         handleClose={handleCloseErrorModel}
         ErrorMessage={errorMessage}
       />
-      <Footer />
+      <div className="view-engagement-footer-wrap">
+        <Footer />
+      </div>
 
       {/* start back-to-top */}
       <button
