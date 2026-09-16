@@ -1339,9 +1339,18 @@ const Prospects = () => {
   const renderProspectVariablesModal = () => {
     if (!showVarModal) return null;
 
+    // UI only: small caption shown under each variable name
+    const pvTypeLabels = {
+      2: "Number",
+      3: "Dropdown",
+      4: "Range",
+      5: "Text",
+      6: "Date",
+    };
+
     return (
       <div
-        className="modal show"
+        className="modal show pv-overlay"
         style={{
           display: "block",
           backgroundColor: "rgba(0,0,0,0.5)",
@@ -1350,12 +1359,33 @@ const Prospects = () => {
         onClick={() => setShowVarModal(false)}
       >
         <div
-          className="modal-dialog modal-md modal-dialog-centered"
+          className="modal-dialog modal-md modal-dialog-centered pv-dialog"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="modal-content prospect-variable-modal">
-            <div className="modal-header">
-              <h5 className="modal-title">Prospect Variables</h5>
+          <div className="modal-content prospect-variable-modal pv-modal">
+            <div className="modal-header pv-header">
+              <span className="pv-header-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1" />
+                  <path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1" />
+                  <line x1="9.5" y1="9.5" x2="14.5" y2="14.5" />
+                  <line x1="14.5" y1="9.5" x2="9.5" y2="14.5" />
+                </svg>
+              </span>
+
+              <h5 className="modal-title pv-title">
+                Prospect Variables
+                {/* {prospectVariables?.length > 0 && (
+                  <span className="pv-count">{prospectVariables.length}</span>
+                )} */}
+              </h5>
 
               <button
                 type="button"
@@ -1365,7 +1395,22 @@ const Prospects = () => {
             </div>
 
             {prospectVariables == null || prospectVariables?.length === 0 ? (
-              <div className="modal-body">
+              <div className="modal-body pv-body pv-empty">
+                <div className="pv-empty-icon" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                </div>
+
                 <h6 className="text-danger mb-2">
                   Please add at least one Global Prospect Variable
                 </h6>
@@ -1381,19 +1426,24 @@ const Prospects = () => {
               </div>
             ) : (
               <>
-                <div className="modal-body">
+                <div className="modal-body pv-body">
                   {prospectVariables.map((variable) => (
                     <div
-                      className="row mb-3"
+                      className="row mb-3 pv-field"
                       key={
                         variable.globalVariableKeyID ||
                         variable.globalVariableID
                       }
                     >
-                      <div className="col-md-3 d-flex align-items-center">
+                      <div className="col-md-3 d-flex align-items-center pv-field-label">
                         <label className="form-label mb-0">
                           {variable.globalVariableName}
                         </label>
+                        {/* {pvTypeLabels[variable.dataType] && (
+                          <span className="pv-type">
+                            {pvTypeLabels[variable.dataType]}
+                          </span>
+                        )} */}
                       </div>
 
                       <div className="col-lg-9 col-md-9 col-sm-12">
@@ -1442,6 +1492,7 @@ const Prospects = () => {
                           <>
                             <Select
                               className="w-100"
+                              classNamePrefix="pv-select"
                               options={variable.variation?.map((item) => ({
                                 value: item.variationName,
                                 label: item.variationName,
@@ -1573,6 +1624,7 @@ const Prospects = () => {
                           <>
                             <Select
                               className="w-100"
+                              classNamePrefix="pv-select"
                               options={variable.slab?.map((item) => ({
                                 value:
                                   item.slabTypeID === 2
@@ -1668,7 +1720,7 @@ const Prospects = () => {
                   ))}
                 </div>
 
-                <div className="modal-footer">
+                <div className="modal-footer pv-footer">
                   <button
                     type="button"
                     className="btn btn-sm btn-secondary"
@@ -1682,6 +1734,17 @@ const Prospects = () => {
                     className="btn btn-sm create-item-btn"
                     onClick={handleVariablesDataSubmit}
                   >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
                     Submit
                   </button>
                 </div>

@@ -781,3 +781,497 @@
     flex: 1 1 auto;
   }
 }
+
+/* ==================================================================
+   Prospect Variables modal – redesigned UI
+   Scoped to .pv-modal / .pv-overlay so no other modal is affected.
+   Uses the same design tokens as ConfirmModel.css and Filter.css.
+   ================================================================== */
+
+/* ---------- Overlay ---------- */
+.pv-overlay {
+  overflow-y: auto;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* ---------- Dialog shell ---------- */
+.pv-dialog {
+  max-width: 620px;
+  padding: 12px;
+}
+.pv-modal {
+  --pv-accent: #0bbad6;
+  --pv-accent-strong: #0896ad;
+  --pv-accent-rgb: 11, 186, 214;
+  --pv-soft: #e8f9fc;
+  --pv-danger: #dc2626;
+  --pv-danger-rgb: 220, 38, 38;
+  --pv-text: #111827;
+  --pv-label: #374151;
+  --pv-muted: #6b7280;
+  --pv-border: #dde2e8;
+  --pv-border-soft: #eceff3;
+  --pv-surface: #f8fafc;
+
+  position: relative;
+  border: none !important;
+  border-radius: 20px !important;
+  overflow: visible;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.06),
+    0 30px 60px -20px rgba(15, 23, 42, 0.4);
+}
+.pv-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  border-radius: 20px 20px 0 0;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--pv-accent-rgb), 0.35),
+    var(--pv-accent),
+    rgba(var(--pv-accent-rgb), 0.35)
+  );
+}
+
+/* ---------- Header ---------- */
+.pv-modal .pv-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 24px 18px;
+  border: none;
+  border-bottom: 1px solid var(--pv-border-soft);
+  border-radius: 20px 20px 0 0;
+  background: linear-gradient(180deg, var(--pv-soft) 0%, #ffffff 100%);
+}
+.pv-modal .pv-header-icon {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pv-accent-strong);
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(var(--pv-accent-rgb), 0.2),
+    0 6px 14px -6px rgba(var(--pv-accent-rgb), 0.55);
+}
+.pv-modal .pv-header-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.pv-modal .pv-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--pv-text);
+}
+.pv-modal .pv-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--pv-accent-strong);
+  background: #ffffff;
+  border: 1px solid rgba(var(--pv-accent-rgb), 0.35);
+}
+.pv-modal .pv-header .btn-close {
+  margin: 0;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  background-size: 11px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--pv-border-soft);
+  opacity: 0.75;
+  box-shadow: none;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+.pv-modal .pv-header .btn-close:hover {
+  opacity: 1;
+  background-color: #ffffff;
+  transform: rotate(90deg);
+}
+.pv-modal .pv-header .btn-close:focus-visible {
+  opacity: 1;
+  box-shadow: 0 0 0 3px rgba(var(--pv-accent-rgb), 0.35);
+}
+
+/* ---------- Body ---------- */
+.pv-modal .pv-body {
+  padding: 8px 12px 12px;
+}
+
+/* One variable row */
+.pv-modal .pv-field {
+  margin: 0 !important;
+  padding: 16px 0;
+  row-gap: 8px;
+  border-bottom: 1px dashed var(--pv-border);
+}
+.pv-modal .pv-field:last-child {
+  border-bottom: none;
+}
+.pv-modal .pv-field-label {
+  flex-direction: column;
+  align-items: flex-start !important;
+  justify-content: center;
+  gap: 5px;
+}
+.pv-modal .pv-field .form-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--pv-label);
+  word-break: break-word;
+}
+.pv-modal .pv-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--pv-muted);
+  background: var(--pv-surface);
+  border: 1px solid var(--pv-border-soft);
+}
+
+/* Inputs (number, text, date, "other" value) */
+.pv-modal .pv-field .input-text,
+.pv-modal .pv-field .react-datepicker__input-container input {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: var(--pv-text);
+  background: #ffffff;
+  border: 1px solid var(--pv-border);
+  border-radius: 10px;
+  outline: none;
+  box-shadow: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.pv-modal .pv-field .input-text::placeholder,
+.pv-modal .pv-field .react-datepicker__input-container input::placeholder {
+  color: #9ca3af;
+}
+.pv-modal .pv-field .input-text:hover,
+.pv-modal .pv-field .react-datepicker__input-container input:hover {
+  border-color: #c3cad3;
+}
+.pv-modal .pv-field .input-text:focus,
+.pv-modal .pv-field .react-datepicker__input-container input:focus {
+  border-color: var(--pv-accent);
+  box-shadow: 0 0 0 3px rgba(var(--pv-accent-rgb), 0.18);
+}
+.pv-modal .pv-field .input-text.mt-2 {
+  margin-top: 10px !important;
+}
+
+/* react-datepicker */
+.pv-modal .pv-field .react-datepicker-wrapper {
+  display: block;
+  width: 100%;
+}
+.pv-modal .pv-field .react-datepicker__input-container input {
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='18' rx='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+}
+.pv-modal .react-datepicker-popper {
+  z-index: 30;
+}
+.pv-modal .react-datepicker {
+  font-family: inherit;
+  border: 1px solid var(--pv-border-soft);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 36px -12px rgba(15, 23, 42, 0.25);
+}
+.pv-modal .react-datepicker__header {
+  background: var(--pv-surface);
+  border-bottom: 1px solid var(--pv-border-soft);
+}
+.pv-modal .react-datepicker__triangle {
+  display: none;
+}
+.pv-modal .react-datepicker__day--selected,
+.pv-modal .react-datepicker__day--keyboard-selected {
+  background: var(--pv-accent-strong) !important;
+  color: #ffffff !important;
+  border-radius: 8px;
+}
+.pv-modal .react-datepicker__day:hover {
+  border-radius: 8px;
+}
+
+/* react-select (classNamePrefix="pv-select") */
+.pv-modal .pv-select__control {
+  min-height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--pv-border);
+  background: #ffffff;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.pv-modal .pv-select__control:hover {
+  border-color: #c3cad3;
+}
+.pv-modal .pv-select__control--is-focused {
+  border-color: var(--pv-accent);
+  box-shadow: 0 0 0 3px rgba(var(--pv-accent-rgb), 0.18);
+}
+.pv-modal .pv-select__value-container {
+  padding: 2px 14px;
+}
+.pv-modal .pv-select__placeholder {
+  color: #9ca3af;
+}
+.pv-modal .pv-select__single-value {
+  color: var(--pv-text);
+}
+.pv-modal .pv-select__indicator-separator {
+  display: none;
+}
+.pv-modal .pv-select__dropdown-indicator {
+  color: #9ca3af;
+  padding: 0 12px;
+  transition:
+    transform 0.2s ease,
+    color 0.15s ease;
+}
+.pv-modal .pv-select__control--menu-is-open .pv-select__dropdown-indicator {
+  transform: rotate(180deg);
+  color: var(--pv-accent-strong);
+}
+.pv-modal .pv-select__menu {
+  z-index: 30;
+  margin-top: 6px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--pv-border-soft);
+  box-shadow: 0 18px 36px -12px rgba(15, 23, 42, 0.25);
+}
+.pv-modal .pv-select__menu-list {
+  padding: 6px;
+}
+.pv-modal .pv-select__option {
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14.5px;
+  color: var(--pv-label);
+  background: transparent;
+  cursor: pointer;
+}
+.pv-modal .pv-select__option--is-focused {
+  background: var(--pv-surface);
+}
+.pv-modal .pv-select__option--is-selected {
+  background: var(--pv-soft);
+  color: var(--pv-accent-strong);
+  font-weight: 600;
+}
+
+/* Validation messages + red field border when a message is showing */
+.pv-modal .pv-field .text-danger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--pv-danger) !important;
+}
+.pv-modal .pv-field .text-danger::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><line x1='12' y1='8' x2='12' y2='12'/><line x1='12' y1='16' x2='12.01' y2='16'/></svg>")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><line x1='12' y1='8' x2='12' y2='12'/><line x1='12' y1='16' x2='12.01' y2='16'/></svg>")
+    center / contain no-repeat;
+}
+.pv-modal .pv-field:has(.text-danger) .input-text,
+.pv-modal .pv-field:has(.text-danger) .pv-select__control {
+  border-color: rgba(var(--pv-danger-rgb), 0.6);
+  background-color: #fffafa;
+}
+.pv-modal .pv-field:has(.text-danger) .input-text:focus,
+.pv-modal .pv-field:has(.text-danger) .pv-select__control--is-focused {
+  border-color: var(--pv-danger);
+  box-shadow: 0 0 0 3px rgba(var(--pv-danger-rgb), 0.15);
+}
+.pv-modal .pv-field:has(.text-danger) .form-label {
+  color: var(--pv-danger);
+}
+
+/* ---------- Empty state ---------- */
+.pv-modal .pv-empty {
+  padding: 34px 32px 32px;
+  text-align: center;
+}
+.pv-modal .pv-empty-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d97706;
+  background: #fff7e6;
+  box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.08);
+}
+.pv-modal .pv-empty-icon svg {
+  width: 32px;
+  height: 32px;
+}
+.pv-modal .pv-empty h6 {
+  margin-bottom: 14px !important;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--pv-text) !important;
+}
+.pv-modal .pv-empty .helpMessage {
+  margin: 0 auto;
+  max-width: 440px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 2;
+  color: var(--pv-muted) !important;
+  background: var(--pv-surface);
+  border: 1px solid var(--pv-border-soft);
+  border-radius: 12px;
+}
+.pv-modal .pv-empty .helpMessage strong {
+  display: inline-block;
+  padding: 1px 9px;
+  line-height: 1.7;
+  font-weight: 600;
+  color: var(--pv-accent-strong);
+  background: #ffffff;
+  border: 1px solid rgba(var(--pv-accent-rgb), 0.3);
+  border-radius: 7px;
+}
+
+/* ---------- Footer ---------- */
+.pv-modal .pv-footer {
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--pv-border-soft);
+  border-radius: 0 0 20px 20px;
+  background: #f9fafb;
+}
+.pv-modal .pv-footer > * {
+  margin: 0;
+}
+.pv-modal .pv-footer .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 120px;
+  min-height: 46px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px;
+  line-height: 1.3;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+.pv-modal .pv-footer .btn svg {
+  width: 17px;
+  height: 17px;
+}
+.pv-modal .pv-footer .btn:active {
+  transform: translateY(1px);
+}
+.pv-modal .pv-footer .btn-secondary {
+  background: #ffffff !important;
+  color: var(--pv-label) !important;
+  border: 1px solid #d5d9e0 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+.pv-modal .pv-footer .btn-secondary:hover {
+  background: #f3f4f6 !important;
+  border-color: #c4c9d1 !important;
+}
+.pv-modal .pv-footer .create-item-btn {
+  background: var(--pv-accent) !important;
+  border: 1px solid var(--pv-accent) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px -10px rgba(var(--pv-accent-rgb), 0.9);
+}
+.pv-modal .pv-footer .create-item-btn:hover {
+  background: var(--pv-accent-strong) !important;
+  border-color: var(--pv-accent-strong) !important;
+}
+.pv-modal .pv-footer .btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--pv-accent-rgb), 0.35) !important;
+}
+
+/* ---------- Motion & small screens ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .pv-modal .pv-header .btn-close:hover,
+  .pv-modal .pv-select__control--menu-is-open .pv-select__dropdown-indicator {
+    transform: none;
+  }
+}
+@media (max-width: 767.98px) {
+  .pv-modal .pv-field-label {
+    flex-direction: row;
+    align-items: center !important;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 480px) {
+  .pv-modal .pv-header,
+  .pv-modal .pv-footer {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .pv-modal .pv-body {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+  .pv-modal .pv-footer .btn {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}

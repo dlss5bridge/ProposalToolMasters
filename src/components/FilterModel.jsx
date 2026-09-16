@@ -14,9 +14,56 @@ import {
   GetBusinessTypeLookupList,
   GetProspectTypeVariationLookupList,
 } from "../redux/Services/Master/BusinessTypeLookupListApi";
-import { GetDocumentStatusTypeLookUpList, GetEmailAddressTypeLookupList, GetTriggerPointTypeLookupList } from "../redux/Services/Config/ReminderApi";
+import {
+  GetDocumentStatusTypeLookUpList,
+  GetEmailAddressTypeLookupList,
+  GetTriggerPointTypeLookupList,
+} from "../redux/Services/Config/ReminderApi";
 import { GetTemplateTypeList } from "../redux/Services/Master/TemplateTypeLookupListApi";
 import { ColorContext } from "../AuthContext/ColorContext";
+import "./Filter.css";
+
+/* ---------------------- UI-only icons (no logic) ---------------------- */
+const FilterIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M3 5h18l-7 8.5V19l-4 2v-7.5L3 5z" />
+  </svg>
+);
+const ResetIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M3 12a9 9 0 1 0 3-6.7" />
+    <polyline points="3 3 3 9 9 9" />
+  </svg>
+);
+const CheckIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
 
 function Filter(props) {
   // A] States Declaration :
@@ -24,16 +71,27 @@ function Filter(props) {
   const common = useSelector((state) => state.Storage);
   const modalRef = useRef(null);
   const [BusinessTypeLookupList, setBusinessTypeLookupList] = useState([]);
-  const [OrganisationBusinessTypeLookupList, setOrganisationBusinessTypeLookupList] = useState([]);
+  const [
+    OrganisationBusinessTypeLookupList,
+    setOrganisationBusinessTypeLookupList,
+  ] = useState([]);
   const [TemplateTypeLookupList, setTemplateTypeLookupList] = useState([]);
-  const [TemplateTypeLookupForReminderList, setTemplateTypeLookupForReminderList] = useState([]);
-  const [EmailAddressTypeLookupList, setEmailAddressTypeLookupList] = useState([]);
-  const [TriggerPointTypeLookupList, setTriggerPointTypeLookupList] = useState([]);
-  const [DocumentStatusTypeLookupList, setDocumentStatusTypeLookupList] = useState([]);
+  const [
+    TemplateTypeLookupForReminderList,
+    setTemplateTypeLookupForReminderList,
+  ] = useState([]);
+  const [EmailAddressTypeLookupList, setEmailAddressTypeLookupList] = useState(
+    [],
+  );
+  const [TriggerPointTypeLookupList, setTriggerPointTypeLookupList] = useState(
+    [],
+  );
+  const [DocumentStatusTypeLookupList, setDocumentStatusTypeLookupList] =
+    useState([]);
   const [NatureOfBusinessTypeLookupList, setNatureOfBusinessTypeLookupList] =
     useState([]);
   const [showProfessionType, setShowProfessionType] = useState(
-    common.organisationKeyID === null
+    common.organisationKeyID === null,
   );
   const {
     EngagementName,
@@ -44,31 +102,27 @@ function Filter(props) {
     getCrudPopUpTitleName,
     GetCustomDate,
   } = useContext(AuthContextProvider);
-  const {
-
-    isAddUpdateDone,
-  } = useContext(ColorContext);
+  const { isAddUpdateDone } = useContext(ColorContext);
   //Getting Logged Users Details From Persist Storage of redux hooks
   //calender Filter
   useEffect(() => {
-    GetEmailAddressTypeData()
-    GetDocumentStatusTypeData()
+    GetEmailAddressTypeData();
+    GetDocumentStatusTypeData();
     GetNOBTypeLookUpListData();
     GetBusinessTypeLookupListData();
-    GetOrganisationBusinessTypeLookupListData()
+    GetOrganisationBusinessTypeLookupListData();
     GetTemplateTypeLookupListData();
-    GetTemplateTypeLookupListForReminderData()
-
+    GetTemplateTypeLookupListForReminderData();
   }, [props.moduleName]);
   useEffect(() => {
     if (isAddUpdateDone) {
-      GetEmailAddressTypeData()
-      GetDocumentStatusTypeData()
+      GetEmailAddressTypeData();
+      GetDocumentStatusTypeData();
       GetNOBTypeLookUpListData();
       GetBusinessTypeLookupListData();
-      GetOrganisationBusinessTypeLookupListData()
+      GetOrganisationBusinessTypeLookupListData();
       GetTemplateTypeLookupListData();
-      GetTemplateTypeLookupListForReminderData()
+      GetTemplateTypeLookupListForReminderData();
     }
   }, [isAddUpdateDone]);
   const handleStatus = (status) => {
@@ -76,13 +130,15 @@ function Filter(props) {
   };
 
   const hasVoidedEL = props?.engagementList?.some((el) => el.statusID === 8);
-  const EngagementLetterStatusOptions = Utils.EngagementLetterStatus.filter(el => {
-    if (hasVoidedEL) {
-      return true;
-    } else {
-      return el.value !== 8;
-    }
-  })
+  const EngagementLetterStatusOptions = Utils.EngagementLetterStatus.filter(
+    (el) => {
+      if (hasVoidedEL) {
+        return true;
+      } else {
+        return el.value !== 8;
+      }
+    },
+  );
 
   const handleChangeBusinessTypeID = (status) => {
     props?.setProspectType(status ? status.value : null);
@@ -133,125 +189,126 @@ function Filter(props) {
         break;
       case CalenderFilterEnum.This_Week:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Week).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Week).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Week).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Week).toDate,
         );
 
         props.setFormDateOfCalenderForExport(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Week).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Week).fromDate,
         );
         props.setToDateCalenderForExport(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Week).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Week).toDate,
         );
 
         props.setShowDatePicker(false);
         break;
       case CalenderFilterEnum.Last_Week:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Week).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Week).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Week).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Week).toDate,
         );
 
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Week).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Week).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Week).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Week).toDate,
         );
 
         props.setShowDatePicker(false);
         break;
       case CalenderFilterEnum.This_Month:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Month).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Month).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Month).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Month).toDate,
         );
 
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Month).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Month).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Month).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Month).toDate,
         );
 
         props.setShowDatePicker(false);
         break;
       case CalenderFilterEnum.Last_Month:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Month).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Month).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Month).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Month).toDate,
         );
         props.setShowDatePicker(false);
         break;
       case CalenderFilterEnum.This_Quarter:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Quarter).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Quarter).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Quarter).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Quarter).toDate,
         );
         props.setShowDatePicker(false);
         break;
       case CalenderFilterEnum.Last_Quarter:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Quarter).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Quarter).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Quarter).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Quarter).toDate,
         );
         props.setShowDatePicker(false);
         break;
       case CalenderFilterEnum.This_6_Months:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_6_Months).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_6_Months).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_6_Months).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_6_Months).toDate,
         );
         props.setShowDatePicker(false);
         break;
       case CalenderFilterEnum.Last_6_Months:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_6_Months).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_6_Months).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_6_Months).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_6_Months).toDate,
         );
         props.setShowDatePicker(false);
         break;
       case CalenderFilterEnum.This_Year:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Year).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Year).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.This_Year).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.This_Year).toDate,
         );
         props.setShowDatePicker(false);
         break;
       case CalenderFilterEnum.Last_Year:
         props.setFromDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Year).fromDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Year).fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Year).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Last_Year).toDate,
         );
         props.setShowDatePicker(true);
         break;
       case CalenderFilterEnum.Custom_Date_Range:
         props.setFromDate(
           GetCustomDate(dateFormat, CalenderFilterEnum.Custom_Date_Range)
-            .fromDate
+            .fromDate,
         );
         props.setToDate(
-          GetCustomDate(dateFormat, CalenderFilterEnum.Custom_Date_Range).toDate
+          GetCustomDate(dateFormat, CalenderFilterEnum.Custom_Date_Range)
+            .toDate,
         );
         props.setShowDatePicker(true);
         // Handle custom date range selection, if needed
@@ -272,7 +329,10 @@ function Filter(props) {
   };
   const handleChangeEmailAddress = (selectedOption) => {
     props.setEmailAddressType(selectedOption?.value);
-    GetTriggerPointTypeData(selectedOption.value, selectedOption.emailAddressIDType)
+    GetTriggerPointTypeData(
+      selectedOption.value,
+      selectedOption.emailAddressIDType,
+    );
   };
   const handleChangeTriggerPoint = (selectedOption) => {
     props.setTriggerPointType(selectedOption?.value);
@@ -284,7 +344,7 @@ function Filter(props) {
     try {
       const data = await GetProspectTypeVariationLookupList(
         common.organisationKeyID,
-        common.userKeyID
+        common.userKeyID,
       );
       if (data?.data?.statusCode === 200) {
         if (data?.data?.responseData?.data) {
@@ -314,7 +374,9 @@ function Filter(props) {
             label: BusinessType.businessTypeName,
           }));
 
-          setOrganisationBusinessTypeLookupList(BusinessTypeListData.slice(1, 5));
+          setOrganisationBusinessTypeLookupList(
+            BusinessTypeListData.slice(1, 5),
+          );
         }
       }
     } catch (error) {
@@ -326,7 +388,7 @@ function Filter(props) {
     try {
       const data = await GetNOBTypeLookupList(
         common.organisationKeyID,
-        common.userKeyID
+        common.userKeyID,
       );
       if (data?.data?.statusCode === 200) {
         if (data?.data?.responseData?.data) {
@@ -339,7 +401,7 @@ function Filter(props) {
           setNatureOfBusinessTypeLookupList(NoBTypeListData);
         }
       }
-    } catch (error) { }
+    } catch (error) {}
   };
   const GetTemplateTypeLookupListData = () => {
     const proposalName = "Proposal";
@@ -360,13 +422,17 @@ function Filter(props) {
   //2) TemplateType Lookup List Api
   const GetTemplateTypeLookupListForReminderData = async () => {
     try {
-      const data = await GetTemplateTypeList(props.ModuleName === "Workflow Email Template" ? 5 : 6);
+      const data = await GetTemplateTypeList(
+        props.ModuleName === "Workflow Email Template" ? 5 : 6,
+      );
       if (data?.data?.statusCode === 200) {
         if (data?.data?.responseData?.data) {
           let TemplateTypeListData = data?.data?.responseData?.data;
           TemplateTypeListData = TemplateTypeListData.map((templateType) => ({
             value: templateType.templateTypeID,
-            label: templateType.templateTypeName?.replace(/contract/gi, EngagementName)?.replace(/quote/gi, proposalName),
+            label: templateType.templateTypeName
+              ?.replace(/contract/gi, EngagementName)
+              ?.replace(/quote/gi, proposalName),
           }));
           setTemplateTypeLookupForReminderList(TemplateTypeListData);
         }
@@ -376,34 +442,48 @@ function Filter(props) {
     }
   };
   const GetEmailAddressTypeData = async () => {
-    setLoader(true)
-    setLoader(true)
+    setLoader(true);
+    setLoader(true);
     try {
-      const data = await GetEmailAddressTypeLookupList(props.ModuleName === "Reminder" ? 1 : 4);
+      const data = await GetEmailAddressTypeLookupList(
+        props.ModuleName === "Reminder" ? 1 : 4,
+      );
       if (data?.data?.statusCode === 200) {
         if (data?.data?.responseData?.data) {
-          setLoader(false)
+          setLoader(false);
           let emailAddressTypeData = data?.data?.responseData.data;
-          emailAddressTypeData = emailAddressTypeData.map((emailAddressType) => ({
-            value: emailAddressType.emailAddressID,
-            label: emailAddressType.emailAddressName?.replace(/prospects/gi, prospectName),
-            emailAddressIDType: emailAddressType.emailAddressIDType
-          }));
+          emailAddressTypeData = emailAddressTypeData.map(
+            (emailAddressType) => ({
+              value: emailAddressType.emailAddressID,
+              label: emailAddressType.emailAddressName?.replace(
+                /prospects/gi,
+                prospectName,
+              ),
+              emailAddressIDType: emailAddressType.emailAddressIDType,
+            }),
+          );
           setEmailAddressTypeLookupList(emailAddressTypeData);
         }
       }
     } catch (error) {
-      setLoader(false)
+      setLoader(false);
       console.log(error);
     }
   };
-  const GetTriggerPointTypeData = async (emailAddressID, emailAddressIDType) => {
-    setLoader(true)
+  const GetTriggerPointTypeData = async (
+    emailAddressID,
+    emailAddressIDType,
+  ) => {
+    setLoader(true);
     try {
-      const data = await GetTriggerPointTypeLookupList(props.ModuleName === "Reminder" ? 1 : 4, emailAddressID, emailAddressIDType);
+      const data = await GetTriggerPointTypeLookupList(
+        props.ModuleName === "Reminder" ? 1 : 4,
+        emailAddressID,
+        emailAddressIDType,
+      );
       if (data?.data?.statusCode === 200) {
         if (data?.data?.responseData?.data) {
-          setLoader(false)
+          setLoader(false);
           let triggerPointTypeData = data?.data?.responseData?.data;
 
           triggerPointTypeData = triggerPointTypeData
@@ -435,32 +515,34 @@ function Filter(props) {
     }
   };
   const GetDocumentStatusTypeData = async () => {
-    setLoader(true)
+    setLoader(true);
     try {
       const data = await GetDocumentStatusTypeLookUpList();
       if (data?.data?.statusCode === 200) {
         if (data?.data?.responseData?.data) {
-          setLoader(false)
+          setLoader(false);
           let documentStatusTypeData = data?.data?.responseData?.data;
 
-          documentStatusTypeData = documentStatusTypeData.map((documentStatus) => {
-            let label = documentStatus.documentStatusName;
+          documentStatusTypeData = documentStatusTypeData.map(
+            (documentStatus) => {
+              let label = documentStatus.documentStatusName;
 
-            // Replace "Contract" with the value of EngagementName in the label
-            if (label.includes("Contract")) {
-              label = label.replace("Contract", EngagementName);
-            }
+              // Replace "Contract" with the value of EngagementName in the label
+              if (label.includes("Contract")) {
+                label = label.replace("Contract", EngagementName);
+              }
 
-            // Replace "Quote" with the value of proposalName in the label
-            if (label.includes("Quote")) {
-              label = label.replace("Quote", proposalName);
-            }
+              // Replace "Quote" with the value of proposalName in the label
+              if (label.includes("Quote")) {
+                label = label.replace("Quote", proposalName);
+              }
 
-            return {
-              value: documentStatus.documentStatusID,
-              label: label,
-            };
-          });
+              return {
+                value: documentStatus.documentStatusID,
+                label: label,
+              };
+            },
+          );
 
           setDocumentStatusTypeLookupList(documentStatusTypeData);
         }
@@ -470,34 +552,34 @@ function Filter(props) {
     }
   };
   const orgBusinessTypeFilter = OrganisationBusinessTypeLookupList?.filter(
-    (businessType) => businessType.value == props.businessTypeID
+    (businessType) => businessType.value == props.businessTypeID,
   );
 
   const templateTypeFilter = TemplateTypeLookupForReminderList?.filter(
-    (template) => template.value == props.TemplateType
+    (template) => template.value == props.TemplateType,
   );
 
   const { ModuleName, status } = props;
-  const modifiedProposalStatus = ModuleName === EngagementName
-    ? Utils.EngagementLetterStatus
-    : Utils.ProposalStatus;
+  const modifiedProposalStatus =
+    ModuleName === EngagementName
+      ? Utils.EngagementLetterStatus
+      : Utils.ProposalStatus;
 
   const selectedOption = modifiedProposalStatus.find(
-    (statusOption) => statusOption.value === status
+    (statusOption) => statusOption.value === status,
   );
-
 
   const selectedTemplateValue = TemplateTypeLookupList.find(
-    (statusOption) => statusOption.value === props.selectedTemplateType
+    (statusOption) => statusOption.value === props.selectedTemplateType,
   );
   const selectedEmailAddressValue = EmailAddressTypeLookupList.find(
-    (statusOption) => statusOption.value === props.EmailAddressType
+    (statusOption) => statusOption.value === props.EmailAddressType,
   );
   const selectedTriggerPointValue = TriggerPointTypeLookupList.find(
-    (statusOption) => statusOption.value === props.TriggerPointType
+    (statusOption) => statusOption.value === props.TriggerPointType,
   );
   const selectedDocumentStatusValue = DocumentStatusTypeLookupList.find(
-    (statusOption) => statusOption.value === props.DocumentStatus
+    (statusOption) => statusOption.value === props.DocumentStatus,
   );
   const ClearFilter = () => {
     // setSelectedTemplate(null);
@@ -513,17 +595,23 @@ function Filter(props) {
       props.setFromDate(null);
       props.setToDate(null);
     } else if (props.ModuleName === "Template") {
-      props.setBusinessTypeID(null)
-      props.setSelectedTemplateType(null)
-      props.setProspectType(null)
+      props.setBusinessTypeID(null);
+      props.setSelectedTemplateType(null);
+      props.setProspectType(null);
     } else if (props.ModuleName === prospectName) {
       props.setBusinessNatureID(null);
       props.setProspectType(null);
-    } else if (props.ModuleName === "Reminder" || props.ModuleName === "Other Reminder") {
+    } else if (
+      props.ModuleName === "Reminder" ||
+      props.ModuleName === "Other Reminder"
+    ) {
       props.setEmailAddressType(null);
       props.setTriggerPointType(null);
       props.setDocumentStatus(null);
-    } else if (props.ModuleName === "Workflow Email Template" || props.ModuleName === "Super Admin Workflow Email Template") {
+    } else if (
+      props.ModuleName === "Workflow Email Template" ||
+      props.ModuleName === "Super Admin Workflow Email Template"
+    ) {
       props.setTemplateType(null);
     }
   };
@@ -532,7 +620,7 @@ function Filter(props) {
   return (
     <div>
       <div
-        class={props.class}
+        className={props.class}
         id={props.id}
         ref={modalRef}
         tabIndex={props.tabIndex}
@@ -541,20 +629,22 @@ function Filter(props) {
         data-bs-backdrop="static"
         data-bs-keyboard="false"
       >
-        <div class="modal-dialog modal-md modal-dialog-centered">
-          <div class="modal-content">
+        <div className="modal-dialog modal-md modal-dialog-centered fm-dialog">
+          <div className="modal-content fm-content">
             {/*Heading Start */}
-            <div class="modal-header bg-light p-3">
-              <h5 class="modal-title" id="exampleModalLabel">
+            <div className="modal-header bg-light p-3 fm-header">
+              <span className="fm-header-icon">
+                <FilterIcon />
+              </span>
+              <h5 className="modal-title fm-title" id="exampleModalLabel">
                 {moduleName}
               </h5>
               {/* Close Button Start */}
               <button
                 type="button"
-                class="btn-close"
+                className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-
                 id="close-modal"
               >
                 {/* Close Button End */}
@@ -563,110 +653,130 @@ function Filter(props) {
             {/*Heading End */}
             {/*Modal body Start */}
             <div
-              class="modal-body"
+              className="modal-body fm-body"
               style={{ height: "50vh", overflow: "auto" }}
             >
               <>
                 <div
-                  class="accordion accordion-flush accessModel"
+                  className="accordion accordion-flush accessModel"
                   id="accordionFlushExample"
                 >
-                  <div class="accordion-item ">
+                  <div className="accordion-item ">
                     {(props.ModuleName === EngagementName ||
                       props.ModuleName === prospectName ||
                       props.ModuleName == "Service" ||
                       props.ModuleName === proposalName ||
                       props.ModuleName === "Package") && (
-                        <>
-                          {(props.ModuleName === EngagementName ||
-                            props.ModuleName === proposalName) && (
-                              <>
-                                <div class="col-12 mb-1">
-                                  <label className="fieldset-label">
-                                    {props.ModuleName} Status
-                                  </label>
+                      <>
+                        {(props.ModuleName === EngagementName ||
+                          props.ModuleName === proposalName) && (
+                          <>
+                            <div className="fm-field">
+                              <div className="col-12 mb-1">
+                                <label className="fieldset-label">
+                                  {props.ModuleName} Status
+                                </label>
+                              </div>
+                              <div className="col-lg-12  mb-2 ">
+                                <div className="input-group">
+                                  <Select
+                                    className="phone-input-country-code selectDropDown Drop-down-width"
+                                    classNamePrefix="fm-select"
+                                    options={
+                                      props.ModuleName === EngagementName
+                                        ? EngagementLetterStatusOptions
+                                        : Utils.ProposalStatus
+                                    }
+                                    value={selectedOption || null}
+                                    onChange={handleStatus}
+                                  />
                                 </div>
-                                <div className="col-lg-12  mb-2 ">
-                                  <div className="input-group">
-                                    <Select
-                                      className="phone-input-country-code selectDropDown Drop-down-width"
-                                      options={props.ModuleName === EngagementName ? EngagementLetterStatusOptions : Utils.ProposalStatus}
-                                      value={selectedOption || null}
-                                      onChange={handleStatus}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-12 mb-1">
-                                  <label className="fieldset-label">
-                                    Date Filter
-                                  </label>
-                                </div>
-                                <div className="col-lg-12  mb-2">
-                                  <div className="input-group">
-                                    <Select
-                                      className="user-role-select "
-                                      options={Utils.CalenderFilter}
-                                      value={props.selectedOption}
-                                      onChange={handleCalenderFilterChange}
-                                    />
-                                  </div>
-                                </div>
-                                {props.showDatePicker && (
-                                  <div className="row mb-2">
-                                    <div class="col-12 mb-1">
-                                      <label>Custom Range</label>
-                                    </div>
-                                    <div className="col-lg-6 col-md-6 col-sm-6 ">
-                                      <DatePicker
-                                        format="dd/MM/y"
-                                        dayPlaceholder="dd"
-                                        monthPlaceholder="mm"
-                                        yearPlaceholder="yyyy"
-                                        className="engagementCalender"
-                                        label="From Date"
-                                        value={
-                                          props.fromDate
-                                            ? dayjs(props.fromDate)
-                                            : null
-                                        }
-                                        maxDate={dayjs().toDate()}
-                                        onChange={handleFromDateChange}
-                                        renderInput={(params) => (
-                                          <input {...params.inputProps} />
-                                        )}
-                                        popperPlacement="bottom-start"
-                                      />
-                                    </div>
-                                    <div className="col-lg-6 col-md-6 col-sm-6">
-                                      <DatePicker
-                                        format="dd/MM/y"
-                                        dayPlaceholder="dd"
-                                        monthPlaceholder="mm"
-                                        yearPlaceholder="yyyy"
-                                        label="To Date"
-                                        className="engagementCalender"
-                                        value={
-                                          props.toDate ? dayjs(props.toDate) : null
-                                        }
-                                        minDate={
-                                          props.fromDate
-                                            ? dayjs(props.fromDate).toDate()
-                                            : null
-                                        }
-                                        maxDate={dayjs().toDate()} // Set maxDate to today
-                                        onChange={handleToDateChange}
-                                        renderInput={(params) => (
-                                          <input {...params.inputProps} />
-                                        )}
-                                        popperPlacement="bottom-start"
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-                              </>
-                            )}
+                              </div>
+                            </div>
 
-                          <div class="col-12 mb-1">
+                            <div className="fm-field fm-group">
+                              <div className="col-12 mb-1">
+                                <label className="fieldset-label">
+                                  Date Filter
+                                </label>
+                              </div>
+                              <div className="col-lg-12  mb-2">
+                                <div className="input-group">
+                                  <Select
+                                    className="user-role-select "
+                                    classNamePrefix="fm-select"
+                                    options={Utils.CalenderFilter}
+                                    value={props.selectedOption}
+                                    onChange={handleCalenderFilterChange}
+                                  />
+                                </div>
+                              </div>
+                              {props.showDatePicker && (
+                                <div className="row mb-2 fm-range">
+                                  <div className="col-12 mb-1">
+                                    <label className="fm-sub-label">
+                                      Custom Range
+                                    </label>
+                                  </div>
+                                  <div className="col-lg-6 col-md-6 col-sm-6 ">
+                                    <span className="fm-range-caption">
+                                      From
+                                    </span>
+                                    <DatePicker
+                                      format="dd/MM/y"
+                                      dayPlaceholder="dd"
+                                      monthPlaceholder="mm"
+                                      yearPlaceholder="yyyy"
+                                      className="engagementCalender"
+                                      label="From Date"
+                                      value={
+                                        props.fromDate
+                                          ? dayjs(props.fromDate)
+                                          : null
+                                      }
+                                      maxDate={dayjs().toDate()}
+                                      onChange={handleFromDateChange}
+                                      renderInput={(params) => (
+                                        <input {...params.inputProps} />
+                                      )}
+                                      popperPlacement="bottom-start"
+                                    />
+                                  </div>
+                                  <div className="col-lg-6 col-md-6 col-sm-6">
+                                    <span className="fm-range-caption">To</span>
+                                    <DatePicker
+                                      format="dd/MM/y"
+                                      dayPlaceholder="dd"
+                                      monthPlaceholder="mm"
+                                      yearPlaceholder="yyyy"
+                                      label="To Date"
+                                      className="engagementCalender"
+                                      value={
+                                        props.toDate
+                                          ? dayjs(props.toDate)
+                                          : null
+                                      }
+                                      minDate={
+                                        props.fromDate
+                                          ? dayjs(props.fromDate).toDate()
+                                          : null
+                                      }
+                                      maxDate={dayjs().toDate()} // Set maxDate to today
+                                      onChange={handleToDateChange}
+                                      renderInput={(params) => (
+                                        <input {...params.inputProps} />
+                                      )}
+                                      popperPlacement="bottom-start"
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
+
+                        <div className="fm-field">
+                          <div className="col-12 mb-1">
                             <label className="fieldset-label">
                               Nature Of Business
                             </label>
@@ -675,20 +785,23 @@ function Filter(props) {
                             <div className="input-group">
                               <Select
                                 className="phone-input-country-code selectDropDown Drop-down-width"
+                                classNamePrefix="fm-select"
                                 options={NatureOfBusinessTypeLookupList}
                                 // value={status}
                                 value={
                                   NatureOfBusinessTypeLookupList.find(
-                                    (item) => item.value == props.businessNatureID
+                                    (item) =>
+                                      item.value == props.businessNatureID,
                                   ) || null
                                 }
                                 onChange={handleChangeNOBType}
                               />
                             </div>
                           </div>
+                        </div>
 
-
-                          <div class="col-12 mb-1">
+                        <div className="fm-field">
+                          <div className="col-12 mb-1">
                             <label className="fieldset-label">
                               {prospectName} Type
                             </label>
@@ -697,133 +810,153 @@ function Filter(props) {
                             <div className="input-group">
                               <Select
                                 className="phone-input-country-code selectDropDown Drop-down-width"
+                                classNamePrefix="fm-select"
                                 options={BusinessTypeLookupList}
                                 value={
                                   BusinessTypeLookupList.find(
-                                    (item) => item.value == props.prospectType
+                                    (item) => item.value == props.prospectType,
                                   ) || null
                                 }
                                 onChange={handleChangeBusinessTypeID}
                               />
                             </div>
                           </div>
-
-                        </>
-                      )}
-                    {(props.ModuleName === "Template" && <>
-                      <div class="col-12 mb-1">
-                        <label className="fieldset-label">
-                          Template  Type
-                        </label>
-                      </div>
-                      <div className="col-lg-12  mb-2 ">
-                        <div className="input-group">
-                          <Select
-                            className="user-role-select"
-                            options={TemplateTypeLookupList}
-                            value={selectedTemplateValue || null}
-                            onChange={handleChangeTemplateType}
-                          />
                         </div>
-                      </div>
-
-                      <div class="col-12 mb-1">
-                        <label className="fieldset-label">
-                          {prospectName} Type
-                        </label>
-                      </div>
-                      <div className="col-lg-12  mb-2 ">
-                        <div className="input-group">
-                          <Select
-                            className="phone-input-country-code selectDropDown Drop-down-width"
-                            options={BusinessTypeLookupList}
-                            value={
-                              BusinessTypeLookupList.find(
-                                (item) => item.value == props.prospectType
-                              ) || null
-                            }
-                            onChange={handleChangeBusinessTypeID}
-                          />
-                        </div>
-                      </div>
-
-                      {showProfessionType && (
-                        <>
-                          <div class="col-12 mb-1">
-                            <label className="fieldset-label">
-
-                              Business Type
-                            </label>
-                          </div>
-                          <div className="col-lg-12  mb-2 ">
-                            <div className="input-group">
-                              <Select
-                                className="user-role-select"
-                                options={OrganisationBusinessTypeLookupList}
-                                value={orgBusinessTypeFilter}
-                                onChange={handleSelectChange}
-
-                              />
-                            </div>
-                          </div>
-                        </>)}
-                    </>)}
-                    {((props.ModuleName === "Reminder" || props.ModuleName === "Other Reminder") && <>
-                      <div class="col-12 mb-1">
-                        <label className="fieldset-label">
-                          Email Address
-                        </label>
-                      </div>
-                      <div className="col-lg-12  mb-2 ">
-                        <div className="input-group">
-                          <Select
-                            className="user-role-select"
-                            options={EmailAddressTypeLookupList}
-                            value={selectedEmailAddressValue || null}
-                            onChange={handleChangeEmailAddress}
-                          />
-                        </div>
-                      </div>
-
-                      <div class="col-12 mb-1">
-                        <label className="fieldset-label">
-                          Trigger Point
-                        </label>
-                      </div>
-                      <div className="col-lg-12  mb-2 ">
-                        <div className="input-group">
-                          <Select
-                            className="user-role-select"
-                            options={TriggerPointTypeLookupList}
-                            value={selectedTriggerPointValue || null}
-                            onChange={handleChangeTriggerPoint}
-                          />
-                        </div>
-                      </div>
-                      {props.DocumentStatus !== undefined &&
-                        <>
-                          <div class="col-12 mb-1">
-                            <label className="fieldset-label">
-                              Document Status
-                            </label>
-                          </div>
-                          <div className="col-lg-12  mb-2 ">
-                            <div className="input-group">
-                              <Select
-                                className="user-role-select"
-                                options={DocumentStatusTypeLookupList}
-                                value={selectedDocumentStatusValue || null}
-                                onChange={handleChangeDocumentStatus}
-                              />
-                            </div>
-                          </div>
-                        </>
-                      }
-                    </>
+                      </>
                     )}
-                    {(props.ModuleName === "Workflow Email Template" || props.ModuleName === "Super Admin Workflow Email Template") &&
+                    {props.ModuleName === "Template" && (
                       <>
-                        <div class="col-12 mb-1">
+                        <div className="fm-field">
+                          <div className="col-12 mb-1">
+                            <label className="fieldset-label">
+                              Template Type
+                            </label>
+                          </div>
+                          <div className="col-lg-12  mb-2 ">
+                            <div className="input-group">
+                              <Select
+                                className="user-role-select"
+                                classNamePrefix="fm-select"
+                                options={TemplateTypeLookupList}
+                                value={selectedTemplateValue || null}
+                                onChange={handleChangeTemplateType}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="fm-field">
+                          <div className="col-12 mb-1">
+                            <label className="fieldset-label">
+                              {prospectName} Type
+                            </label>
+                          </div>
+                          <div className="col-lg-12  mb-2 ">
+                            <div className="input-group">
+                              <Select
+                                className="phone-input-country-code selectDropDown Drop-down-width"
+                                classNamePrefix="fm-select"
+                                options={BusinessTypeLookupList}
+                                value={
+                                  BusinessTypeLookupList.find(
+                                    (item) => item.value == props.prospectType,
+                                  ) || null
+                                }
+                                onChange={handleChangeBusinessTypeID}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {showProfessionType && (
+                          <div className="fm-field">
+                            <div className="col-12 mb-1">
+                              <label className="fieldset-label">
+                                Business Type
+                              </label>
+                            </div>
+                            <div className="col-lg-12  mb-2 ">
+                              <div className="input-group">
+                                <Select
+                                  className="user-role-select"
+                                  classNamePrefix="fm-select"
+                                  options={OrganisationBusinessTypeLookupList}
+                                  value={orgBusinessTypeFilter}
+                                  onChange={handleSelectChange}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {(props.ModuleName === "Reminder" ||
+                      props.ModuleName === "Other Reminder") && (
+                      <>
+                        <div className="fm-field">
+                          <div className="col-12 mb-1">
+                            <label className="fieldset-label">
+                              Email Address
+                            </label>
+                          </div>
+                          <div className="col-lg-12  mb-2 ">
+                            <div className="input-group">
+                              <Select
+                                className="user-role-select"
+                                classNamePrefix="fm-select"
+                                options={EmailAddressTypeLookupList}
+                                value={selectedEmailAddressValue || null}
+                                onChange={handleChangeEmailAddress}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="fm-field">
+                          <div className="col-12 mb-1">
+                            <label className="fieldset-label">
+                              Trigger Point
+                            </label>
+                          </div>
+                          <div className="col-lg-12  mb-2 ">
+                            <div className="input-group">
+                              <Select
+                                className="user-role-select"
+                                classNamePrefix="fm-select"
+                                options={TriggerPointTypeLookupList}
+                                value={selectedTriggerPointValue || null}
+                                onChange={handleChangeTriggerPoint}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        {props.DocumentStatus !== undefined && (
+                          <div className="fm-field">
+                            <div className="col-12 mb-1">
+                              <label className="fieldset-label">
+                                Document Status
+                              </label>
+                            </div>
+                            <div className="col-lg-12  mb-2 ">
+                              <div className="input-group">
+                                <Select
+                                  className="user-role-select"
+                                  classNamePrefix="fm-select"
+                                  options={DocumentStatusTypeLookupList}
+                                  value={selectedDocumentStatusValue || null}
+                                  onChange={handleChangeDocumentStatus}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {(props.ModuleName === "Workflow Email Template" ||
+                      props.ModuleName ===
+                        "Super Admin Workflow Email Template") && (
+                      <div className="fm-field">
+                        <div className="col-12 mb-1">
                           <label className="fieldset-label">
                             Template Type
                           </label>
@@ -832,6 +965,7 @@ function Filter(props) {
                           <div className="input-group">
                             <Select
                               className="user-role-select"
+                              classNamePrefix="fm-select"
                               options={TemplateTypeLookupForReminderList}
                               value={templateTypeFilter}
                               onChange={(e) => {
@@ -840,39 +974,38 @@ function Filter(props) {
                             />
                           </div>
                         </div>
-                      </>
-                    }
-
-
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
             </div>
             {/*Modal body End */}
             {/*Footer body button Start */}
-            <div class="modal-footer">
-              <div class="hstack gap-2 justify-content-end">
+            <div className="modal-footer fm-footer">
+              <div className="hstack gap-2 justify-content-end">
                 <button
                   type="button"
-                  class="btn btn-md btn-light"
+                  className="btn btn-md btn-light fm-btn-clear"
                   onClick={() => ClearFilter()}
                 >
+                  <ResetIcon />
                   <span>{"Clear Filter"}</span>
                 </button>
                 <button
                   type="button"
-                  class="btn btn-md btn-light"
+                  className="btn btn-md btn-light fm-btn-cancel"
                   data-bs-dismiss="modal"
-
                 >
                   <span>{getCrudButtonTextName("Cancel")}</span>
                 </button>
                 <button
                   type="submit"
-                  class="btn btn-md btn-success create-item-btn"
+                  className="btn btn-md btn-success create-item-btn"
                   data-bs-dismiss="modal"
                   onClick={() => props.ApplyFilter()}
                 >
+                  <CheckIcon />
                   <span>{getCrudButtonTextName("Apply", moduleName)}</span>
                 </button>
               </div>
