@@ -2,7 +2,10 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Loader2, Repeat, Package, Check } from "lucide-react";
 
-import { selectQuoteModel } from "../../../redux/reducer/webProposal";
+import {
+  selectQuoteModel,
+  selectThemeSettings,
+} from "../../../redux/reducer/webProposal";
 import {
   selectRecurringServices,
   selectOneOffServices,
@@ -618,11 +621,15 @@ function FeeSection({
     : undefined;
   const titleIconBg = isServiceTitle ? "rgba(255,255,255,0.16)" : `${accent}1F`;
   const titleColor = isServiceTitle ? theme.headerText : accent;
-  const titleBadgeBg = isServiceTitle ? "rgba(255,255,255,0.16)" : `${accent}1A`;
+  const titleBadgeBg = isServiceTitle
+    ? "rgba(255,255,255,0.16)"
+    : `${accent}1A`;
   const titleCountBg = isServiceTitle
     ? "rgba(255,255,255,0.16)"
     : theme.background;
-  const titleCountColor = isServiceTitle ? theme.headerText : theme.textSecondary;
+  const titleCountColor = isServiceTitle
+    ? theme.headerText
+    : theme.textSecondary;
 
   return (
     // Package/Custom Package: no card box, no filled header background —
@@ -1190,6 +1197,8 @@ export default function ProposalPricingTableStep({
   const dispatch = useDispatch();
 
   const quoteModel = useSelector(selectQuoteModel);
+  const themeSettings = useSelector(selectThemeSettings);
+
   const recurringServices = useSelector(selectRecurringServices);
   const oneOffServices = useSelector(selectOneOffServices);
   const recurringSelections = useSelector(selectRecurringSelections);
@@ -1730,7 +1739,7 @@ export default function ProposalPricingTableStep({
   const hasOneOff = oneOffSelectedList.length > 0;
 
   const clientName = quoteModel?.clientName || "Client";
-  const organisationName = quoteModel?.organisationName || "Outbooks";
+  const organisationName = themeSettings?.tradingBusinessName || "Outbooks";
   const preparedOn = new Date().toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
