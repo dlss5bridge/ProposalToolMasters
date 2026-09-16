@@ -1,0 +1,559 @@
+/* VIEW PROSPECT REDESIGN — UI only */
+.view-prospect-redesign {
+  --vpr-bg: #f7f9fc;
+  --vpr-card: #fff;
+  --vpr-heading: #17263d;
+  --vpr-text: #344258;
+  --vpr-muted: #8290a2;
+  --vpr-border: #d8e2eb;
+  --vpr-border-soft: #e8edf3;
+  --vpr-cyan: #18b5d1;
+  width: calc(100% - 18px) !important;
+  max-width: none !important;
+  min-height: 100vh;
+  margin-left: 18px !important;
+  padding: 0 18px !important;
+  display: flex;
+  flex-direction: column;
+  background: var(--vpr-bg) !important;
+  color: var(--vpr-text);
+}
+.view-prospect-redesign,
+.view-prospect-redesign * {
+  box-sizing: border-box;
+}
+.view-prospect-redesign .page-content.page-background,
+.view-prospect-redesign .prospect-bg {
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--vpr-bg) !important;
+}
+.view-prospect-page-header {
+  min-height: 94px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid #dfe6ee;
+  background: var(--vpr-bg);
+}
+.view-prospect-page-heading {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.view-prospect-back-btn {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d2dce7;
+  border-radius: 8px;
+  background: #fff;
+  color: #0788a3;
+  font-size: 18px;
+  box-shadow: none;
+}
+.view-prospect-back-btn:hover {
+  border-color: #9fd9e4;
+  background: #eef9fb;
+}
+.view-prospect-page-title h1 {
+  margin: 0;
+  color: var(--vpr-heading);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.view-prospect-page-title p {
+  max-width: 720px;
+  margin: 4px 0 0;
+  color: var(--vpr-muted);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+.view-prospect-summary-card {
+  min-width: 205px;
+  max-width: 300px;
+  min-height: 56px;
+  padding: 9px 13px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid #d6e0e9;
+  border-radius: 9px;
+  background: #fff;
+}
+.view-prospect-summary-card span {
+  color: #8894a4;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+.view-prospect-summary-card strong {
+  margin-top: 3px;
+  overflow: hidden;
+  color: #23334b;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.view-prospect-content {
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.view-prospect-content > .row {
+  margin: 0 !important;
+}
+.view-prospect-content > .row > .col-lg-12 {
+  padding: 0 !important;
+}
+.view-prospect-main-card {
+  margin-top: 14px !important;
+  margin-bottom: 16px !important;
+  overflow: visible !important;
+  border: 1px solid var(--vpr-border) !important;
+  border-radius: 13px !important;
+  background: #fff !important;
+  box-shadow:
+    0 2px 10px rgba(15, 27, 51, 0.025),
+    0 8px 22px rgba(15, 27, 51, 0.02) !important;
+}
+.view-prospect-main-card > .card-body {
+  padding: 0 !important;
+}
+.view-prospect-customer-list,
+.view-prospect-tabs-shell,
+.view-prospect-tab-card,
+.view-prospect-tab-card > .tab-content {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+.view-prospect-tabs-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.view-prospect-tab-card {
+  margin: 0 !important;
+  overflow: visible !important;
+}
+.view-prospect-tab-card > .nav-tabs {
+  min-height: 62px;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 0 !important;
+  border-bottom: 1px solid var(--vpr-border) !important;
+  background: #fff;
+}
+.view-prospect-tab-card .nav-tabs .nav-item {
+  display: flex;
+  align-items: stretch;
+  margin: 0 !important;
+}
+.view-prospect-tab-card .nav-tabs .nav-link {
+  position: relative;
+  min-height: 62px;
+  padding: 0 12px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #637086 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+  box-shadow: none !important;
+}
+.view-prospect-tab-card .nav-tabs .nav-link:after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  bottom: 0;
+  left: 8px;
+  height: 2px;
+  border-radius: 3px 3px 0 0;
+  background: transparent;
+}
+.view-prospect-tab-card .nav-tabs .nav-link.active {
+  color: #1b2c43 !important;
+}
+.view-prospect-tab-card .nav-tabs .nav-link.active:after {
+  background: var(--vpr-cyan);
+}
+.view-prospect-tab-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #607187;
+  font-size: 14px;
+}
+.view-prospect-tab-card .nav-link.active .view-prospect-tab-icon {
+  color: #0788a3;
+}
+.view-prospect-tab-card > .tab-content {
+  padding: 16px !important;
+  overflow: visible !important;
+  background: #f8fafc;
+}
+.view-prospect-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.view-prospect-info-card {
+  overflow: hidden;
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+  background: #fff;
+}
+.view-prospect-company-card {
+  grid-column: 1/-1;
+}
+.view-prospect-info-card-head {
+  min-height: 72px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #e1e7ee;
+}
+.view-prospect-info-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #eaf8fb;
+  color: #0788a3;
+  font-size: 16px;
+}
+.view-prospect-info-card-head h3 {
+  margin: 0;
+  color: #213149;
+  font-size: 12px;
+  font-weight: 700;
+}
+.view-prospect-info-card-head p {
+  margin: 3px 0 0;
+  color: #8995a5;
+  font-size: 9.5px;
+  line-height: 1.4;
+}
+.view-prospect-info-card-body {
+  padding: 12px 16px 14px;
+}
+.view-prospect-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+}
+.view-prospect-field {
+  min-width: 0;
+  min-height: 58px;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid var(--vpr-border-soft);
+}
+.view-prospect-field-wide {
+  grid-column: 1/-1;
+}
+.view-prospect-field span {
+  margin-bottom: 4px;
+  color: #8692a3;
+  font-size: 8.5px;
+  font-weight: 500;
+}
+.view-prospect-field strong {
+  overflow-wrap: anywhere;
+  color: #273850;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.view-prospect-section-intro {
+  min-height: 52px;
+  margin-bottom: 10px;
+  padding: 0 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.view-prospect-section-intro h3 {
+  margin: 0;
+  color: #213149;
+  font-size: 13px;
+  font-weight: 700;
+}
+.view-prospect-section-intro p {
+  margin: 3px 0 0;
+  color: #8591a2;
+  font-size: 9.5px;
+}
+.view-prospect-count-pill {
+  min-height: 27px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #eef8fa;
+  color: #087f98;
+  font-size: 8.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.view-prospect-people-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.view-prospect-person-card {
+  overflow: hidden;
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(15, 27, 51, 0.025);
+}
+.view-prospect-person-head {
+  min-height: 72px;
+  padding: 12px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #e4eaf0;
+  background: #fbfcfe;
+}
+.view-prospect-person-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.view-prospect-person-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e8f7fa;
+  color: #0788a3;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.view-prospect-person-title {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.view-prospect-person-title small {
+  color: #8a96a6;
+  font-size: 8px;
+}
+.view-prospect-person-title strong {
+  margin-top: 2px;
+  overflow: hidden;
+  color: #22334b;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.view-prospect-authorised-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.view-prospect-authorised-wrap .MuiSwitch-root {
+  transform: scale(0.78);
+  transform-origin: center;
+}
+.view-prospect-authorised-pill {
+  min-height: 25px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.view-prospect-authorised-pill.is-authorised {
+  background: #eaf8f3;
+  color: #18845f;
+}
+.view-prospect-authorised-pill.is-not-authorised {
+  background: #f1f4f7;
+  color: #718095;
+}
+.view-prospect-person-body {
+  padding: 8px 15px 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+.view-prospect-person-field {
+  min-width: 0;
+  min-height: 60px;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-bottom: 1px solid var(--vpr-border-soft);
+}
+.view-prospect-person-field-wide {
+  grid-column: 1/-1;
+}
+.view-prospect-person-field-icon {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: #f0f8fa;
+  color: #0788a3;
+  font-size: 12px;
+}
+.view-prospect-person-field > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.view-prospect-person-field small {
+  color: #8a96a6;
+  font-size: 8px;
+}
+.view-prospect-person-field strong {
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+  color: #2a3b52;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+html body .view-prospect-redesign .view-prospect-footer-wrap {
+  position: static !important;
+  inset: auto !important;
+  flex: 0 0 auto !important;
+  display: block !important;
+  clear: both !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--vpr-bg) !important;
+  transform: none !important;
+  z-index: auto !important;
+}
+html body .view-prospect-redesign .view-prospect-footer-wrap > *,
+html body .view-prospect-redesign .view-prospect-footer-wrap footer,
+html body .view-prospect-redesign .view-prospect-footer-wrap .footer,
+html body .view-prospect-redesign .view-prospect-footer-wrap .fixed-bottom,
+html body .view-prospect-redesign .view-prospect-footer-wrap [class*="footer"] {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  z-index: auto !important;
+}
+.view-prospect-redesign #back-to-top {
+  z-index: 20;
+}
+@media (max-width: 1100px) {
+  .view-prospect-people-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 767px) {
+  .view-prospect-redesign {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 0 8px !important;
+  }
+  .view-prospect-page-header {
+    min-height: auto;
+    padding: 12px 8px;
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .view-prospect-page-heading {
+    align-items: flex-start;
+  }
+  .view-prospect-page-title h1 {
+    font-size: 20px;
+  }
+  .view-prospect-summary-card {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+  .view-prospect-tab-card > .nav-tabs {
+    min-height: 56px;
+    padding: 0 8px !important;
+  }
+  .view-prospect-tab-card .nav-tabs .nav-link {
+    min-height: 56px;
+    padding: 0 9px !important;
+    font-size: 10px !important;
+  }
+  .view-prospect-tab-card > .tab-content {
+    padding: 10px !important;
+  }
+  .view-prospect-info-grid,
+  .view-prospect-field-grid,
+  .view-prospect-person-body {
+    grid-template-columns: 1fr;
+  }
+  .view-prospect-company-card,
+  .view-prospect-field-wide,
+  .view-prospect-person-field-wide {
+    grid-column: auto;
+  }
+  .view-prospect-section-intro {
+    min-height: auto;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .view-prospect-person-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .view-prospect-authorised-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

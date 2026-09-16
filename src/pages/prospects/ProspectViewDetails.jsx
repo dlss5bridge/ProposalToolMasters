@@ -11,6 +11,7 @@ import { GetIncorporatedInLookUpList } from "../../redux/Services/Master/Incorpo
 import Footer from "../../components/Footer";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import "./Prospects.css";
+import "./ProspectViewDetails-redesign.css";
 const ProspectViewDetails = () => {
   const [title, setTitle] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -156,7 +157,7 @@ const ProspectViewDetails = () => {
           let officerArray = [];
           ModelData.officersList.forEach((item) => {
             const PhoneSelectedValue = CountryList.find(
-              (countryCode) => item.countryCodeID == countryCode.value
+              (countryCode) => item.countryCodeID == countryCode.value,
             );
             let officerObj = {
               officerID: item.officerID,
@@ -215,7 +216,7 @@ const ProspectViewDetails = () => {
 
           setCompanyForm(companyObj);
           const fullAddress = concatenateFullAddress(
-            ModelData.companyDetails?.companyAddress
+            ModelData.companyDetails?.companyAddress,
           );
           setConcatenatedRegisterAddress(fullAddress);
 
@@ -228,7 +229,7 @@ const ProspectViewDetails = () => {
                 officersFullAddress: fullAddressConcatenation,
               };
               CorrespondenceOrResidentialAddress.push(
-                CorrespondenceOrResidentialAddressObj
+                CorrespondenceOrResidentialAddressObj,
               );
             } else {
               CorrespondenceOrResidentialAddress.push({
@@ -241,13 +242,13 @@ const ProspectViewDetails = () => {
           if (ModelData.tradingAddress) {
             //const addPart = (part) => (part ? `${part}, ` : "");
             const fullAddress = concatenateFullAddress(
-              ModelData.tradingAddress
+              ModelData.tradingAddress,
             );
             //`${addPart(ModelData.tradingAddress?.premises)}${addPart(ModelData.tradingAddress?.addressLine1)}${addPart(ModelData.tradingAddress?.addressLine2)}${addPart(ModelData.tradingAddress?.locality)}${addPart(ModelData.tradingAddress?.region)}${addPart(ModelData.tradingAddress?.country)}${ModelData.tradingAddress?.postcode || ""}`;
             setConcatenatedTradingAddress(fullAddress);
           }
           const IncorporateValue = incorporateInListData.filter(
-            (item) => ModelData.companyDetails.incInID == item.incInID
+            (item) => ModelData.companyDetails.incInID == item.incInID,
           );
 
           setIncorporateValue(IncorporateValue[0].incInName);
@@ -265,9 +266,9 @@ const ProspectViewDetails = () => {
   const concatenateFullAddress = (address) => {
     const addPart = (part) => (part ? `${part}, ` : "");
     let concatenatedAddress = `${addPart(address?.addressLine1)}${addPart(
-      address?.addressLine2
+      address?.addressLine2,
     )}${addPart(address?.locality)}${addPart(address?.region)}${addPart(
-      address?.country
+      address?.country,
     )}${addPart(address?.countryName)}${address?.postcode || ""}`;
 
     // Remove trailing comma, if present
@@ -278,529 +279,573 @@ const ProspectViewDetails = () => {
   };
 
   return (
-    <div className="container">
-      {/* <div class="main-content"> */}
-        <div class="page-content page-background prospect-bg">
-          {/* <div class="page-info-header page-info-strip"> */}
-            <div class="container">
-              <div className="row">
-                <div className="col-md-6 col-sm-6 col-6">
-                  <div class="page-title-cls">{prospectName}</div>
-                </div>
-                <div class="col-md-6 col-sm-6 col-6">
-                  <div
-                    class="d-flex justify-content-sm-end add-new-btn"
-                    style={{ float: "right" }}
-                  >
-                    <Tooltip title={"Back"}>
-                      <button
-                        className="btn btn-md btn-success create-item-btn"
-                        onClick={() => navigate("/prospects")}
-                      >
-                        <i className="fa fa-arrow-left d-md-none"></i>
-                        <span className="d-none d-sm-inline">Back</span>
-                      </button>
-                    </Tooltip>
-                  </div>
-                </div>
-              </div>
+    <div className="container view-prospect-redesign">
+      <div className="page-content page-background prospect-bg">
+        <div className="view-prospect-page-header">
+          <div className="view-prospect-page-heading">
+            <Tooltip title="Back">
+              <button
+                type="button"
+                className="view-prospect-back-btn"
+                onClick={() => navigate("/prospects")}
+              >
+                <i className="ri-arrow-left-line"></i>
+              </button>
+            </Tooltip>
+
+            <div className="view-prospect-page-title">
+              <h1>{prospectName} Details</h1>
+              <p>
+                Review prospect information, trading details, company
+                information and associated people.
+              </p>
             </div>
-          {/* </div> */}
-          <div class="container-fluid ">
-            <div class="row">
-              <div className="col-lg-12">
-                <div class="card mt-4">
-                  <div class="card-body">
-                    <div id="customerList">
-                      <div class="row g-4 mb-3"></div>
-                      <div class="search-box ms-2 width-searchbox prospect-form">
-                        <div class=" table-card  mb-3 Height_View_scroll">
-                          <ul class="nav nav-tabs mb-3">
-                            <li class="nav-item">
-                              <a
-                                class="nav-link tab_nav active"
-                                data-bs-toggle="tab"
-                                href="#base-justified-home"
-                                role="tab"
-                                aria-selected="false"
-                              >
-                                {prospectName} Details
-                              </a>
-                            </li>
-                            {basicInfo.originalBusinessTypeID ===
-                              CLIENT_TYPES.Individual ? null : (
-                              <li class="nav-item">
-                                {basicInfo.originalBusinessTypeID ===
-                                  CLIENT_TYPES.Partnership ? (
-                                  <a
-                                    class="nav-link tab_nav"
-                                    data-bs-toggle="tab"
-                                    href="#product"
-                                    role="tab"
-                                    aria-selected="false"
-                                  >
-                                    Partner Details
-                                  </a>
-                                ) : null}
-                                {basicInfo.originalBusinessTypeID ===
-                                  CLIENT_TYPES.Sole_Trader ? (
-                                  <a
-                                    class="nav-link tab_nav"
-                                    data-bs-toggle="tab"
-                                    href="#product"
-                                    role="tab"
-                                    aria-selected="false"
-                                  >
-                                    Sole Trader Details
-                                  </a>
-                                ) : null}
-                                {basicInfo.originalBusinessTypeID ===
-                                  CLIENT_TYPES.LLP ||
-                                  basicInfo.originalBusinessTypeID ===
-                                  CLIENT_TYPES.Company ? (
-                                  <a
-                                    class="nav-link tab_nav"
-                                    data-bs-toggle="tab"
-                                    href="#product"
-                                    role="tab"
-                                    aria-selected="false"
-                                  >
-                                    {" "}
-                                    Officer Details
-                                  </a>
-                                ) : null}
-                              </li>
-                            )}
-                          </ul>
-                          <div class="tab-content  text-muted">
-                            <div
-                              class="tab-pane active"
-                              id="base-justified-home"
-                              role="tabpanel"
+          </div>
+
+          <div className="view-prospect-summary-card">
+            <span>{prospectName?.toUpperCase()} TYPE</span>
+            <strong>{basicInfo.businessTypeName || "-"}</strong>
+          </div>
+        </div>
+
+        <div className="container-fluid view-prospect-content">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="card view-prospect-main-card">
+                <div className="card-body">
+                  <div
+                    id="customerList"
+                    className="view-prospect-customer-list"
+                  >
+                    <div className="search-box ms-2 width-searchbox prospect-form view-prospect-tabs-shell">
+                      <div className="table-card mb-3 Height_View_scroll view-prospect-tab-card">
+                        <ul className="nav nav-tabs mb-3">
+                          <li className="nav-item">
+                            <a
+                              className="nav-link tab_nav active"
+                              data-bs-toggle="tab"
+                              href="#base-justified-home"
+                              role="tab"
+                              aria-selected="false"
                             >
-                              <table class="table table-striped fs-13 view-details-table">
-                                <tbody>
-                                  <tr>
-                                    <td>{prospectName} Type</td>
-                                    <td class="text-end">
-                                      {basicInfo.businessTypeName}
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="break-table" colspan="2"></td>
-                                  </tr>
+                              <span className="view-prospect-tab-icon">
+                                <i className="ri-file-info-line"></i>
+                              </span>
+                              <span>{prospectName} Details</span>
+                            </a>
+                          </li>
+
+                          {basicInfo.originalBusinessTypeID ===
+                          CLIENT_TYPES.Individual ? null : (
+                            <li className="nav-item">
+                              {basicInfo.originalBusinessTypeID ===
+                              CLIENT_TYPES.Partnership ? (
+                                <a
+                                  className="nav-link tab_nav"
+                                  data-bs-toggle="tab"
+                                  href="#product"
+                                  role="tab"
+                                  aria-selected="false"
+                                >
+                                  <span className="view-prospect-tab-icon">
+                                    <i className="ri-team-line"></i>
+                                  </span>
+                                  <span>Partner Details</span>
+                                </a>
+                              ) : null}
+
+                              {basicInfo.originalBusinessTypeID ===
+                              CLIENT_TYPES.Sole_Trader ? (
+                                <a
+                                  className="nav-link tab_nav"
+                                  data-bs-toggle="tab"
+                                  href="#product"
+                                  role="tab"
+                                  aria-selected="false"
+                                >
+                                  <span className="view-prospect-tab-icon">
+                                    <i className="ri-user-3-line"></i>
+                                  </span>
+                                  <span>Sole Trader Details</span>
+                                </a>
+                              ) : null}
+
+                              {basicInfo.originalBusinessTypeID ===
+                                CLIENT_TYPES.LLP ||
+                              basicInfo.originalBusinessTypeID ===
+                                CLIENT_TYPES.Company ? (
+                                <a
+                                  className="nav-link tab_nav"
+                                  data-bs-toggle="tab"
+                                  href="#product"
+                                  role="tab"
+                                  aria-selected="false"
+                                >
+                                  <span className="view-prospect-tab-icon">
+                                    <i className="ri-user-star-line"></i>
+                                  </span>
+                                  <span>Officer Details</span>
+                                </a>
+                              ) : null}
+                            </li>
+                          )}
+                        </ul>
+
+                        <div className="tab-content text-muted">
+                          <div
+                            className="tab-pane active"
+                            id="base-justified-home"
+                            role="tabpanel"
+                          >
+                            <div className="view-prospect-info-grid">
+                              <section className="view-prospect-info-card">
+                                <div className="view-prospect-info-card-head">
+                                  <span className="view-prospect-info-icon">
+                                    <i className="ri-information-line"></i>
+                                  </span>
+                                  <div>
+                                    <h3>Basic Information</h3>
+                                    <p>
+                                      Core prospect and registration details.
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="view-prospect-info-card-body view-prospect-field-grid">
+                                  <div className="view-prospect-field">
+                                    <span>{prospectName} Type</span>
+                                    <strong>
+                                      {basicInfo.businessTypeName || "-"}
+                                    </strong>
+                                  </div>
+
                                   {basicInfo.originalBusinessTypeID ===
                                     CLIENT_TYPES.Individual ||
-                                    basicInfo.originalBusinessTypeID ===
+                                  basicInfo.originalBusinessTypeID ===
                                     CLIENT_TYPES.Sole_Trader ||
-                                    basicInfo.originalBusinessTypeID ===
+                                  basicInfo.originalBusinessTypeID ===
                                     CLIENT_TYPES.Partnership ? null : (
                                     <>
-                                      <tr>
-                                        <td>VAT Registered</td>
-                                        <td class="text-end">
+                                      <div className="view-prospect-field">
+                                        <span>VAT Registered</span>
+                                        <strong>
                                           {basicInfo.VATReg === 0 ? "Yes" : ""}
                                           {basicInfo.VATReg === 1 ? "No" : ""}
-                                        </td>
-                                      </tr>
+                                        </strong>
+                                      </div>
                                       {basicInfo.VATNumber !== null && (
-                                        <tr>
-                                          <td>VAT Number</td>
-                                          <td class="text-end">
-                                            {basicInfo.VATNumber}
-                                          </td>
-                                        </tr>
+                                        <div className="view-prospect-field">
+                                          <span>VAT Number</span>
+                                          <strong>{basicInfo.VATNumber}</strong>
+                                        </div>
                                       )}
-
-                                      <tr>
-                                        <td>Website</td>
-                                        <td class="text-end">
-                                          {basicInfo.website}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td
-                                          class="break-table"
-                                          colspan="2"
-                                        ></td>
-                                      </tr>
-                                      <tr>
-                                        <th colspan="2">Trading Details</th>
-                                      </tr>
-                                      <tr>
-                                        <td>Trading Name</td>
-                                        <td class="text-end">
-                                          {basicInfo.tradingName}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Trading Address</td>
-                                        <td class="text-end">
-                                          {concatenatedTradingAddress}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Nature Of Business</td>
-                                        <td class="text-end">
-                                          {basicInfo.businessNatureNames}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td
-                                          class="break-table"
-                                          colspan="2"
-                                        ></td>
-                                      </tr>
-
-                                      <tr>
-                                        <th colspan="2">Company Details</th>
-                                      </tr>
-                                      <tr>
-                                        <td>Company Name</td>
-                                        <td class="text-end">
-                                          {companyForm.companyName}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Entity Type</td>
-                                        <td class="text-end">
-                                          {companyForm.companyType}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Company Number</td>
-                                        <td class="text-end">
-                                          {" "}
-                                          {companyForm.companyNumber}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Company Incorporated In</td>
-                                        <td class="text-end">
-                                          {IncorporatedValue}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Company Incorporation Date</td>
-                                        <td class="text-end">
-                                          {" "}
-                                          {companyForm.incorporationDate}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>
-                                          Company Registered Office Address
-                                        </td>
-                                        <td class="text-end">
-                                          {concatenatedRegisterAddress}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td
-                                          class="break-table"
-                                          colspan="2"
-                                        ></td>
-                                      </tr>
+                                      <div className="view-prospect-field">
+                                        <span>Website</span>
+                                        <strong>
+                                          {basicInfo.website || "-"}
+                                        </strong>
+                                      </div>
                                     </>
                                   )}
-                                  {basicInfo.originalBusinessTypeID ===
-                                    CLIENT_TYPES.Individual ? (
-                                    <>
-                                      <tr>
-                                        <td>First Name</td>
-                                        <td class="text-end">
-                                          {officersForm[0]?.firstName}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Last Name</td>
-                                        <td class="text-end">
-                                          {officersForm[0]?.lastName}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Phone</td>
-                                        <td class="text-end">
-                                          {officersForm[0]?.phoneNo}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>{prospectName} Email</td>
-                                        <td class="text-end">
-                                          {officersForm[0]?.emailID}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Website</td>
-                                        <td class="text-end">
-                                          {basicInfo.website}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Residential Address</td>
-                                        <td class="text-end">
-                                          {
-                                            concatenatedResidentialAddress[0]
-                                              ?.officersFullAddress
-                                          }
-                                        </td>
-                                      </tr>
-                                    </>
-                                  ) : null}
-                                  {basicInfo.originalBusinessTypeID ===
+
+                                  {(basicInfo.originalBusinessTypeID ===
                                     CLIENT_TYPES.Sole_Trader ||
                                     basicInfo.originalBusinessTypeID ===
-                                    CLIENT_TYPES.Partnership ? (
+                                      CLIENT_TYPES.Partnership) && (
                                     <>
-                                      {basicInfo.VATReg === 0 ? (
-                                        <tr>
-                                          <td>VAT Registered</td>
-                                          <td class="text-end">Yes</td>
-                                        </tr>
-                                      ) : (
-                                        <tr>
-                                          <td>VAT Registered</td>
-                                          <td class="text-end">No</td>
-                                        </tr>
-                                      )}
+                                      <div className="view-prospect-field">
+                                        <span>VAT Registered</span>
+                                        <strong>
+                                          {basicInfo.VATReg === 0
+                                            ? "Yes"
+                                            : "No"}
+                                        </strong>
+                                      </div>
                                       {basicInfo.VATNumber !== null && (
-                                        <tr>
-                                          <td>VAT Number</td>
-                                          <td class="text-end">
-                                            {basicInfo.VATNumber}
-                                          </td>
-                                        </tr>
+                                        <div className="view-prospect-field">
+                                          <span>VAT Number</span>
+                                          <strong>{basicInfo.VATNumber}</strong>
+                                        </div>
                                       )}
-                                      <tr>
-                                        <td>Website</td>
-                                        <td class="text-end">
-                                          {basicInfo.website}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td
-                                          class="break-table"
-                                          colspan="2"
-                                        ></td>
-                                      </tr>
-                                      <tr>
-                                        <th colspan="2">Trading Details</th>
-                                      </tr>
-                                      <tr>
-                                        <td>Trading Name</td>
-                                        <td class="text-end">
-                                          {basicInfo.tradingName}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Trading Address</td>
-                                        <td class="text-end">
-                                          {concatenatedTradingAddress}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td>Nature Of Business</td>
-                                        <td class="text-end">
-                                          {basicInfo.businessNatureNames}
-                                        </td>
-                                      </tr>
+                                      <div className="view-prospect-field">
+                                        <span>Website</span>
+                                        <strong>
+                                          {basicInfo.website || "-"}
+                                        </strong>
+                                      </div>
                                     </>
-                                  ) : null}
-                                </tbody>
-                              </table>
+                                  )}
+
+                                  {basicInfo.originalBusinessTypeID ===
+                                    CLIENT_TYPES.Individual && (
+                                    <>
+                                      <div className="view-prospect-field">
+                                        <span>First Name</span>
+                                        <strong>
+                                          {officersForm[0]?.firstName || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field">
+                                        <span>Last Name</span>
+                                        <strong>
+                                          {officersForm[0]?.lastName || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field">
+                                        <span>Phone</span>
+                                        <strong>
+                                          {officersForm[0]?.phoneNo || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field">
+                                        <span>{prospectName} Email</span>
+                                        <strong>
+                                          {officersForm[0]?.emailID || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field">
+                                        <span>Website</span>
+                                        <strong>
+                                          {basicInfo.website || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field view-prospect-field-wide">
+                                        <span>Residential Address</span>
+                                        <strong>
+                                          {concatenatedResidentialAddress[0]
+                                            ?.officersFullAddress || "-"}
+                                        </strong>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </section>
+
+                              {basicInfo.originalBusinessTypeID !==
+                                CLIENT_TYPES.Individual && (
+                                <section className="view-prospect-info-card">
+                                  <div className="view-prospect-info-card-head">
+                                    <span className="view-prospect-info-icon">
+                                      <i className="ri-store-2-line"></i>
+                                    </span>
+                                    <div>
+                                      <h3>Trading Details</h3>
+                                      <p>
+                                        Trading identity, address and business
+                                        activity.
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="view-prospect-info-card-body view-prospect-field-grid">
+                                    <div className="view-prospect-field">
+                                      <span>Trading Name</span>
+                                      <strong>
+                                        {basicInfo.tradingName || "-"}
+                                      </strong>
+                                    </div>
+                                    <div className="view-prospect-field">
+                                      <span>Nature Of Business</span>
+                                      <strong>
+                                        {basicInfo.businessNatureNames || "-"}
+                                      </strong>
+                                    </div>
+                                    <div className="view-prospect-field view-prospect-field-wide">
+                                      <span>Trading Address</span>
+                                      <strong>
+                                        {concatenatedTradingAddress || "-"}
+                                      </strong>
+                                    </div>
+                                  </div>
+                                </section>
+                              )}
+
+                              {basicInfo.originalBusinessTypeID !==
+                                CLIENT_TYPES.Individual &&
+                                basicInfo.originalBusinessTypeID !==
+                                  CLIENT_TYPES.Sole_Trader &&
+                                basicInfo.originalBusinessTypeID !==
+                                  CLIENT_TYPES.Partnership && (
+                                  <section className="view-prospect-info-card view-prospect-company-card">
+                                    <div className="view-prospect-info-card-head">
+                                      <span className="view-prospect-info-icon">
+                                        <i className="ri-building-4-line"></i>
+                                      </span>
+                                      <div>
+                                        <h3>Company Details</h3>
+                                        <p>
+                                          Registered company and incorporation
+                                          information.
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="view-prospect-info-card-body view-prospect-field-grid">
+                                      <div className="view-prospect-field">
+                                        <span>Company Name</span>
+                                        <strong>
+                                          {companyForm.companyName || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field">
+                                        <span>Entity Type</span>
+                                        <strong>
+                                          {companyForm.companyType || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field">
+                                        <span>Company Number</span>
+                                        <strong>
+                                          {companyForm.companyNumber || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field">
+                                        <span>Company Incorporated In</span>
+                                        <strong>
+                                          {IncorporatedValue || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field">
+                                        <span>Company Incorporation Date</span>
+                                        <strong>
+                                          {companyForm.incorporationDate || "-"}
+                                        </strong>
+                                      </div>
+                                      <div className="view-prospect-field view-prospect-field-wide">
+                                        <span>
+                                          Company Registered Office Address
+                                        </span>
+                                        <strong>
+                                          {concatenatedRegisterAddress || "-"}
+                                        </strong>
+                                      </div>
+                                    </div>
+                                  </section>
+                                )}
                             </div>
-                            {/* New Tab Start */}
-                            {/* Officer details */}
-                            <div class="tab-pane" id="product" role="tabpanel">
-                              <div
-                                class="tab-pane active"
-                                id="base-justified-home"
-                                role="tabpanel"
-                              >
-                                <table className="table table-striped fs-13 view-details-table">
-                                  <tbody>
-                                    {officersForm.map((prospect, index) => (
-                                      <React.Fragment key={index}>
-                                        <tr>
-                                          {basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Partnership ? (
-                                            <th colspan="2">
-                                              Partner {index + 1}
-                                            </th>
-                                          ) : null}
-                                          {basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Sole_Trader
-                                            ? null
-                                            : null}
-                                          {basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.LLP ||
-                                            basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Company ? (
-                                            <th colspan="2">
-                                              Officer {index + 1}
-                                            </th>
-                                          ) : null}
-                                        </tr>
-                                        {(basicInfo.originalBusinessTypeID ===
-                                          CLIENT_TYPES.LLP ||
-                                          basicInfo.originalBusinessTypeID ===
-                                          CLIENT_TYPES.Company ||
-                                          basicInfo.originalBusinessTypeID ===
-                                          CLIENT_TYPES.Partnership) && (
-                                            <tr>
-                                              <td>Authorised </td>
-                                              <td className="text-end">
-                                                {officersForm[index]
-                                                  ?.isAuthorisedSignatory
-                                                  ? "Yes"
-                                                  : "NO"}
-                                                <Switch
-                                                  checked={
-                                                    officersForm[index]
-                                                      ?.isAuthorisedSignatory
-                                                  }
-                                                  disabled
-                                                  color="primary"
-                                                />
-                                              </td>
-                                            </tr>
+                          </div>
+
+                          <div
+                            className="tab-pane"
+                            id="product"
+                            role="tabpanel"
+                          >
+                            <div className="view-prospect-people-wrap">
+                              <div className="view-prospect-section-intro">
+                                <div>
+                                  <h3>
+                                    {basicInfo.originalBusinessTypeID ===
+                                    CLIENT_TYPES.Partnership
+                                      ? "Partner Details"
+                                      : basicInfo.originalBusinessTypeID ===
+                                          CLIENT_TYPES.Sole_Trader
+                                        ? "Sole Trader Details"
+                                        : "Officer Details"}
+                                  </h3>
+                                  <p>
+                                    Review contact, role, authorisation and
+                                    address information.
+                                  </p>
+                                </div>
+                                <span className="view-prospect-count-pill">
+                                  {officersForm.length}{" "}
+                                  {officersForm.length === 1
+                                    ? "Person"
+                                    : "People"}
+                                </span>
+                              </div>
+
+                              <div className="view-prospect-people-grid">
+                                {officersForm.map((prospect, index) => (
+                                  <section
+                                    className="view-prospect-person-card"
+                                    key={index}
+                                  >
+                                    <div className="view-prospect-person-head">
+                                      <div className="view-prospect-person-identity">
+                                        <span className="view-prospect-person-avatar">
+                                          {officersForm[
+                                            index
+                                          ].firstName?.charAt(0)}
+                                          {officersForm[index].lastName?.charAt(
+                                            0,
                                           )}
-
-                                        <tr>
-                                          <td>First Name</td>
-                                          <td className="text-end">
-                                            {officersForm[index].firstName}
-                                          </td>
-                                        </tr>
-
-                                        <tr>
-                                          <td>Last Name</td>
-                                          <td className="text-end">
+                                        </span>
+                                        <div className="view-prospect-person-title">
+                                          <small>
+                                            {basicInfo.originalBusinessTypeID ===
+                                            CLIENT_TYPES.Partnership
+                                              ? `Partner ${index + 1}`
+                                              : basicInfo.originalBusinessTypeID ===
+                                                  CLIENT_TYPES.Sole_Trader
+                                                ? "Sole Trader"
+                                                : `Officer ${index + 1}`}
+                                          </small>
+                                          <strong>
+                                            {officersForm[index].firstName}{" "}
                                             {officersForm[index].lastName}
-                                          </td>
-                                        </tr>
+                                          </strong>
+                                        </div>
+                                      </div>
 
-                                        <tr>
-                                          <td>Phone</td>
-                                          <td className="text-end">
-                                            {officersForm[index].phoneNo}
-                                          </td>
-                                        </tr>
-
-                                        <tr>
-                                          <td>Email</td>
-                                          <td className="text-end">
-                                            {officersForm[index].emailID}
-                                          </td>
-                                        </tr>
-                                        {basicInfo.originalBusinessTypeID ===
-                                          CLIENT_TYPES.Sole_Trader ||
-                                          basicInfo.originalBusinessTypeID ===
-                                          CLIENT_TYPES.Partnership ? null : (
-                                          <>
-                                            {" "}
-                                            <tr>
-                                              <td>Role</td>
-                                              <td className="text-end">
-                                                {
-                                                  officersForm[index]
-                                                    .officerRole
-                                                }
-                                              </td>
-                                            </tr>
-                                            <tr>
-                                              <td>Appointed On</td>
-                                              <td className="text-end">
-                                                {
-                                                  officersForm[index]
-                                                    .appointedOn
-                                                }
-                                              </td>
-                                            </tr>
-                                          </>
-                                        )}
-                                        <tr>
-                                          {(basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Sole_Trader ||
-                                            basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Other ||
-                                            basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Partnership) && (
-                                              <td>Residential Address</td>
-                                            )}
-                                          {(basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.Company ||
-                                            basicInfo.originalBusinessTypeID ===
-                                            CLIENT_TYPES.LLP) && (
-                                              <td>Correspondence Address</td>
-                                            )}
-
-                                          <td className="text-end">
-                                            {
-                                              concatenatedResidentialAddress[
-                                                index
-                                              ]?.officersFullAddress
+                                      {(basicInfo.originalBusinessTypeID ===
+                                        CLIENT_TYPES.LLP ||
+                                        basicInfo.originalBusinessTypeID ===
+                                          CLIENT_TYPES.Company ||
+                                        basicInfo.originalBusinessTypeID ===
+                                          CLIENT_TYPES.Partnership) && (
+                                        <div className="view-prospect-authorised-wrap">
+                                          <span
+                                            className={`view-prospect-authorised-pill ${
+                                              officersForm[index]
+                                                ?.isAuthorisedSignatory
+                                                ? "is-authorised"
+                                                : "is-not-authorised"
+                                            }`}
+                                          >
+                                            {officersForm[index]
+                                              ?.isAuthorisedSignatory
+                                              ? "Authorised"
+                                              : "Not Authorised"}
+                                          </span>
+                                          <Switch
+                                            checked={
+                                              officersForm[index]
+                                                ?.isAuthorisedSignatory
                                             }
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td
-                                            class="break-table"
-                                            colspan="2"
-                                          ></td>
-                                        </tr>
-                                      </React.Fragment>
-                                    ))}
-                                  </tbody>
-                                </table>
+                                            disabled
+                                            color="primary"
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="view-prospect-person-body">
+                                      <div className="view-prospect-person-field">
+                                        <span className="view-prospect-person-field-icon">
+                                          <i className="ri-user-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>First Name</small>
+                                          <strong>
+                                            {officersForm[index].firstName ||
+                                              "-"}
+                                          </strong>
+                                        </div>
+                                      </div>
+                                      <div className="view-prospect-person-field">
+                                        <span className="view-prospect-person-field-icon">
+                                          <i className="ri-user-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Last Name</small>
+                                          <strong>
+                                            {officersForm[index].lastName ||
+                                              "-"}
+                                          </strong>
+                                        </div>
+                                      </div>
+                                      <div className="view-prospect-person-field">
+                                        <span className="view-prospect-person-field-icon">
+                                          <i className="ri-phone-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Phone</small>
+                                          <strong>
+                                            {officersForm[index].phoneNo || "-"}
+                                          </strong>
+                                        </div>
+                                      </div>
+                                      <div className="view-prospect-person-field">
+                                        <span className="view-prospect-person-field-icon">
+                                          <i className="ri-mail-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>Email</small>
+                                          <strong>
+                                            {officersForm[index].emailID || "-"}
+                                          </strong>
+                                        </div>
+                                      </div>
+
+                                      {basicInfo.originalBusinessTypeID ===
+                                        CLIENT_TYPES.Sole_Trader ||
+                                      basicInfo.originalBusinessTypeID ===
+                                        CLIENT_TYPES.Partnership ? null : (
+                                        <>
+                                          <div className="view-prospect-person-field">
+                                            <span className="view-prospect-person-field-icon">
+                                              <i className="ri-shield-user-line"></i>
+                                            </span>
+                                            <div>
+                                              <small>Role</small>
+                                              <strong>
+                                                {officersForm[index]
+                                                  .officerRole || "-"}
+                                              </strong>
+                                            </div>
+                                          </div>
+                                          <div className="view-prospect-person-field">
+                                            <span className="view-prospect-person-field-icon">
+                                              <i className="ri-calendar-line"></i>
+                                            </span>
+                                            <div>
+                                              <small>Appointed On</small>
+                                              <strong>
+                                                {officersForm[index]
+                                                  .appointedOn || "-"}
+                                              </strong>
+                                            </div>
+                                          </div>
+                                        </>
+                                      )}
+
+                                      <div className="view-prospect-person-field view-prospect-person-field-wide">
+                                        <span className="view-prospect-person-field-icon">
+                                          <i className="ri-map-pin-line"></i>
+                                        </span>
+                                        <div>
+                                          <small>
+                                            {basicInfo.originalBusinessTypeID ===
+                                              CLIENT_TYPES.Company ||
+                                            basicInfo.originalBusinessTypeID ===
+                                              CLIENT_TYPES.LLP
+                                              ? "Correspondence Address"
+                                              : "Residential Address"}
+                                          </small>
+                                          <strong>
+                                            {concatenatedResidentialAddress[
+                                              index
+                                            ]?.officersFullAddress || "-"}
+                                          </strong>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </section>
+                                ))}
                               </div>
                             </div>
                           </div>
-                          {/* <div class="noResult" style={{ display: "none" }}>
-                                                        <div class="text-center">
-                                                            <lord-icon
-                                                                src="https://cdn.lordicon.com/msoeawqm.json"
-                                                                trigger="loop"
-                                                                colors="primary:#121331,secondary:#08a88a"
-                                                                style={{ width: "75px", height: "75px" }}
-                                                            ></lord-icon>
-                                                            <h5 class="mt-2">Sorry! No Result Found</h5>
-                                                            <p class="text-muted mb-0">
-                                                                We've searched more than 150+ Orders We did not
-                                                                find any orders for you search.
-                                                            </p>
-                                                        </div>
-                                                    </div> */}
                         </div>
                       </div>
                     </div>
-                    {/* end card  */}
                   </div>
-                  {/* end col */}
                 </div>
               </div>
-              {/* end col  */}
             </div>
-            {/* end row */}
-
-            {/* end modal  */}
           </div>
-          {/* container-fluid  */}
         </div>
-        {/* End Page-content */}
 
-        <Footer />
-      {/* </div> */}
+        <div className="view-prospect-footer-wrap">
+          <Footer />
+        </div>
+      </div>
 
-      {/* start back-to-top */}
       <button
         onclick="topFunction()"
-        class="btn btn-danger btn-icon"
+        className="btn btn-danger btn-icon"
         id="back-to-top"
       >
-        <i class="ri-arrow-up-line"></i>
+        <i className="ri-arrow-up-line"></i>
       </button>
-      {/* end back-to-top */}
     </div>
   );
 };
