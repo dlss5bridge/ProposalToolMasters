@@ -2728,6 +2728,7 @@ function AcceptInvitation() {
     try {
       const data = await GetSendToSignEasy(params);
       if (data?.data?.statusCode === 200) {
+        debugger; //TODO:remove debugger later.
         setLoader(false);
         let acceptedDeclinedByEmailID =
           data?.data?.responseData?.acceptedDeclinedByEmailID;
