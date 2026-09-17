@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Tooltip from "@mui/material/Tooltip";
 import "./Proposals.css";
@@ -98,6 +98,47 @@ const View_Proposals = () => {
     AcceptedOn: null,
     SkippedOn: null,
   });
+
+  // Admin (original) proposal data — populated only when the current proposal isAmend === true
+  const [adminProposalData, setAdminProposalData] = useState(null);
+  const [adminProposalLoading, setAdminProposalLoading] = useState(false);
+  const [adminProposalError, setAdminProposalError] = useState(null);
+  const [amendedFromQuoteKeyID, setAmendedFromQuoteKeyID] = useState(null);
+  const fetchedAdminQuoteKeyIDRef = useRef(null);
+  const [inputFieldValuesList, setInputFieldValuesList] = useState([]);
+  const [adminRecurringPricingInfo, setAdminRecurringPricingInfo] = useState({
+    OriginalPrice: null,
+    DefaultDiscount: null,
+    DiscountedPrice: null,
+    Discount: null,
+    DiscountedTotal: null,
+    VATPrice: null,
+    GrandTotal: null,
+  });
+  const [adminOneOffPricingInfo, setAdminOneOffPricingInfo] = useState({
+    OriginalPrice: null,
+    DefaultDiscount: null,
+    DiscountedPrice: null,
+    Discount: null,
+    DiscountedTotal: null,
+    VATPrice: null,
+    GrandTotal: null,
+  });
+  const [adminVatPercentage, setAdminVatPercentage] = useState(null);
+
+  // Accepts boolean true, or common truthy wire-representations (1, "true", "1") for isAmend
+  const isAmendFlag = (value) =>
+    value === true || value === 1 || value === "true" || value === "1";
+
+  // Resolve a readable value from a getInputFieldValuesList entry regardless of its driver type
+  const getInputFieldDisplayValue = (field) =>
+    field?.label ??
+    field?.driverValueLabel ??
+    field?.enteredText ??
+    field?.enteredDate ??
+    field?.driverValue ??
+    field?.value ??
+    "-";
 
   const [pricingTableColumnIDs, setPricingTableColumnIDs] = useState("");
   const [currencySymbol, setCurrencySymbol] = useState(null);
@@ -322,6 +363,21 @@ const View_Proposals = () => {
           setPricingTableColumnIDs(ModelData.pricingTableColumnIDs);
           updateVisibleFieldsFromIds(ModelData.pricingTableColumnIDs);
           // setStatementOfFactsHTML(ModelData.statementOfFacts);
+
+          setInputFieldValuesList(ModelData.getInputFieldValuesList || []);
+
+          // Amended proposal: fetch the original Admin-created proposal separately (additive, read-only)
+          if (
+            isAmendFlag(ModelData.isAmend) &&
+            ModelData.amendedFromQuoteKeyID
+          ) {
+            setAmendedFromQuoteKeyID(ModelData.amendedFromQuoteKeyID);
+            GetAdminProposalDetailsData(ModelData.amendedFromQuoteKeyID);
+          } else {
+            setAmendedFromQuoteKeyID(null);
+            setAdminProposalData(null);
+            setAdminProposalError(null);
+          }
 
           const finalQuotationAmountList =
             data?.data?.responseData?.finalQuotationAmountList;
@@ -730,6 +786,81 @@ const View_Proposals = () => {
     }
   };
 
+  // Get original Admin-created proposal (used only when current proposal isAmend === true)
+  const GetAdminProposalDetailsData = async (adminQuoteKeyID) => {
+    if (!adminQuoteKeyID) {
+      return;
+    }
+    // Avoid refetching if we already fetched this same admin quote key
+    if (fetchedAdminQuoteKeyIDRef.current === adminQuoteKeyID) {
+      return;
+    }
+    fetchedAdminQuoteKeyIDRef.current = adminQuoteKeyID;
+    setAdminProposalLoading(true);
+    setAdminProposalError(null);
+    try {
+      const data = await GetProposalModelList(adminQuoteKeyID);
+      if (data?.data?.statusCode === 200 && data?.data?.responseData?.data) {
+        const AdminModelData = data.data.responseData.data;
+        const adminFinalQuotationAmountList =
+          data?.data?.responseData?.finalQuotationAmountList || [];
+
+        const AdminRecurringDetails = adminFinalQuotationAmountList.find(
+          (obj) => obj.serviceChargeTypeID === 1,
+        );
+        const AdminOneOffDetails = adminFinalQuotationAmountList.find(
+          (obj) => obj.serviceChargeTypeID === 2,
+        );
+
+        setAdminProposalData(AdminModelData);
+        setAdminVatPercentage(
+          AdminRecurringDetails?.vatPercentage ??
+            AdminOneOffDetails?.vatPercentage,
+        );
+
+        setAdminRecurringPricingInfo({
+          OriginalPrice: AdminModelData.recurringOriginalPrice,
+          DefaultDiscount: AdminModelData.recurringDiscountPercentage,
+          DiscountedPrice: AdminModelData.recurringDiscountedPrice,
+          Discount: AdminRecurringDetails?.discounted,
+          DiscountedTotal: AdminRecurringDetails?.discountedTotal,
+          VATPrice: AdminRecurringDetails?.vat,
+          GrandTotal: AdminRecurringDetails?.grandTotal,
+        });
+
+        setAdminOneOffPricingInfo({
+          OriginalPrice: AdminModelData.oneOffOriginalPrice,
+          DefaultDiscount: AdminModelData.oneOffDiscountPercentage,
+          DiscountedPrice: AdminModelData.oneOffDiscountedPrice,
+          Discount: AdminOneOffDetails?.discounted,
+          DiscountedTotal: AdminOneOffDetails?.discountedTotal,
+          VATPrice: AdminOneOffDetails?.vat,
+          GrandTotal: AdminOneOffDetails?.grandTotal,
+        });
+      } else {
+        setAdminProposalError("Unable to load the original Admin proposal.");
+      }
+    } catch (error) {
+      console.log(error);
+      setAdminProposalError("Unable to load the original Admin proposal.");
+    } finally {
+      setAdminProposalLoading(false);
+    }
+  };
+
+  // Preview PDF for the original Admin proposal (uses amendedFromQuoteKeyID, not the current QuoteKeyID)
+  const handleDownloadAdminProposal = () => {
+    if (!amendedFromQuoteKeyID) {
+      return;
+    }
+    navigate("/view-pdf", {
+      state: {
+        ModuleName: "Quote",
+        quoteKeyID: amendedFromQuoteKeyID,
+      },
+    });
+  };
+
   const selectedFrequency = Utils.Payment_Frequency.find(
     (item) => ProposalObject.Payment_Frequency == item.value,
   );
@@ -739,6 +870,20 @@ const View_Proposals = () => {
   const PaymentGatewayValue = Utils.payment_gateway.find(
     (item) => ProposalObject.paymentGatewayID == item.value,
   );
+
+  // Select-value equivalents for the read-only Original Proposal (Admin) tab
+  const adminSelectedFrequency = Utils.Payment_Frequency.find(
+    (item) => adminProposalData?.paymentFrequencyID == item.value,
+  );
+  const adminFeeTypeValue = Utils.feeInProposal.find(
+    (item) => adminProposalData?.feesInQuoteID == item.value,
+  );
+  const adminPaymentGatewayValue = Utils.payment_gateway.find(
+    (item) => adminProposalData?.paymentGatewayID == item.value,
+  );
+  const adminCurrencySymbol = adminProposalData
+    ? getCurrencySymbol(adminProposalData.currencyID)
+    : null;
   //HandleDownload
   const handleDownload = async (ContractKeyID) => {
     setLoader(true);
@@ -2833,6 +2978,20 @@ const View_Proposals = () => {
                       </button>
                     </Tooltip>
                   )}
+                {amendedFromQuoteKeyID && (
+                  <Tooltip title="Preview Admin Proposal PDF">
+                    <button
+                      className="btn btn-md btn-success create-item-btn"
+                      onClick={handleDownloadAdminProposal}
+                      style={{ marginLeft: "10px" }}
+                    >
+                      <i class="bi bi-eye"></i>{" "}
+                      <span className="d-none d-sm-inline">
+                        Preview Admin Proposal PDF
+                      </span>
+                    </button>
+                  </Tooltip>
+                )}
                 <Tooltip title={`Back`}>
                   <button
                     className="btn btn-md btn-success create-item-btn"
@@ -2912,6 +3071,32 @@ const View_Proposals = () => {
                               All Officers
                             </a>
                           </li>
+                          {inputFieldValuesList.length > 0 && (
+                            <li class="nav-item">
+                              <a
+                                class="nav-link tab_nav"
+                                data-bs-toggle="tab"
+                                href="#inputFields"
+                                role="tab"
+                                aria-selected="false"
+                              >
+                                Input Fields
+                              </a>
+                            </li>
+                          )}
+                          {amendedFromQuoteKeyID && (
+                            <li class="nav-item">
+                              <a
+                                class="nav-link tab_nav"
+                                data-bs-toggle="tab"
+                                href="#adminProposal"
+                                role="tab"
+                                aria-selected="false"
+                              >
+                                Original Proposal
+                              </a>
+                            </li>
+                          )}
                         </ul>
 
                         <div class="tab-content  text-muted">
@@ -7890,6 +8075,844 @@ const View_Proposals = () => {
                               </table>
                             </div>
                           </div>
+
+                          {inputFieldValuesList.length > 0 && (
+                            <div
+                              class="tab-pane"
+                              id="inputFields"
+                              role="tabpanel"
+                            >
+                              <table class="table table-striped fs-13 view-details-table">
+                                <tbody>
+                                  <tr>
+                                    <th colspan="2">Input Fields</th>
+                                  </tr>
+                                  {inputFieldValuesList.map((field, idx) => (
+                                    <tr
+                                      key={field.globalPricingDriverID ?? idx}
+                                    >
+                                      <td>{field.driverName}</td>
+                                      <td class="text-end">
+                                        {getInputFieldDisplayValue(field)}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+
+                          {amendedFromQuoteKeyID && (
+                            <div
+                              class="tab-pane"
+                              id="adminProposal"
+                              role="tabpanel"
+                            >
+                              {adminProposalLoading && (
+                                <p>Loading original Admin proposal...</p>
+                              )}
+
+                              {!adminProposalLoading && adminProposalError && (
+                                <p className="text-danger">
+                                  {adminProposalError}
+                                </p>
+                              )}
+
+                              {!adminProposalLoading &&
+                                !adminProposalError &&
+                                adminProposalData && (
+                                  <>
+                                    <>
+                                      <div className="row fieldset">
+                                        <div className="col-lg-3 text-lg-right">
+                                          <label className="fieldset-label required">
+                                            Fees in the {proposalName}
+                                          </label>
+                                        </div>
+                                        <div className="col-lg-9">
+                                          <div className="input-group">
+                                            {/* Add your Select component here */}
+                                            <Select
+                                              isDisabled
+                                              className="phone-input-country-code selectDropDown Drop-down-width"
+                                              value={adminFeeTypeValue}
+                                              options={Utils.feeInProposal}
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      {adminProposalData.paymentGatewayID !==
+                                        null && (
+                                        <div className="row fieldset">
+                                          <div className="col-lg-3 text-lg-right">
+                                            <label className="fieldset-label required">
+                                              Payment Gateway
+                                              <span className="text-danger">
+                                                *
+                                              </span>
+                                            </label>
+                                          </div>
+                                          <div className="col-md-9 mb-2">
+                                            <div className="input-group">
+                                              {/* Adjust the Select component as needed */}
+                                              <Select
+                                                isDisabled
+                                                className="phone-input-country-code selectDropDown Drop-down-width"
+                                                value={adminPaymentGatewayValue}
+                                              />
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+                                      <div className="row fieldset">
+                                        <div className="col-lg-3 text-lg-right">
+                                          <label className="fieldset-label required">
+                                            Show Discount
+                                          </label>
+                                        </div>
+                                        <div className="col-lg-9">
+                                          <div className="input-group">
+                                            {/* Replace Select with Checkbox */}
+                                            <input
+                                              type="checkbox"
+                                              disabled
+                                              checked={
+                                                adminProposalData.showDiscountLine
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      {(
+                                        adminProposalData.reccrunigServiceCatList ||
+                                        []
+                                      )?.length !== 0 && (
+                                        <div className="tab-content">
+                                          <div className="tab-pane p-3 active">
+                                            <div className="row">
+                                              <div className="col-lg-12">
+                                                <div className="separator mb-2"></div>
+                                                <h6>Recurring Services</h6>
+                                                <div className="separator mb-3"></div>
+                                                {adminProposalData.quoteTypeID !==
+                                                  4 && (
+                                                  <>
+                                                    <div className="row fieldset">
+                                                      <div className="col-md-2 col-sm-12  text-md-end">
+                                                        <label className="fieldset-label">
+                                                          Original Price (
+                                                          {getCurrencySymbol(
+                                                            adminProposalData.currencyID,
+                                                          )}
+                                                          )
+                                                        </label>
+                                                      </div>
+                                                      <div className="col-md-4 col-sm-12">
+                                                        <input
+                                                          readonly=""
+                                                          type="text"
+                                                          class="input-text"
+                                                          value={
+                                                            Number(
+                                                              Math.floor(
+                                                                adminRecurringPricingInfo.OriginalPrice *
+                                                                  100,
+                                                              ) / 100,
+                                                            )
+                                                              .toFixed(2)
+                                                              .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                ",",
+                                                              )
+
+                                                            // adminRecurringPricingInfo.OriginalPrice
+                                                          }
+                                                        />
+                                                      </div>
+                                                      <div className="col-md-2 col-sm-12  text-md-end">
+                                                        <label className="fieldset-label required">
+                                                          Payment Frequency
+                                                        </label>
+                                                      </div>
+                                                      <div className="col-md-4 col-sm-12">
+                                                        <Select
+                                                          isDisabled
+                                                          className="phone-input-country-code selectDropDown Drop-down-width"
+                                                          value={
+                                                            adminSelectedFrequency
+                                                          }
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                    <div
+                                                      class="row"
+                                                      id="recurring_Default"
+                                                    >
+                                                      <div class="col-lg-2 mb-1 col-md-2 col-sm-12 mt-2 text-md-end">
+                                                        <label className="fieldset-label">
+                                                          Discount (%)
+                                                        </label>
+                                                      </div>
+                                                      <div class="col-lg-4 col-md-4 col-sm-12">
+                                                        <input
+                                                          readonly=""
+                                                          class="input-text"
+                                                          type="text"
+                                                          placeholder="Discount (%)"
+                                                          value={
+                                                            Number(
+                                                              Math.floor(
+                                                                adminRecurringPricingInfo.DefaultDiscount *
+                                                                  100,
+                                                              ) / 100,
+                                                            )
+                                                              .toFixed(2)
+                                                              .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                ",",
+                                                              )
+
+                                                            // adminRecurringPricingInfo.DefaultDiscount
+                                                          }
+                                                        />
+                                                      </div>
+                                                      <div
+                                                        style={{
+                                                          padding: "0px",
+                                                        }}
+                                                        class="col-lg-2 col-md-2  col-sm-12"
+                                                      >
+                                                        <div class="mt-2 text-md-end">
+                                                          <label class="form-label">
+                                                            Discounted Price (
+                                                            {getCurrencySymbol(
+                                                              adminProposalData.currencyID,
+                                                            )}
+                                                            )
+                                                          </label>
+                                                        </div>
+                                                      </div>
+                                                      <div class="col-lg-4 col-md-4 col-sm-12">
+                                                        <input
+                                                          readonly=""
+                                                          class="input-text"
+                                                          type="text"
+                                                          placeholder={`Discounted Price (${getCurrencySymbol(
+                                                            adminProposalData.currencyID,
+                                                          )})`}
+                                                          value={
+                                                            Number(
+                                                              Math.floor(
+                                                                adminRecurringPricingInfo.DiscountedPrice *
+                                                                  100,
+                                                              ) / 100,
+                                                            )
+                                                              .toFixed(2)
+                                                              .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                ",",
+                                                              )
+
+                                                            // adminRecurringPricingInfo.DiscountedPrice
+                                                          }
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                  </>
+                                                )}
+                                                <div className="mb-3"></div>
+                                                <div
+                                                  style={{ marginTop: "0px" }}
+                                                  className="table-responsive"
+                                                >
+                                                  <table className="table align-middle table-nowrap">
+                                                    <thead className="table-light table-header-font">
+                                                      <tr className="head-row">
+                                                        <th className="tr-table-class text-white">
+                                                          Services
+                                                        </th>
+                                                        {adminProposalData.quoteTypeID !==
+                                                          4 && (
+                                                          <th className="tr-table-class text-white text-right">
+                                                            Fees (
+                                                            {getCurrencySymbol(
+                                                              adminProposalData.currencyID,
+                                                            )}
+                                                            )
+                                                          </th>
+                                                        )}
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                      {(
+                                                        adminProposalData.reccrunigServiceCatList ||
+                                                        []
+                                                      ).map(
+                                                        (service, index) => {
+                                                          return (
+                                                            <>
+                                                              <tr class="a-la-carte-services-review-head-row">
+                                                                <th colspan="2">
+                                                                  {
+                                                                    service.serviceCatName
+                                                                  }
+                                                                </th>
+                                                              </tr>
+                                                              {service.servicesList.map(
+                                                                (
+                                                                  subService,
+                                                                  subIndex,
+                                                                ) => {
+                                                                  return (
+                                                                    <tr
+                                                                      key={
+                                                                        subIndex
+                                                                      }
+                                                                    >
+                                                                      {/* */}
+                                                                      <td>
+                                                                        <div>
+                                                                          {
+                                                                            subService.serviceName
+                                                                          }
+                                                                        </div>
+                                                                        <div class="package-variables"></div>
+                                                                      </td>
+                                                                      {adminProposalData.quoteTypeID !==
+                                                                        4 && (
+                                                                        <td className="text-right">
+                                                                          {adminProposalData.feesInQuoteID ===
+                                                                            1 && (
+                                                                            <>
+                                                                              {" "}
+                                                                              {
+                                                                                adminCurrencySymbol
+                                                                              }
+                                                                              {formatValue(
+                                                                                subService.quotationPrice,
+                                                                              )}
+                                                                            </>
+                                                                          )}
+                                                                          {adminProposalData.feesInQuoteID ===
+                                                                            2 && (
+                                                                            <span className="fa fa-check"></span>
+                                                                          )}
+                                                                        </td>
+                                                                      )}
+                                                                    </tr>
+                                                                  );
+                                                                },
+                                                              )}
+                                                            </>
+                                                          );
+                                                        },
+                                                      )}
+                                                      {adminProposalData.quoteTypeID !==
+                                                        4 && (
+                                                        <tr className="head-row">
+                                                          <td className="tr-table-class text-white">
+                                                            Net Total
+                                                          </td>
+                                                          <td className="tr-table-class text-white text-right">
+                                                            {" "}
+                                                            {
+                                                              adminCurrencySymbol
+                                                            }
+                                                            {
+                                                              Number(
+                                                                adminRecurringPricingInfo.OriginalPrice,
+                                                              ) <
+                                                                Number(
+                                                                  adminRecurringPricingInfo.DiscountedPrice,
+                                                                ) ||
+                                                              (Number(
+                                                                adminRecurringPricingInfo.Discount,
+                                                              ) > 0 &&
+                                                                !adminProposalData.showDiscountLine)
+                                                                ? formatValue(
+                                                                    adminRecurringPricingInfo.DiscountedPrice,
+                                                                  )
+                                                                : // Number(adminRecurringPricingInfo.DiscountedPrice)
+                                                                  //     .toFixed(2)
+                                                                  //     .toString()
+                                                                  //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                                  formatValue(
+                                                                    adminRecurringPricingInfo.OriginalPrice,
+                                                                  )
+                                                              // Number(adminRecurringPricingInfo.OriginalPrice)
+                                                              //     .toFixed(2)
+                                                              //     .toString()
+                                                              //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                            }
+                                                          </td>
+                                                        </tr>
+                                                      )}
+                                                      {Number(
+                                                        adminRecurringPricingInfo.Discount,
+                                                      ) > 0 &&
+                                                        adminProposalData.showDiscountLine && (
+                                                          <>
+                                                            <tr class="head-grey-row">
+                                                              <td className="tr-table-class text-white">
+                                                                Discount
+                                                              </td>
+                                                              <td className="tr-table-class text-white text-right">
+                                                                (-)
+                                                                {
+                                                                  adminCurrencySymbol
+                                                                }
+                                                                {
+                                                                  formatValue(
+                                                                    adminRecurringPricingInfo.Discount,
+                                                                  )
+                                                                  // Number(adminRecurringPricingInfo.Discount)
+                                                                  //   .toFixed(2)
+                                                                  //   .toString()
+                                                                  //   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                                }
+                                                              </td>
+                                                            </tr>
+                                                            <tr class="head-row">
+                                                              <td className="tr-table-class text-white">
+                                                                Discounted Total
+                                                              </td>
+                                                              <td className="tr-table-class text-white text-right">
+                                                                {" "}
+                                                                {
+                                                                  adminCurrencySymbol
+                                                                }
+                                                                {
+                                                                  formatValue(
+                                                                    adminRecurringPricingInfo.DiscountedTotal,
+                                                                  )
+                                                                  // Number(
+                                                                  //   adminRecurringPricingInfo.DiscountedTotal
+                                                                  // )
+                                                                  //   .toFixed(2)
+                                                                  //   .toString()
+                                                                  //   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                                }
+                                                              </td>
+                                                            </tr>
+                                                          </>
+                                                        )}
+
+                                                      {adminVatPercentage && (
+                                                        <>
+                                                          <tr class="head-grey-row">
+                                                            <td className="tr-table-class text-white">
+                                                              {getTaxName(
+                                                                adminProposalData.currencyID,
+                                                              )}
+                                                            </td>
+                                                            <td className="tr-table-class text-white text-right">
+                                                              {" "}
+                                                              {
+                                                                adminCurrencySymbol
+                                                              }
+                                                              {
+                                                                formatValue(
+                                                                  adminRecurringPricingInfo.VATPrice,
+                                                                )
+                                                                // Number(adminRecurringPricingInfo.VATPrice)
+                                                                //   .toFixed(2)
+                                                                //   .toString()
+                                                                //   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                              }
+                                                            </td>
+                                                          </tr>
+                                                          <tr className="head-row">
+                                                            <td className="tr-table-class text-white">
+                                                              Grand Total
+                                                            </td>
+                                                            <td className="tr-table-class text-white text-right">
+                                                              {" "}
+                                                              {
+                                                                adminCurrencySymbol
+                                                              }
+                                                              {
+                                                                formatValue(
+                                                                  adminRecurringPricingInfo.GrandTotal,
+                                                                )
+                                                                // Number(adminRecurringPricingInfo.GrandTotal)
+                                                                //   .toFixed(2)
+                                                                //   .toString()
+                                                                //   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                              }
+                                                            </td>
+                                                          </tr>
+                                                        </>
+                                                      )}
+                                                    </tbody>
+                                                  </table>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {(
+                                        adminProposalData.oneOffServiceCatList ||
+                                        []
+                                      )?.length !== 0 && (
+                                        <div className="tab-content">
+                                          <div className="tab-pane p-3 active">
+                                            <div className="row">
+                                              <div className="col-lg-12">
+                                                <div className="separator mb-2"></div>
+                                                <h6>One-Off Services</h6>
+                                                <div className="separator mb-3"></div>
+                                                {adminProposalData.quoteTypeID !==
+                                                  4 && (
+                                                  <>
+                                                    <div className="row fieldset">
+                                                      <div className="col-md-2 col-sm-12  text-md-end">
+                                                        <label className="fieldset-label">
+                                                          Original Price (
+                                                          {getCurrencySymbol(
+                                                            adminProposalData.currencyID,
+                                                          )}
+                                                          )
+                                                        </label>
+                                                      </div>
+                                                      <div className="col-md-10 col-sm-12">
+                                                        <input
+                                                          readonly=""
+                                                          type="text"
+                                                          class="input-text"
+                                                          value={
+                                                            Number(
+                                                              Math.floor(
+                                                                adminOneOffPricingInfo.OriginalPrice *
+                                                                  100,
+                                                              ) / 100,
+                                                            )
+                                                              .toFixed(2)
+                                                              .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                ",",
+                                                              )
+
+                                                            // formatValue(
+                                                            //   adminOneOffPricingInfo.OriginalPrice
+                                                            // )
+                                                            //   adminOneOffPricingInfo.OriginalPrice.toString().replace(
+                                                            //   /\B(?=(\d{3})+(?!\d))/g,
+                                                            //   ","
+                                                            // )
+                                                          }
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                    <div
+                                                      class="row"
+                                                      id="OneOff_Default"
+                                                    >
+                                                      <div class="col-lg-2 mb-1 col-md-2 col-sm-12 mt-2 text-md-end">
+                                                        <div class="mb-1 text-md-end">
+                                                          <label class="form-label">
+                                                            Discount (%)
+                                                          </label>
+                                                        </div>
+                                                      </div>
+                                                      <div class="col-lg-4 col-md-4 col-sm-12">
+                                                        <input
+                                                          readonly=""
+                                                          class="input-text"
+                                                          type="text"
+                                                          placeholder="Discount (%)"
+                                                          value={
+                                                            Number(
+                                                              Math.floor(
+                                                                adminOneOffPricingInfo.DefaultDiscount *
+                                                                  100,
+                                                              ) / 100,
+                                                            )
+                                                              .toFixed(2)
+                                                              .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                ",",
+                                                              )
+
+                                                            // adminOneOffPricingInfo.DefaultDiscount
+                                                          }
+                                                        />
+                                                      </div>
+                                                      <div
+                                                        style={{
+                                                          padding: "0px",
+                                                        }}
+                                                        class="col-lg-2 col-md-2 mt-2 col-sm-12"
+                                                      >
+                                                        <div class="mb-1  text-md-end">
+                                                          <label class="form-label">
+                                                            Discounted Price (
+                                                            {getCurrencySymbol(
+                                                              adminProposalData.currencyID,
+                                                            )}
+                                                            )
+                                                          </label>
+                                                        </div>
+                                                      </div>
+                                                      <div class="col-lg-4 col-md-4 col-sm-12">
+                                                        <input
+                                                          readonly=""
+                                                          class="input-text"
+                                                          type="text"
+                                                          placeholder={`Discounted Price (${getCurrencySymbol(
+                                                            adminProposalData.currencyID,
+                                                          )})`}
+                                                          value={
+                                                            Number(
+                                                              Math.floor(
+                                                                adminOneOffPricingInfo.DiscountedPrice *
+                                                                  100,
+                                                              ) / 100,
+                                                            )
+                                                              .toFixed(2)
+                                                              .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                ",",
+                                                              )
+
+                                                            //     formatValue(
+                                                            //   adminOneOffPricingInfo.DiscountedPrice
+                                                            // )
+                                                          }
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                  </>
+                                                )}
+                                                <div className="mb-3"></div>
+                                                <div
+                                                  style={{ marginTop: "0px" }}
+                                                  className="table-responsive"
+                                                >
+                                                  <table className="table align-middle table-nowrap">
+                                                    <thead className="table-light table-header-font">
+                                                      <tr className="head-row">
+                                                        <th className="tr-table-class text-white">
+                                                          Services
+                                                        </th>
+                                                        {adminProposalData.quoteTypeID !==
+                                                          4 && (
+                                                          <th className="tr-table-class text-white text-right">
+                                                            Fees (
+                                                            {getCurrencySymbol(
+                                                              adminProposalData.currencyID,
+                                                            )}
+                                                            )
+                                                          </th>
+                                                        )}
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                      {(
+                                                        adminProposalData.oneOffServiceCatList ||
+                                                        []
+                                                      ).map(
+                                                        (service, index) => {
+                                                          return (
+                                                            <>
+                                                              <tr class="a-la-carte-services-review-head-row">
+                                                                <th colspan="2">
+                                                                  {
+                                                                    service.serviceCatName
+                                                                  }
+                                                                </th>
+                                                              </tr>
+                                                              {service.servicesList.map(
+                                                                (
+                                                                  subService,
+                                                                  subIndex,
+                                                                ) => {
+                                                                  return (
+                                                                    <tr
+                                                                      key={
+                                                                        subIndex
+                                                                      }
+                                                                    >
+                                                                      {/* */}
+                                                                      <td>
+                                                                        <div>
+                                                                          {
+                                                                            subService.serviceName
+                                                                          }
+                                                                        </div>
+                                                                        <div class="package-variables"></div>
+                                                                      </td>
+                                                                      {adminProposalData.quoteTypeID !==
+                                                                        4 && (
+                                                                        <td className="text-right">
+                                                                          {adminProposalData.feesInQuoteID ===
+                                                                            1 && (
+                                                                            <>
+                                                                              {" "}
+                                                                              {
+                                                                                adminCurrencySymbol
+                                                                              }
+                                                                              {formatValue(
+                                                                                subService.quotationPrice,
+                                                                              )}
+                                                                            </>
+                                                                          )}
+                                                                          {adminProposalData.feesInQuoteID ===
+                                                                            2 && (
+                                                                            <span className="fa fa-check"></span>
+                                                                          )}
+                                                                        </td>
+                                                                      )}
+                                                                    </tr>
+                                                                  );
+                                                                },
+                                                              )}
+                                                            </>
+                                                          );
+                                                        },
+                                                      )}
+                                                      {adminProposalData.quoteTypeID !==
+                                                        4 && (
+                                                        <tr className="head-row">
+                                                          <td className="tr-table-class text-white">
+                                                            Net Total
+                                                          </td>
+                                                          <td className="tr-table-class text-white text-right">
+                                                            {" "}
+                                                            {
+                                                              adminCurrencySymbol
+                                                            }
+                                                            {
+                                                              Number(
+                                                                adminOneOffPricingInfo.OriginalPrice,
+                                                              ) <
+                                                                Number(
+                                                                  adminOneOffPricingInfo.DiscountedPrice,
+                                                                ) ||
+                                                              (Number(
+                                                                adminOneOffPricingInfo.Discount,
+                                                              ) > 0 &&
+                                                                !adminProposalData.showDiscountLine)
+                                                                ? formatValue(
+                                                                    adminOneOffPricingInfo.DiscountedPrice,
+                                                                  )
+                                                                : // Number(adminOneOffPricingInfo.DiscountedPrice)
+                                                                  //     .toFixed(2)
+                                                                  //     .toString()
+                                                                  //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                                  formatValue(
+                                                                    adminOneOffPricingInfo.OriginalPrice,
+                                                                  )
+                                                              //  Number(adminOneOffPricingInfo.OriginalPrice)
+                                                              //     .toFixed(2)
+                                                              //     .toString()
+                                                              //     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                            }
+                                                          </td>
+                                                        </tr>
+                                                      )}
+                                                      {Number(
+                                                        adminOneOffPricingInfo.Discount,
+                                                      ) > 0 &&
+                                                        adminProposalData.showDiscountLine && (
+                                                          <>
+                                                            {" "}
+                                                            <tr class="head-grey-row">
+                                                              <td className="tr-table-class text-white">
+                                                                Discount
+                                                              </td>
+                                                              <td className="tr-table-class text-white text-right">
+                                                                (-){" "}
+                                                                {
+                                                                  adminCurrencySymbol
+                                                                }
+                                                                {formatValue(
+                                                                  adminOneOffPricingInfo.Discount,
+                                                                )}
+                                                                {/* {adminOneOffPricingInfo.Discount.toFixed(2)
+                                  .toString()
+                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} */}
+                                                              </td>
+                                                            </tr>
+                                                            <tr class="head-row">
+                                                              <td className="tr-table-class text-white">
+                                                                Discounted Total
+                                                              </td>
+                                                              <td className="tr-table-class text-white text-right">
+                                                                {
+                                                                  adminCurrencySymbol
+                                                                }{" "}
+                                                                {formatValue(
+                                                                  adminOneOffPricingInfo.DiscountedTotal,
+                                                                )}
+                                                                {/* {Number(adminOneOffPricingInfo.DiscountedTotal)
+                                  .toFixed(2)
+                                  .toString()
+                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} */}
+                                                              </td>
+                                                            </tr>
+                                                          </>
+                                                        )}
+                                                      {adminVatPercentage && (
+                                                        <>
+                                                          <tr class="head-grey-row">
+                                                            <td className="tr-table-class text-white">
+                                                              {getTaxName(
+                                                                adminProposalData.currencyID,
+                                                              )}
+                                                            </td>
+                                                            <td className="tr-table-class text-white text-right">
+                                                              {" "}
+                                                              {
+                                                                adminCurrencySymbol
+                                                              }
+                                                              {
+                                                                formatValue(
+                                                                  adminOneOffPricingInfo.VATPrice,
+                                                                )
+                                                                // Number(adminOneOffPricingInfo.VATPrice)
+                                                                //   .toFixed(2)
+                                                                //   .toString()
+                                                                //   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                              }
+                                                            </td>
+                                                          </tr>
+                                                          <tr className="head-row">
+                                                            <td className="tr-table-class text-white">
+                                                              Grand Total
+                                                            </td>
+                                                            <td className="tr-table-class text-white text-right">
+                                                              {" "}
+                                                              {
+                                                                adminCurrencySymbol
+                                                              }
+                                                              {
+                                                                formatValue(
+                                                                  adminOneOffPricingInfo.GrandTotal,
+                                                                )
+                                                                // Number(adminOneOffPricingInfo.GrandTotal)
+                                                                //   .toFixed(2)
+                                                                //   .toString()
+                                                                //   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                              }
+                                                            </td>
+                                                          </tr>
+                                                        </>
+                                                      )}
+                                                    </tbody>
+                                                  </table>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </>
+                                  </>
+                                )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
