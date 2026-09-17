@@ -3095,3 +3095,102 @@
     justify-content: center;
   }
 }
+
+
+/* =========================================================
+   SIDEBAR UNIFORM WIDTH FIX
+   Paste at the VERY END of TopbarClone.css.
+   CSS only – no JSX, handlers, routes or permissions touched.
+
+   Cause: the sidebar's inner wrapper (#scrollbar) was sizing
+   itself to its content instead of filling the sidebar. The
+   widest thing inside it is the organisation <select>, whose
+   natural width = its longest option name. A long practice
+   name made the menu wide; a short one made it narrow and
+   centred with extra space on both sides.
+   ========================================================= */
+
+/* 1. Lock the sidebar itself to one fixed width */
+@media (min-width: 1041px) {
+  .topbar-clone:not(.collapsed) .app-menu {
+    flex: 0 0 var(--figma-sidebar-width) !important;
+    width: var(--figma-sidebar-width) !important;
+    min-width: var(--figma-sidebar-width) !important;
+    max-width: var(--figma-sidebar-width) !important;
+  }
+
+  .topbar-clone.collapsed .app-menu {
+    flex: 0 0 0 !important;
+    max-width: 0 !important;
+  }
+}
+
+@media (max-width: 1040px) {
+  .topbar-clone .app-menu {
+    max-width: min(288px, 88vw) !important;
+  }
+}
+
+/* 2. Make every inner wrapper fill the sidebar instead of
+      shrinking/growing to fit its content */
+.topbar-clone .app-menu > #scrollbar,
+.topbar-clone .app-menu > #scrollbar > div,
+.topbar-clone #two-column-menu,
+.topbar-clone #two-column-menu > div,
+.topbar-clone .sidebar-menu-scroll,
+.topbar-clone .sidebar-menu-scroll > .navbar-nav,
+.topbar-clone .sidebar-menu-scroll .edit-dropdown-cls,
+.topbar-clone .figma-sidebar-footer {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  align-self: stretch !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.topbar-clone .app-menu {
+  align-items: stretch !important;
+}
+
+/* 3. The organisation dropdown must never set the width.
+      Long names are truncated with "..." instead. */
+.topbar-clone
+  .sidebar-menu-scroll
+  .edit-dropdown-cls
+  > div:first-child {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.topbar-clone .nav-select.form-select {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+/* 4. Update / Create practice buttons follow the same width */
+.topbar-clone .sidebar-menu-scroll .edit-dropdown-cls > .d-flex,
+.topbar-clone .sidebar-menu-scroll .update-practice-details,
+.topbar-clone .sidebar-menu-scroll .edit-topbar {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* 5. Long menu labels wrap/truncate inside the fixed width */
+.topbar-clone .changed-nav.navbar-nav {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link > span {
+  min-width: 0;
+}
