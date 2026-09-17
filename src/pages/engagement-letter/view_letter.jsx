@@ -92,10 +92,12 @@ const View_Engagement_Latter = () => {
     oneOffDiscountedPrice: null,
     oneOffDiscountPercentage: null,
     declinedReason: null,
-    contractName: null,
     statusID: null,
     manuallySignedContractDocUrl: null,
     clientMasterBusinessTypeID: null,
+    oneOffPaymentStatus: null,
+    recurringPaymentStatus: null,
+    paymentStatus: null,
     draftOn: null,
     sentOn: null,
     signedOn: null,
@@ -279,7 +281,6 @@ const View_Engagement_Latter = () => {
             contractKeyID: id,
             contractName: ModelData.contractName,
             sourceName: ModelData.sourceName,
-            contractName: ModelData.contractName,
             currencyID: ModelData.currencyID,
             draftOn: ModelData.createdOn,
             sentOn: ModelData.sentOn,
@@ -305,6 +306,9 @@ const View_Engagement_Latter = () => {
             manuallySignedContractDocUrl:
               ModelData.manuallySignedContractDocUrl,
             clientMasterBusinessTypeID: ModelData.clientMasterBusinessTypeID,
+            oneOffPaymentStatus: ModelData.oneOffPaymentStatus,
+            recurringPaymentStatus: ModelData.recurringPaymentStatus,
+            paymentStatus: ModelData.paymentStatus,
           });
 
           const RecurringDetails = finalContractAmountList.find(
@@ -559,6 +563,10 @@ const View_Engagement_Latter = () => {
       size: null,
     });
   };
+
+  // Renders a boolean status field as "-" (null/undefined), "true" or "false"
+  const formatBooleanStatus = (value) =>
+    value === null || value === undefined ? "-" : String(value);
 
   const GetOnlyDate = (value) => {
     if (!value) return "";
@@ -1701,6 +1709,30 @@ const View_Engagement_Latter = () => {
                                   <td>Template</td>
                                   <td class="text-end">
                                     {EngagementObj.templateName}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>One-off Payment Status</td>
+                                  <td class="text-end">
+                                    {formatBooleanStatus(
+                                      EngagementObj.oneOffPaymentStatus,
+                                    )}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Recurring Payment Status</td>
+                                  <td class="text-end">
+                                    {formatBooleanStatus(
+                                      EngagementObj.recurringPaymentStatus,
+                                    )}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Payment Status</td>
+                                  <td class="text-end">
+                                    {formatBooleanStatus(
+                                      EngagementObj.paymentStatus,
+                                    )}
                                   </td>
                                 </tr>
                                 {EngagementObj.draftOn && (
