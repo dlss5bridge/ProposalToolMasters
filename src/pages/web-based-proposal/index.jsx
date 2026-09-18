@@ -37,9 +37,7 @@ export default function WebBasedProposal() {
   const themeSettings = useSelector(selectThemeSettings);
   const inputFieldsLoading = useSelector(selectInputFieldsListLoading);
 
-  // Uses quoteModel.brandColor (from GetQuoteModel) when present, otherwise
-  // falls back to the default theme. GetOrganisationThemeSettings's
-  // background color/font family are then layered on top.
+  // Brand color comes from quoteModel, background/font from org theme settings.
   const theme = useMemo(
     () => getProposalTheme(quoteModel, themeSettings),
     [quoteModel, themeSettings],
@@ -57,9 +55,9 @@ export default function WebBasedProposal() {
     return <div>Missing QuoteKeyID.</div>;
   }
 
-  // Input fields are fetched here (not inside ProposalInputFieldsStep) so
-  // selectHasInputFields is already resolved by the time the proposal-type
-  // components decide whether to include the "Input Fields" step at all.
+  // Fetched here (not in ProposalInputFieldsStep) so selectHasInputFields is
+  // already resolved before the proposal-type components decide whether to
+  // include that step.
   if (loading || inputFieldsLoading || (!quoteModel && !error)) {
     return <div>Loading proposal...</div>;
   }

@@ -2,14 +2,10 @@ import { getVisibleInputFieldsItems } from "../../../redux/reducer/webProposal/i
 import { getVisibleAdditionalInformationItems } from "../../../redux/reducer/webProposal/additionalInformation";
 import { QUOTE_TYPE_ID } from "../../../Middleware/enums";
 
-// driverTypeID: 2 = quantity (driverValue), 3 = variation (lookup select),
-// 4 = slab (lookup select), 5 = free text (enteredText), 6 = date
-// (enteredDate) — same convention as ProposalInputFieldsStep.jsx. For the
-// two lookup-list types, driverValue only holds the selected option's ID
-// (variationID/slabID) — AddUpdateQuote wants the option's display label
-// instead, so resolve it the same way ProposalInputFieldsStep.jsx renders
-// it (option.variationName, or option.slabTypeName falling back to its
-// from/to range).
+// driverTypeID: 2 = quantity, 3 = variation, 4 = slab, 5 = free text, 6 = date
+// (same convention as ProposalInputFieldsStep.jsx). For variation/slab,
+// driverValue only holds the option's ID, but AddUpdateQuote wants the
+// display label, so we resolve it the way ProposalInputFieldsStep.jsx does.
 const getEnteredInputFieldValue = (item) => {
   if (item.driverTypeID === 5) return item.enteredText;
   if (item.driverTypeID === 6) return item.enteredDate;
@@ -67,14 +63,11 @@ export const buildGlobalPricingDriverIDsWithValues = (
   );
 };
 
-// Turns one committed selection (+ its service catalog definition) into the
-// moduleServicesGPDList row shape AddUpdateProposal.jsx's modifiedDraftArray
-// builds (AddUpdateProposal.jsx:22648-22698) — only driverVisibility: true
-// drivers get a row, and driverValue is the actual numeric value (a
-// variation/slab option's variationValue/slabValue, not its ID; the ID
-// itself is carried separately as variationID/slabID). msgMapID/msMapID are
-// always null here, same as the admin flow's freshly-built rows — the
-// backend assigns real ones on save.
+// Builds the moduleServicesGPDList row shape from AddUpdateProposal.jsx's
+// modifiedDraftArray (AddUpdateProposal.jsx:22648). Only visible drivers get
+// a row; driverValue is the resolved variationValue/slabValue, not the ID
+// (that's carried separately). msgMapID/msMapID stay null — backend assigns
+// them on save.
 const buildModuleServicesGPDList = (selection, serviceDef) => {
   const visibleDrivers = (serviceDef?.pricingDriverList || []).filter(
     (driver) => driver.driverVisibility,
@@ -135,14 +128,11 @@ const buildServiceDefMap = (categories) => {
   return map;
 };
 
-// Reconstructs selectedServicesList from the client's live, possibly-edited
-// service selections (recurringSelections/oneOffSelections) instead of the
-// stale copy on quoteModel (fetched once at page load, before any Services-
-// step edits) — mirrors AddUpdateProposal.jsx's modifiedDraftArray
-// (AddUpdateProposal.jsx:22645-22719) field-for-field. Only meaningful for
-// Service-based/Custom Package Amendment, where the client can actually add
-// or remove services; Package Amendment has no Services step and keeps the
-// quoteModel passthrough instead (see buildAddUpdateQuotePayload).
+// Reconstructs selectedServicesList from the client's live service selections
+// instead of the stale quoteModel copy fetched at page load. Mirrors
+// AddUpdateProposal.jsx's modifiedDraftArray (AddUpdateProposal.jsx:22645).
+// Only relevant for Service/Custom Package Amendment; Package Amendment has
+// no Services step and keeps the quoteModel passthrough instead.
 export const buildSelectedServicesListFromSelections = ({
   recurringSelections,
   oneOffSelections,
@@ -169,15 +159,9 @@ export const buildSelectedServicesListFromSelections = ({
     serviceCatID: selection.serviceCatID,
     serviceChargeTypeID,
     servicePackageID: null,
-    // AddUpdateProposal.jsx:22709-22713 only sends null here for its
-    // "Master Agreement - Custom Variable Fee" quote type
-    // (selectedProposalTypeValue === 4) — a type with no QUOTE_TYPE_ID
-    // equivalent that the web proposal flow never reaches. Custom Package
-    // is selectedProposalTypeValue === 1, which admin's own condition
-    // excludes, so it gets the real live price via
-    // service.originalServicePrice, same as every other type this function
-    // is called for (Service). Previously this was wrongly nulled for
-    // Custom Package by conflating it with admin's value-4 case.
+    // AddUpdateProposal.jsx:22709 only nulls this for its "Custom Variable
+    // Fee" type (value 4), which the web proposal flow never reaches —
+    // Custom Package (value 1) isn't that case, so it keeps the real price.
     finalCalculatedServicePrice:
       priceByServiceID.get(`${serviceChargeTypeID}:${selection.serviceID}`) ??
       null,
@@ -194,36 +178,22 @@ export const buildSelectedServicesListFromSelections = ({
   return [...recurringList, ...oneOffList];
 };
 
-// quotationFinalAmountList holds the recurring/one-off Net Total/Discount/
-// VAT/Grand Total the quote was last priced at. For a Service-type quote
-// (QUOTE_TYPE_ID.Service — no packages involved) that's stale the moment the
-// client adds or removes a service on the Amendment's Services step: the
-// stored netTotal no longer reflects what's actually selected. Rebuilds each
-// charge type's row from the live selections' summed prices (same
-// priceByServiceID source buildSelectedServicesListFromSelections uses for
-// finalCalculatedServicePrice), reapplying the quote's already-agreed
-// discountPercentageWithAllDecimal/vatPercentage on top — mirrors
-// AddUpdateProposal.jsx's non-package quotationFinalAmountList branch
-// (AddUpdateProposal.jsx:22926-22990: netTotal from the live total,
-// discounted/discountedTotal/vat/grandTotal derived from it) rather than
-// AddUpdateProposal.jsx's package branch, which this quote type never uses.
-// Package/Custom Package quotes have no client-editable Services step here
-// (Package Amendment skips it entirely; Custom Package prices against the
-// package, not summed service prices) and keep the quoteModel passthrough
-// untouched — see buildQuotationFinalAmountList's dispatch below.
+// quotationFinalAmountList holds the last-priced Net Total/Discount/VAT/Grand
+// Total per charge type. For a Service-type quote this goes stale the moment
+// the client adds or removes a service on the Amendment's Services step, so
+// we rebuild each row from the live selections' summed prices and reapply
+// the already-agreed discount/VAT — mirrors AddUpdateProposal.jsx's
+// non-package branch (AddUpdateProposal.jsx:22926). Package/Custom Package
+// quotes have no client-editable Services step and keep the quoteModel
+// passthrough instead (see buildQuotationFinalAmountList's dispatch below).
 export const buildQuotationFinalAmountListForServiceType = ({
   quoteModel,
   recurringSelections,
   oneOffSelections,
   pricing,
-  // Same fallback ProposalPricingTableStep.jsx's recurringVatPercentage/
-  // oneOffVatPercentage already use (selectServicesVatPercentage — the
-  // live rate from GetCalculatedServicesPriceByPackages, shared across
-  // charge types) — needed when a charge type has no existingRow of its
-  // own yet, e.g. the admin's original quote only had One-Off services and
-  // the client just added a Recurring one on the Amendment's Services step.
-  // Without it, that charge type's vatPercentage/vat/grandTotal would come
-  // out null even though a real, already-known VAT rate applies.
+  // Fallback for a charge type with no existingRow yet (e.g. client adds a
+  // Recurring service to a quote that was originally One-Off only). Same
+  // rate ProposalPricingTableStep.jsx already uses (selectServicesVatPercentage).
   vatPercentage: fallbackVatPercentage,
 }) => {
   const priceByServiceID = new Map();
@@ -297,17 +267,11 @@ export const buildQuotationFinalAmountListForServiceType = ({
   return rows;
 };
 
-// Dispatches quotationFinalAmountList building by proposal type — the only
-// type whose totals can go stale from a client Services-step edit is
-// Service (see buildQuotationFinalAmountListForServiceType above); every
-// other type (Package, Custom Package) keeps the quoteModel passthrough,
-// since neither lets the client change which services are priced into it
-// here. isAmend gates the Service rebuild too: an unamended Service
-// Amendment (client changed nothing from the admin defaults) has nothing to
-// rebuild either, so it keeps the same quoteModel passthrough as Package/
-// Custom Package. Defaults to true so callers that never pass it (the
-// non-Amendment Accept/Save flows in ProposalInputForm.jsx) keep their
-// existing always-rebuild behavior unchanged.
+// Dispatches quotationFinalAmountList building by proposal type. Only
+// Service quotes can go stale from a Services-step edit, so Package/Custom
+// Package always keep the quoteModel passthrough. isAmend gates the rebuild
+// too — an unamended Service Amendment has nothing to rebuild either.
+// Defaults to true so existing non-Amendment callers keep rebuilding.
 export const buildQuotationFinalAmountList = ({
   quoteModel,
   recurringSelections,
@@ -330,24 +294,15 @@ export const buildQuotationFinalAmountList = ({
 };
 
 // ---------------------------------------------------------------------------
-// pricingVariablesList (Service-type only) — ports AuthContext.jsx's
-// replaceTemplatePricingVariables Service branch (selectedProposalTypeValue
-// === 3, AuthContext.jsx:3009-3249) and the template-string helpers it calls
-// (formatValue, getTaxName, getPaymentFrequencyLabel,
-// SingleServiceWithCombinedTableView, ReplaceVariable_WithTableView,
-// GetReplaceServiceWithTableView[WithPrice], GetReplaceServiceWithCommaView
-// [WithPrice], GetReplaceServiceWithBulletListView[WithPrice],
-// GetReplaceValueByWithComma, GetReplaceValueByWithBulletList) verbatim,
-// including their existing quirks (e.g. GetReplaceServiceWithTableView's
-// duplicated "Recurring Services" heading when a one-off list is also
-// present) — this is a byte-for-byte port, not a rewrite, so the web
-// proposal's generated HTML/text matches the admin flow exactly. Only each
-// function's non-package branch is ported: AuthContext.jsx always calls
-// these with servicePackageList: null for a Service-type quote, so the
-// package branch is unreachable here and left out. AuthContext.jsx itself
-// isn't reusable directly — it's a React context provider only ever mounted
-// in the authenticated app, never in the unauthenticated web-proposal route
-// tree (see additionalInformationThunk.js's comment on why).
+// pricingVariablesList (Service-type only) — byte-for-byte port of
+// AuthContext.jsx's replaceTemplatePricingVariables Service branch
+// (AuthContext.jsx:3009) and the template-string helpers it calls, so the
+// generated HTML/text matches the admin flow exactly, quirks included (e.g.
+// GetReplaceServiceWithTableView's duplicated heading). Only each function's
+// non-package branch is ported — AuthContext.jsx always passes
+// servicePackageList: null for Service quotes, so the package branch is
+// unreachable here. AuthContext.jsx itself can't be imported directly since
+// it's a context provider only mounted in the authenticated app.
 
 // AuthContext.jsx:1196 formatValue, called everywhere in the Service branch
 // with no `id` (currency-symbol) argument — so only the no-symbol path is
@@ -805,14 +760,11 @@ const getReplaceValueByWithBulletList = (recurringValue, oneOffValue) => `
         </ul>
       `;
 
-// Groups a charge type's live selections into the
-// [{servicesList: [{serviceName, price}]}] shape the ported helpers above
-// expect (mirrors AddUpdateProposal.jsx's selectedRecurringServiceList/
-// selectedOneOffServiceList category grouping) — one group per selection
-// here since the web proposal's selections don't carry serviceCatID-grouped
-// batches the way AddUpdateProposal.jsx's category state does; the ported
-// helpers only ever flatten via `.servicesList`, so the exact grouping
-// doesn't affect the rendered output.
+// Groups live selections into the [{servicesList: [{serviceName, price}]}]
+// shape the ported helpers expect. One group per selection here (the web
+// proposal has no serviceCatID batching like AddUpdateProposal.jsx's
+// category state) — doesn't matter since the helpers just flatten via
+// `.servicesList`.
 const buildServiceGroupsForTemplateVariables = (selections, chargeTypeID, priceByServiceID) =>
   Object.values(selections || {}).map((selection) => ({
     servicesList: [
@@ -823,13 +775,10 @@ const buildServiceGroupsForTemplateVariables = (selections, chargeTypeID, priceB
     ],
   }));
 
-// Maps a quotationFinalAmountList row (see
-// buildQuotationFinalAmountListForServiceType above) to the RecurringPricingInfo/
-// OneOffPricingInfo field names replaceTemplatePricingVariables' Service
-// branch reads. DiscountedPrice has no distinct source in the rebuilt row —
-// AddUpdateProposal.jsx's own RecurringPricingInfo.DiscountedPrice and
-// .DiscountedTotal represent the same discounted-total-before-VAT figure in
-// practice, so both are aliased to discountedTotal here.
+// Maps a quotationFinalAmountList row to the RecurringPricingInfo/
+// OneOffPricingInfo field names the Service branch reads. DiscountedPrice
+// and DiscountedTotal represent the same figure in practice, so both alias
+// to discountedTotal here.
 const buildPricingInfoFromRow = (row) => ({
   OriginalPrice: row?.netTotal ?? 0,
   Discount: row?.discounted ?? 0,
@@ -840,11 +789,9 @@ const buildPricingInfoFromRow = (row) => ({
   DefaultDiscount: row?.discountPercentageWithAllDecimal ?? 0,
 });
 
-// Rebuilds pricingVariablesList for a Service-type quote, byte-for-byte
-// matching AuthContext.jsx's replaceTemplatePricingVariables Service branch
-// (AuthContext.jsx:3009-3249) plus AddUpdateProposal.jsx's own
-// {variableName, variableValue} wrapping (AddUpdateProposal.jsx:23157-23162)
-// — every value is String()-coerced, null/undefined defaults to "0.00".
+// Rebuilds pricingVariablesList for a Service-type quote, matching
+// AuthContext.jsx:3009 plus AddUpdateProposal.jsx's {variableName,
+// variableValue} wrapping (AddUpdateProposal.jsx:23157).
 export const buildPricingVariablesListForServiceType = ({
   quotationFinalAmountRows,
   recurringSelections,
@@ -1076,28 +1023,18 @@ export const buildPricingVariablesListForServiceType = ({
 
 // ---------------------------------------------------------------------------
 // pricingVariablesList (Package and Custom Package) — ports
-// replaceTemplatePricingVariables' non-Service branch (AuthContext.jsx:3250-
-// 3567, reached whenever selectedProposalTypeValue !== 3 — the admin flow
-// itself never distinguishes Package from Custom Package here, so neither
-// does this) plus the package-shaped helpers it calls (GetReplacePackageTableView,
-// GetReplacePackageCombinedTableView, and the servicePackageList branches of
-// GetReplaceValueByWithComma/WithBulletList/ReplaceVariable_WithTableView
-// already ported above). Ported verbatim, quirks included — e.g.
-// AuthContext.jsx's own Discounted_Total_WithComma/WithBulletList/
-// WithTableView calls omit the Type argument, so those three always resolve
-// through every branch to PackageOneValue: null, same as admin sends today.
+// replaceTemplatePricingVariables' non-Service branch (AuthContext.jsx:3250)
+// plus the package-shaped helpers it calls (GetReplacePackageTableView,
+// GetReplacePackageCombinedTableView, and the servicePackageList branches
+// already ported above). Ported verbatim, quirks included — e.g. admin's
+// Discounted_Total_WithComma/WithBulletList/WithTableView calls omit the
+// Type argument, so those three always resolve to PackageOneValue: null.
 //
-// Six variables are intentionally left as the quoteModel passthrough instead
-// of rebuilt: AllServices_WithTableView/WithComma/WithBulletList and their
-// WithPrice variants. Their admin-side source data (each service's own
-// packageOneID/packageOneValue/servicePackageIDs, from the admin's package-
-// scoped service catalog fetch) isn't part of the web proposal's live
-// selection state, and Package/Custom Package here never let the client
-// change which services are priced in anyway (Package Amendment has no
-// Services step at all; Custom Package's added services aren't reflected in
-// that admin-only catalog shape either) — so there's nothing for a live
-// rebuild to actually fix for these six, unlike the totals below (which
-// source cleanly from quotationFinalAmountList).
+// AllServices_WithTableView/WithComma/WithBulletList and their WithPrice
+// variants stay as the quoteModel passthrough (not rebuilt): their source
+// data isn't part of the web proposal's live selection state, and neither
+// Package nor Custom Package lets the client change which services are
+// priced in here anyway.
 
 // AuthContext.jsx:1556 GetReplacePackageTableView
 const getReplacePackageTableView = (pricingInfo, type, servicePackageList) => {
@@ -1467,10 +1404,8 @@ const getReplaceValueByWithCommaPackage = (
 };
 
 // AuthContext.jsx:1957 GetReplaceValueByWithBulletList, servicePackageList
-// branch — same per-type value resolution as getReplaceValueByWithCommaPackage
-// (kept as a private copy here rather than shared, since the source only
-// shares the Type-to-field switch by literal duplication too), wrapped as a
-// <ul><li> list instead of the comma view's joined <b> string.
+// branch — same value resolution as getReplaceValueByWithCommaPackage, just
+// wrapped as a <ul><li> list instead of a joined <b> string.
 const getReplaceValueByWithBulletListPackage = (
   recurringPricingInfo,
   oneOffPricingInfo,
@@ -1711,11 +1646,10 @@ const replaceVariableWithTableViewPackage = (
 `;
 };
 
-// Maps quotationFinalAmountList rows (the existing quoteModel passthrough —
-// Package/Custom Package quotes aren't rebuilt, see buildQuotationFinalAmountList)
-// to the packageOneNetTotal/packageOneDisCount/.../DiscountPercentagePackageOne
-// (…Two/…Three) field set the ported package helpers above read, matching
-// each servicePackageList entry to its row by servicePackageID.
+// Maps quotationFinalAmountList rows to the packageOneNetTotal/
+// packageOneDisCount/.../DiscountPercentagePackageOne (…Two/…Three) field
+// set the ported package helpers read, matching each servicePackageList
+// entry to its row by servicePackageID.
 const buildPricingInfoWithPackagesFromRows = (
   rows,
   serviceChargeTypeID,
@@ -1742,12 +1676,10 @@ const buildPricingInfoWithPackagesFromRows = (
   return info;
 };
 
-// Rebuilds pricingVariablesList for Package/Custom Package, byte-for-byte
-// matching AuthContext.jsx's replaceTemplatePricingVariables non-Service
-// branch (AuthContext.jsx:3250-3567) for every variable except the six
-// AllServices_*/AllServicesWithPrice_* ones — see the comment above
-// getReplacePackageTableView for why those stay as the quoteModel
-// passthrough.
+// Rebuilds pricingVariablesList for Package/Custom Package, matching
+// AuthContext.jsx:3250 for every variable except the six
+// AllServices_*/AllServicesWithPrice_* ones, which stay as the quoteModel
+// passthrough (see comment above getReplacePackageTableView).
 export const buildPricingVariablesListForPackageType = ({
   quoteModel,
   servicePackageList,
@@ -2068,22 +2000,15 @@ export const buildPricingVariablesListForPackageType = ({
 };
 
 // Dispatches pricingVariablesList building by proposal type — Service
-// rebuilds from the live selections/totals (buildPricingVariablesListForServiceType);
-// Package and Custom Package both rebuild from the existing
-// quotationFinalAmountList + servicePackageList
-// (buildPricingVariablesListForPackageType — the admin flow itself never
-// distinguishes the two here either); any other/unrecognised type keeps the
-// plain quoteModel passthrough.
-// Unlike buildQuotationFinalAmountList/selectedServicesList/
-// additionalInformationList, this is NOT gated by isAmend: GetQuoteModel's
-// own pricingVariablesList is a write-only template-substitution field that
-// AddUpdateQuote itself populates on save, not something GetQuoteModel
-// reliably returns already populated — falling back to the raw
-// quoteModel.pricingVariablesList passthrough for an unamended Service
-// quote would silently send an empty list and drop every $Variable$ the PDF
-// template relies on. So Service rebuilds this from the current (unchanged,
-// when unamended) live selections/pricing regardless of isAmend, exactly
-// like Package/Custom Package's branch below already does unconditionally.
+// rebuilds from live selections/totals, Package/Custom Package both rebuild
+// from quotationFinalAmountList + servicePackageList, everything else keeps
+// the quoteModel passthrough.
+//
+// Not gated by isAmend, unlike the other builders here: pricingVariablesList
+// is a write-only field AddUpdateQuote populates on save, so GetQuoteModel
+// doesn't reliably return it already populated. Falling back to the raw
+// passthrough for an unamended quote would send an empty list and drop
+// every $Variable$ the PDF template needs.
 export const buildPricingVariablesList = ({
   quoteModel,
   quotationFinalAmountRows,
@@ -2120,23 +2045,14 @@ export const buildPricingVariablesList = ({
     : [];
 };
 
-// GetQuoteModel's selectedServicesList rows are whatever AddUpdateQuote
-// persisted the last time this quote was saved — for Package Amendment
-// (no client-editable Services step, so buildSelectedServicesListFromSelections
-// never runs) that's forwarded as-is today, carrying stale msgMapID/msMapID
-// from that prior save and, since it round-tripped through JSON parsing on
-// GetQuoteModel's own response, numeric fields that can come back as
-// strings ("20" instead of 20). Re-shapes each row into exactly the field
-// set/types AddUpdateProposal.jsx's modifiedDraftArray sends
-// (AddUpdateProposal.jsx:22700-22716 / 22650-22698), dropping any extra
-// GetQuoteModel-only bookkeeping fields and forcing msgMapID/msMapID to
-// null the same way buildModuleServicesGPDList and
-// buildAdditionalInformationListForPayload already do. servicePackageID is
-// likewise always sent as null — modifiedDraftArray hardcodes
-// `servicePackageID: null` unconditionally (AddUpdateProposal.jsx:22708),
-// for every proposal type including Package, so forwarding whatever value
-// GetQuoteModel happens to return here (as the old passthrough-only version
-// of this function did) doesn't match the admin flow for a Package quote.
+// GetQuoteModel's selectedServicesList rows are whatever was last persisted
+// — for Package Amendment (no Services step, so buildSelectedServicesListFromSelections
+// never runs) that's forwarded as-is, carrying stale msgMapID/msMapID and
+// numeric fields that can come back as strings after JSON round-tripping.
+// Re-shapes each row into the field set/types AddUpdateProposal.jsx's
+// modifiedDraftArray sends (AddUpdateProposal.jsx:22700), nulling
+// msgMapID/msMapID/servicePackageID the same way modifiedDraftArray does
+// unconditionally, even for Package.
 const toNullableNumber = (value) =>
   value === null || value === undefined || value === "" ? null : Number(value);
 
@@ -2180,16 +2096,11 @@ const normalizeSelectedServicesListFromQuoteModel = (selectedServicesList) => {
   }));
 };
 
-// isAmend: false counterpart to normalizeModuleServicesGPDList/
-// normalizeSelectedServicesListFromQuoteModel above — same field
-// projection/type coercion (AddUpdateQuote's accepted shape), but keeps
-// each row's actual driverValue/msMapID/servicePackageID/msgMapID exactly
-// as GetQuoteModel returned them instead of forcing them to null. Nulling
-// those IDs so the backend assigns fresh ones only makes sense while
-// actually submitting new/changed amendment data (see the comment above
-// normalizeSelectedServicesListFromQuoteModel) — an unamended resubmission
-// has nothing new to assign fresh IDs for, so the previously-saved IDs are
-// preserved as-is.
+// isAmend: false counterpart to the normalize* functions above — same field
+// projection, but keeps each row's driverValue/msMapID/servicePackageID/
+// msgMapID as GetQuoteModel returned them instead of nulling them. Nulling
+// only makes sense when submitting new/changed data; an unamended
+// resubmission has nothing new, so the saved IDs are preserved.
 const preserveModuleServicesGPDList = (moduleServicesGPDList) => {
   if (!Array.isArray(moduleServicesGPDList) || moduleServicesGPDList.length === 0) {
     return null;
@@ -2231,41 +2142,26 @@ const preserveSelectedServicesListFromQuoteModel = (selectedServicesList) => {
 };
 
 // GetQuoteModel's additionalInformationList is the row shape the Additional
-// Information step edits (driverValue holding a selected variationID/slabID
-// rather than its resolved price, plus msgMapID/msMapID from whatever prior
-// save produced that row) — not what AddUpdateQuote accepts. Rebuilds it
-// fresh from the step's own live list the same way AddUpdateProposal.jsx's
-// modifiedAdditionalServiceArray does (AddUpdateProposal.jsx:22996-23072):
-// resolve driverValue to the actual selected value, keep only the ID field
-// that applies to this driver's type, and always send msgMapID/msMapID as
-// null — the backend assigns real ones on save. Falls back to the
-// GetQuoteModel passthrough when the live list isn't available (e.g. a
-// proposal type with no Additional Information step at all).
+// Information step edits (driverValue holds a selected variationID/slabID,
+// not the resolved price) — not what AddUpdateQuote accepts. Rebuilds it
+// from the step's own live list the same way AddUpdateProposal.jsx's
+// modifiedAdditionalServiceArray does (AddUpdateProposal.jsx:22996): resolve
+// driverValue to the real value, keep only the relevant ID field, and always
+// null msgMapID/msMapID. Falls back to the GetQuoteModel passthrough when
+// there's no live list (e.g. a type with no Additional Information step).
 const buildAdditionalInformationListForPayload = (
   additionalInformationList,
   // Both Custom Package only (see buildAdditionalInformationList below):
   {
-    // When the live driverValue doesn't resolve to a real variation/slab
-    // option — e.g. GetPricingFormulasGlobalPricingDrivers not reliably
-    // returning the saved selection for one of Custom Package's
-    // admin-locked default services, the same "corrupted default"
-    // unreliability already worked around elsewhere for this endpoint (see
-    // withDefaultDriverValues.js) — fall back to whichever option the API
-    // still marks isDefault, exactly the value AddUpdateProposal.jsx's own
-    // modifiedAdditionalServiceArray reads (AddUpdateProposal.jsx:23013-
-    // 23031: it picks the isDefault-flagged slab/variation directly, rather
-    // than resolving driverValue to an ID first). Service/Package never
-    // pass this, so their behavior is unchanged.
+    // Fallback when the live driverValue doesn't resolve to a real
+    // variation/slab option (a known unreliability for Custom Package's
+    // admin-locked default services — see withDefaultDriverValues.js). Picks
+    // the isDefault-flagged option instead, same as AddUpdateProposal.jsx's
+    // modifiedAdditionalServiceArray (AddUpdateProposal.jsx:23013).
     fallbackToIsDefaultOption = false,
-    // withDefaultDriverValues.js already corrects this in the redux list
-    // for a quantity driver (driverTypeID 2) whose driverValue came back
-    // equal to its own globalPricingDriverID — the same "corrupted default"
-    // GetPricingFormulasGlobalPricingDrivers quirk documented there — but
-    // this function reads item.driverValue straight off the passed-in list
-    // without re-checking, so a row that fetch never corrected (or a
-    // caller that skipped it) can still leak globalPricingDriverID through
-    // as driverValue into the payload. Re-applies the identical guard right
-    // before it's sent.
+    // Re-applies withDefaultDriverValues.js's "corrupted default" guard for
+    // a quantity driver whose driverValue leaked through as its own
+    // globalPricingDriverID, in case this list wasn't already corrected.
     fixCorruptedQuantityDefault = false,
   } = {},
 ) => {
@@ -2339,29 +2235,20 @@ const buildAdditionalInformationListForPayload = (
   );
 };
 
-// The live additionalInformationList redux list only ever carries drivers
-// for services GetPricingFormulasGlobalPricingDrivers was actually asked
-// about (ProposalAmendment.jsx's servicesIDs: selectedServiceIDs) — a
-// Package-type quote never shows the Additional Information step at all
-// (additionalInfoStepInserted is hardcoded false for it), so that live list
-// has nothing visible in it; a Custom Package quote's admin-added default
-// services (locked, outside the client's own selection) can likewise be
-// missing from it. Either way buildAdditionalInformationListForPayload
-// above then drops those drivers' rows from the payload entirely — even
-// though GetQuoteModel's own additionalInformationList still has the real
-// saved values for them (already close to the AddUpdateQuote row shape —
-// just msgMapID/msMapID need nulling, like
-// normalizeSelectedServicesListFromQuoteModel does for selectedServicesList).
+// The live additionalInformationList only carries drivers for services
+// GetPricingFormulasGlobalPricingDrivers was actually asked about — a
+// Package quote never shows the Additional Information step, and a Custom
+// Package's admin-added default services can be missing too, so
+// buildAdditionalInformationListForPayload would drop those rows entirely.
+// GetQuoteModel's own list still has the real saved values for them; this
+// just nulls msgMapID/msMapID to match the accepted shape.
 const normalizeAdditionalInformationListFromQuoteModel = (
   additionalInformationList,
-  // Custom Package only — see the matching flag on
-  // buildAdditionalInformationListForPayload. This passthrough's rows carry
-  // no driverTypeID to branch on, but a quantity-type row is the only kind
-  // with none of variationID/slabID/dateID/textID set, so that absence is
-  // used as the same signal here: if driverValue still equals this row's
-  // own globalPricingDriverID (the corrupted-default GetPricingFormulas
-  // GlobalPricingDrivers quirk, persisted from a prior save that went out
-  // uncorrected), reset it to 0 instead of forwarding the corrupted value.
+  // Custom Package only. These rows have no driverTypeID to branch on, but a
+  // quantity row is the only kind with no variationID/slabID/dateID/textID
+  // set, so that absence signals it: reset driverValue to 0 if it still
+  // equals this row's own globalPricingDriverID (the corrupted-default
+  // quirk) instead of forwarding it.
   { fixCorruptedQuantityDefault = false } = {},
 ) => {
   if (!Array.isArray(additionalInformationList)) {
@@ -2399,14 +2286,9 @@ const normalizeAdditionalInformationListFromQuoteModel = (
 };
 
 // isAmend: false counterpart to normalizeAdditionalInformationListFromQuoteModel
-// above — same field projection, but keeps each row's actual msgMapID/
-// msMapID exactly as GetQuoteModel returned them instead of forcing them to
-// null (see preserveSelectedServicesListFromQuoteModel's comment for why).
-// No fixCorruptedQuantityDefault correction either: that fix exists to
-// repair a value the live redux state disagrees with, which only matters
-// while actually submitting a live-derived amendment — an unamended
-// resubmission has no live-derived value to compare against, so the saved
-// driverValue is forwarded exactly as GetQuoteModel returned it.
+// — same projection, but keeps msgMapID/msMapID as-is instead of nulling
+// them, and skips the fixCorruptedQuantityDefault correction since there's
+// no live value to compare against on an unamended resubmission.
 const preserveAdditionalInformationListFromQuoteModel = (
   additionalInformationList,
 ) => {
@@ -2429,13 +2311,10 @@ const preserveAdditionalInformationListFromQuoteModel = (
   }));
 };
 
-// Merges the live-rebuilt rows (fresher — reflect whatever the client just
-// edited) with GetQuoteModel's own saved rows (normalized), keyed by
-// globalPricingDriverID: a driver present in both takes the live version; a
-// driver GetQuoteModel has that the live fetch never covered (see the
-// comment above normalizeAdditionalInformationListFromQuoteModel) is kept
-// from the saved copy instead of being silently dropped; a driver only the
-// live list has (freshly added) is appended as-is.
+// Merges the live-rebuilt rows with GetQuoteModel's saved rows, keyed by
+// globalPricingDriverID: a driver in both takes the live version, one only
+// GetQuoteModel has is kept instead of dropped, one only the live list has
+// is appended.
 const mergeAdditionalInformationLists = (
   liveList,
   quoteModelList,
@@ -2465,30 +2344,19 @@ const mergeAdditionalInformationLists = (
   return merged;
 };
 
-// Dispatches additionalInformationList building by proposal type — Service
-// is unchanged: rebuilds purely from the Additional Information step's live
-// list (buildAdditionalInformationListForPayload), same as before. Package
-// is also unchanged from its own existing fix: always the normalized
-// GetQuoteModel passthrough, never the live list — its
-// additionalInfoStepInserted is hardcoded false (the client never sees this
-// step, so there's nothing to merge from a live edit), and its live redux
-// list isn't verified to always be empty in practice, so merging it in
-// could resurface the exact driverValue-corruption bug
-// fixCorruptedQuantityDefault exists to fix (a fix Package doesn't get,
-// since its own consumer never showed the gap). Only Custom Package merges
-// the live list with GetQuoteModel's saved one (see
-// mergeAdditionalInformationLists above), since it's the one type that can
-// have drivers — an admin-added, locked default service among them — the
-// live fetch's scope never covers.
+// Dispatches additionalInformationList building by proposal type. Service
+// rebuilds purely from the step's live list. Package always uses the
+// normalized GetQuoteModel passthrough — it has no Additional Information
+// step, and its live redux list isn't reliably empty, so merging it could
+// resurface the driverValue-corruption bug fixCorruptedQuantityDefault
+// exists for. Only Custom Package merges the live list with GetQuoteModel's
+// saved one, since it's the one type with drivers the live fetch can miss
+// (admin-added locked default services).
 //
-// isAmend (defaults to true — see buildAddUpdateQuotePayload's matching
-// default) gates all of the above: those branches all null out msgMapID/
-// msMapID (directly, or via buildAdditionalInformationListForPayload/
-// normalizeAdditionalInformationListFromQuoteModel), which is only correct
-// while actually submitting new/changed amendment data. An unamended
-// Service/Custom Package proposal, and Package's always-unamended one, use
-// preserveAdditionalInformationListFromQuoteModel instead — the plain
-// GetQuoteModel passthrough with those IDs left exactly as returned.
+// isAmend (default true) gates all of this: those branches null
+// msgMapID/msMapID, which is only correct when submitting new/changed data.
+// An unamended proposal uses preserveAdditionalInformationListFromQuoteModel
+// instead — the plain passthrough with IDs left as returned.
 const buildAdditionalInformationList = ({
   quoteModel,
   additionalInformationList,
@@ -2526,38 +2394,23 @@ const buildAdditionalInformationList = ({
     : quoteModelAdditionalInformationList;
 };
 
-// Mirrors AddUpdateProposal.jsx's own submit-time rebuild of
-// quoteAdditionalServicesInPackages (AddUpdateProposal.jsx:22721-22737):
+// Mirrors AddUpdateProposal.jsx's submit-time rebuild of
+// quoteAdditionalServicesInPackages (AddUpdateProposal.jsx:22721):
 // {serviceID, serviceCatID, serviceChargeTypeID, servicePackageIDs} for
-// every currently-selected service flagged isAdditionalService. A
-// Package-scoped services fetch sets isAdditionalService = !isDisabled on
-// every row it returns (AddUpdateProposal.jsx:20419-20424) — there's no
-// separate isAdditionalService field on the web proposal's own services
-// catalog response, so it's derived the same way from each service
-// definition's own isDisabled flag here.
+// every currently-selected service flagged isAdditionalService (derived
+// from !isDisabled, same as admin's package-scoped services fetch does at
+// AddUpdateProposal.jsx:20419).
 //
-// servicePackageIDs differs by type, because admin's own two
-// package-pricing consumers build it differently:
-//   - Standard Package (GetCalculatedServicesPriceByPackagesData,
-//     AddUpdateProposal.jsx:19011-19073) — left untouched here, out of
-//     scope for this fix.
-//   - Custom Package (GetCalculatedServicesPriceData,
-//     AddUpdateProposal.jsx:17829-17849, repeated at 17858+/17908+): for
-//     service.isAdditionalService (a client-added, non-locked service —
-//     matched here by !isDisabled), servicePackageIDs is NOT recomputed
-//     from live pricing data at all. serviceMappingWithPackagesList only
-//     ever carries the admin's own package cross-join rows (the package's
-//     pre-configured default services), so a client addition structurally
-//     never has a row there — filtering it for one always returns [],
-//     which is exactly the bug being fixed here. Admin instead reads
-//     straight off this quote's own previously-saved
-//     quoteAdditionalServicesInPackages (QuotationAdditionalServices,
-//     seeded from ModelData.quoteAdditionalServicesInPackages at
-//     AddUpdateProposal.jsx:21732-21734), matched by serviceID +
-//     serviceChargeTypeID — i.e. whichever package(s) this addition was
-//     already assigned to on a prior save, carried forward as-is. Falls
-//     back to [] when there's no prior saved entry (a service the client
-//     just added this session, never saved before).
+// servicePackageIDs differs by type:
+//   - Standard Package: every additional service belongs to every
+//     configured package (unchanged, out of scope here).
+//   - Custom Package: a client-added service has no row in
+//     serviceMappingWithPackagesList (that only carries the admin's
+//     pre-configured package cross-join), so filtering it always returns
+//     [] — the bug being fixed here. Instead reads the package membership
+//     straight off this quote's previously-saved
+//     quoteAdditionalServicesInPackages, matched by serviceID +
+//     serviceChargeTypeID, falling back to [] if never saved before.
 const buildQuoteAdditionalServicesInPackages = ({
   quoteTypeID,
   recurringSelections,
@@ -2607,14 +2460,11 @@ const buildQuoteAdditionalServicesInPackages = ({
 };
 
 // AddUpdateQuote only accepts this exact field set — mirrors
-// ApiRequest_ParamsObj in AddUpdateProposal.jsx:23077-23170. GetQuoteModel's
-// response carries several extra bookkeeping/audit fields (templateKeyID,
-// the *_WithAllDecimal variants, serviceDescription, statementOfFacts,
-// createdBy/createdOn, keyID, etc.) that AddUpdateQuote doesn't take and
-// that the admin flow never sends — those are dropped here rather than
-// forwarded. Every value below is still read straight from GetQuoteModel
-// (no reconstruction from other local/derived state), so this is a field
-// projection, not a rebuild.
+// ApiRequest_ParamsObj in AddUpdateProposal.jsx:23077. GetQuoteModel's
+// response carries extra bookkeeping/audit fields (templateKeyID,
+// *_WithAllDecimal variants, serviceDescription, createdBy, etc.) that
+// AddUpdateQuote doesn't take — those are dropped rather than forwarded.
+// This is a field projection, not a rebuild.
 const ADD_UPDATE_QUOTE_FIELD_MAP = [
   "organisationKeyID",
   "userKeyID",
@@ -2654,49 +2504,28 @@ const ADD_UPDATE_QUOTE_FIELD_MAP = [
 ];
 
 // Base AddUpdateQuote request payload for every web-based-proposal type:
-// only the fields AddUpdateQuote accepts, sourced from the complete
-// GetQuoteModel response, with globalPricingDriverIDsWithValues patched
-// from what the client actually entered on the Input Fields step. Package
-// selection data and everything not called out below is left exactly as
-// GetQuoteModel returned it. selectedServicesList is rebuilt from the
-// client's live selections when selectedServicesListOverride is supplied
-// (Service-based/Custom Package Amendment — see
-// buildSelectedServicesListFromSelections); every other caller instead gets
-// the GetQuoteModel copy re-shaped by
-// normalizeSelectedServicesListFromQuoteModel, since that raw copy isn't in
-// the shape/types AddUpdateQuote accepts either. additionalInformationList
-// is always rebuilt from the Additional Information step's own live list
-// (see buildAdditionalInformationListForPayload) when that list is passed
-// in — every caller has one available, since GetQuoteModel's copy uses a
-// different row shape AddUpdateQuote doesn't accept. quotationFinalAmountList
-// and pricingVariablesList are both rebuilt per proposal type (see
-// buildQuotationFinalAmountList and buildPricingVariablesList): Service
-// recomputes from the live selections/pricing; Package and Custom Package
-// both rebuild pricingVariablesList from the existing quotationFinalAmountList
-// (left untouched itself) plus servicePackageList; any other/unrecognised
-// type keeps the plain passthrough. ServiceMappingWithPackagesList is
-// likewise preferred live over the GetQuoteModel passthrough when supplied
-// (see the comment above that assignment). serviceSelectionsForTotals
-// ({recurringSelections, oneOffSelections, pricing, currencyID,
-// servicePackageList, serviceMappingWithPackagesList}) supplies the live
-// data these rebuilds need — Service only reads the first four,
-// Package/Custom Package only read servicePackageList and
-// serviceMappingWithPackagesList — so a caller can omit whichever fields
-// its proposal type never needs.
+// only the fields AddUpdateQuote accepts, sourced from GetQuoteModel, with
+// globalPricingDriverIDsWithValues patched from the Input Fields step.
+// Everything not called out below is left exactly as GetQuoteModel returned
+// it.
 //
-// isAmend (defaults to true so callers that never pass it — the
-// non-Amendment Accept/Save flows in ProposalInputForm.jsx — keep their
-// existing behavior unchanged) additionally gates selectedServicesList,
+// selectedServicesList rebuilds from the client's live selections when
+// selectedServicesListOverride is supplied (Service/Custom Package
+// Amendment); otherwise it's the GetQuoteModel copy re-shaped by
+// normalizeSelectedServicesListFromQuoteModel. additionalInformationList
+// rebuilds from the Additional Information step's live list when supplied.
+// quotationFinalAmountList and pricingVariablesList are rebuilt per
+// proposal type (see buildQuotationFinalAmountList/buildPricingVariablesList).
+// serviceSelectionsForTotals supplies the live data these rebuilds need;
+// a caller can omit whichever fields its proposal type doesn't use.
+//
+// isAmend (default true) additionally gates selectedServicesList,
 // additionalInformationList, and the Service-type quotationFinalAmountList
-// rebuild: an unamended Service/Custom Package Amendment (client changed
-// nothing from the admin defaults) has nothing to rebuild, so those three
-// use the plain GetQuoteModel-sourced values (IDs preserved, not nulled —
-// see preserveSelectedServicesListFromQuoteModel/
-// preserveAdditionalInformationListFromQuoteModel) with the caller expected
-// to pass isAmend: false and no selectedServicesListOverride in that case.
-// pricingVariablesList is the one exception — see the comment on
-// buildPricingVariablesList for why it always rebuilds regardless of
-// isAmend.
+// rebuild — an unamended Amendment has nothing to rebuild, so those three
+// fall back to the plain GetQuoteModel values with IDs preserved (see
+// preserveSelectedServicesListFromQuoteModel/
+// preserveAdditionalInformationListFromQuoteModel). pricingVariablesList is
+// the exception and always rebuilds (see buildPricingVariablesList).
 export const buildAddUpdateQuotePayload = (
   quoteModel,
   inputFieldsList,
@@ -2796,23 +2625,15 @@ export const buildAddUpdateQuotePayload = (
     isAmend,
   });
 
-  // AddUpdateProposal.jsx's quoteAdditionalServicesInPackages is built by
-  // filtering on service.isAdditionalService (AddUpdateProposal.jsx:22721-
-  // 22737) — a flag only ever set (true or false) while fetching a
-  // package-scoped service list (AddUpdateProposal.jsx:20419-20424), so it's
-  // always undefined for a Service-type proposal and the filter naturally
-  // empties out to []. GetQuoteModel doesn't apply that same rule to what it
-  // returns here, so a Service-type quote's row can still come back
-  // non-empty — force it to [] to match, same as the admin flow always does
-  // for this proposal type.
+  // Admin's quoteAdditionalServicesInPackages filters on isAdditionalService
+  // (AddUpdateProposal.jsx:22721), a flag only ever set for package-scoped
+  // service lists — always empty for Service. GetQuoteModel doesn't apply
+  // that rule itself, so force [] here to match.
   //
-  // Package and Custom Package both rebuild it live from the current
-  // selections the same way admin does at submit time, instead of
-  // forwarding GetQuoteModel's stale saved copy — see
+  // Package and Custom Package rebuild it live from current selections
+  // instead of forwarding GetQuoteModel's stale copy — see
   // buildQuoteAdditionalServicesInPackages for how servicePackageIDs is
-  // sourced for each (Package: unchanged, out of scope; Custom Package:
-  // carried forward from this quote's own previously-saved
-  // quoteAdditionalServicesInPackages).
+  // sourced for each.
   if (quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Service) {
     payload.quoteAdditionalServicesInPackages = [];
   } else if (

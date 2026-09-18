@@ -17,12 +17,9 @@ export default function ProposalSidebar({
   const organisationName = proposal?.themeSettings?.tradingBusinessName;
   const logoUrl = proposal?.themeSettings?.logoUrl;
 
-  // "Read More" should only appear when the 3-line clamp below is actually
-  // cutting text off, which depends on the sidebar's width/font size rather
-  // than character count - so measure the real overflow instead of guessing
-  // at a character limit. Only meaningful while collapsed: once expanded the
-  // clamp is removed (card grows instead), so scrollHeight/clientHeight would
-  // always match and there's nothing left to detect.
+  // Only show "Read More" when the 3-line clamp is actually cutting text off
+  // (measured directly, since that depends on width/font size, not char
+  // count). Skipped while expanded, since the clamp is removed then anyway.
   useLayoutEffect(() => {
     if (isDescriptionExpanded) return;
     const el = descriptionRef.current;
@@ -33,9 +30,7 @@ export default function ProposalSidebar({
   return (
     <aside>
       <div className="p-3">
-        {/* Organization Card - a gradient cover with the logo overlapping it
-            as a ringed avatar, in the vein of a modern profile/brand card
-            rather than a plain centered box. */}
+        {/* Organization card: gradient cover with the logo overlapping as a ringed avatar. */}
         <div
           className="overflow-hidden rounded-2xl border shadow-sm"
           style={{
@@ -52,13 +47,8 @@ export default function ProposalSidebar({
 
           <div className="px-4 pb-4 text-center">
             <div className="-mt-8 flex justify-center">
-              {/* Rounded-rectangle "plate" rather than a circular avatar - a
-                  circle clips anything outside its inscribed radius, so a
-                  wide/rectangular logo scaled to fit the box's width (via
-                  object-contain) had its left/right edges cut off near the
-                  corners. A rounded rect fits any aspect ratio - square,
-                  landscape, or portrait, white background or transparent -
-                  without cropping any of it. */}
+              {/* Rounded-rect plate instead of a circular avatar, since a circle
+                  was clipping the edges of wide/rectangular logos. */}
               <div
                 className="flex h-16 w-28 items-center justify-center overflow-hidden rounded-xl border-4 bg-white p-2 shadow-md"
                 style={{
@@ -85,8 +75,7 @@ export default function ProposalSidebar({
               {organisationName || "Outbooks"}
             </h2>
 
-            {/* Labelled divider separating identity from description,
-                instead of a second stacked card. */}
+            {/* Labelled divider separating identity from description. */}
             <div className="mt-3 flex items-center justify-center gap-2">
               <span
                 className="h-px w-6"
@@ -115,10 +104,7 @@ export default function ProposalSidebar({
             >
               {organisationDescription}
             </p>
-            {/* Rendered after (not inside) the clamped paragraph - text
-                nested inside a line-clamped element can get cut off by the
-                clamp itself, so it can't reliably stay visible glued to the
-                end. */}
+            {/* Kept outside the clamped paragraph so the clamp can't cut it off. */}
             {isDescriptionClamped && (
               <span
                 role="button"

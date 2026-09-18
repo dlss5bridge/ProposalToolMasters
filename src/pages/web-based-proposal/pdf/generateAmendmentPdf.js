@@ -6,25 +6,14 @@ import {
 } from "../../../redux/Services/Proposal/ProposalApi";
 import { ElementType, QUOTE_TYPE_ID } from "../../../Middleware/enums";
 
-// Web-Based Proposal counterpart to PreviewComponentpdf.jsx's
-// generatePdf()/sendDataToBackend()/generateMergePdfUrl() (see that file's
-// `generatePdfData`/`MergePdfUrl` state) — reuses the exact same two
-// raw-fetch endpoints and payload/response shape AddUpdateProposal.jsx's
-// Preview step already relies on, WITHOUT modifying or importing anything
-// from PreviewComponentpdf.jsx or AddUpdateProposal.jsx.
+// Web-Based Proposal counterpart to PreviewComponentpdf.jsx's generatePdf/
+// sendDataToBackend/generateMergePdfUrl flow, using the same endpoints and
+// payload shape but without importing from that admin-only file.
 //
-// Scope: PreviewComponentpdf.jsx's full document (intro letter, Statement of
-// Facts, signature/Payment Terms) still depends on admin-authenticated
-// component state (contractSignatoriesList, the template editor's live
-// content) with no reachable API — so this regenerates only what the client
-// can actually change on this Amendment (Services fees, Additional
-// Information) plus the cover page and per-page header/footer branding,
-// which ARE now reachable: organisation logo/client name
-// (GetMasterTemplateDetailsWithVariableValues), header/footer template
-// assets (GetProposalEnggLetterTemplateLookUpList — confirmed unauthenticated
-// despite the admin-side wrapper's name), and organisation contact details
-// (GetOrganisationInformationModel — its auth requirement was removed).
-// Merged the same way admin does, via generatePdfUrl/mergePdfApiUrl.
+// Scope: the full admin document depends on authenticated component state
+// with no reachable API, so this regenerates only what the client can
+// change (fees, Additional Information) plus the cover page and header/
+// footer branding, using endpoints confirmed to work without a token.
 const escapeHtml = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -34,21 +23,12 @@ const escapeHtml = (value) =>
       ],
   );
 
-// Every Text Block element's htmlContent (intro letter, Statement of Facts
-// intro, Payment Terms) is raw Draft.js editor export markup: deeply nested
-// `<div data-block="true" style="box-sizing: border-box; ...; position:
-// relative; ...">` wrappers around `<span data-text="true">`. Confirmed
-// live: passed through verbatim, this content never actually renders any
-// visible text through the PDF-render microservice, yet still consumes a
-// full page of blank space before the next real content — this nested
-// box-sizing/position:relative combination is a known problem class for
-// wkhtmltopdf-style renderers (silently dropped/blanked while still
-// reserving layout space). Rebuilt here as plain, minimal <p> tags instead
-// of trusting the raw editor markup — extracts each `data-text="true"`
-// span's own text (one per Draft.js block/paragraph), preserving embedded
-// newlines as <br> and bold styling on the immediate parent span (the only
-// inline style this template actually uses, e.g. the "Payment Terms"
-// heading).
+// Text Block htmlContent is raw Draft.js export markup (nested
+// data-block/data-text spans with box-sizing/position:relative styles).
+// Passed through verbatim it renders no visible text but still reserves a
+// full blank page in the PDF microservice, so we extract each
+// data-text span's own text into plain <p> tags instead, preserving line
+// breaks and bold styling.
 const extractDraftJsPlainHtml = (rawHtml) => {
   if (!rawHtml) return "";
 
@@ -70,15 +50,9 @@ const extractDraftJsPlainHtml = (rawHtml) => {
 
   if (paragraphs.length > 0) return paragraphs.join("");
 
-  // Not every Text Block was authored in Draft.js's own nested
-  // data-block/data-text export shape — confirmed live that the Statement
-  // of Facts intro paragraph ("Proposal for the custom package is based on
-  // the facts...") is instead a plain `<p><span style="...">text</span></p>`
-  // block with no data-text attribute at all. The pattern above matched
-  // nothing for it and silently returned "", which still passed every
-  // caller's truthiness check (the padding div wrapper around it is a
-  // non-empty string) — so the section wasn't skipped, it just rendered
-  // blank. Falls back to reading each top-level <p> as its own paragraph.
+  // Not every Text Block uses the nested data-text shape — some are plain
+  // <p><span>text</span></p> blocks, which the pattern above silently
+  // matches nothing for. Fall back to reading each top-level <p>.
   const paragraphPattern = /<p[^>]*>([\s\S]*?)<\/p>/g;
   const fallbackParagraphs = [];
   let pMatch = paragraphPattern.exec(rawHtml);
@@ -91,21 +65,15 @@ const extractDraftJsPlainHtml = (rawHtml) => {
   }
   if (fallbackParagraphs.length > 0) return fallbackParagraphs.join("");
 
-  // Last resort — no recognisable paragraph structure at all: strip every
-  // tag and show whatever text remains as a single paragraph, rather than
-  // silently rendering nothing.
+  // Last resort: strip all tags and show the remaining text as one paragraph.
   const plainText = rawHtml.replace(/<[^>]+>/g, "").trim();
   return plainText ? `<p style="margin:0 0 1em 0">${plainText}</p>` : "";
 };
 
-// Same map ProposalPricingTableStep.jsx already uses for on-screen totals
-// (CURRENCY_SYMBOLS) — duplicated here rather than exported/imported since
-// that file doesn't export it and this is a tiny, stable lookup.
+// Duplicated from ProposalPricingTableStep.jsx (not exported there).
 const CURRENCY_SYMBOLS = { 1: "£", 2: "€", 3: "$", 4: "₹" };
 
-// Same mapping ProposalPricingTableStep.jsx's own PAYMENT_FREQUENCY_LABEL
-// uses, mirroring AddUpdateProposal.jsx's getPaymentFrequencyLabel — admin's
-// fees table title is suffixed with this, e.g. "Recurring Fees (Monthly)".
+// Suffixes the fees table title, e.g. "Recurring Fees (Monthly)".
 const PAYMENT_FREQUENCY_LABEL = {
   1: "Yearly",
   2: "Half-Yearly",
@@ -113,10 +81,8 @@ const PAYMENT_FREQUENCY_LABEL = {
   4: "Monthly",
 };
 
-// Same mapping as buildAddUpdateQuotePayload.js's own getTaxName (not
-// exported from there, duplicated here for the same reason as
-// CURRENCY_SYMBOLS above) — admin's fees table labels this row by currency,
-// e.g. "GST" for INR, not a hardcoded "VAT".
+// Labels the tax row by currency (e.g. "GST" for INR), not a hardcoded "VAT".
+// Duplicated from buildAddUpdateQuotePayload.js's getTaxName (not exported).
 const getTaxName = (currencyID) => {
   switch (currencyID) {
     case 1:
@@ -132,10 +98,7 @@ const getTaxName = (currencyID) => {
   }
 };
 
-// Groups one charge type's live, currently-committed selections by category
-// — mirrors buildSelectedServicesListFromSelections' own reading of
-// `selections`/`pricing`, but only for display (name + price), no payload
-// shape involved.
+// Groups one charge type's live selections by category for display (name + price only).
 const groupSelectionsByCategory = (selections, serviceChargeTypeID, pricing) => {
   const priceByServiceID = new Map();
   (pricing || []).forEach((item) => {
@@ -150,10 +113,7 @@ const groupSelectionsByCategory = (selections, serviceChargeTypeID, pricing) => 
     const key = selection.serviceCatID ?? "uncategorised";
     if (!categoriesByID.has(key)) {
       categoriesByID.set(key, {
-        // ProposalServicesStep/index.jsx stores this field as `categoryName`
-        // (from category.serviceCatName), not `serviceCatName` on the
-        // selection itself — using the wrong key silently fell through to
-        // the "Services" fallback for every category.
+        // Field is `categoryName` on the selection, not `serviceCatName`.
         categoryName: selection.categoryName || "Services",
         services: [],
       });
@@ -169,19 +129,13 @@ const groupSelectionsByCategory = (selections, serviceChargeTypeID, pricing) => 
   return Array.from(categoriesByID.values());
 };
 
-// Package/Custom Package quotes price a service per *package slot*
-// (packageOneValue/Two/ThreeValue, each tagged with which package landed in
-// that slot via packageOneID/Two/ThreeID) instead of a single flat `price` —
-// ported verbatim from ProposalPricingTableStep.jsx's own
-// priceForSelectedPackage/PACKAGE_PRICE_SLOTS (not exported from there, so
-// duplicated here the same way CURRENCY_SYMBOLS/getTaxName already are).
-// Standard Package trusts serviceMappingWithPackagesList's cross-join first
-// (the admin-agreed per-package price); Custom Package reads the pricing
-// item's own flat slot value after checking servicePackageIDs membership
-// (a slot can carry a packageID with a null value for a package the service
-// isn't actually part of). Returns null — rendered as "—"/a cross — when
-// the service isn't part of that package by either source, exactly
-// matching the on-screen package columns this same function drives there.
+// Package/Custom Package quotes price a service per package slot
+// (packageOneValue/Two/ThreeValue tagged by packageOneID/Two/ThreeID)
+// instead of a single flat price. Ported from ProposalPricingTableStep.jsx
+// (not exported there). Standard Package trusts the admin-agreed cross-join
+// in serviceMappingWithPackagesList; Custom Package reads the pricing item's
+// own flat slot value after checking servicePackageIDs membership. Returns
+// null (rendered as a cross) when the service isn't part of that package.
 const PACKAGE_PRICE_SLOTS = [
   { idKey: "packageOneID", valueKey: "packageOneValue" },
   { idKey: "packageTwoID", valueKey: "packageTwoValue" },
@@ -217,11 +171,8 @@ const priceForSelectedPackage = (
   return match ? Number(match.price) || 0 : null;
 };
 
-// Groups selections by category the same way groupSelectionsByCategory does
-// (name/serviceID per service, category name from the selection's own
-// categoryName), but resolves a per-package price for every package column
-// instead of a single price — for the Package/Custom Package pricing table
-// below.
+// Same grouping as groupSelectionsByCategory, but resolves a per-package
+// price for every package column instead of a single price.
 const groupSelectionsByCategoryForPackages = (
   selections,
   serviceChargeTypeID,
@@ -263,35 +214,16 @@ const groupSelectionsByCategoryForPackages = (
   return Array.from(categoriesByID.values());
 };
 
-// Statement of Facts driver breakdown — mirrors PreviewComponentpdf.jsx's
-// own STATEMENT_OF_FACTS case (non-package branch, PreviewComponentpdf.jsx:
-// 6199-6351): "Ongoing/Recurring Services"/"One-Off/Ad hoc Services"
-// heading, category name + <hr>, then per service its name followed by a
-// bullet list of "driverName: value" for every one of its pricing drivers.
-// Reads the SAME redux-hydrated `driverValues` map the Services step's own
-// dropdowns/inputs read and write (ProposalServicesStep/index.jsx's
-// buildInitialDriverValues + PricingDriverField.jsx's onChange) — each
-// entry already carries a resolved, human-readable `label` for a
-// variation/slab driver (kept in sync with every user edit by
-// PricingDriverField.jsx's `label: option?.label ?? null`), so there's no
-// separate variation/slab lookup to get wrong here the way
-// resolveAdditionalInformationDisplayValue's did — this reuses the value
-// the UI itself already computed and displays.
-// A service priced purely off Global Pricing Drivers (no local
-// pricingDriverList entries of its own — confirmed live: its whole
-// pricingDriverList comes back as []) has an empty driverValues map above,
-// so it would otherwise show no driver line here at all. Admin's own
-// STATEMENT_OF_FACTS case doesn't have this gap because its
-// selectedRecurringServiceList/selectedOneOffServiceList items carry a
-// separate gpdList field merging in exactly these global drivers
-// (AddUpdateProposal.jsx:3249, `srv?.gpdList`). Rebuilt here from data
-// already available: `pricing` (GetCalculatedServicesPriceByPackages) has
-// this service's own pricingFormulaGPDsList (which globalPricingDriverIDs
-// its formula actually uses), cross-referenced against
-// additionalInformationList (which has each global driver's own resolved
-// display value) — reuses resolveAdditionalInformationDisplayValue rather
-// than re-deriving variation/slab labels a second, possibly-inconsistent
-// way.
+// Statement of Facts driver breakdown — mirrors admin's STATEMENT_OF_FACTS
+// case: heading, category name + <hr>, then per service a bullet list of
+// "driverName: value" for each pricing driver. Reads the same redux
+// driverValues map the Services step itself writes, so labels stay in sync
+// with the UI without a separate lookup.
+//
+// A service priced purely off Global Pricing Drivers has an empty
+// driverValues map (no local pricingDriverList entries), so it needs
+// drivers rebuilt from `pricing`'s pricingFormulaGPDsList cross-referenced
+// against additionalInformationList instead.
 const buildGlobalDriversForService = (
   serviceID,
   serviceChargeTypeID,
@@ -374,12 +306,8 @@ const buildDriverBreakdownSection = (
   );
   if (categories.length === 0) return "";
 
-  // Mirrors AddUpdateProposal.jsx's own STATEMENT_OF_FACTS non-package case
-  // exactly: the "Ongoing/Recurring Services"/"One-Off/Ad hoc Services"
-  // heading is colored with newColorCode (the template's brand color), not
-  // black — only the category name below it (serviceCat.serviceCatName) is
-  // black in admin's own markup. This heading was hardcoded black here,
-  // one of the confirmed color mismatches against admin's PDF.
+  // The section heading is colored with the brand accent, not black —
+  // only the category name below it is black in admin's markup.
   return `
     <p style="font-family:${fontFamily};font-size:0.2in;color:${accentColor};font-weight:bold">${escapeHtml(categoryHeading)}</p>
     ${categories
@@ -437,13 +365,9 @@ const buildStatementOfFactsDriverBreakdownHtml = ({
   return `<div style="padding-left:40px;padding-right:40px">${recurringSection}${oneOffSection}</div>`;
 };
 
-// Fees table — same header/category/total row styling confirmed via a live
-// GetQuoteModel response to match GetQuoteModel's own recurringHtmlContent/
-// oneOffHtmlContent for this organisation (#00BFFF header, #DCDCDC category
-// rows — two cells, not colspan — #808080 total rows). Fed from the live,
-// correctly-computed totals (quotationFinalAmountList, which now falls back
-// to the live VAT rate for a charge type with no prior row — see
-// buildQuotationFinalAmountListForServiceType).
+// Fees table — header/category/total row styling matches admin's
+// GetQuoteModel recurringHtmlContent/oneOffHtmlContent output for this
+// organisation (#00BFFF header, #DCDCDC category rows, #808080 totals).
 const buildFeesTableHtml = ({
   title,
   currencySymbol,
@@ -519,20 +443,12 @@ const buildFeesTableHtml = ({
     </div>`;
 };
 
-// Package/Custom Package pricing table — same header/category/total-row
-// styling as buildFeesTableHtml, but one column per package instead of a
-// single "Fees" column, matching the on-screen package columns
-// ProposalPricingTableStep.jsx renders (packageColumns.map + "—" for a
-// service that isn't part of that package). packageTotals is one
+// Package/Custom Package pricing table — same styling as buildFeesTableHtml
+// but one column per package. packageTotals holds one
 // {netTotal, discounted, vatPercentage, vat, grandTotal} per package column
-// (see findFinalAmountRowForPackage below) — each package prices
-// independently, so Net Total/Discount/VAT/Grand Total genuinely differ per
-// column, same as ProposalPricingTableStep.jsx's own side-by-side
-// Calculation columns (buildPackageTotalsList). Showing one shared total
-// only in the last column, as an earlier version of this function did, was
-// the actual bug: quotationFinalAmountList has one row per package for a
-// package-based quote, and only the single row matching the charge type
-// (whichever package happened to come first) was ever read.
+// since each package prices independently (see findFinalAmountRowForPackage
+// below) — quotationFinalAmountList has one row per package, not a single
+// shared total.
 const buildPackageColumnsFeesTableHtml = ({
   title,
   currencySymbol,
@@ -640,13 +556,9 @@ const buildPackageColumnsFeesTableHtml = ({
     </div>`;
 };
 
-// Fetches this quote's document template — same endpoint/params
-// AddUpdateProposal.jsx uses via TemplateApi.jsx's GetTemplateModelData
-// (AddUpdateProposal.jsx:21520-21525: TemplateTypeID: 1, ModuleKeyID: the
-// quote itself) — returns the whole response data, or null on failure.
-// Only templateElementListWithRequiredData (organisationLogoUrl/
-// clientNameOnFirstPage) is actually used right now, for the first/cover
-// page below.
+// Fetches this quote's document template (same endpoint/params as
+// AddUpdateProposal.jsx's GetTemplateModelData call). Only
+// templateElementListWithRequiredData is used right now, for the cover page.
 const fetchTemplateModel = async ({ templateKeyID, clientID, moduleKeyID }) => {
   if (!templateKeyID || !clientID) return null;
 
@@ -659,18 +571,11 @@ const fetchTemplateModel = async ({ templateKeyID, clientID, moduleKeyID }) => {
   return res?.data?.responseData?.data ?? null;
 };
 
-// Fetches this organisation's template list — (templateID, templateKeyID,
-// headerContent/footerContent/headerImage/footerImage/headerHeight/
-// footerHeight/watermarkImage/showSeparatorLines) per template. Used both to
-// resolve the real templateKeyID for this quote (see resolvedTemplateKeyID
-// below) and to pick the header/footer template matching this quote's
-// templateID — mirrors AddUpdateProposal.jsx's own defaultTemplateObject
-// selection exactly (AddUpdateProposal.jsx:20914-20943: filter
-// mappedOptions by templateID, use the first match; :21031-21034 for the
-// templateKeyID resolution). Falls back to the first template in the list
-// when there's no exact templateID match (AddUpdateProposal.jsx's own else
-// branch, :21091-21166) rather than returning nothing. Returns null if the
-// lookup fails or the organisation has none configured.
+// Fetches this organisation's template list. Used both to resolve the real
+// templateKeyID for this quote and to pick the header/footer template
+// matching this quote's templateID — mirrors AddUpdateProposal.jsx's
+// defaultTemplateObject selection, falling back to the first template when
+// there's no exact match. Returns null if the lookup fails or none exist.
 const fetchTemplateLookupList = async ({ organisationKeyID, clientID, quoteKeyID }) => {
   if (!organisationKeyID) return null;
 
@@ -689,10 +594,8 @@ const fetchTemplateHeaderFooter = ({ list, templateID }) => {
   return list.find((item) => item.templateID === templateID) || list[0];
 };
 
-// Same concatenation AddUpdateProposal.jsx's own concatenateFullAddress
-// does (AddUpdateProposal.jsx:20780-20796), applied to
-// ModelData.organisationAddress — comma-joins whichever address parts are
-// non-empty, trailing comma stripped.
+// Mirrors AddUpdateProposal.jsx's concatenateFullAddress: comma-joins
+// whichever address parts are non-empty, trailing comma stripped.
 const concatenateFullAddress = (address) => {
   const addPart = (part) => (part ? `${part}, ` : "");
 
@@ -708,12 +611,9 @@ const concatenateFullAddress = (address) => {
   return concatenatedAddress;
 };
 
-// Fetches the organisation's own contact details — email/phone/address/
-// website — same source AddUpdateProposal.jsx reads for sendDataToBackend's
-// email/mobile/fullAddress/webSite fields (AddUpdateProposal.jsx:20754-20804).
-// This endpoint previously required an auth token (confirmed via a live
-// 401); that requirement has since been removed, so it's now reachable here
-// the same way the template lookups above are.
+// Fetches the organisation's contact details (email/phone/address/website),
+// the same source AddUpdateProposal.jsx reads. Previously required an auth
+// token; that requirement was removed, so it's reachable here too.
 const fetchOrganisationContactDetails = async (organisationKeyID) => {
   if (!organisationKeyID) return null;
 
@@ -728,41 +628,23 @@ const fetchOrganisationContactDetails = async (organisationKeyID) => {
 
   return {
     email: emailID ?? null,
-    // Same concatenation as admin's own concatenatedPhone
-    // (AddUpdateProposal.jsx:20803).
+    // Same concatenation as admin's own concatenatedPhone.
     mobile: countryCode || phoneNo ? `${countryCode ?? ""} ${phoneNo ?? ""}`.trim() : null,
     fullAddress: concatenateFullAddress(modelData.organisationAddress) || null,
     webSite: website ?? null,
   };
 };
 
-// First/cover page — mirrors AddUpdateProposal.jsx's firstPageHTML
-// (AddUpdateProposal.jsx:21545-21565) field-for-field: organisation logo as
-// a centered background-image block, then "Proposal For" + the client's
-// name, both in the admin flow's hardcoded #00BFFF (not the live brand
-// color — admin doesn't use one here either). Only built when the
-// template doesn't already define its own First Page element
-// (ElementType.First_Page) — mirrors AddUpdateProposal.jsx's
-// isAddedFirstPage check (AddUpdateProposal.jsx:21567-21572): if the
-// template has one, that element's own (admin-authored) htmlContent is
-// admin's real cover page and must not be overridden here.
-// NOTE on page-break-after: admin's own firstPageHTML
-// (AddUpdateProposal.jsx:21559) has `page-break-after: always` on this
-// paragraph because the First Page element is never sent as its own
-// standalone generatePdfUrl call — PreviewComponentpdf.jsx's TEXT_BLOCK/
-// SERVICE_PRICING_TABLE cases only start a NEW call when the previous
-// element was a PAGE_BREAK/AWS_PDF_LINK; First_Page isn't either, so the
-// intro letter and pricing table that follow it get APPENDED onto the very
-// same call/HTML document as the cover. The forced break is the only thing
-// separating the cover from that content within that one shared render.
-// An earlier version of this file sent the cover as its own independent,
-// short-content call — removing the break there just meant the cover's own
-// call didn't force an extra page on ITS OWN, but the underlying
-// architecture mismatch (cover as an isolated call at all) was the actual
-// bug producing the extra blank page. Fixed at the call site
-// (generateAmendmentPdfUrl below) by merging the cover into the same page
-// entry as the services content, matching admin's real grouping — which
-// means this forced break is genuinely needed again now.
+// First/cover page — mirrors admin's firstPageHTML: organisation logo as a
+// centered background-image block, then "Proposal For" + client name in
+// the hardcoded #00BFFF. Only built when the template doesn't already
+// define its own First Page element — that element's htmlContent is
+// admin's real cover and must not be overridden.
+//
+// The `page-break-after: always` here matters: the cover gets appended onto
+// the SAME generatePdfUrl call as the intro letter/pricing table that
+// follow it (see generateAmendmentPdfUrl below), so this break is the only
+// thing separating the cover from that content.
 const buildCoverPageHtml = ({ organisationLogoUrl, clientNameOnFirstPage, fontFamily }) => `
   <div style="margin-top:300px">
     <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;margin-top:${organisationLogoUrl ? "-100px" : "0px"}">
@@ -778,23 +660,12 @@ const buildCoverPageHtml = ({ organisationLogoUrl, clientNameOnFirstPage, fontFa
     </div>
   </div>`;
 
-// Service Description section — mirrors PreviewComponentpdf.jsx's own
-// SERVICE_DESCRIPTION case markup (PreviewComponentpdf.jsx:5774-5858):
-// "Ongoing/Recurring Services" heading, then each category name + <hr>,
-// then each service's name + description paragraph, repeated for
-// "One-Off/Ad hoc Services". Built from the LIVE, currently-selected
-// services (recurringSelections/oneOffSelections) so a client-added
-// service's category/name always appears here, same as before — but its
-// description now comes from `descriptionByServiceID` (built from
-// `pricing`, i.e. GetCalculatedServicesPriceByPackages), NOT the services
-// catalog (GetServicesWithGlobalPricingDriverListByServiceChargeType).
-// Confirmed live: the catalog response never carries a serviceDescription
-// field on ANY service, admin included — this earlier version read it from
-// there and so silently rendered every description as empty. Admin's own
-// servicePriceData.serviceDescription (AddUpdateProposal.jsx:17581) is
-// read from that same GetCalculatedServicesPriceByPackages response,
-// confirmed live to genuinely carry a populated serviceDescription per
-// service+charge-type where one is configured.
+// Service Description section — mirrors admin's SERVICE_DESCRIPTION markup:
+// heading, category name + <hr>, then each service's name + description,
+// repeated for recurring/one-off. Built from the live selections so a
+// client-added service always appears. Description comes from `pricing`
+// (GetCalculatedServicesPriceByPackages), not the services catalog — the
+// catalog never carries a serviceDescription field on any service.
 const buildServiceDescriptionSection = (selections, descriptionByServiceID, categoryHeading, accentColor, fontFamily) => {
   const categoriesByID = new Map();
   Object.values(selections || {}).forEach((selection) => {
@@ -837,13 +708,8 @@ const buildServiceDescriptionSection = (selections, descriptionByServiceID, cate
       .join("")}`;
 };
 
-// pricing (GetCalculatedServicesPriceByPackages' `data` array) is keyed by
-// serviceChargeTypeID+serviceID elsewhere in this file (see
-// groupSelectionsByCategory's own priceByServiceID) because a serviceID is
-// only unique within one charge type — but Recurring/One-Off descriptions
-// are built and looked up separately here (recurringSelections only ever
-// contains recurring serviceIDs, oneOffSelections only one-off ones), so a
-// plain serviceID keying is unambiguous for each map on its own.
+// serviceID alone is enough to key this map since recurring/one-off
+// descriptions are built and looked up in separate maps.
 const buildDescriptionByServiceID = (pricing, serviceChargeTypeID) => {
   const map = new Map();
   (pricing || [])
@@ -881,11 +747,8 @@ const buildServiceDescriptionHtml = ({
 
   if (!recurringSection && !oneOffSection) return "";
 
-  // Mirrors PreviewComponentpdf.jsx's own HEADING case markup
-  // (padding-top:40px, colored, <br><hr>) — the section-level title
-  // ("Service Description") that sits above the Ongoing/Recurring
-  // Services breakdown in the real template, distinct from that
-  // breakdown's own sub-headings.
+  // Mirrors admin's HEADING case markup — the section-level title above the
+  // breakdown, distinct from the breakdown's own sub-headings.
   const headingHtml = heading
     ? `<div style="padding-left:40px;padding-top:40px;padding-right:40px;font-size:0.2in;color:${accentColor};font-family:${fontFamily}">${escapeHtml(heading)}<br><hr style="color:black"></div>`
     : "";
@@ -893,12 +756,10 @@ const buildServiceDescriptionHtml = ({
   return `${headingHtml}<div style="padding-left:40px;padding-right:40px">${recurringSection}${oneOffSection}</div>`;
 };
 
-// "Additional Information" section — mirrors PreviewComponentpdf.jsx's own
-// markup for it (its own driverName + resolved-value paragraphs under a
-// heading + <hr>), built from the live, redux-hydrated additionalInformationList
-// (already carries item.driverName plus the same variation/slab/text/date
-// shape buildAdditionalInformationListForPayload resolves in
-// buildAddUpdateQuotePayload.js).
+// "Additional Information" section — mirrors admin's markup (driverName +
+// resolved-value paragraphs under a heading). Built from the live redux
+// additionalInformationList, same variation/slab/text/date shape as
+// buildAddUpdateQuotePayload.js resolves for the payload.
 const resolveAdditionalInformationDisplayValue = (item) => {
   if (item.driverTypeID === 5) return item.enteredText ?? "";
   if (item.driverTypeID === 6) return item.enteredDate ?? "";
@@ -911,13 +772,8 @@ const resolveAdditionalInformationDisplayValue = (item) => {
   if (item.driverTypeID === 4) {
     const slab = item.slab?.find((option) => option.slabID === item.driverValue);
     if (!slab) return "";
-    // Mirrors ProposalAdditionalInformationStep.jsx's own slab label/value
-    // resolution exactly (renderField, driverTypeID 4 case): a slabTypeID 2
-    // row is the "Other" entry — its own slabFrom/slabTo range is
+    // slabTypeID 2 is the "Other" entry — its slabFrom/slabTo range is
     // meaningless, the client's typed number lives in slabValue instead.
-    // There is no `slabTypeName` field on this shape at all — reading it
-    // here always returned undefined and silently fell through to the
-    // (equally wrong, for "Other") from-to range.
     return slab.slabTypeID === 2
       ? String(slab.slabValue ?? "")
       : `${slab.slabFrom} - ${slab.slabTo}`;
@@ -948,18 +804,11 @@ const buildAdditionalInformationHtml = (additionalInformationList, accentColor) 
     </div>`;
 };
 
-// Mirrors sendDataToBackend()'s request shape field-for-field. email/mobile/
-// fullAddress/webSite (fetchOrganisationContactDetails) and HeaderContent/
-// FooterContent/HeaderImage/FooterImage/HeaderHeight/FooterHeight/
-// WatermarkImage/showSeparatorLines (fetchTemplateHeaderFooter) are now
-// fetched from their real sources below — both were confirmed to require
-// no auth token (one from the start, one after the auth requirement was
-// removed). headerFooterFirstPage is now the real, template-level value
-// (see resolvedHeaderFooterFirstPage in generateAmendmentPdfUrl) —
-// hardcoding it `false` sent an admin-meaningful boolean's wrong value to
-// the render microservice on every call. fontSizeContent/fontFamily/
-// landscapeMode/flagForTemplatePdf/awsPdfHeight/awsPdfWidth still have no
-// equivalent wired up here.
+// Mirrors sendDataToBackend()'s request shape. headerFooterFirstPage is the
+// real template-level value (see resolvedHeaderFooterFirstPage below) —
+// hardcoding it false previously sent the wrong value on every call.
+// fontSizeContent/fontFamily/landscapeMode/flagForTemplatePdf/awsPdfHeight/
+// awsPdfWidth have no equivalent wired up here yet.
 const sendAmendmentPageToBackend = async ({
   userId,
   headingforpage,
@@ -1024,7 +873,7 @@ const sendAmendmentPageToBackend = async ({
   return data;
 };
 
-// Mirrors generateMergePdfUrl()'s request/response shape exactly:
+// Mirrors generateMergePdfUrl()'s request/response shape:
 // {userId, moduleName} in, {success, s3Url} out.
 const mergeAmendmentPdfs = async ({ userId, moduleName }) => {
   const response = await fetch(mergePdfApiUrl, {
@@ -1045,11 +894,9 @@ const mergeAmendmentPdfs = async ({ userId, moduleName }) => {
 // Returns the merged PDF's URL (same field AddUpdateProposal.jsx assigns to
 // quotePDFUrl), or null when there's nothing to render.
 //
-// Sequence mirrors generatePdf() exactly: one generate-PDF call per page —
-// Recurring Fees, One-Off Fees, Additional Information, whichever are
-// actually present — fired together via Promise.all, and only once every
-// one of those calls has succeeded does the single merge call run, matching
-// `await Promise.all(promises); generateMergePdfUrl();`.
+// Mirrors generatePdf(): one generate-PDF call per page (whichever of
+// Recurring Fees/One-Off Fees/Additional Information are present), fired
+// via Promise.all, then a single merge call once all succeed.
 export const generateAmendmentPdfUrl = async ({
   quoteModel,
   accentColor,
@@ -1065,40 +912,20 @@ export const generateAmendmentPdfUrl = async ({
   if (!quoteModel?.userKeyID) return null;
 
   // generatePdfUrl/mergePdfApiUrl namespace pages purely by this `userId`
-  // string — there's no per-request/session key in their contract, and no
-  // clear/reset endpoint exists on either side (PreviewComponentpdf.jsx
-  // doesn't call one either). Using the real, shared quoteModel.userKeyID
-  // directly meant any earlier attempt for this same quote that generated
-  // pages but never reached a successful merge (a thrown error mid-
-  // Promise.all, a retried Amend click) left pages sitting under that same
-  // key — the next successful merge would then pull those stale pages in
-  // alongside the new ones, producing duplicated/out-of-order pages. A
-  // fresh, disposable key per call sidesteps that: each Amend attempt gets
-  // its own isolated generate+merge namespace.
+  // string, with no clear/reset endpoint. Using quoteModel.userKeyID
+  // directly would let a failed prior attempt's stale pages get pulled into
+  // the next merge, so each call gets its own disposable key instead.
   const userId = `${quoteModel.userKeyID}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
   const currencySymbol = CURRENCY_SYMBOLS[currencyID] || "£";
   // Overridden below with the template's own requiredData.brandColor once
-  // fetched — admin colors every heading/table-header/label (Recurring
-  // Fees, Additional Information, Service Description, ...) from that
-  // field (PreviewComponentpdf.jsx's `newColorCode = props.BrandColor`),
-  // not from this web-based-proposal app's own UI theme. Confirmed live:
-  // this org's real brandColor is "#00AFEF", not the "#00BFFF" fallback or
-  // whatever theme.primary happens to resolve to here — using the wrong
-  // color for every colored element was the actual cause of the visible
-  // theme mismatch against admin's PDF.
+  // fetched — admin colors every heading/table-header/label from that
+  // field, not from this app's own UI theme.
   let resolvedAccentColor = accentColor || "#00BFFF";
 
-  // First/cover page — fetched separately since it needs
-  // templateElementListWithRequiredData (organisationLogoUrl/
-  // clientNameOnFirstPage), not anything already available from
-  // quoteModel/live selections. A failure here (template fetch, or the
-  // template genuinely has no logo/client name) just means no cover page
-  // gets prepended — it doesn't block the Services/Additional Information
-  // pages this call already produces.
-  // Same lookup list used to resolve the header/footer template below —
-  // fetched once here and reused for both, since it's also the source of
-  // the real templateKeyID (see resolvedTemplateKeyID below).
+  // Fetched once and reused for the cover page, the header/footer template,
+  // and resolving the real templateKeyID below. A failure just means the
+  // cover page is skipped rather than blocking the other pages.
   let templateLookupList = null;
   try {
     templateLookupList = await fetchTemplateLookupList({
@@ -1110,17 +937,10 @@ export const generateAmendmentPdfUrl = async ({
     templateLookupList = null;
   }
 
-  // quoteModel.templateKeyID (the quote's own stored field) is NOT what
-  // admin actually uses to fetch the template — AddUpdateProposal.jsx
-  // comments out exactly that assignment (`// selectTemplateTypeId:
-  // ModelData.templateKeyID,`) and instead resolves the real key by
-  // matching this quote's numeric templateID against
-  // GetProposalEnggLetterTemplateLookUpList's results, using THAT record's
-  // templateKeyID. Confirmed live: quoteModel.templateKeyID pointed at a
-  // stale/wrong template whose Text Block was missing content
-  // (documentCode-like value + a second reference number) that the
-  // correctly-resolved templateKeyID's Text Block does contain — this was
-  // the actual root cause of the missing text, not a backend limitation.
+  // quoteModel.templateKeyID is NOT what admin uses to fetch the template —
+  // AddUpdateProposal.jsx resolves the real key by matching this quote's
+  // templateID against the template lookup list instead. Using the stored
+  // field directly pointed at a stale template missing content.
   const resolvedTemplateKeyID =
     (templateLookupList || []).find(
       (item) => item.templateID === quoteModel?.templateID,
@@ -1132,20 +952,10 @@ export const generateAmendmentPdfUrl = async ({
   let paymentTermsHtml = "";
   let serviceDescriptionHeading = "Service Description";
   let organisationLogoUrl = null;
-  // AddUpdateProposal.jsx sends this SAME value on every single page call,
-  // not per-page (PreviewComponentpdf.jsx:342-344: `isDefaultFirstPage ?
-  // headerFooterFirstPage : null`, both computed once and passed as a
-  // constant to every sendDataToBackend call). isDefaultFirstPage is
-  // ModelData.enableFirstPage (AddUpdateProposal.jsx:21646); the actual
-  // toggle value is ModelData.headerFooterFirstPage — both are fields on
-  // this same template model response. Hardcoding `false` here on every
-  // page (as before) sent an admin-meaningful boolean's WRONG value to the
-  // render microservice on every call, including the one whose sequence
-  // really is page 1 of the merged document — this is the most likely
-  // cause of the extra blank page that kept appearing directly after the
-  // cover regardless of the cover page's own HTML content (confirmed live:
-  // the blank page persisted even after the cover page's content was
-  // fixed to render correctly).
+  // Admin sends this same value on every page call (computed once from
+  // ModelData.enableFirstPage / headerFooterFirstPage, not per-page).
+  // Hardcoding false here was sending the wrong value to the render
+  // microservice on every call — the likely cause of an extra blank page.
   let resolvedHeaderFooterFirstPage = false;
   try {
     const templateModel = await fetchTemplateModel({
@@ -1177,53 +987,25 @@ export const generateAmendmentPdfUrl = async ({
       });
     }
 
-    // Same lookup AddUpdateProposal.jsx itself uses for GetCommonFontFamily
-    // (AddUpdateProposal.jsx:21531-21532: the first "Text Block" element) —
-    // in the real template this is the intro letter (date/"To,"/client
-    // details/"Dear <name>,"/opening paragraph) that sits immediately
-    // before the pricing table on the same page, already fully rendered
-    // with this client/quote's variables merged by
-    // GetMasterTemplateDetailsWithVariableValues. Used verbatim, same as
-    // every other Text Block element.
+    // The first "Text Block" element is the intro letter (date/"To,"/client
+    // details/"Dear <name>,"/opening paragraph), already rendered with this
+    // client/quote's variables merged server-side.
     const introTextBlock = Array.isArray(templateElementList)
       ? templateElementList.find(
           (element) => element.templateElementTypeName === "Text Block",
         )
       : null;
-    // Mirrors PreviewComponentpdf.jsx's own TEXT_BLOCK case exactly
-    // (PreviewComponentpdf.jsx:5624-5629: `<div style="padding-left: 40px;
-    // padding-right: 40px;">${htmlContent}</div>`) — every Text Block gets
-    // this 40px left/right padding wrapper; using the raw htmlContent
-    // without it (as before) ran the letter edge-to-edge instead of
-    // matching admin's actual margins.
-    //
-    // The short reference value above the contact line, and the second
-    // reference number near "To,", both come from this Text Block's
-    // htmlContent itself once fetched with the correctly-resolved
-    // templateKeyID above — no separate field/guess needed (documentCode
-    // and postcode were both ruled out earlier; the real cause was the
-    // wrong templateKeyID being used to fetch the template at all).
-    //
-    // extractDraftJsPlainHtml, not the raw htmlContent: confirmed live that
-    // passing this Draft.js markup straight through rendered NO visible
-    // text anywhere in the merged PDF while still eating a full blank
-    // page — see that function's own comment.
+    // Every Text Block gets admin's same 40px left/right padding wrapper.
+    // Uses extractDraftJsPlainHtml, not raw htmlContent — see that
+    // function's comment for why the raw Draft.js markup renders blank.
     introLetterHtml = introTextBlock?.htmlContent
       ? `<div style="padding-left:40px;padding-right:40px">${extractDraftJsPlainHtml(introTextBlock.htmlContent)}</div>`
       : "";
 
-    // The real template has a SECOND Text Block ("Proposal for the ...
-    // package is based on the facts you have given below. We've based our
-    // proposal on the following facts...") sitting directly between the
-    // Service Pricing Table and the Statement of facts element — verified
-    // live: templateElementList[2] here, right after
-    // templateElementList[1]'s Service Pricing Table and right before
-    // templateElementList[3]'s Statement of facts. Only picking the FIRST
-    // Text Block (the intro letter above) silently dropped this one.
-    // Statement of facts itself still isn't rendered here (it needs the
-    // admin's own StatementOfFact prop shape, not reachable from this
-    // quote's live selections) — just this intro paragraph, which is
-    // static per-template text with no per-quote variables.
+    // The template has a second Text Block sitting directly before the
+    // Statement of facts element, distinct from the intro letter above.
+    // Statement of facts itself still isn't rendered here (needs admin's
+    // own prop shape) — just this static intro paragraph.
     const statementOfFactsIndex = Array.isArray(templateElementList)
       ? templateElementList.findIndex(
           (element) => element.templateElementTypeName === "Statement of facts",
@@ -1243,13 +1025,9 @@ export const generateAmendmentPdfUrl = async ({
       }
     }
 
-    // "Payment Terms" — the real template's LAST Text Block, sitting right
-    // after the "Service Descriptions" element (verified live: it's the
-    // Text Block whose own first line is literally "Payment Terms", bold —
-    // static per-template text, no per-quote variables). Found by
-    // searching forward from Service Descriptions for the next Text Block,
-    // same technique as the Statement of facts intro paragraph above but
-    // in the opposite direction.
+    // "Payment Terms" is the template's last Text Block, right after
+    // "Service Descriptions" — found the same way as the Statement of
+    // facts intro above, searching forward instead of back.
     const serviceDescriptionsIndex = Array.isArray(templateElementList)
       ? templateElementList.findIndex(
           (element) => element.templateElementTypeName === "Service Descriptions",
@@ -1258,10 +1036,8 @@ export const generateAmendmentPdfUrl = async ({
     // The Heading element immediately preceding "Service Descriptions"
     // carries this section's actual title text (element.headings, e.g.
     // "Service Description") — mirrors PreviewComponentpdf.jsx's own
-    // HEADING case. Admin renders it as its own colored label above the
-    // Ongoing/Recurring Services breakdown; missing that label made this
-    // whole section look like it wasn't there at all, even though the
-    // Ongoing/Recurring Services content itself was present underneath it.
+    // The Heading element before "Service Descriptions" carries this
+    // section's title text — mirrors admin's own HEADING case.
     if (
       serviceDescriptionsIndex > 0 &&
       templateElementList[serviceDescriptionsIndex - 1]?.templateElementTypeName ===
@@ -1294,21 +1070,15 @@ export const generateAmendmentPdfUrl = async ({
     paymentTermsHtml = "";
   }
 
-  // Header/footer template (headerContent/footerContent/headerImage/
-  // footerImage/headerHeight/footerHeight/watermarkImage/showSeparatorLines)
-  // — confirmed live to be reachable unauthenticated (unlike organisation
-  // contact details below), so fetched and sent the same way admin does,
-  // even though it comes back null when the organisation hasn't configured
-  // one (both are real possibilities, not treated as errors).
+  // Header/footer template — reachable unauthenticated, sent the same way
+  // admin does; comes back null when the organisation hasn't configured one.
   const headerFooter = fetchTemplateHeaderFooter({
     list: templateLookupList,
     templateID: quoteModel?.templateID,
   });
 
-  // Organisation contact details (email/phone/address/website) — the
-  // Organisation/GetOrganisationInformationModel auth requirement was
-  // removed, so this is now fetched the same way as the two template
-  // lookups above.
+  // Organisation contact details — auth requirement was removed, so this
+  // is fetched the same way as the template lookups above.
   let organisationContactDetails = null;
   try {
     organisationContactDetails = await fetchOrganisationContactDetails(
@@ -1318,26 +1088,17 @@ export const generateAmendmentPdfUrl = async ({
     organisationContactDetails = null;
   }
 
-  // Everything colored below is built only now, after resolvedAccentColor
-  // has had its chance to be overridden by the template's real brandColor
-  // above — building these earlier (against the accentColor prop/#00BFFF
-  // fallback only) was the actual cause of the visible color mismatch
-  // against admin's PDF, since admin colors every one of these from that
-  // same template field.
+  // Built only now, after resolvedAccentColor may have been overridden by
+  // the template's real brandColor above, so colors match admin's PDF.
   const findFinalAmountRow = (serviceChargeTypeID) =>
     (quotationFinalAmountList || []).find(
       (row) => Number(row.serviceChargeTypeID) === serviceChargeTypeID,
     ) || null;
 
-  // Package/Custom Package quotes store ONE quotationFinalAmountList row
-  // per selected package per charge type (each tagged with its own
-  // servicePackageID), not the single servicePackageID:null row a Service
-  // quote has — mirrors ProposalPricingTableStep.jsx's own findFinalAmount.
-  // findFinalAmountRow above only matches on serviceChargeTypeID, so for a
-  // package-based quote it always resolved to whichever package's row
-  // happened to come first — that single row's totals were then shown
-  // identically in every package column. This looks up each package's own
-  // row instead.
+  // Package/Custom Package quotes store one quotationFinalAmountList row
+  // per selected package per charge type, not a single servicePackageID:null
+  // row like a Service quote — findFinalAmountRow above only matches on
+  // charge type, so this looks up each package's own row instead.
   const findFinalAmountRowForPackage = (serviceChargeTypeID, packageID) =>
     (quotationFinalAmountList || []).find(
       (row) =>
@@ -1346,12 +1107,10 @@ export const generateAmendmentPdfUrl = async ({
         String(row.servicePackageID) === String(packageID),
     ) || null;
 
-  // Package/Custom Package quotes price against package columns, not a
-  // single flat fee per service — mirrors ProposalPricingTableStep.jsx's
-  // own isStandardPackage/isPackageBased (quoteModel.quoteTypeID switch),
-  // which decides whether priceForSelectedPackage trusts
-  // serviceMappingWithPackagesList's cross-join (Standard Package) or the
-  // pricing item's own flat packageOne/Two/ThreeValue (Custom Package).
+  // Mirrors ProposalPricingTableStep.jsx's isStandardPackage/isPackageBased
+  // switch, which decides whether priceForSelectedPackage trusts the
+  // serviceMappingWithPackagesList cross-join or the pricing item's own
+  // flat package value.
   const isStandardPackage = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
   const isPackageBased =
     isStandardPackage || quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
@@ -1371,21 +1130,12 @@ export const generateAmendmentPdfUrl = async ({
       );
       if (categories.length === 0) return "";
 
-      // netTotal is summed from the LIVE, currently-selected services'
-      // per-package prices (categories' own packagePrices, already resolved
-      // via priceForSelectedPackage above) rather than trusted from the
-      // stored quotationFinalAmountList row — that row is a snapshot from
-      // whenever admin last saved the quote, so for Custom Package (whose
-      // Services step lets the client add services beyond the package's
-      // locked defaults) it silently excluded anything the client just
-      // added, undercounting both Net Total and Grand Total. Mirrors
-      // ProposalPricingTableStep.jsx's own buildPackageTotalsList +
-      // buildChargeTypeTotals package branch: Package/Custom Package always
-      // applies the package's own already-agreed discount percentage
-      // (discountPercentageWithAllDecimal, still read from the stored row —
-      // that agreed rate itself hasn't changed) to the live total, with no
-      // "unchanged" shortcut and no amendment-specific branching (that
-      // branch only exists for Service-type quotes).
+      // netTotal is summed from the live selected services' per-package
+      // prices, not the stored quotationFinalAmountList row — that row is a
+      // snapshot from admin's last save, so it would undercount anything
+      // the client just added via Custom Package. The discount percentage
+      // itself is still read from the stored row since that agreed rate
+      // hasn't changed.
       const packageTotals = packageColumns.map((pkg, pkgIndex) => {
         const packageRow = findFinalAmountRowForPackage(
           serviceChargeTypeID,
@@ -1404,19 +1154,14 @@ export const generateAmendmentPdfUrl = async ({
         const discountPercentage =
           Number(packageRow?.discountPercentageWithAllDecimal) || 0;
         const vatPercentage = packageRow?.vatPercentage ?? null;
-        // Rounded to the nearest cent (toFixed(2)) to match
-        // AddUpdateProposal.jsx's GetNetTotalValueByRecurringPackage —
-        // mirrors the same fix applied to ProposalPricingTableStep.jsx's
-        // buildChargeTypeTotals; this was the same discountAmount formula,
-        // just never rounded at all here, so it could drift from the live
-        // Pricing Table/admin figure by more than the Math.floor case did.
+        // Rounded to the nearest cent to match
+        // AddUpdateProposal.jsx's GetNetTotalValueByRecurringPackage.
         const discounted = Number(
           ((liveNetTotal * discountPercentage) / 100).toFixed(2),
         );
         const discountedTotal = liveNetTotal - discounted;
-        // Truncated to 2 decimals (not rounded) to match AuthContext.jsx's
-        // GetTwoDecimalValueWithoutRoundOff, which
-        // GetNetTotalValueByRecurringPackage uses for every VAT amount.
+        // Truncated (not rounded) to match AuthContext.jsx's
+        // GetTwoDecimalValueWithoutRoundOff, used for every VAT amount.
         const vat =
           vatPercentage == null
             ? null
@@ -1465,9 +1210,7 @@ export const generateAmendmentPdfUrl = async ({
   };
 
   // Admin's Recurring Fees title carries the payment frequency, e.g.
-  // "Recurring Fees (Monthly)" — getPaymentFrequencyLabel() in
-  // AddUpdateProposal.jsx, PAYMENT_FREQUENCY_LABEL in
-  // ProposalPricingTableStep.jsx.
+  // "Recurring Fees (Monthly)".
   const paymentFrequencyLabel =
     PAYMENT_FREQUENCY_LABEL[quoteModel?.paymentFrequencyID] || "Yearly";
 
@@ -1493,10 +1236,9 @@ export const generateAmendmentPdfUrl = async ({
     heading: serviceDescriptionHeading,
   });
 
-  // Second page: intro letter + both fees tables + the Statement of Facts
-  // intro paragraph + its driver-value breakdown, all together, same as the
-  // real template (no page break between any of these elements there) —
-  // not separate pages.
+  // Second page: intro letter + both fees tables + Statement of Facts intro
+  // + driver breakdown, all together — no page break between them, same as
+  // the real template.
   const statementOfFactsDriverBreakdownHtml = buildStatementOfFactsDriverBreakdownHtml({
     recurringSelections,
     oneOffSelections,
@@ -1516,19 +1258,12 @@ export const generateAmendmentPdfUrl = async ({
     .join("");
 
   // Admin never sends the cover as its own standalone generatePdfUrl call —
-  // PreviewComponentpdf.jsx's own element-grouping loop only starts a NEW
-  // call when the previous element was a PAGE_BREAK/AWS_PDF_LINK, and
-  // First_Page isn't either, so the intro letter/pricing table that follow
-  // it get appended onto the SAME call as the cover (as multiple {textbox}
-  // entries in one array, not one concatenated string — mirrored here).
-  // Sending the cover as its own short, isolated call was the actual
-  // architecture mismatch causing the extra blank page: fixed by merging it
-  // into the same page entry as the services content, exactly like admin's
-  // real grouping. After the services fees tables: Service Description,
-  // then Additional Information, then Payment Terms — same relative order
-  // as the real template's own Service Descriptions -> Payment Terms Text
-  // Block, with Additional Information (a web-based-proposal-only section,
-  // not part of the fetched template) folded in between.
+  // it gets appended onto the same call as the services content (as
+  // multiple {textbox} entries, not one concatenated string), matching
+  // admin's own element grouping and avoiding an extra blank page.
+  // After the fees tables: Service Description, then Additional
+  // Information (web-based-proposal-only, not part of the template), then
+  // Payment Terms.
   const coverAndServicesPage = [coverPageHtml, servicesPageHtml]
     .filter(Boolean)
     .map((html) => ({ textbox: html }));
@@ -1544,10 +1279,8 @@ export const generateAmendmentPdfUrl = async ({
   const headingforpage = quoteModel?.quotationName || "";
   const lengthPdf = pages.length;
 
-  // BrandLogo/HeaderContent/FooterContent/HeaderImage/FooterImage/
-  // HeaderHeight/FooterHeight/WatermarkImage/showSeparatorLines/
-  // headerFooterFirstPage are sent identically on every call, same as
-  // admin's own postData — it never varies these per page/sequence.
+  // These fields are sent identically on every call, same as admin's own
+  // postData — none of them vary per page/sequence.
   await Promise.all(
     pages.map((page, index) =>
       sendAmendmentPageToBackend({

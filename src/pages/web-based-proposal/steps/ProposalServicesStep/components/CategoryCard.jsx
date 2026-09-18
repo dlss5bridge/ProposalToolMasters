@@ -45,12 +45,8 @@ const CategoryCard = ({
           {category.servicesList.map((service) => {
             const isSelected = Boolean(selections[service.serviceID]);
             const isLocked = Boolean(selections[service.serviceID]?.locked);
-            // isLocked is checked first: the backend may also flag an
-            // admin-selected default service as isDisabled (e.g. to keep it
-            // out of the catalog's own toggle logic), but the client-facing
-            // message should always explain *why* — that it's part of the
-            // package by default — rather than the generic "Unavailable"
-            // that's meant for services not offered at all.
+            // Check locked before isDisabled so a default package service
+            // shows "Included by default" rather than the generic message.
             const disabledReason = isLocked
               ? "Included by default"
               : service.isDisabled

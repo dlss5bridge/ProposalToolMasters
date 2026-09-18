@@ -49,9 +49,7 @@ const resolveDateDriver = (item) => {
 
 // Turns the Additional Information step's list into the row shape
 // GetCalculatedServicesPriceByPackages expects, one entry per visible
-// global pricing driver — mirroring extractServiceData's AdditionalData
-// block in AddUpdateProposal.jsx, adapted to this list's field names
-// (enteredText/enteredDate instead of a pre-resolved driverValue).
+// global pricing driver.
 export const buildAdditionalInformationDriverEntries = (list) =>
   (list || [])
     .filter((item) => item.driverTypeID !== 1 && item.serviceID != null)
@@ -118,11 +116,7 @@ export const buildAdditionalInformationDriverEntries = (list) =>
       return base;
     });
 
-// Whether the price-relevant part of the Additional Information list has
-// changed since it was fetched — i.e. the same comparison
-// ProposalPricingTableStep's selectionsMatch does for per-service driver
-// values, but for the separate global-pricing-driver list. Compares the
-// *resolved* driverValue (via buildAdditionalInformationDriverEntries)
+// Compares the *resolved* driverValue (via buildAdditionalInformationDriverEntries)
 // rather than the raw list, so an edit only counts as a change if it
 // actually affects price (e.g. re-selecting the same variation doesn't).
 export const additionalInformationEntriesMatch = (listA, listB) => {

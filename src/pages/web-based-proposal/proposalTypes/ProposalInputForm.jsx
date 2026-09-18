@@ -69,18 +69,13 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
   const isPackageBased = isPackageType || isCustomPackageType;
 
   const [acceptError, setAcceptError] = useState(null);
-  // Mirrors ProposalPricingTableStep's own selection state (via
-  // onSelectedPackageChange below) purely so the finish action here can be
-  // gated on whether a package has actually been selected yet — same as
-  // StandardProposal.jsx's Package/Custom Package flow.
+  // Tracks ProposalPricingTableStep's selection so the finish action can be
+  // gated on a package actually being picked.
   const [selectedPackageKeyID, setSelectedPackageKeyID] = useState(null);
 
-  // Custom Package only (mirrors ProposalAmendment.jsx): the admin's locked
-  // default services are priced against a fixed package, but the client can
-  // add their own services on top, and one of those could carry its own
-  // additional-information requirement (a global pricing driver) — the step
-  // is only inserted when that's actually the case. Standard Package has no
-  // client-editable services at all, so it never inserts this step.
+  // Custom Package only: locked default services are priced against a fixed
+  // package, but the client can add their own on top — the step only shows
+  // up if one of those client-added services needs a pricing driver value.
   const hasClientAddedAdditionalInformation =
     isCustomPackageType &&
     getVisibleAdditionalInformationItems(additionalInformationList).some(
@@ -88,14 +83,8 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     );
   const additionalInfoStepInserted = hasClientAddedAdditionalInformation;
 
-  // Additional Information carries the global pricing driver values every
-  // Custom Package service (default or client-added) needs to be priced
-  // correctly — without this fetch, GetCalculatedServicesPriceByPackages
-  // (fired from ProposalPricingTableStep) would price them off no driver
-  // data at all. There's no visible Services step here to fetch this on
-  // leaving (Package/Custom Package proposals skip it — see the hidden
-  // ProposalServicesStep mount below), so it's fetched as soon as the
-  // admin's default selections have hydrated (mirrors ProposalAmendment.jsx).
+  // No visible Services step here to trigger this fetch on leaving, so it
+  // fires as soon as the default selections have hydrated instead.
   const additionalInfoFetchedRef = useRef(false);
   useEffect(() => {
     if (!isPackageBased) return;
@@ -115,10 +104,8 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     );
   }, [isPackageBased, quoteModel, selectedServiceIDs, dispatch]);
 
-  // Additional Information (Custom Package only, and only when a
-  // client-added service actually needs it) slots in right after Proposal.
-  // Pricing Table shifts one step further right when it's inserted; Input
-  // Fields, when present, always follows Pricing Table.
+  // Additional Information slots in right after Proposal when present;
+  // Pricing Table and Input Fields shift accordingly.
   const ADDITIONAL_INFO_STEP_INDEX = 1;
   const PRICING_STEP_INDEX = additionalInfoStepInserted ? 2 : 1;
   const INPUT_FIELDS_STEP_INDEX = isPackageBased
@@ -132,11 +119,8 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       additionalInfoStepInserted &&
       currentStepIndex === ADDITIONAL_INFO_STEP_INDEX
     ) {
-      // Custom Package: locked fields (the admin's default services) are
-      // read-only, so a stale/incomplete admin default there must never
-      // block the client from proceeding — only fields belonging to a
-      // service the client added themselves can actually be fixed, so only
-      // those are checked (mirrors ProposalAmendment.jsx).
+      // Custom Package: locked fields are read-only, so only client-added
+      // services' fields are validated.
       const validatableList = additionalInformationList.filter(
         (item) => !lockedServiceIDs.has(item.serviceID),
       );
@@ -149,9 +133,8 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       return true;
     }
 
-    // Package/Custom Package quotes must have a package selected before
-    // leaving the Pricing Table step — otherwise Input Fields (or the
-    // eventual Accept) would have nothing to price/contract against.
+    // Package/Custom Package quotes need a package selected before leaving
+    // Pricing Table, or later steps have nothing to price against.
     if (currentStepIndex === PRICING_STEP_INDEX && isPackageBased) {
       if (!selectedPackageKeyID) {
         setAcceptError("Please select a package to continue.");
@@ -176,32 +159,13 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     return true;
   };
 
-  // Plain (non-package) Input Fields flow's "Save" action — Package/Custom
-  // Package quotes finish via handleAccept below instead. Base request is
-  // the complete GetQuoteModel response; only the
-  // globalPricingDriverIDsWithValues entries the client actually filled in
-  // are patched on top, same as handleAccept. Mirrors handleAccept's
-  // generate-contract redirect too, since this is the "finish" action for
-  // this (non-package) proposal type just as handleAccept is for package
-  // ones.
-  //
-  // isAmend: false — this "Slideshow with Input Fields" web proposal type
-  // (webProposalTypeID 2, see index.jsx's WEB_PROPOSAL_TYPE_ID) never gives
-  // the client a Services or Additional Information step (see the `steps`
-  // array below — only Proposal/Pricing Table/Input Fields ever appear), so
-  // there's nothing here that qualifies as an amendment the way
-  // ProposalAmendment.jsx's Service/Custom Package flows do. Passing
-  // isAmend: false makes buildAddUpdateQuotePayload preserve
-  // selectedServicesList/additionalInformationList exactly as GetQuoteModel
-  // returned them (see preserveSelectedServicesListFromQuoteModel/
-  // preserveAdditionalInformationListFromQuoteModel) instead of applying
-  // the amendment-only null-ID transformations meant for actual amendment
-  // submissions.
+  // "Save" action for the plain (non-package) flow — Package/Custom Package
+  // quotes finish via handleAccept instead. This proposal type never shows a
+  // Services or Additional Information step, so isAmend is always false and
+  // buildAddUpdateQuotePayload just preserves GetQuoteModel's values as-is.
   const handleSave = async () => {
     const quoteKeyID = quoteModel?.quoteKeyID;
-    // themeSettings was already fetched by GetOrganisationThemeSettings on
-    // page load (see WebBasedProposal in index.jsx) — reuse it instead of
-    // calling the endpoint again here.
+    // Already fetched on page load (WebBasedProposal in index.jsx).
     const themeSettings = proposal.themeSettings;
     const serviceChargeTypeID = themeSettings?.serviceChargeTypeID;
 
@@ -242,12 +206,8 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
 
     setAcceptError(null);
 
-    // Mirrors the email accept link's query shape exactly (see
-    // PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl):
-    // quoteKeyID, ServiceChargeTypeID, Action, ContractSignatoryKeyID. This
-    // is a Service-based (non-package) proposal, so there's no
-    // ServicePackageKeyID to resolve — left out of the URL entirely, same
-    // as handleAccept does for that case.
+    // No ServicePackageKeyID here — this is a Service-based (non-package)
+    // proposal, so there's nothing to resolve.
     const params = new URLSearchParams({
       quoteKeyID,
       ServiceChargeTypeID: String(serviceChargeTypeID),
@@ -255,23 +215,16 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       ContractSignatoryKeyID: themeSettings?.contractSignatoryKeyID ?? "",
     });
 
-    // Full navigation (not react-router's navigate) — the client-facing
-    // generate-contract destination lives on the production proposal
-    // domain, not necessarily the origin this app is currently served from.
+    // Full navigation, not react-router — generate-contract lives on the
+    // production proposal domain, not necessarily this app's origin.
     window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
   };
 
-  // Same "Accept" destination the admin-side proposal email button links to
-  // (see PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl) —
-  // /generate-contract itself calls GenerateContractFromProposal on mount,
-  // generates the contract PDF, and hands off to SignEasy, so accepting here
-  // just navigates there with the same query params instead of duplicating
-  // that flow. Mirrors StandardProposal.jsx's handleAccept exactly.
+  // /generate-contract calls GenerateContractFromProposal on mount and hands
+  // off to SignEasy, so accepting here just navigates there.
   const handleAccept = async () => {
     const quoteKeyID = quoteModel?.quoteKeyID;
-    // themeSettings was already fetched by GetOrganisationThemeSettings on
-    // page load (see WebBasedProposal in index.jsx) — reuse it instead of
-    // calling the endpoint again here.
+    // Already fetched on page load (WebBasedProposal in index.jsx).
     const themeSettings = proposal.themeSettings;
     const serviceChargeTypeID = themeSettings?.serviceChargeTypeID;
 
@@ -280,10 +233,9 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       return;
     }
 
-    // Package/Custom Package proposals must have a package selected on the
-    // Pricing Table step before the proposal can be accepted — the Select
-    // Package button there only picks a package, it never submits, so this
-    // is the one gate that actually blocks acceptance.
+    // Package/Custom Package needs a package selected on Pricing Table
+    // before acceptance — the Select Package button there only picks, it
+    // never submits.
     if (isPackageBased && !selectedPackageKeyID) {
       setAcceptError("Please select a package to continue.");
       return;
@@ -297,22 +249,9 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       return;
     }
 
-    // Base request is the complete GetQuoteModel response; only the
-    // globalPricingDriverIDsWithValues entries the client actually filled in
-    // on the Input Fields step are patched on top — the package selection
-    // and everything else stays exactly as GetQuoteModel returned it.
-    // serviceSelectionsForTotals is only actually read for a Package/Custom
-    // Package quote's quoteAdditionalServicesInPackages rebuild (see
-    // buildQuoteAdditionalServicesInPackages) — Service ignores these fields
-    // since it never reaches handleAccept (isPackageBased-gated) at all.
-    //
-    // isAmend: false — same reasoning as handleSave above: this proposal
-    // type never gives the client a Services or Additional Information step
-    // for any quote type (Package, Custom Package included — the `steps`
-    // array below only ever shows Proposal/Pricing Table/Input Fields), so
-    // selectedServicesList/additionalInformationList should preserve
-    // GetQuoteModel's own values rather than the amendment-only null-ID
-    // transformations.
+    // Only the Input Fields entries the client filled in get patched onto
+    // the GetQuoteModel response; isAmend stays false for the same reason
+    // as handleSave above.
     try {
       await dispatch(
         addUpdateQuote({
@@ -343,14 +282,8 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
 
     setAcceptError(null);
 
-    // Mirrors the email accept link's query shape exactly (see
-    // PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl):
-    // quoteKeyID, ServiceChargeTypeID, Action, ServicePackageKeyID,
-    // ContractSignatoryKeyID. ServicePackageKeyID is a different value from
-    // the selected servicePackageID — it must be looked up from
-    // themeSettings._ServicePackage (see resolveServicePackageKeyID) — and a
-    // Service-based proposal has no packages at all, so it's left out of the
-    // URL entirely for that case.
+    // ServicePackageKeyID needs a lookup (see resolveServicePackageKeyID)
+    // and is omitted for Service-based proposals, which have no packages.
     const servicePackageID =
       selectedPackageKeyID ?? quoteModel?.servicePackageID?.[0];
     const servicePackageKeyID = resolveServicePackageKeyID(
@@ -367,9 +300,8 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       params.set("ServicePackageKeyID", servicePackageKeyID);
     }
 
-    // Full navigation (not react-router's navigate) — the client-facing
-    // generate-contract destination lives on the production proposal
-    // domain, not necessarily the origin this app is currently served from.
+    // Full navigation, not react-router — generate-contract lives on the
+    // production proposal domain, not necessarily this app's origin.
     window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
   };
 
@@ -432,9 +364,7 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
           backgroundColor: theme.background,
         }}
       >
-        {/* Sidebar (logo/description) — shown on every step, including
-            Additional Information and Input Fields, not just Proposal and
-            Pricing Table. */}
+        {/* Sidebar (logo/description) — shown on every step. */}
         <aside
           className="hidden lg:flex lg:w-80 lg:flex-shrink-0 overflow-y-auto border-r"
           style={{
@@ -452,12 +382,9 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
             backgroundColor: theme.background,
           }}
         >
-          {/* Package proposals skip a visible Services step entirely, but the
-              Pricing Table still needs the admin's default selections
-              hydrated into redux — so the step stays mounted here,
-              permanently hidden, purely to run its data-fetch/hydration
-              effects in the background (mirrors StandardProposal.jsx /
-              ProposalAmendment.jsx). */}
+          {/* Package proposals have no visible Services step, but Pricing
+              Table still needs the default selections hydrated into redux —
+              so it stays mounted here, hidden, just to run that effect. */}
           {isPackageBased && (
             <div className="hidden">
               <ProposalServicesStep theme={theme} />

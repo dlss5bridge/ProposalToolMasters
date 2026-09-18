@@ -13,8 +13,7 @@ import {
 } from "../../../redux/reducer/webProposal/inputFields";
 
 // driverTypeID: 2 = quantity (number), 3 = variation (select), 4 = slab (select),
-// 5 = free text, 6 = date. Same convention used across the web-proposal steps
-// (see ProposalAdditionalInformationStep / PricingDriverField).
+// 5 = free text, 6 = date
 const updateItem = (list, globalPricingDriverID, patch) =>
   list.map((item) =>
     item.globalPricingDriverID === globalPricingDriverID

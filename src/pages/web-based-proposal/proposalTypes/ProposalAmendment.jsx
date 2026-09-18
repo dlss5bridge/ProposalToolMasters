@@ -67,10 +67,8 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const activeStep = useSelector(selectActiveStep);
   const quoteModel = useSelector(selectQuoteModel);
   const [acceptError, setAcceptError] = useState(null);
-  // Mirrors ProposalPricingTableStep's own selection state (via
-  // onSelectedPackageChange below) purely so Next/Amend can be gated on
-  // whether a package has actually been selected yet — same pattern as
-  // StandardProposal.jsx / ProposalInputForm.jsx.
+  // Tracks ProposalPricingTableStep's selection so Next/Amend can be gated
+  // on a package actually being picked.
   const [selectedPackageKeyID, setSelectedPackageKeyID] = useState(null);
   const selectedServiceIDs = useSelector(selectSelectedServiceIDs);
   const servicesFieldErrors = useSelector(selectServicesFieldErrors);
@@ -94,38 +92,24 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   const oneOffServices = useSelector(selectOneOffServices);
   const servicesPricing = useSelector(selectServicesPricing);
   const servicesCurrencyID = useSelector(selectServicesCurrencyID);
-  // Same source ProposalPricingTableStep.jsx already falls back to
-  // (recurringVatPercentage/oneOffVatPercentage) when a charge type has no
-  // existing quotationFinalAmountList row of its own yet — see
-  // buildQuotationFinalAmountListForServiceType's matching fallback.
   const servicesVatPercentage = useSelector(selectServicesVatPercentage);
   const servicesPackageList = useSelector(selectServicesPackageList);
   const serviceMappingWithPackagesList = useSelector(
     selectServiceMappingWithPackagesList,
   );
 
-  // Package proposals ship with the admin's fixed default services and give
-  // the client no service picker at all — the Services step is dropped from
-  // the stepper entirely (see isPackageType below).
+  // Package proposals use the admin's fixed default services, so there's no
+  // service picker step at all.
   const isPackageType = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
   const isCustomPackageType =
     quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
   const isPackageBased = isPackageType || isCustomPackageType;
 
-  // Package proposals are priced against a fixed package/discount rather
-  // than the per-service driver values Additional Information exists to
-  // capture, so the step is skipped entirely — never inserted into the
-  // stepper, never navigable to.
-  //
-  // Custom Package is different: the admin's locked default services are
-  // still priced against a fixed package, but the client can add their own
-  // services on top of that package, and one of those could carry its own
-  // additional-information requirement (a global pricing driver). The step
-  // is only inserted when that's actually the case — i.e. at least one
-  // visible field belongs to a service the client added themselves, not one
-  // of the admin's locked defaults — so a Custom Package proposal with no
-  // client-added services (or none needing extra info) still skips it
-  // exactly like before.
+  // Package is priced against a fixed package/discount, so Additional
+  // Information never applies. Custom Package still has locked default
+  // services on a fixed package, but the client can add their own on top —
+  // the step only shows up if one of those client-added services actually
+  // needs a pricing driver value.
   const hasClientAddedAdditionalInformation =
     isCustomPackageType &&
     getVisibleAdditionalInformationItems(additionalInformationList).some(
@@ -137,16 +121,14 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       ? hasClientAddedAdditionalInformation
       : hasAdditionalInformation;
 
-  // Base step order is fixed, so the final index of any step can be derived
-  // up front from its position here plus whether Additional Information gets
-  // spliced in after Services — needed below to tell the Pricing Table step
-  // when it becomes the active step.
+  // Base step order, used to derive each step's final index once Additional
+  // Information is spliced in.
   const BASE_STEP_LABELS = isPackageType
     ? ["Proposal", "Pricing Table", "Input Fields"]
     : ["Proposal", "Services", "Pricing Table", "Input Fields"];
   const SERVICES_STEP_INDEX = BASE_STEP_LABELS.indexOf("Services");
-  // Additional Information normally follows Services; Package proposals have
-  // no Services step, so it slots in right after Proposal instead.
+  // Additional Information normally follows Services; Package has no
+  // Services step, so it slots in right after Proposal instead.
   const ADDITIONAL_INFO_INSERT_INDEX = isPackageType
     ? 1
     : SERVICES_STEP_INDEX + 1;
@@ -157,9 +139,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     BASE_STEP_LABELS.indexOf("Input Fields") +
     (additionalInfoStepInserted ? 1 : 0);
 
-  // Single source of truth pairing each step's label with its component, so
-  // the two can never drift out of sync (steps not yet built get a `null`
-  // component but still reserve their place in the flow).
+  // Pairs each step's label with its component so they can't drift apart.
   const baseSteps = [
     { label: "Proposal", component: <ProposalPdfStep theme={theme} /> },
     ...(isPackageType
@@ -199,12 +179,8 @@ export default function ProposalAmendment({ theme, proposal, services }) {
           component: (
             <ProposalAdditionalInformationStep
               theme={theme}
-              // Custom Package: the admin's locked default services keep
-              // their pre-set values shown but not editable; only fields
-              // belonging to a service the client added themselves are
-              // live. Every other proposal type has no locked services, so
-              // this is an empty set and every field stays editable exactly
-              // as before.
+              // Custom Package: locked default services show their values
+              // read-only; only client-added services stay editable.
               lockedServiceIDs={isCustomPackageType ? lockedServiceIDs : undefined}
             />
           ),
@@ -218,31 +194,18 @@ export default function ProposalAmendment({ theme, proposal, services }) {
 
   const ADDITIONAL_INFO_STEP_INDEX = ADDITIONAL_INFO_INSERT_INDEX;
 
-  // For a Service/Amendment proposal this fetch happens when the client
-  // clicks Next out of the Services step (see the SERVICES_STEP_INDEX branch
-  // of handleBeforeNextStep below). Standard Package proposals have no
-  // Services step to leave, so without this neither the (read-only)
-  // Additional Information step nor the Pricing Table would ever learn a
-  // selected service's global pricing driver value.
+  // Standard Package has no Services step to trigger this fetch on Next, so
+  // it needs to happen here instead — otherwise Pricing Table would never
+  // learn the selected services' global pricing driver values.
   //
-  // Custom Package does have a Services step, but its locked default
-  // services are already selected before the client ever reaches it — if the
-  // Pricing Table becomes active without that step's Next handler having run
-  // (e.g. the stepper's tab lets an already-reachable step be opened
-  // directly, skipping it), the same gap applies: those services would reach
-  // GetCalculatedServicesPriceByPackages with no global-driver row at all,
-  // silently pricing off the package's generic defaults instead of this
-  // quote's actual resolved values. So this runs for both package types.
+  // Custom Package does have a Services step, but the stepper's tabs let the
+  // client jump straight to Pricing Table without going through it, so the
+  // same fetch is needed as a safety net there too.
   const additionalInfoFetchedRef = useRef(false);
-  // Custom Package only: tracks which service IDs the safety-net fetch below
-  // has already covered. A plain one-shot ref (like Package uses) would
-  // permanently miss a service the client adds on the Services step after
-  // this quote's locked defaults already hydrated and triggered the first
-  // fetch — handleBeforeNextStep's own refetch covers that when the client
-  // clicks Next out of Services, but the stepper's tabs let them jump
-  // straight to a later step instead, skipping that handler entirely.
-  // Refetching whenever a not-yet-covered ID shows up closes that gap
-  // without changing anything for Package (untouched below).
+  // Custom Package only: tracks which service IDs we've already fetched
+  // Additional Information for, since the client can add new services after
+  // the first fetch (via the stepper tabs, bypassing handleBeforeNextStep's
+  // own refetch on Services' Next).
   const additionalInfoFetchedServiceIDsRef = useRef(new Set());
   useEffect(() => {
     if (!isPackageBased) return;
@@ -278,10 +241,8 @@ export default function ProposalAmendment({ theme, proposal, services }) {
   ]);
 
   const handleBeforeNextStep = async (currentStepIndex) => {
-    // Package/Custom Package quotes must have a package selected before
-    // leaving the Pricing Table step — otherwise Additional Information/
-    // Input Fields (or the eventual Amend) would have nothing to price/
-    // contract against.
+    // Package/Custom Package quotes need a package selected before leaving
+    // Pricing Table, or later steps have nothing to price against.
     if (currentStepIndex === PRICING_STEP_INDEX && isPackageBased) {
       if (!selectedPackageKeyID) {
         setAcceptError("Please select a package to continue.");
@@ -307,10 +268,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       additionalInfoStepInserted &&
       currentStepIndex === ADDITIONAL_INFO_STEP_INDEX
     ) {
-      // Custom Package: locked fields are read-only, so a stale/incomplete
-      // admin default there must never block the client from proceeding —
-      // only fields belonging to a service the client added themselves can
-      // actually be fixed, so only those are checked.
+      // Custom Package: locked fields are read-only, so only client-added
+      // services' fields are validated — a stale admin default shouldn't
+      // block the client.
       const validatableList = isCustomPackageType
         ? additionalInformationList.filter(
             (item) => !lockedServiceIDs.has(item.serviceID),
@@ -359,9 +319,8 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       list = [];
     }
 
-    // Mirrors additionalInfoStepInserted above: for Custom Package, only a
-    // client-added service's field counts toward inserting the step — a
-    // freshly re-fetched `list` (not yet in redux) needs the same filter.
+    // Same Custom Package filter as additionalInfoStepInserted above,
+    // applied to this freshly fetched list (not yet in redux).
     const visibleItems = getVisibleAdditionalInformationItems(list);
     const hasVisibleAdditionalInformation = isCustomPackageType
       ? visibleItems.some((item) => !lockedServiceIDs.has(item.serviceID))
@@ -375,14 +334,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     return true;
   };
 
-  // Redirect below mirrors StandardProposal.jsx's handleAccept exactly, so
-  // every Web-Based Proposal type lands on the same generate-contract flow
-  // after its final action.
   const handleAmendProposal = async () => {
     const quoteKeyID = quoteModel?.quoteKeyID;
-    // themeSettings was already fetched by GetOrganisationThemeSettings on
-    // page load (see WebBasedProposal in index.jsx) — reuse it instead of
-    // calling the endpoint again here.
+    // Already fetched on page load (WebBasedProposal in index.jsx).
     const themeSettings = proposal.themeSettings;
     const serviceChargeTypeID = themeSettings?.serviceChargeTypeID;
 
@@ -404,16 +358,10 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       return;
     }
 
-    // isAmend is decided independently per proposal type, per the table in
-    // buildAddUpdateQuotePayload.js's doc comment:
-    //   - Package never lets the client change anything on this proposal
-    //     (no Services step, no Additional Information step), so it's
-    //     always false — no comparison needed.
-    //   - Service and Custom Package are amendments only when the client
-    //     actually changed something from the admin's defaults — a service
-    //     selection/driver value or an Additional Information driver value.
-    //     Submitting the unedited default proposal (e.g. just picking a
-    //     package and accepting) is not an amendment.
+    // Package can't be amended (no Services/Additional Information steps),
+    // so it's always false. Service and Custom Package count as an
+    // amendment only if the client actually changed something from the
+    // admin's defaults.
     const hasBeenAmended =
       !selectionsMatch(recurringSelections, defaultRecurringSelections) ||
       !selectionsMatch(oneOffSelections, defaultOneOffSelections) ||
@@ -423,15 +371,8 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       );
     const isAmend = isPackageType ? false : hasBeenAmended;
 
-    // Base request is the complete GetQuoteModel response. Package
-    // Amendment never lets the client add/remove services, and an unamended
-    // Service/Custom Package proposal has nothing to rebuild either — both
-    // cases leave selectedServicesList exactly as GetQuoteModel returned it
-    // (see buildAddUpdateQuotePayload's isAmend gate). Only an actually
-    // amended Service/Custom Package proposal rebuilds it from the live,
-    // currently-committed selections instead of the stale quoteModel copy
-    // (fetched once at page load, before any edits) — see
-    // buildSelectedServicesListFromSelections.
+    // Only an actually amended proposal needs selectedServicesList rebuilt
+    // from the live selections rather than the stale quoteModel copy.
     const selectedServicesListOverride = isAmend
       ? buildSelectedServicesListFromSelections({
           recurringSelections,
@@ -442,8 +383,6 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         })
       : undefined;
 
-    // Existing amendment payload logic, untouched — built once, before any
-    // PDF work.
     const amendmentPayload = buildAddUpdateQuotePayload(
       quoteModel,
       inputFieldsList,
@@ -463,19 +402,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       isAmend,
     );
 
-    // Regenerate the PDF only for an actual Service/Custom Package
-    // amendment — mirrors AddUpdateProposal.jsx/PreviewComponentpdf.jsx's
-    // own generate → merge → quotePDFUrl sequence (generateAmendmentPdf.js:
-    // one generatePdfUrl call per updated-content page — Recurring Fees,
-    // One-Off Fees, Additional Information — then a single mergePdfApiUrl
-    // call), using the correctly-totalled live selections
-    // (quotationFinalAmountList, now falling back to the live VAT rate for
-    // a charge type with no prior row). Must finish and update
-    // amendmentPayload.quotePDFUrl before the single addUpdateQuote call
-    // below — Package never reaches this (isAmend is always false for it),
-    // and an unamended Service/Custom Package proposal (isAmend: false)
-    // skips it too, leaving quotePDFUrl exactly as buildAddUpdateQuotePayload
-    // already set it.
+    // Regenerate the PDF only for an actual amendment (see
+    // generateAmendmentPdf.js) — must finish before addUpdateQuote below,
+    // since amendmentPayload.quotePDFUrl needs the merged result.
     let finalPayload = amendmentPayload;
     if (isAmend) {
       let mergedPdfUrl;
@@ -501,19 +430,13 @@ export default function ProposalAmendment({ theme, proposal, services }) {
         return;
       }
 
-      // Same field AddUpdateProposal.jsx assigns MergePdfUrl to
-      // (quotePDFUrl: MergePdfUrl || null) — every other key from the
-      // existing amendment payload is passed through unchanged.
       finalPayload = { ...amendmentPayload, quotePDFUrl: mergedPdfUrl };
     }
 
     let amendedQuoteKeyID;
     try {
-      // On success, AddUpdateQuote's responseData.data is the new
-      // quoteKeyID for this amendment (the addUpdateQuote thunk already
-      // unwraps to responseData.data) — Generate Contract must be called
-      // with that one, not the original quoteModel.quoteKeyID, since an
-      // amendment persists as a new quote record.
+      // An amendment persists as a new quote record, so Generate Contract
+      // needs the returned quoteKeyID, not the original.
       amendedQuoteKeyID = await dispatch(
         addUpdateQuote({
           ...finalPayload,
@@ -532,14 +455,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
 
     setAcceptError(null);
 
-    // Mirrors the email accept link's query shape exactly (see
-    // PreviewComponentpdf.jsx's AcceptRecurringUrl/AcceptOneOffUrl):
-    // quoteKeyID, ServiceChargeTypeID, Action, ServicePackageKeyID,
-    // ContractSignatoryKeyID. ServicePackageKeyID is a different value from
-    // the selected servicePackageID — it must be looked up from
-    // themeSettings._ServicePackage (see resolveServicePackageKeyID) — and a
-    // Service-based proposal has no packages at all, so it's left out of the
-    // URL entirely for that case.
+    // Mirrors the email accept link's query params. ServicePackageKeyID
+    // needs a lookup (see resolveServicePackageKeyID) and is omitted for
+    // Service-based proposals, which have no packages.
     const servicePackageID =
       selectedPackageKeyID ?? quoteModel?.servicePackageID?.[0];
     const servicePackageKeyID = resolveServicePackageKeyID(
@@ -559,9 +477,8 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     // eslint-disable-next-line no-debugger
     debugger; // TEMP: inspect the resolved generate-contract params before navigating away.
 
-    // Full navigation (not react-router's navigate) — the client-facing
-    // generate-contract destination lives on the production proposal
-    // domain, not necessarily the origin this app is currently served from.
+    // Full navigation, not react-router — generate-contract lives on the
+    // production proposal domain, not necessarily this app's origin.
     window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
   };
 
@@ -582,9 +499,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
           backgroundColor: theme.background,
         }}
       >
-        {/* Sidebar (logo/description) — shown on every step, including
-            Additional Information and Input Fields, not just Proposal and
-            Pricing Table. */}
+        {/* Sidebar (logo/description) — shown on every step. */}
         <aside
           className="hidden lg:flex lg:w-80 lg:flex-shrink-0 overflow-y-auto border-r"
           style={{
@@ -602,11 +517,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
             backgroundColor: theme.background,
           }}
         >
-          {/* Package proposals skip the Services step entirely (no service
-              picker is ever shown), but the Pricing Table still needs the
-              admin's default selections hydrated into redux — so the step
-              stays mounted here, permanently hidden, purely to run its
-              data-fetch/hydration effects in the background. */}
+          {/* Package proposals have no visible Services step, but Pricing
+              Table still needs the default selections hydrated into redux —
+              so it stays mounted here, hidden, just to run that effect. */}
           {isPackageType && (
             <div className="hidden">
               <ProposalServicesStep theme={theme} />

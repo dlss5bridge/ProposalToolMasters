@@ -7,9 +7,8 @@ const SERVICE_CHARGE_TYPE_ID = {
   ONE_OFF: 2,
 };
 
-// The web-based-proposal route runs outside the authenticated app (no login,
-// no redux/local-storage auth state), so all identity values are sourced
-// from the GetQuoteModel API response (webProposal.quoteModel) instead.
+// This route runs unauthenticated, so identity values come from the
+// GetQuoteModel response (webProposal.quoteModel) rather than app auth state.
 const buildServicesPayload = (
   {
     organisationKeyID,
@@ -78,11 +77,9 @@ const toResult = (responseData) => ({
   vatPercentage: responseData.vatPercentage || 0,
   currencyID: responseData.currencyID || 1,
   packageList: responseData.packageList || [],
-  // Standard "Package" quotes (QUOTE_TYPE_ID.Package) resolve each
-  // service's per-package price from this list, not from the flat
-  // packageOneValue/Two/ThreeValue on `data` — see packagePriceViaMapping
-  // in ProposalPricingTableStep.jsx, mirroring AddUpdateProposal.jsx's
-  // GetCalculatedServicesPriceByPackagesData.
+  // Package quotes resolve each service's per-package price from this list
+  // rather than the flat packageOneValue/Two/ThreeValue on `data` — see
+  // packagePriceViaMapping in ProposalPricingTableStep.jsx.
   serviceMappingWithPackagesList: responseData.serviceMappingWithPackagesList || [],
 });
 
@@ -90,20 +87,16 @@ export const getCalculatedServicesPriceByPackages = createAsyncThunk(
   "webProposalServices/getCalculatedServicesPriceByPackages",
   async (payload, thunkAPI) => {
     try {
-      // One-off services are billed once — they must never reprice when the
-      // quote's recurring payment frequency changes. The backend scales
-      // every row in one shared calculateServicesGPDList by the single
-      // GetValueOf sent, one-off rows included, so a combined request makes
-      // one-off prices drift with frequency exactly like recurring ones do.
-      // Sending one-off rows in their own request, always pinned to
-      // GetValueOf: "Yearly" (frequency-independent), keeps them stable
-      // while the recurring request still scales normally.
+      // One-off services must never reprice when the recurring payment
+      // frequency changes, but the backend scales every row in a shared
+      // calculateServicesGPDList by the single GetValueOf sent. So one-off
+      // rows go in their own request pinned to GetValueOf: "Yearly", while
+      // the recurring request scales normally.
       const { oneOffGetValueOf, calculateServicesGPDList = [], ...rest } =
         payload;
-      // AdditionalData rows (Additional Information global pricing drivers)
-      // carry no serviceChargeTypeID — a single such driver can feed both a
-      // recurring and a one-off service's formula, so it must be resent with
-      // both split requests, not routed to just one.
+      // Additional Information pricing driver rows carry no
+      // serviceChargeTypeID and can feed both recurring and one-off
+      // formulas, so they need to be resent with both split requests.
       const oneOffEntries = calculateServicesGPDList.filter(
         (entry) => Number(entry.serviceChargeTypeID) === 2,
       );

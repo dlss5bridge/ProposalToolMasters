@@ -44,9 +44,7 @@ const PAYMENT_FREQUENCY_LABEL = {
   3: "Quarterly",
   4: "Monthly",
 };
-// Sent as GetValueOf on GetCalculatedServicesPriceByPackages, exactly mirroring
-// AddUpdateProposal.jsx's handleSetCalculatedPackageData/handleCalculatedData
-// switch on ProposalObject.Payment_Frequency — the backend, not the client,
+// Sent as GetValueOf on GetCalculatedServicesPriceByPackages — the backend
 // scales the recurring price down to this billing period.
 const GET_VALUE_OF_BY_FREQUENCY = {
   1: "Yearly",
@@ -55,9 +53,8 @@ const GET_VALUE_OF_BY_FREQUENCY = {
   4: "Monthly",
 };
 
-// serviceID is only unique within a charge type (recurring vs one-off share
-// the same ID space), so lookups must key on both — otherwise a one-off
-// price entry can be shadowed by a recurring entry with the same serviceID.
+// serviceID is only unique within a charge type (recurring and one-off share
+// the same ID space), so lookups must key on both.
 const priceKey = (serviceChargeTypeID, serviceID) =>
   `${serviceChargeTypeID}_${serviceID}`;
 
@@ -97,9 +94,9 @@ const normalizeSelectionsForCompare = (selections) =>
     }))
     .sort((a, b) => String(a.serviceID).localeCompare(String(b.serviceID)));
 
-// Exported for ProposalAmendment.jsx's isAmend gate — an amendment is only
-// a genuine amendment when something the client controls (a service
-// selection or a driver value) actually changed from the admin's defaults.
+// Exported for ProposalAmendment.jsx's isAmend gate — it's only a genuine
+// amendment when a service selection or driver value changed from the
+// admin's defaults.
 export const selectionsMatch = (current, defaults) =>
   JSON.stringify(normalizeSelectionsForCompare(current)) ===
   JSON.stringify(normalizeSelectionsForCompare(defaults));
@@ -116,9 +113,7 @@ const buildServiceDefMap = (categories) => {
 };
 
 // Turns one selected service (+ the driver values the user chose for it)
-// into the row shape GetCalculatedServicesPriceByPackages expects. Mirrors
-// the equivalent logic in AddUpdateProposal.jsx's extractServiceData, but
-// reads the *chosen* driver value instead of always the default one.
+// into the row shape GetCalculatedServicesPriceByPackages expects.
 const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
   const allDrivers = serviceDef?.pricingDriverList || [];
   const visibleDrivers = allDrivers.filter((driver) => driver.driverVisibility);
@@ -131,8 +126,8 @@ const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
     dateID: null,
   };
 
-  // A service with no pricing drivers at all still needs one row so the
-  // backend has something to price it against.
+  // A service with no pricing drivers still needs one row for the backend
+  // to price it against.
   if (allDrivers.length === 0) {
     return [
       {
@@ -145,11 +140,10 @@ const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
     ];
   }
 
-  // Every driver here is hidden (driverVisibility: false) because it's a
-  // global pricing driver captured on the separate Additional Information
-  // step instead — additionalDriverEntries supplies its row. Emitting a
-  // driverValue: null placeholder here as well would send a second,
-  // conflicting row for the same service and shadow that real value.
+  // Every driver here is hidden because it's a global pricing driver
+  // captured on the Additional Information step instead —
+  // additionalDriverEntries supplies its row, so skip it here to avoid a
+  // conflicting duplicate.
   if (visibleDrivers.length === 0) {
     return [];
   }
@@ -187,14 +181,8 @@ const buildDriverEntries = (selection, serviceDef, serviceChargeTypeID) => {
   });
 };
 
-// Mirrors AuthContext.jsx's GetTwoDecimalValueWithoutRoundOff exactly — used
-// for every VAT amount in AddUpdateProposal.jsx's own totals functions
-// (GetNetTotalValueByRecurring/GetNetTotalValueByRecurringPackage, Service
-// and Package/Custom Package alike): truncates to 2 decimals rather than
-// rounding to the nearest cent. Left unrounded, this component's own VAT
-// figure could come out a cent higher than admin's whenever the raw VAT's
-// third decimal digit is 5 or more, since formatAmount's toFixed(2) rounds
-// at display time instead of truncating.
+// Truncates to 2 decimals rather than rounding, matching how admin computes
+// VAT — otherwise our figure could come out a cent higher than theirs.
 const truncateToTwoDecimals = (value) => Math.floor(value * 100) / 100;
 
 const applyVat = (netTotal, vatPercentage) => {
@@ -205,14 +193,9 @@ const applyVat = (netTotal, vatPercentage) => {
 };
 
 // For Package/Custom Package quotes, GetCalculatedServicesPriceByPackages
-// doesn't return a plain `price` per service — it returns a value per
-// *package slot* (packageOneValue/packageTwoValue/packageThreeValue), each
-// tagged with which package landed in that slot (packageOneID/Two/Three).
-// The proposal is only ever priced against ONE selected package at a time
-// (selectedPackageID, shared by Recurring and One-off alike — see
-// ProposalPricingTableStep below), so a service's price is whichever single
-// slot matches that package, not a sum across every slot it happens to
-// belong to.
+// returns a value per *package slot* (packageOneValue/Two/Three), each
+// tagged with which package landed in that slot. A service's price is
+// whichever slot matches the currently selected package.
 const PACKAGE_PRICE_SLOTS = [
   { idKey: "packageOneID", valueKey: "packageOneValue" },
   { idKey: "packageTwoID", valueKey: "packageTwoValue" },
@@ -220,30 +203,18 @@ const PACKAGE_PRICE_SLOTS = [
 ];
 
 // GetCalculatedServicesPriceByPackages's `serviceMappingWithPackagesList`
-// (one row per service per configured package: {servicePackageID, serviceID,
-// serviceCatID, serviceChargeTypeID, price}) is the admin-saved per-package
-// price a Standard Package quote (a fixed, non-editable service list) was
-// actually agreed/discounted against — the same figure quotationFinalAmount
-// List's netTotal and the PDF total add up to. That's what
-// GetCalculatedServicesPriceByPackagesData (AddUpdateProposal.jsx, the
-// consumer used for Standard Package, selectedProposalTypeValue === 2)
-// overrides each service's price with — see its "Override package values if
-// data is found in recurringServices" block. Standard Package trusts this
-// cross-join match first for exactly that reason.
+// (one row per service per configured package) is the admin-saved
+// per-package price a Standard Package quote was actually agreed/discounted
+// against, so Standard Package resolves price via that cross-join first.
 //
-// Custom Package is deliberately different, and matches
-// AddUpdateProposal.jsx's ReviewPackagesComponent exactly: for Custom
-// Package (selectedProposalTypeValue === 4), the consumer is
-// GetCalculatedServicesPriceData, not GetCalculatedServicesPriceByPackages
-// Data — and it never reads serviceMappingWithPackagesList for price at all.
-// It reads a pricing item's own flat packageOneValue/Two/ThreeValue straight
-// off the API response into recArrayWithPrice, which becomes
-// selectedRecurringServiceList — the exact prop ReviewPackagesComponent
-// renders — with no further scaling. (serviceMappingWithPackagesList is
-// still consulted there, but only to rebuild each service's
-// servicePackageIDs membership list, never its price.) Returns null —
-// rendered as "—" — when the service isn't part of the selected package by
-// either source.
+// Custom Package is deliberately different: it never reads
+// serviceMappingWithPackagesList for price, only for a service's
+// servicePackageIDs membership list. Its price comes straight off the
+// pricing item's own flat packageOneValue/Two/ThreeValue, matching how
+// AddUpdateProposal.jsx's ReviewPackagesComponent handles it.
+//
+// Returns null — rendered as "—" — when the service isn't part of the
+// selected package by either source.
 const priceForSelectedPackage = (
   item,
   packageID,
@@ -258,16 +229,10 @@ const priceForSelectedPackage = (
   if (!slot) return null;
 
   if (!isStandardPackage) {
-    // The pricing item tags a slot's packageOneID/Two/ThreeID with whichever
-    // package the API put in that position, even for a package this service
-    // isn't actually mapped to at all (that slot's own Value then comes back
-    // null) — e.g. a service belonging only to package 1929 can still carry
-    // packageOneID: 1928 with packageOneValue: null. Reading `slot` alone
-    // would surface that null as 0 ("€0.00") for the unrelated package
-    // instead of "—". `servicePackageIDs` is the service's actual package
-    // membership list (mirrors AddUpdateProposal.jsx's ReviewPackagesComponent
-    // checking `servicePackageIDs.includes(packageOneID)` before trusting
-    // packageOneValue), so membership must be checked explicitly here too.
+    // A slot's packageOneID/Two/ThreeID can be tagged with a package this
+    // service isn't actually mapped to (that slot's Value then comes back
+    // null) — reading `slot` alone would surface that null as 0 instead of
+    // "—", so check the service's actual servicePackageIDs membership too.
     const membership = (item.servicePackageIDs || []).map(String);
     if (!membership.includes(String(packageID))) return null;
     return Number(item[slot.valueKey]) || 0;
@@ -280,31 +245,21 @@ const priceForSelectedPackage = (
       Number(row.serviceChargeTypeID) === Number(item.serviceChargeTypeID) &&
       String(row.servicePackageID) === String(packageID),
   );
-  // Standard Package quotes are always fully described by the cross-join —
-  // no match there means the service genuinely isn't part of this package.
+  // No match in the cross-join means the service isn't part of this
+  // package.
   return match ? Number(match.price) || 0 : null;
 };
 
-// A charge type's Calculation-card figures. When the selections still match
-// the quote's hydrated defaults, the stored final amount (with whatever
-// discount it already carries) is shown as-is. Otherwise a live recompute is
-// needed, and the discount % applied to it differs by proposal type:
-//   - Service (isPackageBased: false): an Amendment proposal where the
-//     client has swapped out the default services — the discount to show
-//     depends on which way the new total moved relative to what they were
-//     originally quoted (defaultFinalAmount):
-//       - lower total: the original discount no longer applies (it was
-//         priced against the higher default total), so the amendment's
-//         pre-agreed discount percentage is applied to the new total instead.
-//       - higher/equal total: the admin's originally agreed discount
-//         percentage still applies, even though the underlying services
-//         changed.
-//     Either way a note explains why the discount shown differs from the
-//     default quote's.
-//   - Package/Custom Package (isPackageBased: true): there is no "amendment"
-//     concept here — the package's own agreed discount percentage always
-//     applies to the live total, regardless of whether it moved above or
-//     below the default. No branching, no note.
+// A charge type's Calculation-card figures. When selections still match the
+// quote's hydrated defaults, the stored final amount is shown as-is.
+// Otherwise a live recompute is needed:
+//   - Service: an amendment where services changed — if the new total is
+//     lower than what was originally quoted, the original discount no
+//     longer applies and the amendment's discount % is used instead; if
+//     it's higher/equal, the original discount still applies. A note
+//     explains which case applied.
+//   - Package/Custom Package: no amendment concept — the package's own
+//     agreed discount % always applies to the live total.
 const buildChargeTypeTotals = ({
   finalAmount,
   defaultFinalAmount,
@@ -321,14 +276,11 @@ const buildChargeTypeTotals = ({
     const storedDiscountPercentage =
       Number(finalAmount.discountPercentageWithAllDecimal) || 0;
     const storedNetTotal = Number(finalAmount.netTotal) || 0;
-    // For a surcharge (negative %), the stored `discounted` field mirrors
-    // AddUpdateProposal.jsx's GetNetTotalValueByRecurringPackage, which only
-    // ever populates its discountAmount variable in the positive-discount
-    // branch — the negative branch computes a separate addOnValue that never
-    // gets persisted back into `discounted`. Recompute from the percentage
-    // instead of trusting the persisted (always-0) value so the surcharge
-    // amount actually displays; discountedTotal/grandTotal are unaffected
-    // since those were already correctly persisted including the addOn.
+    // For a surcharge (negative %) the stored `discounted` field is always
+    // 0 — admin only persists it on the positive-discount branch — so
+    // recompute from the percentage instead to actually show the surcharge.
+    // discountedTotal/grandTotal are unaffected since those were already
+    // persisted correctly.
     const discountAmount =
       storedDiscountPercentage < 0
         ? (storedNetTotal * storedDiscountPercentage) / 100
@@ -342,11 +294,9 @@ const buildChargeTypeTotals = ({
       discountAmount,
       discountedTotal: storedDiscountedTotal,
       vatAmount: storedVatAmount,
-      // Derived from the other two stored fields rather than trusting
-      // finalAmount.grandTotal directly — that field has been seen null on
-      // a saved quote (e.g. one with no VAT configured) even though
-      // discountedTotal/vat were both correctly persisted, which displayed
-      // as a £0.00 Grand Total despite a real, non-zero discounted total.
+      // Derived from the other stored fields rather than trusting
+      // finalAmount.grandTotal directly — that field can be null on a saved
+      // quote even when discountedTotal/vat are both populated.
       grandTotal: storedDiscountedTotal + storedVatAmount,
       note: null,
     };
@@ -356,12 +306,9 @@ const buildChargeTypeTotals = ({
   let note = null;
 
   if (isPackageBased) {
-    // Mirrors AddUpdateProposal.jsx's GetNetTotalValueByRecurringPackage: a
-    // negative package discount percentage is a surcharge (raises the
-    // total), not a discount to ignore — gating on `> 0` here silently
-    // dropped it instead of letting the discountAmount/discountedTotal math
-    // below apply it (a negative % naturally produces a negative
-    // discountAmount, which is exactly the surcharge admin computes).
+    // A negative package discount percentage is a surcharge (raises the
+    // total), not a discount to ignore, so don't gate on `> 0` here — a
+    // negative % naturally produces a negative discountAmount below.
     if (Number(adminDiscountPercentage)) {
       discountPercentage = Number(adminDiscountPercentage);
     }
@@ -398,15 +345,10 @@ const buildChargeTypeTotals = ({
     };
   }
 
-  // Matches GetNetTotalValueByRecurringPackage (the Review Package function
-  // this mirrors) exactly rather than a single symmetric formula: a surcharge
-  // (negative %) is added at full precision (its addOnValue is never
-  // rounded), while a discount (positive %) is rounded to 2 decimals via
-  // nearest-cent rounding (toFixed(2), matching GetNetTotalValueByRecurringPackage's
-  // own `Number(discountAmount)?.toFixed(2)`) before being subtracted —
-  // package/custom-package only, so Review Package/the PDF and this live
-  // recompute land on the same cent. Math.floor here would truncate instead
-  // of round, coming out a cent low whenever the third decimal is >= 5.
+  // Package/custom-package only: a surcharge (negative %) is added at full
+  // precision, while a discount (positive %) is rounded to the nearest cent
+  // before being subtracted — matching admin's own rounding so this recompute
+  // lands on the same cent as the PDF.
   const discountAmount = isPackageBased
     ? discountPercentage < 0
       ? (liveNetTotal * discountPercentage) / 100
@@ -445,10 +387,8 @@ function CalculationBlock({
   const isSurcharge = Number(discountPercentage) < 0;
 
   return (
-    // No nested card box here — a plain top divider is enough to separate
-    // the totals from the line items above. Only the Grand Total keeps a
-    // filled band, so it stays the single figure that's unmistakable at a
-    // glance.
+    // A plain top divider separates the totals from the line items above;
+    // only the Grand Total keeps a filled band so it stands out.
     <div
       className="mt-3 overflow-hidden rounded-lg border-t"
       style={{ borderColor: theme.border }}
@@ -503,9 +443,8 @@ function CalculationBlock({
           </span>
         </div>
       </div>
-      {/* Grand Total gets its own emphasized band — a filled, rounded strip,
-          bolder and larger than every other line above — so it's the one
-          figure that's unmistakable at a glance. */}
+      {/* Grand Total gets its own emphasized band, bolder and larger than
+          every line above it. */}
       <div
         className="mt-1.5 flex items-center justify-between rounded-lg px-3.5 py-2.5"
         style={{ backgroundColor: `${accent}1A` }}
@@ -524,10 +463,8 @@ function CalculationBlock({
   );
 }
 
-// One charge type rendered as its own tinted section — an accent-colored
-// icon/title identify which charge type it is at a glance, its line items,
-// and a total row, all within a faint accent-tinted container so the two
-// charge types read as clearly separate groups without a heavy card look.
+// One charge type rendered as its own tinted section: accent-colored
+// icon/title, its line items, and a total row.
 function FeeSection({
   theme,
   title,
@@ -549,34 +486,29 @@ function FeeSection({
   note,
   isCustomPackage,
   frequencyLabel,
-  // Package/Custom Package quotes only — see ProposalPricingTableStep
+  // Package/Custom Package quotes only
   isPackageBased,
-  // Standard "Package" quotes only (not Custom Package) — gates the
-  // "hide services that belong to none of this proposal's packages" filter
-  // below, so Custom Package's own row set stays untouched.
+  // Standard "Package" quotes only — gates the "hide services not mapped to
+  // any package" filter below; Custom Package keeps its full row set.
   isStandardPackage,
   // Every package this proposal was quoted with, one price/calculation
-  // column each, plus the single shared selectedPackageID/onSelectPackage
-  // that both the Recurring and One-off sections read from and write to —
-  // only set (and only rendered) when there's more than one to choose
-  // between; a single-package quote keeps the plain single-column layout.
+  // column each, plus the shared selectedPackageID/onSelectPackage — only
+  // set when there's more than one package to choose between.
   packageColumns,
   priceByServiceAndPackage,
   packageTotalsList,
   selectedPackageID,
   onSelectPackage,
-  // Package/Custom Package quotes only — shown on the right of the section
-  // title when there's a single package (the comparison grid already shows
-  // every package's own name in its column header).
+  // Package/Custom Package quotes only — shown next to the section title
+  // when there's a single package.
   selectedPackageName,
 }) {
   const hasPackageColumns = (packageColumns?.length || 0) > 1;
 
-  // Standard Package quotes only: a service that isn't mapped to ANY of
-  // this proposal's packages has nothing to show in any column (every
-  // cell would be "—"), so drop it from the grid entirely instead of
-  // rendering a dead row. Custom Package keeps its full row set — its
-  // client-added services are real selections, not package mappings.
+  // Standard Package quotes only: drop a service that isn't mapped to any
+  // of this proposal's packages instead of rendering a dead "—" row.
+  // Custom Package keeps its full row set — client-added services are real
+  // selections, not package mappings.
   const visibleCategoryGroups =
     hasPackageColumns && isStandardPackage
       ? categoryGroups
@@ -596,22 +528,16 @@ function FeeSection({
           .filter((group) => group.items.length > 0)
       : categoryGroups;
 
-  // The header badge must reflect what's actually rendered below, not the
-  // raw selection count — for Standard Package quotes those can differ
-  // (dead rows not in any package are dropped from visibleCategoryGroups
-  // above), so this sums the same groups the table renders.
+  // Sum the same groups the table renders, not the raw selection count —
+  // Standard Package can drop dead rows above, so the two counts can differ.
   const visibleServiceCount = visibleCategoryGroups.reduce(
     (sum, group) => sum + group.items.length,
     0,
   );
 
-  // Service (non-package) proposals only: the Services title gets the same
-  // dark-theme treatment as the Package Name headers in the Package/Custom
-  // Package comparison grid, so a Service quote's pricing table reads with
-  // the same premium, on-brand look. Package/Custom Package's own title row
-  // (isPackageBased true, both the grid and the single-package layout) is
-  // untouched — every token below resolves to exactly what it already was
-  // before this branch existed.
+  // Service (non-package) proposals only: give the title the same dark-theme
+  // treatment as the Package Name headers in the comparison grid, for a
+  // consistent look. Package/Custom Package's own title row is untouched.
   const isServiceTitle = !isPackageBased;
   const titleWrapperClassName = isServiceTitle
     ? "mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-3 sm:px-5 sm:py-3.5"
@@ -632,10 +558,8 @@ function FeeSection({
     : theme.textSecondary;
 
   return (
-    // Package/Custom Package: no card box, no filled header background —
-    // just a plain accent-icon title row (unchanged). Service: a dark
-    // theme-background title bar, matching the Package Name headers'
-    // styling (see the comparison grid below and titleWrapperStyle above).
+    // Package/Custom Package: plain accent-icon title row. Service: a dark
+    // theme-background title bar matching the Package Name headers below.
     <div>
       <div className={titleWrapperClassName} style={titleWrapperStyle}>
         <div className="flex items-center gap-2.5">
@@ -652,11 +576,9 @@ function FeeSection({
             >
               {title}
             </span>
-            {/* Same "Recurring Fees (Monthly)" pattern as
-                AddUpdateProposal.jsx's Review Services tab
-                (getPaymentFrequencyLabel), styled as a badge so the billing
-                period reads clearly at a glance instead of blending into
-                the title. */}
+            {/* "Recurring Fees (Monthly)" pattern, styled as a badge so the
+                billing period reads clearly instead of blending into the
+                title. */}
             {frequencyLabel && (
               <span
                 className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
@@ -671,8 +593,8 @@ function FeeSection({
           </div>
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
-          {/* Package Name, right-aligned — only shown for the single-package
-              layout; the comparison grid already names every package in its
+          {/* Package Name, right-aligned — only for the single-package
+              layout; the comparison grid already names each package in its
               own column header. */}
           {!hasPackageColumns && selectedPackageName && (
             <span
@@ -702,17 +624,9 @@ function FeeSection({
       <div>
         {hasPackageColumns ? (
           // A CSS-grid "plan comparison" layout, not a spreadsheet table: the
-          // Service column takes only as much width as it needs (capped), and
-          // every package gets an equal, flexible share of whatever space is
-          // left — so 2 packages fill the card just as cleanly as 4 do. Every
-          // row (header, category label, service, calculation, CTA) reuses
-          // the same column template so everything lines up perfectly without
-          // table borders/cellspacing doing the work.
-          // No nested card box here — the grid sits directly in the section.
-          // Horizontal-only dividers (no vertical grid lines), quiet
-          // typography for line items, and one tinted "Calculation" zone at
-          // the bottom with its own bold Grand Total band — just with
-          // package columns standing in for the single value column.
+          // Service column is capped-width, and every package gets an equal
+          // flexible share of the rest. Every row reuses the same column
+          // template so everything lines up without table borders.
           <div className="overflow-x-auto overflow-y-hidden">
             <div
               style={{
@@ -721,12 +635,9 @@ function FeeSection({
                 minWidth: `${200 + packageColumns.length * 140}px`,
               }}
             >
-              {/* Plan header row — package name only, one line, on a dark
-                theme background so each package's own identity is clearly
-                prominent. Selection lives on the name itself (a filled
-                brand-accent pill when active) instead of a separate
-                "Selected"/"Select this plan" line, so the header stays
-                compact. */}
+              {/* Plan header row — package name on a dark theme background.
+                Selection lives on the name itself (a filled pill when
+                active) rather than a separate line, to stay compact. */}
               <div
                 className="sticky left-0 z-10 flex items-center px-3.5 pb-2 pt-3"
                 style={{
@@ -784,10 +695,8 @@ function FeeSection({
               })}
 
               {/* Category + service rows — same type scale as the plain
-                list, but colored in the accent (the same tone used for the
-                Calculation label below) so a category reads unmistakably
-                as its own section, distinct from the neutral-grey "Service"
-                column header and the plain service names beneath it. */}
+                list, colored in the accent so a category reads as its own
+                section. */}
               {visibleCategoryGroups.map((group, groupIndex) => (
                 <Fragment key={group.serviceCatID ?? group.categoryName}>
                   <div
@@ -876,10 +785,7 @@ function FeeSection({
               ))}
 
               {/* Calculation — same tinted zone + Grand Total band as
-                CalculationBlock (identical background/border tokens and
-                type scale: text-sm regular lines, text-base bold Grand
-                Total), just repeated once per package column instead of
-                once for a single total. */}
+                CalculationBlock, repeated once per package column. */}
               <div
                 className="sticky left-0 z-10 px-3.5 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wider"
                 style={{
@@ -1007,8 +913,8 @@ function FeeSection({
                 </div>
               ))}
 
-              {/* Grand Total — the one filled, bold band, exactly matching
-                CalculationBlock's Grand Total footer strip. */}
+              {/* Grand Total — filled, bold band matching CalculationBlock's
+                footer strip. */}
               <div
                 className="sticky left-0 z-10 flex items-center px-3.5 py-2.5 text-xs font-bold uppercase tracking-wide"
                 style={{
@@ -1031,12 +937,10 @@ function FeeSection({
                 </div>
               ))}
 
-              {/* Select Package — one button per column, immediately below
-                  that package's own Grand Total, so it's unambiguous which
-                  package it picks. This only selects the package (same
-                  effect as clicking its name above) — it never submits or
-                  accepts the proposal; that's the footer Accept button's
-                  job, once a package is selected. */}
+              {/* Select Package — one button per column below that
+                  package's Grand Total. Only selects the package (same as
+                  clicking its name above); the footer Accept button
+                  handles actually submitting. */}
               {onSelectPackage && (
                 <>
                   <div
@@ -1080,10 +984,8 @@ function FeeSection({
           </div>
         ) : (
           <>
-            {/* Service details, grouped under a header per category — sits
-              directly in the section (no nested card box); horizontal
-              dividers alone separate items, since the plain title row above
-              is already this content's only heading. */}
+            {/* Service details, grouped under a header per category;
+              horizontal dividers alone separate items. */}
             <div>
               {categoryGroups.map((group) => (
                 <div key={group.serviceCatID ?? group.categoryName}>
@@ -1100,10 +1002,9 @@ function FeeSection({
                     const price = priceByServiceID.get(
                       priceKey(chargeTypeID, item.serviceID),
                     );
-                    // Custom Package locks the admin's default services (see
-                    // ProposalServicesStep) — anything without that `locked`
-                    // flag was added by the client themselves, so call it out
-                    // here too.
+                    // Custom Package locks the admin's default services —
+                    // anything without that `locked` flag was added by the
+                    // client themselves.
                     const isUserAdded = isCustomPackage && !item.locked;
                     const notInPackage = isPackageBased && price === null;
 
@@ -1188,10 +1089,9 @@ function FeeSection({
 export default function ProposalPricingTableStep({
   theme,
   isActive,
-  // Package/Custom Package quotes only — called whenever the client's
-  // selected package changes (including the initial auto-select for a
-  // single-package quote), so the parent can gate its own footer Accept
-  // button on whether a selection has actually been made.
+  // Package/Custom Package quotes only — called whenever the selected
+  // package changes, so the parent can gate the footer Accept button on
+  // whether a selection has been made.
   onSelectedPackageChange,
 }) {
   const dispatch = useDispatch();
@@ -1225,35 +1125,27 @@ export default function ProposalPricingTableStep({
   const servicesPackageList = useSelector(selectServicesPackageList);
 
   // Package/Custom Package quotes are priced against the admin's selected
-  // package(s) (quoteModel.servicePackageID), not the generic per-service
-  // formula the Service flow uses — see packagePriceForItem/findFinalAmount.
+  // package(s), not the generic per-service formula the Service flow uses.
   const isCustomPackage =
     quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
   // Standard "Package" quotes resolve price via the serviceMappingWithPackages
-  // List cross-join (packagePriceViaMapping); Custom Package keeps using the
-  // flat packageOneValue/Two/ThreeValue fields (packagePriceForItem) — see
-  // the comment above packagePriceViaMapping for why these genuinely differ
-  // in AddUpdateProposal.jsx.
+  // cross-join; Custom Package uses the flat packageOneValue/Two/ThreeValue
+  // fields instead — see priceForSelectedPackage.
   const isStandardPackage = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
   const isPackageBased = isStandardPackage || isCustomPackage;
-  // quoteModel is only set once (on load), so keying off the field itself
-  // (rather than `|| []` inline, which would be a fresh array every render)
-  // keeps this reference-stable for the pricing effect's dependency array.
-  // Still sent to the pricing API as-is (fetches every admin-configured
-  // package's data in one request) so switching the active package below
-  // never needs a refetch.
+  // Keying off the field itself (rather than `|| []` inline) keeps this
+  // reference-stable for the pricing effect's dependency array. Sent to the
+  // pricing API as-is so switching the active package never needs a refetch.
   const selectedPackageIDs = useMemo(
     () => quoteModel?.servicePackageID || [],
     [quoteModel?.servicePackageID],
   );
 
-  // The proposal can only ever be priced/quoted against ONE package at a
-  // time — Recurring and One-off are never allowed to show different
-  // packages, so this is a single, proposal-level selection (not one per
-  // charge type) shared by both FeeSections below. Only auto-selected when
-  // there's exactly one configured package (no real choice to make); with
-  // more than one, the client must explicitly pick one — the footer Accept
-  // button stays disabled until they do (see onSelectedPackageChange below).
+  // The proposal is only ever priced against ONE package at a time, so this
+  // is a single proposal-level selection shared by both FeeSections below.
+  // Auto-selected only when there's exactly one configured package; with
+  // more than one, the client must explicitly pick one (footer Accept stays
+  // disabled until they do).
   const [selectedPackageID, setSelectedPackageID] = useState(() =>
     selectedPackageIDs.length === 1 ? selectedPackageIDs[0] : null,
   );
@@ -1263,20 +1155,16 @@ export default function ProposalPricingTableStep({
     }
   }, [selectedPackageID, selectedPackageIDs]);
 
-  // Lets the parent (StandardProposal) gate the footer Accept button on
-  // whether a package has actually been selected yet — this component's own
-  // selection state stays the single source of truth; the callback just
-  // mirrors it upward.
+  // Mirrors the selection state upward so the parent can gate the footer
+  // Accept button on it.
   useEffect(() => {
     onSelectedPackageChange?.(selectedPackageID);
   }, [selectedPackageID, onSelectedPackageChange]);
 
   // GetValueOf tells GetCalculatedServicesPriceByPackages which billing
   // period to scale recurring prices down to — the backend does the
-  // scaling, mirroring AddUpdateProposal.jsx's handleSetCalculatedPackageData/
-  // handleCalculatedData (both switch on Payment_Frequency into this exact
-  // string set). The response's price/packageXValue figures already reflect
-  // this, so nothing here needs to divide them further client-side.
+  // scaling, so the response's price/packageXValue figures already reflect
+  // it and don't need further client-side division.
   const getValueOfFrequency =
     GET_VALUE_OF_BY_FREQUENCY[quoteModel?.paymentFrequencyID] || "Yearly";
   const paymentFrequencyLabel =
@@ -1303,24 +1191,19 @@ export default function ProposalPricingTableStep({
     return [...recurring, ...oneOff].sort((a, b) => a.order - b.order);
   }, [recurringSelections, oneOffSelections]);
 
-  // Services priced via a global pricing driver (captured on the separate
-  // Additional Information step, not here) need their driver value merged in
-  // too — otherwise they reach the backend with driverValue: null and price
-  // at whatever minimum/fallback the formula defaults to.
+  // Services priced via a global pricing driver (captured on the Additional
+  // Information step) need that driver value merged in too, otherwise they
+  // reach the backend as driverValue: null and price at some fallback.
   const additionalDriverEntries = useMemo(
     () => buildAdditionalInformationDriverEntries(additionalInformationList),
     [additionalInformationList],
   );
 
   // additionalDriverEntries are sent as-is, with no serviceChargeTypeID/
-  // serviceCatID — mirrors AddUpdateProposal.jsx's extractServiceData
-  // AdditionalData block exactly. A global pricing driver's value can feed
-  // more than one service's pricing formula (e.g. the same GPD referenced by
-  // both a recurring and a one-off service, as with globalPricingDriverID
-  // 19540 above), so tagging the row to a single charge type/category was
-  // wrong — it made the backend apply the value only to the formula matching
-  // that tag and silently zero it out for every other service referencing
-  // the same driver.
+  // serviceCatID — a global pricing driver's value can feed more than one
+  // service's pricing formula (e.g. both a recurring and a one-off service
+  // referencing the same driver), so tagging the row to a single charge
+  // type would make the backend zero it out for every other service.
   const calculateServicesGPDList = useMemo(() => {
     const recurring = Object.values(recurringSelections || {}).flatMap(
       (selection) =>
@@ -1346,21 +1229,12 @@ export default function ProposalPricingTableStep({
     additionalDriverEntries,
   ]);
 
-  // The Services step's "Next" gate normally blocks leaving with a required
-  // driver field unset, but the step tabs let a visited step be reached
-  // directly (ProposalStepper's handleStepClick), skipping that gate. A
-  // service with a required quantity/variation/slab driver left empty would
-  // otherwise reach GetCalculatedServicesPriceByPackages as a null
-  // driverValue and break that calculation — so re-check the same
-  // requirement here, right before firing the request, regardless of how
-  // this step was reached.
-  // Standard Package quotes have no Services step for the client to fill in
-  // a quantity/variation/slab field — every selection comes from the
-  // admin's own defaults (see buildSelectionsFromQuoteModel's driverValue
-  // hydration), and GetCalculatedServicesPriceByPackages already prices
-  // them successfully as-is, so this required-field check (and the "go
-  // back to Services" warning it drives) only applies where the client
-  // actually has a Services step to complete.
+  // The Services step's "Next" gate normally blocks a required driver field
+  // being left unset, but the step tabs let a visited step be reached
+  // directly, skipping that gate — so re-check the same requirement here
+  // before firing the pricing request. Standard Package quotes have no
+  // Services step (every selection comes from the admin's own defaults), so
+  // this check doesn't apply to them.
   const hasIncompleteSelections = useMemo(
     () =>
       !isStandardPackage &&
@@ -1399,20 +1273,15 @@ export default function ProposalPricingTableStep({
         userKeyID: quoteModel.userKeyID,
         organisationKeyID: quoteModel.organisationKeyID,
         ServicePackageIDs: selectedPackageIDs,
-        // Mirrors AddUpdateProposal.jsx's handleSetCalculatedPackageServiceData/
-        // handleCalculatedData: GetValueOf always tracks the quote's actual
-        // payment frequency (switch on Payment_Frequency), for every
-        // proposal type including Package/Custom Package. This only affects
-        // the live flat packageOneValue/Two/ThreeValue fallback used for a
-        // service with no serviceMappingWithPackagesList row (e.g. a Custom
-        // Package client's own addition) — every service the admin already
-        // configured for this package is priced from that cross-join's own
-        // saved `price` instead (see priceForSelectedPackage), which is a
-        // static figure GetValueOf can't scale either way.
+        // GetValueOf tracks the quote's actual payment frequency for every
+        // proposal type. This only affects the flat packageOneValue/Two/
+        // ThreeValue fallback for a service with no serviceMappingWithPackages
+        // List row — services the admin already configured for this package
+        // price off that cross-join's static `price` instead.
         GetValueOf: getValueOfFrequency,
-        // One-off services are billed once, never on a recurring cadence —
-        // pinning their own request to "Yearly" keeps their price stable
-        // regardless of the quote's payment frequency (see the thunk).
+        // One-off services are billed once, so pin their request to
+        // "Yearly" to keep the price stable regardless of the quote's
+        // payment frequency.
         oneOffGetValueOf: "Yearly",
         calculateServicesGPDList,
       }),
@@ -1430,14 +1299,12 @@ export default function ProposalPricingTableStep({
   ]);
 
   // null means "this service isn't part of the selected package" (rendered
-  // as "—"), as opposed to 0 (a real zero-value price) — Map.get() returning
-  // undefined for an unpriced service is treated the same way by every
-  // consumer below.
+  // as "—"), as opposed to 0 (a real zero-value price).
   const priceByServiceID = useMemo(() => {
     const map = new Map();
     (pricing || []).forEach((item) => {
       // Already scaled to the requested GetValueOf billing period by the
-      // backend — none of these branches need further client-side division.
+      // backend — no further client-side division needed.
       const price = isPackageBased
         ? priceForSelectedPackage(
             item,
@@ -1457,21 +1324,14 @@ export default function ProposalPricingTableStep({
     serviceMappingWithPackagesList,
   ]);
 
-  // The full list of packages this proposal was quoted with (for the
-  // side-by-side price/calculation columns below) — quoteModel has no
-  // selectedPackagesList field of its own (that's an AddUpdateProposal.jsx
-  // local-state concept, never part of GetQuoteModel's response); the
-  // equivalent here is packageList, returned by
-  // GetCalculatedServicesPriceByPackages itself (the same response
-  // servicePackageIDs/pricing came from), so it's only populated once that
-  // fetch has actually returned.
+  // The full list of packages this proposal was quoted with, for the
+  // side-by-side price/calculation columns below — populated from the same
+  // GetCalculatedServicesPriceByPackages response once it's returned.
   const packageColumns = isPackageBased ? servicesPackageList || [] : [];
 
-  // Raw pricing response item per service (packageOneID/Two/Three,
-  // servicePackageIDs, etc.) — priceByServiceID above already resolves this
-  // down to one number for the selected package, but the side-by-side
-  // columns need to resolve every package's price for the same service, not
-  // just the selected one.
+  // Raw pricing response item per service — priceByServiceID above already
+  // resolves this to one number for the selected package, but the
+  // side-by-side columns need every package's price for the same service.
   const pricingItemByServiceID = useMemo(() => {
     const map = new Map();
     (pricing || []).forEach((item) => {
@@ -1532,8 +1392,7 @@ export default function ProposalPricingTableStep({
     [oneOffSelectedList, priceByServiceID],
   );
 
-  // Each charge type is billed (and VAT'd) independently, same as the
-  // recurring/one-off fee tables the backend generates for the final quote.
+  // Each charge type is billed (and VAT'd) independently.
   const recurringLiveVatAmount = truncateToTwoDecimals(
     (recurringLiveNetTotal * (Number(vatPercentage) || 0)) / 100,
   );
@@ -1545,21 +1404,17 @@ export default function ProposalPricingTableStep({
   );
   const oneOffLiveGrandTotal = oneOffLiveNetTotal + oneOffLiveVatAmount;
 
-  // When the user hasn't added/updated any services since this proposal was
-  // loaded (selections still match the quote model's hydrated defaults), show
-  // the amounts the quote was already priced/discounted at instead of a fresh
-  // live recalculation — the stored figures may include discounts a naive
+  // When selections still match the quote model's hydrated defaults, show
+  // the amounts the quote was already priced/discounted at instead of a
+  // fresh recalculation — the stored figures may include discounts a naive
   // net * vat% recompute wouldn't reproduce.
   const quotationFinalAmountList = quoteModel?.quotationFinalAmountList || [];
 
   // Package/Custom Package quotes store one quotationFinalAmountList row per
-  // selected package per charge type (servicePackageID set on each), instead
-  // of the single servicePackageID: null row a Service quote has — see
-  // AddUpdateProposal.jsx's package-branch quotationFinalAmountList building.
-  // Defaults to the currently selected package (a direct lookup, not a blend
-  // across every package the admin configured), but also takes an explicit
-  // packageID so buildPackageTotalsList below can look up any package's own
-  // row for its side-by-side column.
+  // selected package per charge type, instead of the single
+  // servicePackageID: null row a Service quote has. Defaults to the
+  // currently selected package, but also takes an explicit packageID so
+  // buildPackageTotalsList below can look up any package's own row.
   const findFinalAmount = (chargeTypeID, packageID = selectedPackageID) => {
     if (!isPackageBased) {
       return quotationFinalAmountList.find(
@@ -1580,13 +1435,9 @@ export default function ProposalPricingTableStep({
     );
   };
 
-  // One buildChargeTypeTotals result per package, each computed against that
-  // package's own agreed discount % and its own net total (mirrors
-  // AddUpdateProposal.jsx's Review Packages tab, where
-  // GetNetTotalValueByRecurringPackage runs once per package) — shown as the
-  // side-by-side calculation columns; the single recurringTotals/oneOffTotals
-  // above (used for the plain single-column layout when there's only one
-  // package) stay computed against the one selected package only.
+  // One buildChargeTypeTotals result per package, each computed against
+  // that package's own agreed discount % and net total — shown as the
+  // side-by-side calculation columns.
   const buildPackageTotalsList = (chargeTypeID, selectedItems, unchanged) =>
     packageColumns.map((pkg) => {
       const finalAmountRow = findFinalAmount(
@@ -1626,12 +1477,10 @@ export default function ProposalPricingTableStep({
       return { pkg, totals };
     });
 
-  // A service's own driver values live in recurringSelections/oneOffSelections,
-  // but a *global* pricing driver's value lives in the separate Additional
-  // Information list — selectionsMatch alone can't see an edit there (the
-  // selections themselves don't change), so without this a locked default
-  // service's global driver value could change price without ever tripping
-  // the "unchanged" shortcut below, leaving the stale stored total on screen.
+  // A global pricing driver's value lives in the separate Additional
+  // Information list, not in recurringSelections/oneOffSelections —
+  // selectionsMatch alone can't see an edit there, so check it separately
+  // or a changed driver value could leave a stale stored total on screen.
   const additionalInformationUnchanged = additionalInformationEntriesMatch(
     additionalInformationList,
     defaultAdditionalInformationList,
@@ -1645,16 +1494,11 @@ export default function ProposalPricingTableStep({
     additionalInformationUnchanged;
 
   // defaultFinalAmount is the quote's originally saved pricing for this
-  // charge type — used as the "what the client was already quoted" baseline
-  // for the amendment-discount check below, regardless of whether the
-  // current selections still match it. In AddUpdateProposal.jsx's Review
-  // Services tab, handlePaymentFrequencyChange keeps RecurringPricingInfo
-  // (the source of the saved quotationFinalAmountList recurring row) synced
-  // to whatever payment frequency is selected at save time — and the web
-  // proposal has no control to change frequency after that (paymentFrequencyID
-  // is fixed, read-only, from quoteModel) — so this stored recurring
-  // finalAmount already matches quoteModel.paymentFrequencyID and must be
-  // used as-is here, not divided by paymentFrequencyDivisor again.
+  // charge type — the "what the client was already quoted" baseline for the
+  // amendment-discount check below, used regardless of whether current
+  // selections still match it. paymentFrequencyID is fixed/read-only in the
+  // web proposal, so this stored value already matches it and needs no
+  // further scaling.
   const defaultRecurringFinalAmount = findFinalAmount(
     SERVICE_CHARGE_TYPE_ID.RECURRING,
   );
@@ -1668,9 +1512,8 @@ export default function ProposalPricingTableStep({
   const oneOffFinalAmount = oneOffUnchanged ? defaultOneOffFinalAmount : null;
 
   // Package/Custom Package quotes have no per-quote recurringDiscountPercentage
-  // field (that's a Service-only concept) — their agreed discount lives on the
-  // package's own quotationFinalAmountList row(s), already blended into
-  // defaultFinalAmount.discountPercentageWithAllDecimal above.
+  // field — their agreed discount lives on the package's own
+  // quotationFinalAmountList row(s) instead.
   const recurringAdminDiscountPercentage = isPackageBased
     ? defaultRecurringFinalAmount?.discountPercentageWithAllDecimal
     : quoteModel?.recurringDiscountPercentage;
@@ -1714,8 +1557,7 @@ export default function ProposalPricingTableStep({
     : Number(vatPercentage) || 0;
 
   // Side-by-side per-package calculation columns — only built when there's
-  // more than one package to actually compare; a single-package quote keeps
-  // the plain single-column layout with recurringTotals/oneOffTotals above.
+  // more than one package to compare.
   const hasMultiplePackagesForTotals = packageColumns.length > 1;
   const recurringPackageTotalsList = hasMultiplePackagesForTotals
     ? buildPackageTotalsList(
@@ -1747,9 +1589,8 @@ export default function ProposalPricingTableStep({
   });
 
   // Package/Custom Package proposals are priced against exactly one
-  // currently selected package (selectedPackageID) — shown here so the
-  // client always sees which package the figures below belong to, same as
-  // servicePackageName on AddUpdateProposal.jsx's selectedPackagesList.
+  // currently selected package — shown here so the client sees which
+  // package the figures below belong to.
   const selectedPackage = packageColumns.find(
     (pkg) => String(pkg.servicePackageID) === String(selectedPackageID),
   );
@@ -1759,9 +1600,8 @@ export default function ProposalPricingTableStep({
       className="flex h-full overflow-hidden p-1.5 sm:p-3"
       style={{ backgroundColor: theme.background }}
     >
-      {/* Full width on mobile so the card isn't squeezed into 90% of an
-          already-small viewport. From lg up, w-[90%] (not centered) leaves a
-          consistent 10% gap on the right, matching the PDF step's card width. */}
+      {/* Full width on mobile; from lg up, w-[90%] leaves a consistent gap
+          on the right, matching the PDF step's card width. */}
       <div
         className="flex h-full w-full flex-col overflow-hidden rounded-xl border bg-white shadow-lg sm:rounded-2xl lg:w-[90%]"
         style={{ borderColor: theme.border }}
@@ -1831,8 +1671,7 @@ export default function ProposalPricingTableStep({
         </div>
 
         {/* Services — recurring and one-off each get their own tinted
-            section (same accent color for both, so the two share one
-            consistent theme) with a title/icon to tell them apart */}
+            section with a title/icon to tell them apart */}
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-3 py-4 sm:px-6 sm:py-5">
           {selectedList.length === 0 ? (
             <p

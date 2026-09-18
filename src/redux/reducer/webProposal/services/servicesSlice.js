@@ -17,28 +17,22 @@ const initialState = {
   selectedServiceIDs: [],
   selectionError: false,
 
-  // Live map of required-driver-field errors across the currently committed
-  // selections (recurring + one-off), keyed by serviceID -> driverID ->
-  // message. Kept in sync from ProposalServicesStep so the step-advance
-  // guard (in ProposalAmendment/ProposalInputForm) can block leaving the
-  // Services step while a selected service is missing a required
-  // quantity/variation/slab value. fieldErrorsVisible mirrors the
-  // additionalInformationValidationVisible pattern: the errors are computed
-  // continuously, but only rendered inline once an advance attempt fails.
+  // Required-driver-field errors for the current selections, keyed by
+  // serviceID -> driverID -> message. Lets the step-advance guard block
+  // leaving Services while a required quantity/variation/slab is missing.
+  // fieldErrorsVisible only reveals them inline once an advance attempt fails.
   fieldErrors: { recurring: {}, oneOff: {} },
   fieldErrorsVisible: false,
 
   // Full selection detail (including chosen driver values), mirrored from
-  // ProposalServicesStep's local state so the Pricing Table step can build
-  // the GetCalculatedServicesPriceByPackages payload without re-deriving it.
+  // ProposalServicesStep so the Pricing Table step can build the
+  // GetCalculatedServicesPriceByPackages payload without re-deriving it.
   recurringSelections: {},
   oneOffSelections: {},
 
-  // Snapshot of recurringSelections/oneOffSelections taken once, right after
-  // hydrating from the quote model (i.e. the services the client was already
-  // quoted for an Amendment proposal). Kept immutable afterwards so the
-  // Pricing Table step can tell whether the user has since changed the
-  // selection and, if so, compare against the original priced set.
+  // Snapshot taken once right after hydrating from the quote model (the
+  // services already quoted on an Amendment). Stays immutable so Pricing
+  // Table can detect if the selection changed since and diff against it.
   defaultRecurringSelections: {},
   defaultOneOffSelections: {},
 

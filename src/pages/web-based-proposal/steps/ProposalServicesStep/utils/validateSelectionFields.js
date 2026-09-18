@@ -1,9 +1,7 @@
-// Mirrors AddUpdateProposal.jsx's pre-calculation guard (search
-// `hasUndefinedDriver` there): a selected service's visible quantity/
-// variation/slab driver must have a real value before it's safe to send to
-// GetCalculatedServicesPriceByPackages — an unset driver reaches the API as
-// a null driverValue, which breaks that service's (and can break the whole
-// request's) price calculation instead of just pricing it at 0.
+// A selected service's visible quantity/variation/slab driver must have a
+// real value before it's safe to send to GetCalculatedServicesPriceByPackages
+// — an unset driver reaches the API as a null value and can break the whole
+// request's price calculation, not just that service's.
 export const validateSelectionFields = (service, driverValues) => {
   const fieldErrors = {};
 
@@ -29,11 +27,10 @@ export const validateSelectionFields = (service, driverValues) => {
           return;
         }
 
-        // Mirrors AddUpdateProposal.jsx's quantity range guard (search
-        // `hasFrom`/`hasTo` there): quantityFrom/quantityTo come back as
-        // `null`, not just `undefined`, when a bound isn't configured, so
-        // both must be excluded — otherwise an unset bound is coerced to 0
-        // and a valid default value (e.g. 1) is rejected as "between 0 and 0".
+        // quantityFrom/quantityTo can come back `null` (not just
+        // `undefined`) when a bound isn't configured, so both need to be
+        // excluded explicitly — otherwise an unset bound is coerced to 0
+        // and a valid value gets rejected as "between 0 and 0".
         const quantity = driver.quantity?.[0];
         const from = quantity?.quantityFrom;
         const to = quantity?.quantityTo;
@@ -76,10 +73,8 @@ export const validateSelectionFields = (service, driverValues) => {
 };
 
 // Validates every selection in a selections map (keyed by serviceID) against
-// its service definition's required driver fields. Shared by the pending
-// (Add Service modal), committed (main list), and Pricing Table's
-// pre-calculation checks so a service is held to the same required-field bar
-// no matter how it was selected or which step reads it.
+// its service definition's required driver fields. Shared by the Add Service
+// modal, the main list, and the Pricing Table's pre-calculation checks.
 export const validateSelectionsMap = (selections, serviceByID) => {
   const errors = {};
   let hasError = false;

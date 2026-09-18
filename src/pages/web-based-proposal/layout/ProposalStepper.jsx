@@ -14,14 +14,11 @@ import {
   handlePreviousStep,
 } from "../../../redux/reducer/webProposal/stepper/stepperThunk";
 
-// `onNext`, if provided, is called with the current step index before the
-// stepper advances. It may run async work (e.g. fetching data that decides
-// whether a step should be inserted) and return `false` to block advancing.
+// `onNext`, if provided, runs before advancing and can return `false` to
+// block the step change (e.g. validation).
 //
-// `onFinish`, if provided, is called instead of advancing once the last step
-// is reached — the button switches from "Next" to `finishLabel` and becomes
-// clickable. Without an `onFinish` handler the last-step button stays
-// disabled, since there'd be nothing for it to do.
+// `onFinish`, if provided, replaces "Next" with `finishLabel` on the last
+// step. Without it the last-step button just stays disabled.
 export default function ProposalStepper({
   theme,
   steps = [],
@@ -43,14 +40,13 @@ export default function ProposalStepper({
       dispatch(initializeStepper(steps.length));
       isInitialized.current = true;
     } else {
-      // The step count can change later on (e.g. an "Additional Information"
-      // step gets inserted) — this must not reset activeStep/maxVisitedStep.
+      // Step count can change later (e.g. an "Additional Information" step
+      // gets inserted) — don't reset activeStep/maxVisitedStep when it does.
       dispatch(updateTotalSteps(steps.length));
     }
   }, [dispatch, steps.length]);
 
-  // Keep the active step centered so users swipe/scroll between steps rather
-  // than hunting for the current one along a long, off-screen row.
+  // Keep the active step centered in the scrollable row.
   useEffect(() => {
     activeStepRef.current?.scrollIntoView({
       behavior: "smooth",
@@ -65,9 +61,8 @@ export default function ProposalStepper({
   const handleStepClick = async (index) => {
     if (index === activeStep || index > maxVisitedStep || isAdvancing) return;
 
-    // Jumping ahead from the step label must be validated the same way the
-    // Next button is — otherwise a user can clear a required selection (e.g.
-    // Services) on the current step and skip straight past it via the label.
+    // Jumping via the step label needs the same validation as Next, otherwise
+    // a required selection can be cleared and skipped past.
     if (index > activeStep && onNext) {
       setIsAdvancing(true);
       let canProceed;
@@ -100,8 +95,7 @@ export default function ProposalStepper({
     if (!onFinish) return;
     setIsAdvancing(true);
     try {
-      // The last step's own validation (e.g. required Input Fields) must run
-      // before finishing, same as it would before advancing to a next step.
+      // Run the last step's own validation before finishing, same as any other step.
       if (onNext) {
         const canProceed = await onNext(activeStep);
         if (canProceed === false) return;
@@ -112,8 +106,7 @@ export default function ProposalStepper({
     }
   };
 
-  // A single-step flow has nothing to step between — the back button and
-  // step row would just be dead chrome, so show only the finish action.
+  // Single-step flow: no back/step row to show, just the finish action.
   if (steps.length <= 1) {
     return (
       <div className="flex justify-end">
@@ -155,10 +148,8 @@ export default function ProposalStepper({
         <span className="hidden sm:inline">Back</span>
       </button>
 
-      {/* Steps */}
-      {/* Center — a single horizontally scrollable row at every breakpoint, so
-          steps that don't fit the available width stay reachable and clickable
-          instead of being clipped or collapsed into a non-interactive summary. */}
+      {/* Steps: horizontally scrollable row so steps stay reachable when they
+          don't all fit. */}
       <div className="hide-scrollbar flex min-w-0 items-center gap-3 overflow-x-auto scroll-smooth px-1 py-1 sm:gap-5 lg:justify-center">
         {steps.map((step, index) => {
           const active = index === activeStep;

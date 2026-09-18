@@ -30,9 +30,7 @@ const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
     const source = isSlab ? driver.slab : driver.variation;
     const options = (source || []).map((option) => ({
       value: isSlab ? option.slabID : option.variationID,
-      // Mirrors AddUpdateProposal.jsx's slab display logic: slabTypeID 2 is
-      // a fixed-value slab (shown via its slabValue), everything else is a
-      // range slab (shown as "slabFrom - slabTo").
+      // slabTypeID 2 is a fixed-value slab, everything else is a range.
       label: isSlab
         ? option.slabTypeID === 2
           ? String(option.slabValue)
@@ -64,9 +62,8 @@ const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
               ...base,
               borderColor: errorMessage ? "#f87171" : base.borderColor,
             }),
-            // Add Service renders this inside an MUI Modal (z-index 1300+).
-            // Without this, the portalled options list uses react-select's
-            // default z-index of 1 and renders behind the modal, invisible.
+            // Without this the portalled menu sits behind the MUI modal
+            // (z-index 1300+), since react-select defaults to z-index 1.
             menuPortal: (base) => ({ ...base, zIndex: 9999 }),
           }}
         />

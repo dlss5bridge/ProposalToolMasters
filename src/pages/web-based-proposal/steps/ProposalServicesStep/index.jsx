@@ -51,9 +51,7 @@ const buildInitialDriverValues = (service) => {
           label: defaultOption ? defaultOption.variationName : null,
         };
       } else if (driver.driverTypeID === 4) {
-        // Mirrors AddUpdateProposal.jsx's slab display logic: slabTypeID 2 is
-        // a fixed-value slab (shown via its slabValue), everything else is a
-        // range slab (shown as "slabFrom - slabTo").
+        // slabTypeID 2 is a fixed-value slab, everything else is a range.
         const defaultOption = driver.slab?.find((option) => option.isDefault);
         values[driver.globalPricingDriverID] = {
           driverName: driver.driverName,
@@ -514,13 +512,9 @@ const ServiceSelectionComponent = ({ theme }) => {
     [oneOffSelections],
   );
 
-  // Services picked directly from the main list (as opposed to through the
-  // Add Service modal) skip the modal's confirm-time validation, so a
-  // required driver field (quantity/variation/slab) can be left unset. That
-  // silently reaches the pricing API as a null driver value and comes back
-  // priced at 0/incorrect for just that service — validate the committed
-  // selections here too so the main list surfaces the same required-field
-  // errors and the step can block advancing until they're fixed.
+  // Services picked directly from the main list skip the Add Service modal's
+  // confirm-time validation, so validate the committed selections here too
+  // and let the main list surface the same required-field errors.
   const committedFieldErrors = useMemo(
     () => ({
       recurring: validateSelectionsMap(recurringSelections, recurringServiceByID)

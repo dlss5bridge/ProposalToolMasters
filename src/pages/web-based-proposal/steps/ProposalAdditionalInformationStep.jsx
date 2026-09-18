@@ -20,18 +20,14 @@ const updateItem = (list, globalPricingDriverID, patch) =>
       : item,
   );
 
-// Matches the standard single-column field width used across the other
-// web-proposal steps (see ProposalInputFieldsStep).
+// Same single-column field width used across the other web-proposal steps.
 const FIELD_MAX_WIDTH = 420;
 
 export default function ProposalAdditionalInformationStep({
   theme,
   readOnly = false,
-  // Custom Package only: serviceIDs whose fields must stay read-only (the
-  // admin's locked default services) even though the step as a whole is
-  // editable — every other proposal type passes nothing, so every field
-  // stays editable exactly as before (isFieldReadOnly falls back to the
-  // whole-step `readOnly` flag alone).
+  // Custom Package only: locks fields for the admin's default services
+  // while leaving the rest of the step editable.
   lockedServiceIDs,
 }) {
   const dispatch = useDispatch();
@@ -97,10 +93,8 @@ export default function ProposalAdditionalInformationStep({
     if (item.driverTypeID === 3 || item.driverTypeID === 4) {
       const isSlab = item.driverTypeID === 4;
       const source = isSlab ? item.slab : item.variation;
-      // A slab with slabTypeID 2 is the "Other" entry — it has no
-      // slabFrom/slabTo range of its own; the client types an exact number
-      // instead, same as the legacy SelectServices.jsx flow. Mirrors that
-      // component's `slabTypeID === 2 ? "Other" : "<from> - <to>"` label.
+      // slabTypeID 2 is the "Other" entry — no from/to range, the client
+      // just types an exact number.
       const options = (source || []).map((option) => ({
         value: isSlab ? option.slabID : option.variationID,
         label: isSlab
@@ -126,10 +120,8 @@ export default function ProposalAdditionalInformationStep({
               const newlySelectedSlab = isSlab
                 ? item.slab?.find((slab) => slab.slabID === option?.value)
                 : null;
-              // Picking "Other" must start blank, not whatever slabValue the
-              // backend happened to send for that slab row (e.g. a leftover
-              // default) — the client hasn't typed anything yet. Mirrors
-              // legacy SelectServices.jsx clearing driverValue on selection.
+              // Picking "Other" should start blank rather than showing
+              // whatever slabValue the backend sent for that row.
               const patch =
                 newlySelectedSlab?.slabTypeID === 2
                   ? {
@@ -160,11 +152,8 @@ export default function ProposalAdditionalInformationStep({
               value={selectedSlab?.slabValue ?? ""}
               disabled={isFieldReadOnly}
               onChange={(e) => {
-                // The typed number is the Other slab's own slabValue, not a
-                // separate field — buildAdditionalInformationDriverEntries
-                // resolves driverValue by looking up item.slab's slabValue
-                // for the selected slabID, same as legacy SelectServices.jsx
-                // overwriting the isDefault slab's slabValue in place.
+                // The typed number is stored as the Other slab's own
+                // slabValue, not a separate field.
                 const nextValue = e.target.value;
                 handleChange(
                   item.globalPricingDriverID,

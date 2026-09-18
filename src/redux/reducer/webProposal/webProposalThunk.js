@@ -17,15 +17,10 @@ export const getQuoteModel = createAsyncThunk(
       if (res?.data?.statusCode === 200 && res?.data?.responseData?.data) {
         const data = res.data.responseData.data;
 
-        // GetQuoteModel now returns the saved global-pricing-driver
-        // selection as globalPricingDriverIDsWithValues
-        // ({globalPricingDriverID, values}[]) instead of a plain ID array —
-        // mirrors AddUpdateProposal.jsx's ModelData unwrap. Every consumer
-        // here (ProposalAmendment.jsx, ProposalInputFieldsStep.jsx,
-        // inputFieldsSelectors.js, validateInputFields.js) only ever reads
-        // quoteModel.globalPricingDriverID as a flat ID array, so unwrap it
-        // once here rather than touching each call site; falls back to the
-        // old plain-array field for any proposal saved before this change.
+        // API returns the pricing driver selection as
+        // globalPricingDriverIDsWithValues; unwrap it to a flat ID array
+        // here so every consumer can just read globalPricingDriverID.
+        // Falls back to the old plain-array field for older proposals.
         return {
           ...data,
           globalPricingDriverID: Array.isArray(
@@ -73,10 +68,7 @@ export const getOrganisationThemeSettings = createAsyncThunk(
   },
 );
 
-// Real "final Accept/Amend" persistence call, shared by every web proposal
-// type. Params is the AddUpdateQuote payload built from GetQuoteModel's
-// response (state.webProposal.quoteModel) with only the user's actual
-// changes applied on top — see buildAddUpdateQuotePayload.
+// Shared final Accept/Amend persistence call for all web proposal types.
 export const addUpdateQuote = createAsyncThunk(
   "webProposal/addUpdateQuote",
   async (params, thunkAPI) => {

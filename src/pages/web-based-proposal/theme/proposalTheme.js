@@ -57,9 +57,8 @@ const rgbToHex = ({ r, g, b }) => {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
 };
 
-// Mixes a hex color toward black, used to derive a dark header/footer/secondary
-// shade from a single brand color (mirrors the primary/secondary relationship
-// in DEFAULT_PROPOSAL_THEME, e.g. #00BFFF -> #00192D).
+// Mixes a hex color toward black, used to derive the dark header/footer/
+// secondary shade from a single brand color.
 const darken = (hex, weight) => {
   const { r, g, b } = hexToRgb(hex);
   const clampedWeight = Math.min(Math.max(weight, 0), 1);
@@ -85,18 +84,15 @@ const deriveThemeFromBrandColor = (brandColor) => {
   };
 };
 
-// GetOrganisationThemeSettings returns fontFamilyID, an ID into the same
-// font lookup used by the template editor's font picker (Utils.FontFamily),
-// not a usable CSS font-family string.
+// GetOrganisationThemeSettings returns a fontFamilyID, not a CSS font-family
+// string — look it up in Utils.FontFamily.
 const getFontFamilyFromID = (fontFamilyID) => {
   const font = Utils.FontFamily.find((item) => item.value === fontFamilyID);
   return font?.label || null;
 };
 
-// Resolves the active theme for a proposal: uses quoteModel.brandColor (from
-// GetQuoteModel) when present and valid, otherwise falls back to the default
-// theme above. GetOrganisationThemeSettings's backgroundColor/fontFamily, when
-// present, are then layered on top and apply to all web proposal types.
+// Resolves the active theme: brandColor if valid, else the default, with
+// GetOrganisationThemeSettings's background/fontFamily layered on top.
 export const getProposalTheme = (quoteModel, themeSettings) => {
   const brandColor = quoteModel?.brandColor;
   const baseTheme = isValidHexColor(brandColor)
@@ -141,8 +137,8 @@ const THEME_KEY_TO_CSS_VAR = {
   completedStepBackground: "--wp-completed-step-bg",
 };
 
-// Turns a theme object into CSS custom properties so plain CSS files (e.g.
-// ProposalServicesStep.css) can read the same colors via var(--wp-*).
+// Turns a theme object into CSS custom properties so plain CSS files can
+// read the same colors via var(--wp-*).
 export const getProposalThemeCssVars = (theme) => {
   const vars = {};
   for (const [themeKey, cssVar] of Object.entries(THEME_KEY_TO_CSS_VAR)) {

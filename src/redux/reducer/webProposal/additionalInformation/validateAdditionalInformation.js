@@ -43,10 +43,8 @@ export const validateAdditionalInformationItem = (item) => {
       return `${item.driverName} is required.`;
     }
 
-    // A slab with slabTypeID 2 is the "Other" option — the client has to
-    // type an exact number for it (stored on that slab's own slabValue, see
-    // ProposalAdditionalInformationStep), so picking "Other" alone isn't
-    // enough to satisfy this field.
+    // slabTypeID 2 is the "Other" option — picking it alone isn't enough,
+    // the client also has to enter a value for it.
     if (item.driverTypeID === 4) {
       const selectedSlab = item.slab?.find(
         (option) => option.slabID === item.driverValue,

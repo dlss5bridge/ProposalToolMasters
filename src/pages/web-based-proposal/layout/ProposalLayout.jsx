@@ -9,10 +9,8 @@ export default function ProposalLayout({
   sidebar,
   children,
 }) {
-  // MUI components (Typography, Modal, Button, ...) set their own font-family
-  // rather than inheriting it, so plain CSS inheritance from the div below
-  // doesn't reach them. Threading the same fontFamily through a ThemeProvider
-  // makes every MUI component under this layout pick it up too.
+  // MUI components set their own font-family instead of inheriting it, so we
+  // thread it through a ThemeProvider to keep them in sync with the rest.
   const muiTheme = useMemo(
     () => createTheme({ typography: { fontFamily: theme.fontFamily } }),
     [theme.fontFamily],
@@ -23,10 +21,8 @@ export default function ProposalLayout({
       <div
         className="wp-proposal-root flex h-screen flex-col overflow-hidden"
         style={{
-          // Mobile browsers (esp. iOS Safari) resize the viewport as chrome
-          // (address bar) shows/hides, so h-screen (100vh) can clip content
-          // or leave a gap. 100dvh tracks the *actual* visible viewport;
-          // browsers that don't support it ignore this and keep h-screen.
+          // 100dvh avoids the clipping/gap h-screen (100vh) gets on mobile
+          // Safari when the address bar shows/hides.
           height: "100dvh",
           background: theme.background,
           fontFamily: theme.fontFamily,
