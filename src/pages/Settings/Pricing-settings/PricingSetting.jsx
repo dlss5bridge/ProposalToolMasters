@@ -46,6 +46,16 @@ const Pricing_Settings = () => {
   const masterProposalType = Utils.select_Quote_Type.find(
     (item) => item.value === 4,
   )?.label;
+  // PPCID — PaymentPriorityConfiguration
+  const PaymentPriorityConfigurationOptions = [
+    { value: 1, label: "Both services payment" },
+    { value: 2, label: "Only one service payment" },
+  ];
+  // PaymentModeID — PaymentMode
+  const PaymentModeOptions = [
+    { value: 1, label: "One-Off" },
+    { value: 2, label: "Recurring" },
+  ];
   const [pricingSettingObj, setPricingSettingObj] = useState({
     userKeyID: null,
     minOneOffPriceForQC: "",
@@ -60,6 +70,8 @@ const Pricing_Settings = () => {
     webProposalTypeID: null,
     globalPricingDriverID: [],
     isCollectPaymentBeforeProposalAmendment: false,
+    ppcid: null,
+    paymentModeID: null,
   });
   const [ServiceFeeInflationConfig, setServiceFeeInflationConfig] = useState({
     OrganisationKeyID: null,
@@ -108,6 +120,8 @@ const Pricing_Settings = () => {
     webProposalTypeID: null,
     globalPricingDriverID: [],
     isCollectPaymentBeforeProposalAmendment: false,
+    ppcid: null,
+    paymentModeID: null,
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [feeInflationErrorMessage, setFeeInflationErrorMessage] = useState("");
@@ -187,6 +201,8 @@ const Pricing_Settings = () => {
             globalPricingDriverID: ModelData?.globalPricingDriverID,
             isCollectPaymentBeforeProposalAmendment:
               ModelData?.isCollectPaymentBeforeProposalAmendment || false,
+            ppcid: ModelData?.ppcid || null,
+            paymentModeID: ModelData?.paymentModeID || null,
           });
           setPrevPricingSettingObj({
             ...pricingSettingObj,
@@ -206,6 +222,8 @@ const Pricing_Settings = () => {
             globalPricingDriverID: ModelData?.globalPricingDriverID,
             isCollectPaymentBeforeProposalAmendment:
               ModelData?.isCollectPaymentBeforeProposalAmendment || false,
+            ppcid: ModelData?.ppcid || null,
+            paymentModeID: ModelData?.paymentModeID || null,
           });
         }
       } else {
@@ -416,7 +434,10 @@ const Pricing_Settings = () => {
       pricingSettingObj.globalPricingDriverID ==
         PrevPricingSettingObj.globalPricingDriverID &&
       pricingSettingObj.isCollectPaymentBeforeProposalAmendment ==
-        PrevPricingSettingObj.isCollectPaymentBeforeProposalAmendment
+        PrevPricingSettingObj.isCollectPaymentBeforeProposalAmendment &&
+      pricingSettingObj.ppcid ==
+        PrevPricingSettingObj.ppcid &&
+      pricingSettingObj.paymentModeID == PrevPricingSettingObj.paymentModeID
     ) {
       SetPrevError(true);
       return false;
@@ -490,6 +511,8 @@ const Pricing_Settings = () => {
       globalPricingDriverID: pricingSettingObj?.globalPricingDriverID,
       isCollectPaymentBeforeProposalAmendment:
         pricingSettingObj?.isCollectPaymentBeforeProposalAmendment || false,
+      ppcid: pricingSettingObj?.ppcid || null,
+      paymentModeID: pricingSettingObj?.paymentModeID || null,
     };
 
     setFieldErrors({});
@@ -885,7 +908,9 @@ const Pricing_Settings = () => {
                               type="checkbox"
                               className="check check_tick"
                               style={{ verticalAlign: "middle" }}
-                              checked={pricingSettingObj.enableMasterProposalType}
+                              checked={
+                                pricingSettingObj.enableMasterProposalType
+                              }
                               onChange={(e) => {
                                 setPricingSettingObj({
                                   ...pricingSettingObj,
@@ -1038,26 +1063,136 @@ const Pricing_Settings = () => {
                             </div>
                           )}
 
-                          <div class="fieldset col-12">
-                            <label class=" fieldset-label pe-2">
-                              Collect Amendment Payment
-                            </label>
-                            <input
-                              type="checkbox"
-                              className="check check_tick"
-                              style={{ verticalAlign: "middle" }}
-                              checked={
-                                pricingSettingObj.isCollectPaymentBeforeProposalAmendment
-                              }
-                              onChange={(e) => {
-                                setPricingSettingObj({
-                                  ...pricingSettingObj,
-                                  isCollectPaymentBeforeProposalAmendment:
-                                    e.target.checked,
-                                });
+                          {pricingSettingObj?.defaultProposalFormatID === 3 && (
+                            <div
+                              class="fieldset col-12"
+                              style={{
+                                border: "1px solid #e0e0e0",
+                                borderRadius: "6px",
+                                padding: "16px",
+                                marginTop: "10px",
                               }}
-                            />
-                          </div>
+                            >
+                              <label class="fieldset-label table-content-font PricingSetting-Proposal">
+                                <b>Collect Amendment Payment</b>
+                              </label>
+
+                              {/* Step 1: When should payment be collected */}
+                              <div
+                                class="col-lg-12 fieldset"
+                                style={{ marginTop: "8px" }}
+                              >
+                                <label class="fieldset-label table-content-font PricingSetting-Proposal">
+                                  When should the payment be collected?
+                                </label>
+                                <div className="d-flex gap-4 mt-1">
+                                  <label
+                                    className="d-flex align-items-center gap-2"
+                                    style={{
+                                      fontWeight: "normal",
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    <input
+                                      type="radio"
+                                      name="paymentCollectionTiming"
+                                      checked={
+                                        pricingSettingObj.isCollectPaymentBeforeProposalAmendment ===
+                                        true
+                                      }
+                                      onChange={() => {
+                                        setPricingSettingObj({
+                                          ...pricingSettingObj,
+                                          isCollectPaymentBeforeProposalAmendment: true,
+                                        });
+                                      }}
+                                    />
+                                    Before Contract Sign
+                                  </label>
+                                  <label
+                                    className="d-flex align-items-center gap-2"
+                                    style={{
+                                      fontWeight: "normal",
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    <input
+                                      type="radio"
+                                      name="paymentCollectionTiming"
+                                      checked={
+                                        pricingSettingObj.isCollectPaymentBeforeProposalAmendment ===
+                                        false
+                                      }
+                                      onChange={() => {
+                                        setPricingSettingObj({
+                                          ...pricingSettingObj,
+                                          isCollectPaymentBeforeProposalAmendment: false,
+                                        });
+                                      }}
+                                    />
+                                    After Contract Sign
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* Step 2: How many services should be paid for */}
+                              <div
+                                class="col-lg-12 fieldset"
+                                style={{ marginTop: "16px" }}
+                              >
+                                <label class="fieldset-label table-content-font PricingSetting-Proposal">
+                                  Should payment be collected for both
+                                  services or only one?
+                                </label>
+                                <Select
+                                  className="phone-input-country-code selectDropDown Drop-down-width mt-1"
+                                  options={PaymentPriorityConfigurationOptions}
+                                  value={PaymentPriorityConfigurationOptions.find(
+                                    (item) => item.value === pricingSettingObj.ppcid,
+                                  )}
+                                  onChange={(selectedOption) => {
+                                    setPricingSettingObj({
+                                      ...pricingSettingObj,
+                                      ppcid: selectedOption.value,
+                                      // Both services payment: One-Off is always collected first by default.
+                                      // Only one service payment: reset until the user picks which one.
+                                      paymentModeID:
+                                        selectedOption.value === 1 ? 1 : null,
+                                    });
+                                  }}
+                                />
+                              </div>
+
+                              {/* Step 3: only applicable when a single service payment is being collected */}
+                              {pricingSettingObj.ppcid ===
+                                2 && (
+                                <div
+                                  class="col-lg-12 fieldset"
+                                  style={{ marginTop: "16px" }}
+                                >
+                                  <label class="fieldset-label table-content-font PricingSetting-Proposal">
+                                    Which service payment should be
+                                    collected?
+                                  </label>
+                                  <Select
+                                    className="phone-input-country-code selectDropDown Drop-down-width mt-1"
+                                    options={PaymentModeOptions}
+                                    value={PaymentModeOptions.find(
+                                      (item) =>
+                                        item.value ===
+                                        pricingSettingObj.paymentModeID,
+                                    )}
+                                    onChange={(selectedOption) => {
+                                      setPricingSettingObj({
+                                        ...pricingSettingObj,
+                                        paymentModeID: selectedOption.value,
+                                      });
+                                    }}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
 
