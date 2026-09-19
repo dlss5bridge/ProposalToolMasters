@@ -8,7 +8,7 @@ export default function PdfViewer({ theme }) {
       style={{ backgroundColor: theme.surface }}
     >
       <div
-        className="flex-1 overflow-auto"
+        className="relative flex-1 overflow-auto"
         style={{ backgroundColor: theme.pdfBackground }}
       >
         <PdfSlider theme={theme} />

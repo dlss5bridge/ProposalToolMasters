@@ -5,7 +5,8 @@ import { useSearchParams } from "react-router-dom";
 import ProposalAmendment from "./proposalTypes/ProposalAmendment";
 import StandardProposalWithInputs from "./proposalTypes/ProposalInputForm";
 import StandardProposal from "./proposalTypes/StandardProposal";
-import { getProposalTheme } from "./theme/proposalTheme";
+import { Loader2 } from "lucide-react";
+import { getProposalTheme, DEFAULT_PROPOSAL_THEME } from "./theme/proposalTheme";
 import "./theme/proposalTheme.css";
 import {
   getQuoteModel,
@@ -59,7 +60,26 @@ export default function WebBasedProposal() {
   // already resolved before the proposal-type components decide whether to
   // include that step.
   if (loading || inputFieldsLoading || (!quoteModel && !error)) {
-    return <div>Loading proposal...</div>;
+    return (
+      <div
+        className="flex flex-col items-center justify-center gap-3 px-4 text-center"
+        style={{
+          height: "100dvh",
+          backgroundColor: DEFAULT_PROPOSAL_THEME.background,
+        }}
+      >
+        <Loader2
+          className="h-8 w-8 animate-spin sm:h-10 sm:w-10"
+          style={{ color: DEFAULT_PROPOSAL_THEME.primary }}
+        />
+        <span
+          className="text-sm sm:text-base"
+          style={{ color: DEFAULT_PROPOSAL_THEME.textSecondary }}
+        >
+          Loading proposal...
+        </span>
+      </div>
+    );
   }
 
   if (error || !quoteModel) {

@@ -5,6 +5,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import { useDispatch, useSelector } from "react-redux";
 import { selectNumPages, setNumPages } from "../../../redux/reducer/pdfViewer";
 import { useLayoutEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { selectQuoteModel } from "../../../redux/reducer/webProposal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
@@ -45,6 +46,22 @@ export default function PdfSlider({ theme }) {
     <Document
       file={quoteModel?.quotePDFUrl}
       onLoadSuccess={({ numPages }) => dispatch(setNumPages(numPages))}
+      // Centered within the PDF viewer area (PdfViewer's scroll container is
+      // `relative`), instead of react-pdf's default top-left "Loading PDF…".
+      loading={
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+          <Loader2
+            className="h-6 w-6 animate-spin sm:h-7 sm:w-7"
+            style={{ color: theme.primary }}
+          />
+          <span
+            className="text-xs sm:text-sm"
+            style={{ color: theme.textSecondary }}
+          >
+            Loading PDF...
+          </span>
+        </div>
+      }
     >
       <div
         className="h-full overflow-y-auto overflow-x-hidden"
@@ -58,6 +75,18 @@ export default function PdfSlider({ theme }) {
               <Page
                 pageNumber={index + 1}
                 width={pageWidth}
+                loading={
+                  <div
+                    className="flex items-center justify-center"
+                    style={{ width: pageWidth, height: pageWidth * 1.414 }}
+                  >
+                    <Loader2
+                      size={24}
+                      className="animate-spin"
+                      style={{ color: theme.primary }}
+                    />
+                  </div>
+                }
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
               />

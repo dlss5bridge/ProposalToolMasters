@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Plus, X } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
 import { Modal, Box } from "@mui/material";
 
 import RecurringServices from "./components/RecurringServices";
@@ -560,7 +560,12 @@ const ServiceSelectionComponent = ({ theme }) => {
   }) => (
     <>
       {recurringServicesLoading && (
-        <p className="pss-empty-state">Loading recurring services...</p>
+        <div className="flex min-h-[30vh] flex-col items-center justify-center gap-2 px-4 py-6 text-center">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400 sm:h-7 sm:w-7" />
+          <span className="text-xs text-gray-500 sm:text-sm">
+            Loading recurring services...
+          </span>
+        </div>
       )}
       {recurringServicesError && (
         <p className="pss-empty-state">Failed to load recurring services.</p>
@@ -592,7 +597,12 @@ const ServiceSelectionComponent = ({ theme }) => {
   }) => (
     <>
       {oneOffServicesLoading && (
-        <p className="pss-empty-state">Loading one-off services...</p>
+        <div className="flex min-h-[30vh] flex-col items-center justify-center gap-2 px-4 py-6 text-center">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400 sm:h-7 sm:w-7" />
+          <span className="text-xs text-gray-500 sm:text-sm">
+            Loading one-off services...
+          </span>
+        </div>
       )}
       {oneOffServicesError && (
         <p className="pss-empty-state">Failed to load one-off services.</p>

@@ -99,7 +99,11 @@ const getTaxName = (currencyID) => {
 };
 
 // Groups one charge type's live selections by category for display (name + price only).
-const groupSelectionsByCategory = (selections, serviceChargeTypeID, pricing) => {
+const groupSelectionsByCategory = (
+  selections,
+  serviceChargeTypeID,
+  pricing,
+) => {
   const priceByServiceID = new Map();
   (pricing || []).forEach((item) => {
     priceByServiceID.set(
@@ -465,7 +469,8 @@ const buildPackageColumnsFeesTableHtml = ({
   const columnCount = packageColumns.length;
   const formatAmount = (value) =>
     `${currencySymbol}${(Number(value) || 0).toFixed(2)}`;
-  const formatCell = (value) => (value === null ? "&#10007;" : formatAmount(value));
+  const formatCell = (value) =>
+    value === null ? "&#10007;" : formatAmount(value);
 
   const categoryRows = categories
     .map(
@@ -503,7 +508,9 @@ const buildPackageColumnsFeesTableHtml = ({
     </tr>`;
 
   const hasAnyDiscount = packageTotals.some((totals) => totals.discounted > 0);
-  const hasAnyVat = packageTotals.some((totals) => totals.vatPercentage != null);
+  const hasAnyVat = packageTotals.some(
+    (totals) => totals.vatPercentage != null,
+  );
 
   const discountRow = hasAnyDiscount
     ? totalRow(
@@ -576,7 +583,11 @@ const fetchTemplateModel = async ({ templateKeyID, clientID, moduleKeyID }) => {
 // matching this quote's templateID — mirrors AddUpdateProposal.jsx's
 // defaultTemplateObject selection, falling back to the first template when
 // there's no exact match. Returns null if the lookup fails or none exist.
-const fetchTemplateLookupList = async ({ organisationKeyID, clientID, quoteKeyID }) => {
+const fetchTemplateLookupList = async ({
+  organisationKeyID,
+  clientID,
+  quoteKeyID,
+}) => {
   if (!organisationKeyID) return null;
 
   const res = await GetTemplateHeaderFooterLookupWithoutToken({
@@ -617,9 +628,8 @@ const concatenateFullAddress = (address) => {
 const fetchOrganisationContactDetails = async (organisationKeyID) => {
   if (!organisationKeyID) return null;
 
-  const res = await GetOrganisationInformationModelWithoutToken(
-    organisationKeyID,
-  );
+  const res =
+    await GetOrganisationInformationModelWithoutToken(organisationKeyID);
   const modelData = res?.data?.responseData?.data;
   if (!modelData) return null;
 
@@ -629,7 +639,10 @@ const fetchOrganisationContactDetails = async (organisationKeyID) => {
   return {
     email: emailID ?? null,
     // Same concatenation as admin's own concatenatedPhone.
-    mobile: countryCode || phoneNo ? `${countryCode ?? ""} ${phoneNo ?? ""}`.trim() : null,
+    mobile:
+      countryCode || phoneNo
+        ? `${countryCode ?? ""} ${phoneNo ?? ""}`.trim()
+        : null,
     fullAddress: concatenateFullAddress(modelData.organisationAddress) || null,
     webSite: website ?? null,
   };
@@ -645,7 +658,11 @@ const fetchOrganisationContactDetails = async (organisationKeyID) => {
 // the SAME generatePdfUrl call as the intro letter/pricing table that
 // follow it (see generateAmendmentPdfUrl below), so this break is the only
 // thing separating the cover from that content.
-const buildCoverPageHtml = ({ organisationLogoUrl, clientNameOnFirstPage, fontFamily }) => `
+const buildCoverPageHtml = ({
+  organisationLogoUrl,
+  clientNameOnFirstPage,
+  fontFamily,
+}) => `
   <div style="margin-top:300px">
     <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;margin-top:${organisationLogoUrl ? "-100px" : "0px"}">
       ${
@@ -666,7 +683,13 @@ const buildCoverPageHtml = ({ organisationLogoUrl, clientNameOnFirstPage, fontFa
 // client-added service always appears. Description comes from `pricing`
 // (GetCalculatedServicesPriceByPackages), not the services catalog — the
 // catalog never carries a serviceDescription field on any service.
-const buildServiceDescriptionSection = (selections, descriptionByServiceID, categoryHeading, accentColor, fontFamily) => {
+const buildServiceDescriptionSection = (
+  selections,
+  descriptionByServiceID,
+  categoryHeading,
+  accentColor,
+  fontFamily,
+) => {
   const categoriesByID = new Map();
   Object.values(selections || {}).forEach((selection) => {
     const key = selection.serviceCatID ?? "uncategorised";
@@ -770,7 +793,9 @@ const resolveAdditionalInformationDisplayValue = (item) => {
     );
   }
   if (item.driverTypeID === 4) {
-    const slab = item.slab?.find((option) => option.slabID === item.driverValue);
+    const slab = item.slab?.find(
+      (option) => option.slabID === item.driverValue,
+    );
     if (!slab) return "";
     // slabTypeID 2 is the "Other" entry — its slabFrom/slabTo range is
     // meaningless, the client's typed number lives in slabValue instead.
@@ -781,7 +806,10 @@ const resolveAdditionalInformationDisplayValue = (item) => {
   return item.driverValue ?? "";
 };
 
-const buildAdditionalInformationHtml = (additionalInformationList, accentColor) => {
+const buildAdditionalInformationHtml = (
+  additionalInformationList,
+  accentColor,
+) => {
   const rows = (additionalInformationList || [])
     .map((item) => ({
       label: item.driverName,
@@ -1030,7 +1058,8 @@ export const generateAmendmentPdfUrl = async ({
     // facts intro above, searching forward instead of back.
     const serviceDescriptionsIndex = Array.isArray(templateElementList)
       ? templateElementList.findIndex(
-          (element) => element.templateElementTypeName === "Service Descriptions",
+          (element) =>
+            element.templateElementTypeName === "Service Descriptions",
         )
       : -1;
     // The Heading element immediately preceding "Service Descriptions"
@@ -1040,8 +1069,8 @@ export const generateAmendmentPdfUrl = async ({
     // section's title text — mirrors admin's own HEADING case.
     if (
       serviceDescriptionsIndex > 0 &&
-      templateElementList[serviceDescriptionsIndex - 1]?.templateElementTypeName ===
-        "Heading" &&
+      templateElementList[serviceDescriptionsIndex - 1]
+        ?.templateElementTypeName === "Heading" &&
       templateElementList[serviceDescriptionsIndex - 1]?.headings
     ) {
       serviceDescriptionHeading =
@@ -1113,10 +1142,15 @@ export const generateAmendmentPdfUrl = async ({
   // flat package value.
   const isStandardPackage = quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Package;
   const isPackageBased =
-    isStandardPackage || quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
+    isStandardPackage ||
+    quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage;
   const packageColumns = isPackageBased ? servicePackageList || [] : [];
 
-  const buildFeesHtmlForChargeType = (title, serviceChargeTypeID, selections) => {
+  const buildFeesHtmlForChargeType = (
+    title,
+    serviceChargeTypeID,
+    selections,
+  ) => {
     const row = findFinalAmountRow(serviceChargeTypeID);
 
     if (packageColumns.length > 0) {
@@ -1165,7 +1199,9 @@ export const generateAmendmentPdfUrl = async ({
         const vat =
           vatPercentage == null
             ? null
-            : Math.floor((discountedTotal * Number(vatPercentage)) / 100 * 100) / 100;
+            : Math.floor(
+                ((discountedTotal * Number(vatPercentage)) / 100) * 100,
+              ) / 100;
         const grandTotal = vat == null ? null : discountedTotal + vat;
 
         return {
@@ -1239,13 +1275,14 @@ export const generateAmendmentPdfUrl = async ({
   // Second page: intro letter + both fees tables + Statement of Facts intro
   // + driver breakdown, all together — no page break between them, same as
   // the real template.
-  const statementOfFactsDriverBreakdownHtml = buildStatementOfFactsDriverBreakdownHtml({
-    recurringSelections,
-    oneOffSelections,
-    pricing,
-    additionalInformationList,
-    accentColor: resolvedAccentColor,
-  });
+  const statementOfFactsDriverBreakdownHtml =
+    buildStatementOfFactsDriverBreakdownHtml({
+      recurringSelections,
+      oneOffSelections,
+      pricing,
+      additionalInformationList,
+      accentColor: resolvedAccentColor,
+    });
 
   const servicesPageHtml = [
     introLetterHtml,
@@ -1296,6 +1333,7 @@ export const generateAmendmentPdfUrl = async ({
         headerImage: headerFooter?.headerImage,
         footerImage: headerFooter?.footerImage,
         headerHeight: headerFooter?.headerHeight,
+
         footerHeight: headerFooter?.footerHeight,
         watermarkImage: headerFooter?.watermarkImage,
         showSeparatorLines: Boolean(headerFooter?.showSeparatorLines),
