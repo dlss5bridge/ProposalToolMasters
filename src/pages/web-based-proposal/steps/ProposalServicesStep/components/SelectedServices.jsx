@@ -11,6 +11,24 @@ const getDriverSummary = (driverValues) =>
       driver.value !== undefined,
   );
 
+// Groups items under their category, preserving each category's
+// first-appearance order and each item's selection order.
+const groupByCategory = (items) => {
+  const groups = new Map();
+  items.forEach((item) => {
+    const key = item.serviceCatID ?? item.categoryName ?? "Other";
+    if (!groups.has(key)) {
+      groups.set(key, {
+        key,
+        categoryName: item.categoryName || "Other",
+        items: [],
+      });
+    }
+    groups.get(key).items.push(item);
+  });
+  return Array.from(groups.values());
+};
+
 const SelectedGroup = ({ label, icon: Icon, items, onRemove }) => {
   if (items.length === 0) return null;
 
@@ -21,47 +39,53 @@ const SelectedGroup = ({ label, icon: Icon, items, onRemove }) => {
         <span>{label}</span>
       </div>
 
-      <ul className="pss-sidebar-group-list">
-        {items.map((item) => (
-          <li key={item.serviceID} className="pss-sidebar-item">
-            <div className="pss-sidebar-item-row">
-              <div className="pss-sidebar-item-info">
-                <p className="pss-sidebar-item-name">{item.serviceName}</p>
-                <p className="pss-sidebar-item-category">{item.categoryName}</p>
-              </div>
-              {item.locked ? (
-                <span
-                  className="pss-sidebar-item-remove pss-sidebar-item-locked"
-                  title="Included by default"
-                >
-                  <Lock size={13} />
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => onRemove(item.listType, item.serviceID)}
-                  className="pss-sidebar-item-remove"
-                >
-                  <X size={13} />
-                </button>
-              )}
-            </div>
-
-            {getDriverSummary(item.driverValues).length > 0 && (
-              <ul className="pss-sidebar-item-drivers">
-                {getDriverSummary(item.driverValues).map((driver, index) => (
-                  <li key={index} className="pss-sidebar-item-driver">
-                    {driver.driverName}:{" "}
-                    <span className="pss-sidebar-item-driver-value">
-                      {driver.label ?? driver.value}
+      {groupByCategory(items).map((group) => (
+        <div key={group.key} className="pss-sidebar-category">
+          <p className="pss-sidebar-category-title">{group.categoryName}</p>
+          <ul className="pss-sidebar-group-list">
+            {group.items.map((item) => (
+              <li key={item.serviceID} className="pss-sidebar-item">
+                <div className="pss-sidebar-item-row">
+                  <div className="pss-sidebar-item-info">
+                    <p className="pss-sidebar-item-name">{item.serviceName}</p>
+                  </div>
+                  {item.locked ? (
+                    <span
+                      className="pss-sidebar-item-remove pss-sidebar-item-locked"
+                      title="Included by default"
+                    >
+                      <Lock size={13} />
                     </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => onRemove(item.listType, item.serviceID)}
+                      className="pss-sidebar-item-remove"
+                    >
+                      <X size={13} />
+                    </button>
+                  )}
+                </div>
+
+                {getDriverSummary(item.driverValues).length > 0 && (
+                  <ul className="pss-sidebar-item-drivers">
+                    {getDriverSummary(item.driverValues).map(
+                      (driver, index) => (
+                        <li key={index} className="pss-sidebar-item-driver">
+                          {driver.driverName}:{" "}
+                          <span className="pss-sidebar-item-driver-value">
+                            {driver.label ?? driver.value}
+                          </span>
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 };

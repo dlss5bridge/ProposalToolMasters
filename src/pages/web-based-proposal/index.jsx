@@ -6,7 +6,10 @@ import ProposalAmendment from "./proposalTypes/ProposalAmendment";
 import StandardProposalWithInputs from "./proposalTypes/ProposalInputForm";
 import StandardProposal from "./proposalTypes/StandardProposal";
 import { Loader2 } from "lucide-react";
-import { getProposalTheme, DEFAULT_PROPOSAL_THEME } from "./theme/proposalTheme";
+import {
+  getProposalTheme,
+  DEFAULT_PROPOSAL_THEME,
+} from "./theme/proposalTheme";
 import "./theme/proposalTheme.css";
 import {
   getQuoteModel,
@@ -89,9 +92,7 @@ export default function WebBasedProposal() {
   const proposal = {
     quoteModel,
     title: quoteModel.quotationName || "Proposal",
-
     showSidebar: false,
-
     theme,
     themeSettings,
   };
