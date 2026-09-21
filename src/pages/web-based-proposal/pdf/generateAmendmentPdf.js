@@ -5,6 +5,7 @@ import {
   GetOrganisationInformationModelWithoutToken,
 } from "../../../redux/Services/Proposal/ProposalApi";
 import { ElementType, QUOTE_TYPE_ID } from "../../../Middleware/enums";
+import Utils from "../../../Middleware/Utils";
 
 // Web-Based Proposal counterpart to PreviewComponentpdf.jsx's generatePdf/
 // sendDataToBackend/generateMergePdfUrl flow, using the same endpoints and
@@ -23,6 +24,11 @@ const escapeHtml = (value) =>
       ],
   );
 
+// Admin puts the template's font (Utils.FontFamily by fontFamilyID) into
+// every block's inline style; a template without one resolves to null and
+// the declaration is invalid, so emit nothing rather than a hardcoded font.
+const ffCss = (fontFamily) => (fontFamily ? `font-family:${fontFamily};` : "");
+
 // Text Block htmlContent is raw Draft.js export markup (nested
 // data-block/data-text spans with box-sizing/position:relative styles).
 // Passed through verbatim it renders no visible text but still reserves a
@@ -31,6 +37,18 @@ const escapeHtml = (value) =>
 // breaks and bold styling.
 const extractDraftJsPlainHtml = (rawHtml) => {
   if (!rawHtml) return "";
+
+  // Admin keeps the editor's own inline typography (color/font-family/
+  // font-size); reuse the first such style found so the rebuilt <p> tags
+  // look the same instead of falling back to renderer defaults.
+  const styleMatch = rawHtml.match(/style="([^"]*font-size[^"]*)"/);
+  const pickStyle = (prop) => {
+    const found = styleMatch?.[1].match(
+      new RegExp(`(?:^|;)\\s*${prop}:\\s*([^;]+)`),
+    );
+    return found ? `${prop}:${found[1].trim()};` : "";
+  };
+  const baseStyle = `${pickStyle("color")}${pickStyle("font-family")}${pickStyle("font-size")}`;
 
   const paragraphs = [];
   const blockPattern =
@@ -41,9 +59,7 @@ const extractDraftJsPlainHtml = (rawHtml) => {
     const isBold = /font-weight:\s*bold/.test(styleAttr);
     const lineBreakHtml = text.replace(/\r?\n/g, "<br>");
     paragraphs.push(
-      isBold
-        ? `<p style="margin:0 0 1em 0;font-weight:bold">${lineBreakHtml}</p>`
-        : `<p style="margin:0 0 1em 0">${lineBreakHtml}</p>`,
+      `<p style="${baseStyle}margin:1em 0px;${isBold ? "font-weight:bold;" : ""}">${lineBreakHtml}</p>`,
     );
     match = blockPattern.exec(rawHtml);
   }
@@ -59,7 +75,7 @@ const extractDraftJsPlainHtml = (rawHtml) => {
   while (pMatch) {
     const text = pMatch[1].replace(/<[^>]+>/g, "").trim();
     if (text) {
-      fallbackParagraphs.push(`<p style="margin:0 0 1em 0">${text}</p>`);
+      fallbackParagraphs.push(`<p style="${baseStyle}">${text}</p>`);
     }
     pMatch = paragraphPattern.exec(rawHtml);
   }
@@ -67,7 +83,7 @@ const extractDraftJsPlainHtml = (rawHtml) => {
 
   // Last resort: strip all tags and show the remaining text as one paragraph.
   const plainText = rawHtml.replace(/<[^>]+>/g, "").trim();
-  return plainText ? `<p style="margin:0 0 1em 0">${plainText}</p>` : "";
+  return plainText ? `<p style="${baseStyle}">${plainText}</p>` : "";
 };
 
 // Duplicated from ProposalPricingTableStep.jsx (not exported there).
@@ -313,21 +329,21 @@ const buildDriverBreakdownSection = (
   // The section heading is colored with the brand accent, not black —
   // only the category name below it is black in admin's markup.
   return `
-    <p style="font-family:${fontFamily};font-size:0.2in;color:${accentColor};font-weight:bold">${escapeHtml(categoryHeading)}</p>
+    <p style="${ffCss(fontFamily)}font-size:0.2in;color:${accentColor};font-weight:bold">${escapeHtml(categoryHeading)}</p>
     ${categories
       .map(
         (category) => `
-          <div style="font-family:${fontFamily}">
-            <p style="font-family:${fontFamily};color:black;font-size:0.2in;font-weight:bold">${escapeHtml(category.categoryName)}</p>
+          <div style="${ffCss(fontFamily)}">
+            <p style="${ffCss(fontFamily)}color:black;font-size:0.2in;font-weight:bold">${escapeHtml(category.categoryName)}</p>
             <hr style="color:gray;margin-top:-15px">
             ${category.services
               .map(
                 (service) => `
-                  <p style="font-family:${fontFamily};color:black;font-size:14px">${escapeHtml(service.name)}</p>
+                  <p style="${ffCss(fontFamily)}color:black">${escapeHtml(service.name)}</p>
                   ${service.drivers
                     .map(
                       (driver) => `
-                        <li style="font-family:${fontFamily};color:black;font-size:14px;margin-top:5px">${escapeHtml(driver.driverName)}: <strong>${escapeHtml(String(driver.label ?? driver.value))}</strong></li>`,
+                        <li style="${ffCss(fontFamily)}color:black;margin-top:5px">${escapeHtml(driver.driverName)}: <strong>${escapeHtml(String(driver.label ?? driver.value))}</strong></li>`,
                     )
                     .join("")}`,
               )
@@ -343,7 +359,7 @@ const buildStatementOfFactsDriverBreakdownHtml = ({
   pricing,
   additionalInformationList,
   accentColor,
-  fontFamily = "arial, sans-serif",
+  fontFamily = null,
 }) => {
   const recurringSection = buildDriverBreakdownSection(
     recurringSelections,
@@ -383,6 +399,7 @@ const buildFeesTableHtml = ({
   vat,
   grandTotal,
   accentColor,
+  fontFamily,
 }) => {
   if (!categories || categories.length === 0) return "";
 
@@ -392,8 +409,8 @@ const buildFeesTableHtml = ({
   const categoryRows = categories
     .map(
       (category) => `
-        <tr style="background-color:#DCDCDC">
-          <td style="border:1px solid #DDDDDD;text-align:left;padding:8px;font-weight:bold;font-size:0.2in">${escapeHtml(category.categoryName)}</td>
+        <tr style="background-color:#eee">
+          <td style="border:1px solid #DDDDDD;text-align:left;padding:8px;font-weight:bold;font-size:18px">${escapeHtml(category.categoryName)}</td>
           <td style="border:1px solid #DDDDDD;text-align:left;padding:8px"></td>
         </tr>
         ${category.services
@@ -425,12 +442,12 @@ const buildFeesTableHtml = ({
       : "";
 
   return `
-    <div style="padding-left:40px;padding-right:40px;font-family:'Times New Roman', Times, serif">
-      <p style="font-family:arial, sans-serif;color:${accentColor};font-size:0.2in;margin-top:15px">${escapeHtml(title)}</p>
-      <table style="font-family:arial, sans-serif;border-collapse:collapse;width:100%;margin-top:-15px">
+    <div style="padding-left:40px;padding-right:40px;${ffCss(fontFamily)}page-break-inside:avoid;break-inside:avoid">
+      <p style="${ffCss(fontFamily)}color:${accentColor};font-size:20px;margin-top:15px">${escapeHtml(title)}</p>
+      <table style="${ffCss(fontFamily)}border-collapse:collapse;width:100%;margin-top:-15px">
         <tr style="background-color:${accentColor}">
-          <th style="border:1px solid #DDDDDD;text-align:left;padding:8px;color:white;font-size:0.2in">Services</th>
-          <th style="border:1px solid #DDDDDD;text-align:right;padding:8px;color:white;font-size:0.2in">Fees (${currencySymbol})</th>
+          <th style="border:1px solid #DDDDDD;text-align:left;padding:8px;color:white;font-size:18px">Services</th>
+          <th style="border:1px solid #DDDDDD;text-align:right;padding:8px;color:white;font-size:18px">Fees (${currencySymbol})</th>
         </tr>
         ${categoryRows}
         <tr style="background-color:#808080">
@@ -461,6 +478,7 @@ const buildPackageColumnsFeesTableHtml = ({
   packageColumns,
   packageTotals,
   accentColor,
+  fontFamily,
 }) => {
   if (!categories || categories.length === 0 || packageColumns.length === 0) {
     return "";
@@ -476,7 +494,7 @@ const buildPackageColumnsFeesTableHtml = ({
     .map(
       (category) => `
         <tr style="background-color:#DCDCDC">
-          <td style="border:1px solid #DDDDDD;text-align:left;padding:8px;font-weight:bold;font-size:0.2in">${escapeHtml(category.categoryName)}</td>
+          <td style="border:1px solid #DDDDDD;text-align:left;padding:8px;font-weight:bold;font-size:18px">${escapeHtml(category.categoryName)}</td>
           ${'<td style="border:1px solid #DDDDDD;text-align:left;padding:8px"></td>'.repeat(columnCount)}
         </tr>
         ${category.services
@@ -530,15 +548,15 @@ const buildPackageColumnsFeesTableHtml = ({
     : "";
 
   return `
-    <div style="padding-left:40px;padding-right:40px;font-family:'Times New Roman', Times, serif">
-      <p style="font-family:arial, sans-serif;color:${accentColor};font-size:0.2in;margin-top:15px">${escapeHtml(title)}</p>
-      <table style="font-family:arial, sans-serif;border-collapse:collapse;width:100%;margin-top:-15px">
+    <div style="padding-left:40px;padding-right:40px;${ffCss(fontFamily)}page-break-inside:avoid;break-inside:avoid">
+      <p style="${ffCss(fontFamily)}color:${accentColor};font-size:20px;margin-top:15px">${escapeHtml(title)}</p>
+      <table style="${ffCss(fontFamily)}border-collapse:collapse;width:100%;margin-top:-15px">
         <tr style="background-color:${accentColor}">
-          <th style="border:1px solid #DDDDDD;text-align:left;padding:8px;color:white;font-size:0.2in">Services</th>
+          <th style="border:1px solid #DDDDDD;text-align:left;padding:8px;color:white;font-size:18px">Services</th>
           ${packageColumns
             .map(
               (pkg) =>
-                `<th style="border:1px solid #DDDDDD;text-align:right;padding:8px;color:white;font-size:0.2in">${escapeHtml(pkg.servicePackageName)}</th>`,
+                `<th style="border:1px solid #DDDDDD;text-align:right;padding:8px;color:white;font-size:18px">${escapeHtml(pkg.servicePackageName)}</th>`,
             )
             .join("")}
         </tr>
@@ -671,8 +689,8 @@ const buildCoverPageHtml = ({
           : ""
       }
       <p style="text-align:center;color:#00BFFF;page-break-after:always">
-        <span style="display:block;color:#00BFFF;margin-top:15px;font-size:50px;font-family:${fontFamily}">Proposal For</span>
-        <span style="display:block;color:black;margin-top:15px;font-size:25px;font-family:${fontFamily}">${escapeHtml(clientNameOnFirstPage || "")}</span>
+        <span style="display:block;color:#00BFFF;margin-top:15px;font-size:50px;${ffCss(fontFamily)}">Proposal For</span>
+        <span style="display:block;color:black;margin-top:15px;font-size:25px;${ffCss(fontFamily)}">${escapeHtml(clientNameOnFirstPage || "")}</span>
       </p>
     </div>
   </div>`;
@@ -710,19 +728,19 @@ const buildServiceDescriptionSection = (
   return `
     ${
       categories.length !== 0
-        ? `<p style="font-family:${fontFamily};font-size:0.2in;color:${accentColor};font-weight:bold">${escapeHtml(categoryHeading)}</p>`
+        ? `<p style="${ffCss(fontFamily)}font-size:0.2in;color:${accentColor};font-weight:bold">${escapeHtml(categoryHeading)}</p>`
         : ""
     }
     ${categories
       .map(
         (category) => `
           <div>
-            <p style="color:black;font-weight:bold;font-family:${fontFamily};font-size:0.2in">${escapeHtml(category.categoryName)}</p>
+            <p style="color:black;font-weight:bold;${ffCss(fontFamily)}font-size:0.2in">${escapeHtml(category.categoryName)}</p>
             <hr style="color:gray;margin-top:-15px">
             ${category.services
               .map(
                 (service) => `
-                  <p style="color:black;font-family:${fontFamily};font-size:14px">${escapeHtml(service.name)}</p>
+                  <p style="color:black;${ffCss(fontFamily)}">${escapeHtml(service.name)}</p>
                   <p style="color:black">${service.description ? service.description : ""}</p>`,
               )
               .join("")}
@@ -751,7 +769,7 @@ const buildServiceDescriptionHtml = ({
   pricing,
   accentColor,
   heading,
-  fontFamily = "arial, sans-serif",
+  fontFamily = null,
 }) => {
   const recurringSection = buildServiceDescriptionSection(
     recurringSelections,
@@ -773,7 +791,7 @@ const buildServiceDescriptionHtml = ({
   // Mirrors admin's HEADING case markup — the section-level title above the
   // breakdown, distinct from the breakdown's own sub-headings.
   const headingHtml = heading
-    ? `<div style="padding-left:40px;padding-top:40px;padding-right:40px;font-size:0.2in;color:${accentColor};font-family:${fontFamily}">${escapeHtml(heading)}<br><hr style="color:black"></div>`
+    ? `<div style="padding-left:40px;padding-top:40px;padding-right:40px;font-size:0.2in;color:${accentColor};${ffCss(fontFamily)}">${escapeHtml(heading)}<br><hr style="color:black"></div>`
     : "";
 
   return `${headingHtml}<div style="padding-left:40px;padding-right:40px">${recurringSection}${oneOffSection}</div>`;
@@ -809,6 +827,7 @@ const resolveAdditionalInformationDisplayValue = (item) => {
 const buildAdditionalInformationHtml = (
   additionalInformationList,
   accentColor,
+  fontFamily,
 ) => {
   const rows = (additionalInformationList || [])
     .map((item) => ({
@@ -820,7 +839,7 @@ const buildAdditionalInformationHtml = (
   if (rows.length === 0) return "";
 
   return `
-    <div style="padding-left:40px;padding-right:40px;font-family:arial, sans-serif">
+    <div style="padding-left:40px;padding-right:40px;${ffCss(fontFamily)}">
       <p style="color:${accentColor};font-weight:bold;font-size:0.2in">Additional Information</p>
       <hr style="color:gray;margin-top:-15px">
       ${rows
@@ -974,6 +993,19 @@ export const generateAmendmentPdfUrl = async ({
       (item) => item.templateID === quoteModel?.templateID,
     )?.templateKeyID || quoteModel?.templateKeyID;
 
+  const headerFooter = fetchTemplateHeaderFooter({
+    list: templateLookupList,
+    templateID: quoteModel?.templateID,
+  });
+
+  // Same resolution as admin's getFontNameById(template.fontFamilyID); the
+  // "Select" placeholder (value null) is not a real font, so treat it as none.
+  const resolvedFont = Utils.FontFamily.find(
+    (font) => font.value === headerFooter?.fontFamilyID,
+  )?.label;
+  const fontFamily =
+    resolvedFont && resolvedFont !== "Select" ? resolvedFont : null;
+
   let coverPageHtml = "";
   let introLetterHtml = "";
   let statementOfFactsIntroHtml = "";
@@ -1011,7 +1043,7 @@ export const generateAmendmentPdfUrl = async ({
       coverPageHtml = buildCoverPageHtml({
         organisationLogoUrl: requiredData.organisationLogoUrl,
         clientNameOnFirstPage: requiredData.clientNameOnFirstPage,
-        fontFamily: "arial, sans-serif",
+        fontFamily,
       });
     }
 
@@ -1098,13 +1130,6 @@ export const generateAmendmentPdfUrl = async ({
     statementOfFactsIntroHtml = "";
     paymentTermsHtml = "";
   }
-
-  // Header/footer template — reachable unauthenticated, sent the same way
-  // admin does; comes back null when the organisation hasn't configured one.
-  const headerFooter = fetchTemplateHeaderFooter({
-    list: templateLookupList,
-    templateID: quoteModel?.templateID,
-  });
 
   // Organisation contact details — auth requirement was removed, so this
   // is fetched the same way as the template lookups above.
@@ -1221,6 +1246,7 @@ export const generateAmendmentPdfUrl = async ({
         packageColumns,
         packageTotals,
         accentColor: resolvedAccentColor,
+        fontFamily,
       });
     }
 
@@ -1242,6 +1268,7 @@ export const generateAmendmentPdfUrl = async ({
       vat: row?.vat,
       grandTotal: row?.grandTotal,
       accentColor: resolvedAccentColor,
+      fontFamily,
     });
   };
 
@@ -1263,6 +1290,7 @@ export const generateAmendmentPdfUrl = async ({
   const additionalInformationHtml = buildAdditionalInformationHtml(
     additionalInformationList,
     resolvedAccentColor,
+    fontFamily,
   );
   const serviceDescriptionHtml = buildServiceDescriptionHtml({
     recurringSelections,
@@ -1270,6 +1298,7 @@ export const generateAmendmentPdfUrl = async ({
     pricing,
     accentColor: resolvedAccentColor,
     heading: serviceDescriptionHeading,
+    fontFamily,
   });
 
   // Second page: intro letter + both fees tables + Statement of Facts intro
@@ -1282,6 +1311,7 @@ export const generateAmendmentPdfUrl = async ({
       pricing,
       additionalInformationList,
       accentColor: resolvedAccentColor,
+      fontFamily,
     });
 
   const servicesPageHtml = [
