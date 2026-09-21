@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { servicePackageTypeID } from "../Middleware/enums";
 import { Tooltip } from "@mui/material";
 import { FormatOverlineSharp } from "@mui/icons-material";
@@ -20,8 +20,8 @@ import { useSelector } from "react-redux";
 const PricingTableTemplatesModal = ({
   show,
   onHide,
-  setSelectedTemplateID,
-  selectedTemplateID,
+  setSelectedTemplateID: applySelectedTemplateID,
+  selectedTemplateID: committedTemplateID,
   selectedRecurringServiceList,
   setSelectedRecurringServiceList,
   RecurringPricingInfo,
@@ -29,8 +29,8 @@ const PricingTableTemplatesModal = ({
   formatValue,
   vatPercentage,
   serviceTypeID,
-  setSelectedTemplateIDOneOff,
-  selectedTemplateIDOneOff,
+  setSelectedTemplateIDOneOff: applySelectedTemplateIDOneOff,
+  selectedTemplateIDOneOff: committedTemplateIDOneOff,
   selectedOneOffServiceList,
   OneOffPricingInfo,
   selectedPackagesList,
@@ -46,13 +46,49 @@ const PricingTableTemplatesModal = ({
   OneOffPricingInfoCopy,
   setOneOffPricingInfoCopy,
   setOneOffPricingInfo,
-  setVisibleFieldsCustomTemp,
-  visibleFieldsCustomTemp,
+  setVisibleFieldsCustomTemp: applyVisibleFieldsCustomTemp,
+  visibleFieldsCustomTemp: committedVisibleFieldsCustomTemp,
   vatPercentageOneOff,
   currencyID,
   taxName,
   currencySymbol,
 }) => {
+  // Selections made in this popup are only a draft. They reach the parent
+  // when "Confirm Selection" is clicked and are thrown away on Cancel, the X
+  // button or a backdrop click.
+  const [selectedTemplateID, setSelectedTemplateID] =
+    useState(committedTemplateID);
+  const [selectedTemplateIDOneOff, setSelectedTemplateIDOneOff] = useState(
+    committedTemplateIDOneOff,
+  );
+  const [visibleFieldsCustomTemp, setVisibleFieldsCustomTemp] = useState(
+    committedVisibleFieldsCustomTemp,
+  );
+
+  const resetDraft = () => {
+    setSelectedTemplateID(committedTemplateID);
+    setSelectedTemplateIDOneOff(committedTemplateIDOneOff);
+    setVisibleFieldsCustomTemp(committedVisibleFieldsCustomTemp);
+  };
+
+  // Start every opening from what is currently applied.
+  useLayoutEffect(() => {
+    if (show) resetDraft();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show]);
+
+  const handleCancel = () => {
+    resetDraft();
+    onHide();
+  };
+
+  const handleConfirm = () => {
+    applySelectedTemplateID(selectedTemplateID);
+    applySelectedTemplateIDOneOff(selectedTemplateIDOneOff);
+    applyVisibleFieldsCustomTemp(visibleFieldsCustomTemp);
+    onHide();
+  };
+
   const [totalOnePackageValue, setTotalOnePackageValue] = useState(0);
   const [totalTwoPackageValue, setTotalTwoPackageValue] = useState(0);
   const [totalThreePackageValue, setTotalThreePackageValue] = useState(0);
@@ -12445,7 +12481,7 @@ const PricingTableTemplatesModal = ({
           backgroundColor: "rgba(0, 0, 0, 0.5)",
           zIndex: 1040,
         }}
-        onClick={onHide}
+        onClick={handleCancel}
       />
 
       {/* Modal */}
@@ -12472,7 +12508,7 @@ const PricingTableTemplatesModal = ({
                 type="button"
                 className="btn-close"
                 aria-label="Close"
-                onClick={onHide}
+                onClick={handleCancel}
               ></button>
             </div>
 
@@ -12762,23 +12798,18 @@ const PricingTableTemplatesModal = ({
               </form>
             </div>
 
-            <div className="modal-footer">
+            <div className="modal-footer ptt-modal__footer">
               <button
                 type="button"
-                className="btn btn-md btn-light"
-                onClick={() => {
-                  onHide();
-                }}
+                className="btn btn-md btn-light ptt-btn--cancel"
+                onClick={handleCancel}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="btn btn-md btn-primary create-item-btn"
-                onClick={() => {
-                  // console.log("Selected Template:", selectedTemplateID);
-                  onHide();
-                }}
+                className="btn btn-md btn-primary create-item-btn ptt-btn--confirm"
+                onClick={handleConfirm}
               >
                 Confirm Selection
               </button>

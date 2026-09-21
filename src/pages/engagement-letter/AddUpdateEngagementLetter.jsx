@@ -13,6 +13,8 @@ import Utils from "../../Middleware/Utils";
 import { useLocation } from "react-router-dom";
 import EditableCell from "../../components/EditableCell";
 import "./Engagement_Letter.css";
+import "../proposals/proposal-ui.css";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   ChangeDefaultPaymentGatewaysTypes,
   EngagementLetterHeader,
@@ -83,6 +85,7 @@ import {
 import { getServiceScopeDriverList } from "../../lib/utils";
 import PriceAdjustedToZeroFloorValue from "../../components/PriceAdjustedToZeroFloorValue";
 const SelectServices = lazy(() => import("../../components/SelectServices"));
+const serviceThemeID = 2;
 const PreviewComponentPdf = lazy(
   () => import("../../components/PreviewComponentpdf"),
 );
@@ -18520,12 +18523,26 @@ const Add_Update_Engagement_Letter = () => {
     });
     $("#" + "RecordsAvailablePopupModel").modal("show");
   };
+  const getStepClass = (tabId, isValid) =>
+    `step tab-field-center w-90 ${
+      activeTab === tabId
+        ? "is-active"
+        : isValid
+          ? "is-complete"
+          : "disabled cursor-not-allowed"
+    }`;
+
   return (
     <div>
-      <div className="container-fluid">
+      <div
+        className={`container-fluid proposal-ui${
+          serviceThemeID === 2 ? " proposal-ui--fluid" : ""
+        }`}
+      >
         <div>
           <div className="row form-row">
             <div className="col-12">
+              <div className="proposal-header">
               <h3 class="modal-title">
                 <BackButtonSvg onClick={handleCancel} />
                 {location?.state?.Action === null
@@ -18534,7 +18551,7 @@ const Add_Update_Engagement_Letter = () => {
               </h3>
               {/* <h3 class="modal-title">{modelAction === "Add" ? `Add Engagement Letter ` : `Edit Engagement Letter `}: {location.state.clientName}</h3> */}
               <div
-                className="steps overflow-auto"
+                className="steps proposal-header__steps"
                 style={{ pointerEvents: "all" }}
               >
                 <ul className="steps-list">
@@ -18544,13 +18561,7 @@ const Add_Update_Engagement_Letter = () => {
                       onClick={() =>
                         handleClickOnTabChange(1, "ELBasicInformationDiv")
                       }
-                      class={`${
-                        activeTab === EngagementLetterHeader.BasicInformation
-                          ? "step tab-field-center"
-                          : isValidForm.BasicForm === true
-                            ? "step tab-field-center"
-                            : "step disabled cursor-not-allowed tab-field-center"
-                      } w-90`}
+                      className={getStepClass(EngagementLetterHeader.BasicInformation, isValidForm.BasicForm)}
                     >
                       <span class="stepCount">1</span>
                       <span class="stepTitle">Basic Information</span>
@@ -18571,13 +18582,7 @@ const Add_Update_Engagement_Letter = () => {
                         onClick={() =>
                           handleClickOnTabChange(2, "ELSelectServiceDiv")
                         }
-                        class={`${
-                          activeTab === EngagementLetterHeader.SelectServices
-                            ? "step tab-field-center"
-                            : isValidForm.BasicForm === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
+                        className={getStepClass(EngagementLetterHeader.SelectServices, isValidForm.BasicForm)}
                       >
                         <span class="stepCount">2</span>
                         <span class="stepTitle">Select Services</span>
@@ -18596,14 +18601,7 @@ const Add_Update_Engagement_Letter = () => {
                       onClick={() =>
                         handleClickOnTabChange(3, "ELAdditionalInformationDiv")
                       }
-                      class={`${
-                        activeTab ===
-                        EngagementLetterHeader.AdditionalInformation
-                          ? "step tab-field-center"
-                          : isValidForm.SelectService === true
-                            ? "step tab-field-center"
-                            : "step disabled cursor-not-allowed tab-field-center"
-                      } w-90`}
+                      className={getStepClass(EngagementLetterHeader.AdditionalInformation, isValidForm.SelectService)}
                     >
                       <span class="stepCount">
                         {engagementObj.selectSourceId === 1 ||
@@ -18632,13 +18630,7 @@ const Add_Update_Engagement_Letter = () => {
                           onClick={() =>
                             handleClickOnTabChange(4, "ELReviewServiceDiv")
                           }
-                          class={`${
-                            activeTab === EngagementLetterHeader.ReviewServices
-                              ? "step tab-field-center"
-                              : isValidForm.AdditionalInfo === true
-                                ? "step tab-field-center"
-                                : "step disabled cursor-not-allowed tab-field-center"
-                          } w-90`}
+                          className={getStepClass(EngagementLetterHeader.ReviewServices, isValidForm.AdditionalInfo)}
                         >
                           <span class="stepCount">
                             {engagementObj.selectSourceId === 1 ? "4" : "3"}
@@ -18658,13 +18650,7 @@ const Add_Update_Engagement_Letter = () => {
                       <div
                         id="ReviewPackage1"
                         onClick={() => HandleBack(7, "ReviewPackage1")}
-                        class={`${
-                          activeTab === EngagementLetterHeader.ReviewPackages
-                            ? "step tab-field-center"
-                            : isValidForm.ReviewPackages === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
+                        className={getStepClass(EngagementLetterHeader.ReviewPackages, isValidForm.ReviewPackages)}
                       >
                         <span class="stepCount">{TabHide ? 5 : 4}</span>
                         <span class="stepTitle">Review Packages</span>
@@ -18682,13 +18668,7 @@ const Add_Update_Engagement_Letter = () => {
                     <div
                       id="ELPreviewDiv"
                       onClick={() => handleClickOnTabChange(5, "ELPreviewDiv")}
-                      class={`${
-                        activeTab === EngagementLetterHeader.Preview
-                          ? "step tab-field-center"
-                          : isValidForm.PricingInfo === true
-                            ? "step tab-field-center"
-                            : "step disabled cursor-not-allowed tab-field-center"
-                      } w-90`}
+                      className={getStepClass(EngagementLetterHeader.Preview, isValidForm.PricingInfo)}
                     >
                       <span class="stepCount">
                         {engagementObj.selectSourceId === 1 ||
@@ -18709,6 +18689,15 @@ const Add_Update_Engagement_Letter = () => {
                     </div>
                   </li>
                 </ul>
+              </div>
+              <button
+                type="button"
+                className="proposal-header__close"
+                aria-label="Close"
+                onClick={handleCancel}
+              >
+                <CloseIcon />
+              </button>
               </div>
               {activeTab === EngagementLetterHeader.BasicInformation && (
                 <BasicInformationComponent
@@ -18765,6 +18754,7 @@ const Add_Update_Engagement_Letter = () => {
               {activeTab === EngagementLetterHeader.SelectServices && (
                 <Suspense>
                   <SelectServices
+                    serviceThemeID={serviceThemeID}
                     DisableTabOnChange={DisableTabOnChange}
                     oneOffObj={oneOffObj}
                     requireMessage={requireMessage}

@@ -1244,7 +1244,7 @@ const AdditionalInformation = (props) => {
           <div class="d-flex" style={{ overflowX: "auto" }}>
             {props.moduleName == "Contract" && (
               <button
-                className="btn btn-md btn-primary create-item-btn  mr-1 text-nowrap "
+                className="btn btn-md btn-primary create-item-btn  mr-1 text-nowrap pf-btn--secondary"
                 onClick={() => {
                   props.AddSignatory();
                 }}
@@ -1255,14 +1255,14 @@ const AdditionalInformation = (props) => {
             )}
             {props.getSAChanges ? (
               <button
-                class="btn btn-md btn-success declined-item-btn mr-1"
+                class="btn btn-md btn-success declined-item-btn mr-1 pf-btn--cancel"
                 onClick={() => props.DeclineSuperAdminChangesData("Decline")}
               >
                 <span>Decline</span>
               </button>
             ) : (
               <button
-                class="btn btn-md  btn-light mr-1"
+                class="btn btn-md  btn-light mr-1 pf-btn--cancel"
                 onClick={props.handleCancel}
               >
                 <span>{props.getCrudButtonTextName("Cancel")}</span>
@@ -1271,13 +1271,13 @@ const AdditionalInformation = (props) => {
             <button
               onClick={() => props.HandleBack(2)}
               style={{ marginRight: "5px" }}
-              className="btn btn-md btn-success create-item-btn text-nowrap"
+              className="btn btn-md btn-success create-item-btn text-nowrap pf-btn--back"
             >
               <span>Back</span>
             </button>
             {props?.ProposalObject?.selectedProposalTypeValue === 1 && (
               <button
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn pf-btn--next"
                 onClick={async () => {
                   await props.HandleTabChange(7);
                 }}
@@ -1287,7 +1287,7 @@ const AdditionalInformation = (props) => {
             )}
             {props?.ProposalObject?.selectedProposalTypeValue === 2 && (
               <button
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn pf-btn--next"
                 onClick={async () => {
                   await props.HandleTabChange(7);
                 }}
@@ -1297,7 +1297,7 @@ const AdditionalInformation = (props) => {
             )}
             {props?.ProposalObject?.selectedProposalTypeValue === 3 && (
               <button
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn pf-btn--next"
                 onClick={async () => {
                   await props.HandleTabChange(6);
                 }}
@@ -1307,7 +1307,7 @@ const AdditionalInformation = (props) => {
             )}
             {props?.ProposalObject?.selectedProposalTypeValue === 4 && (
               <button
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn pf-btn--next"
                 onClick={async () => {
                   await props.HandleTabChange(4);
                 }}
@@ -1318,7 +1318,7 @@ const AdditionalInformation = (props) => {
             {(props.moduleName == "Contract" ||
               props.moduleName === "Package") && (
               <button
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn pf-btn--next"
                 onClick={async () => {
                   await props.HandleTabChange(4);
                 }}
@@ -1329,7 +1329,7 @@ const AdditionalInformation = (props) => {
             {props.moduleName == "Quote" && (
               <button
                 type="submit"
-                class="btn btn-md btn-success create-item-btn text-nowrap"
+                class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
                 onClick={() =>
                   props.handleSaveAsDraft(
                     3,
@@ -1345,7 +1345,7 @@ const AdditionalInformation = (props) => {
             {props.moduleName == "Contract" && (
               <button
                 type="submit"
-                class="btn btn-md btn-success create-item-btn text-nowrap"
+                class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
                 onClick={() => props.HandleTabChange(4, statusID.Draft)}
                 style={{ marginLeft: "5px" }}
               >

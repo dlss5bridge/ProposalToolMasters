@@ -5,6 +5,8 @@ import pdfWorker from "pdfjs-dist/build/pdf.worker.entry";
 import { lazy, Suspense } from "react";
 import "../configure/packages/Package.css";
 import "./Proposals.css";
+import "./proposal-ui.css";
+import CloseIcon from "@mui/icons-material/Close";
 import Select from "react-select";
 import SuccessModal from "../../components/SuccessModal";
 import PricingModel from "../../components/PricingModel";
@@ -104,6 +106,7 @@ const PricingTableTemplatesModal = lazy(
 //   () => import("../../components/PricingTableTemplatesModal"),
 // );
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+const serviceThemeID = 2;
 
 const BasicInformationComponent = (props) => {
   const navigate = useNavigate();
@@ -1215,19 +1218,17 @@ const ReviewServicesComponent = (props) => {
             >
               Services
             </th>
-            {props.ProposalObject.selectedProposalTypeValue !== 4 && (
-              <th
-                style={{
-                  border: "1px solid #DDDDDD",
-                  textAlign: "right",
-                  padding: "8px",
-                  color: "white",
-                  fontSize: "18px",
-                }}
-              >
-                Fees ({props.currencySymbol})
-              </th>
-            )}
+            <th
+              style={{
+                border: "1px solid #DDDDDD",
+                textAlign: "right",
+                padding: "8px",
+                color: "white",
+                fontSize: "18px",
+              }}
+            >
+              Fees ({props.currencySymbol})
+            </th>
           </tr>
           {props.selectedRecurringServiceList.map((serviceCat) => (
             <React.Fragment key={serviceCat.serviceCatID}>
@@ -1239,15 +1240,18 @@ const ReviewServicesComponent = (props) => {
                     padding: "8px",
                     fontWeight: "bold",
                     fontSize: "18px",
+                    width: "75%",
                   }}
                 >
                   {serviceCat.serviceCatName}
                 </td>
+
                 <td
                   style={{
                     border: "1px solid #DDDDDD",
-                    textAlign: "left",
+                    textAlign: "right",
                     padding: "8px",
+                    width: "25%",
                   }}
                 ></td>
               </tr>
@@ -16071,6 +16075,7 @@ const Add_Update_Proposal = (props) => {
     useState(false);
   const [TabHide, setTabHide] = useState(false);
   const [activeTab, setActiveTab] = useState(1);
+
   const [modelAction, setModelAction] = useState(null);
   const [StatementOfFact, setStatementOfFacts] = useState([]);
   const [paymentGatewayObj, setPaymentGatewayObj] = useState({
@@ -16374,6 +16379,15 @@ const Add_Update_Proposal = (props) => {
 
   // proposal name
   const [proposalLookUpOptions, setProposalLookUpOptions] = useState([]);
+
+  const getStepClass = (tabId, isValid) =>
+    `step tab-field-center w-90 ${
+      activeTab === tabId
+        ? "is-active"
+        : isValid
+          ? "is-complete"
+          : "disabled cursor-not-allowed"
+    }`;
 
   useEffect(() => {
     setTopbar("none");
@@ -24379,16 +24393,21 @@ const Add_Update_Proposal = (props) => {
   };
   return (
     <div>
-      <div className="container-fluid new-item-page-container">
+      <div
+        className={`container-fluid new-item-page-container proposal-ui${
+          serviceThemeID === 2 ? " proposal-ui--fluid" : ""
+        }`}
+      >
         <div className="new-item-page-content">
           <div className={`row form-row  `}>
             <div className="col-12">
-              <h3 class="modal-title">
-                <BackButtonSvg onClick={handleCancelBtn} />
-                {modelAction === "Add"
-                  ? getCrudPopUpTitleName("Add", proposalName)
-                  : getCrudPopUpTitleName("Update", proposalName)}
-                {/* {modelAction !== "Add" ? ` : ` : ""}{" "}
+              <div className="proposal-header">
+                <h3 class="modal-title">
+                  <BackButtonSvg onClick={handleCancelBtn} />
+                  {modelAction === "Add"
+                    ? getCrudPopUpTitleName("Add", proposalName)
+                    : getCrudPopUpTitleName("Update", proposalName)}
+                  {/* {modelAction !== "Add" ? ` : ` : ""}{" "}
                 {isMobile
                   ? location.state.servicePackageName?.length > 10
                     ? `${location.state.servicePackageName.substring(0, 10)}...`
@@ -24396,17 +24415,14 @@ const Add_Update_Proposal = (props) => {
                   : location.state.servicePackageName?.length > 35
                     ? `${location.state.servicePackageName.substring(0, 35)}...`
                     : location.state.servicePackageName} */}
-              </h3>
-              <div
-                id="AddUpdateProposal"
-                className="steps "
-                style={{
-                  pointerEvents: "all",
-                  marginLeft: "18px",
-                }}
-              >
-                <ul className="steps-list">
-                  {/* <li>
+                </h3>
+                <div
+                  id="AddUpdateProposal"
+                  className="steps proposal-header__steps"
+                  style={{ pointerEvents: "all" }}
+                >
+                  <ul className="steps-list">
+                    {/* <li>
                     <div
                       class={`${
                         activeTab === ProposalHeader.BasicInformation
@@ -24418,46 +24434,19 @@ const Add_Update_Proposal = (props) => {
                       <span class="stepTitle">Basic Information</span>
                     </div>
                   </li> */}
-                  <li>
-                    <div
-                      id="PackageBasicInformation"
-                      onClick={() => HandleBack(1, "PackageBasicInformation")}
-                      class={`${
-                        activeTab === ProposalHeader.BasicInformation
-                          ? "step tab-field-center"
-                          : isValidForm.BasicForm === true
-                            ? "step tab-field-center"
-                            : "step disabled cursor-not-allowed tab-field-center"
-                      } w-90`}
-                    >
-                      <span class="stepCount">1</span>
-                      <span class="stepTitle">Basic Information</span>
-                      &nbsp;
-                      {activeTab == ProposalHeader.BasicInformation &&
-                        requireMessage && (
-                          <span className="validation">
-                            <InvalidFormIcon />
-                          </span>
+                    <li>
+                      <div
+                        id="PackageBasicInformation"
+                        onClick={() => HandleBack(1, "PackageBasicInformation")}
+                        className={getStepClass(
+                          ProposalHeader.BasicInformation,
+                          isValidForm.BasicForm,
                         )}
-                    </div>
-                  </li>
-                  {ProposalObject.selectedProposalTypeValue === 1 && (
-                    <li>
-                      <div
-                        id="SelectedPackages1"
-                        onClick={() => HandleBack(5, "SelectedPackages1")}
-                        class={`${
-                          activeTab === ProposalHeader.SelectPackages
-                            ? "step tab-field-center"
-                            : isValidForm.SelectPackages === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
                       >
-                        <span class="stepCount">2</span>
-                        <span class="stepTitle">Select Packages</span>
+                        <span class="stepCount">1</span>
+                        <span class="stepTitle">Basic Information</span>
                         &nbsp;
-                        {activeTab == ProposalHeader.SelectPackages &&
+                        {activeTab == ProposalHeader.BasicInformation &&
                           requireMessage && (
                             <span className="validation">
                               <InvalidFormIcon />
@@ -24465,72 +24454,15 @@ const Add_Update_Proposal = (props) => {
                           )}
                       </div>
                     </li>
-                  )}
-                  {ProposalObject.selectedProposalTypeValue === 1 && (
-                    // <li>
-                    //   <div
-                    //     className={`${
-                    //       activeTab === ProposalHeader.SelectServices
-                    //         ? "step"
-                    //         : "step disabled cursor-not-allowed"
-                    //     } w-90`}
-                    //   >
-                    //     <span className="stepCount">3</span>
-                    //     <span className="stepTitle">Select Service</span>
-                    //   </div>
-                    // </li>
-                    <li>
-                      <div
-                        id="PackageSelectService1"
-                        onClick={() => HandleBack(2, "PackageSelectService1")}
-                        class={`${
-                          activeTab === ProposalHeader.SelectServices
-                            ? "step tab-field-center"
-                            : isValidForm.SelectService === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">3</span>
-                        <span class="stepTitle ">
-                          Select Additional Services
-                        </span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.SelectServices &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
-                          )}
-                      </div>
-                    </li>
-                  )}
-
-                  {ProposalObject.selectedProposalTypeValue === 2 && (
-                    <>
-                      {/* <li>
-                      <div
-                        className={`${
-                          activeTab === ProposalHeader.SelectPackages
-                            ? "step"
-                            : "step disabled cursor-not-allowed"
-                        } w-90`}
-                      >
-                        <span className="stepCount">2</span>
-                        <span className="stepTitle">Select Packages</span>
-                      </div>
-                    </li> */}
+                    {ProposalObject.selectedProposalTypeValue === 1 && (
                       <li>
                         <div
-                          id="SelectedPackages2"
-                          onClick={() => HandleBack(5, "SelectedPackages2")}
-                          class={`${
-                            activeTab === ProposalHeader.SelectPackages
-                              ? "step tab-field-center"
-                              : isValidForm.SelectPackages === true
-                                ? "step tab-field-center"
-                                : "step disabled cursor-not-allowed tab-field-center"
-                          } w-90`}
+                          id="SelectedPackages1"
+                          onClick={() => HandleBack(5, "SelectedPackages1")}
+                          className={getStepClass(
+                            ProposalHeader.SelectPackages,
+                            isValidForm.SelectPackages,
+                          )}
                         >
                           <span class="stepCount">2</span>
                           <span class="stepTitle">Select Packages</span>
@@ -24543,355 +24475,401 @@ const Add_Update_Proposal = (props) => {
                             )}
                         </div>
                       </li>
-                    </>
-                  )}
+                    )}
+                    {ProposalObject.selectedProposalTypeValue === 1 && (
+                      // <li>
+                      //   <div
+                      //     className={`${
+                      //       activeTab === ProposalHeader.SelectServices
+                      //         ? "step"
+                      //         : "step disabled cursor-not-allowed"
+                      //     } w-90`}
+                      //   >
+                      //     <span className="stepCount">3</span>
+                      //     <span className="stepTitle">Select Service</span>
+                      //   </div>
+                      // </li>
+                      <li>
+                        <div
+                          id="PackageSelectService1"
+                          onClick={() => HandleBack(2, "PackageSelectService1")}
+                          className={getStepClass(
+                            ProposalHeader.SelectServices,
+                            isValidForm.SelectService,
+                          )}
+                        >
+                          <span class="stepCount">3</span>
+                          <span class="stepTitle ">
+                            Select Additional Services
+                          </span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.SelectServices &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
 
-                  {(ProposalObject.selectedProposalTypeValue === 3 ||
-                    ProposalObject.selectedProposalTypeValue === null) && (
-                    <li>
+                    {ProposalObject.selectedProposalTypeValue === 2 && (
+                      <>
+                        {/* <li>
                       <div
-                        id="PackageSelectService3"
-                        onClick={() => HandleBack(2, "PackageSelectService3")}
-                        class={`${
-                          activeTab === ProposalHeader.SelectServices
-                            ? "step tab-field-center"
-                            : isValidForm.SelectService === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">2</span>
-                        <span class="stepTitle">Select Service</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.SelectServices &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
-                          )}
-                      </div>
-                    </li>
-                  )}
-                  {(ProposalObject.selectedProposalTypeValue === 4 ||
-                    ProposalObject.selectedProposalTypeValue === null) && (
-                    <li>
-                      <div
-                        id="PackageSelectService4"
-                        onClick={() => HandleBack(2, "PackageSelectService4")}
-                        class={`${
-                          activeTab === ProposalHeader.SelectServices
-                            ? "step tab-field-center"
-                            : isValidForm.SelectService === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">2</span>
-                        <span class="stepTitle">Select Service</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.SelectServices &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
-                          )}
-                      </div>
-                    </li>
-                  )}
-                  {ProposalObject.selectedProposalTypeValue === 3 && (
-                    // <li style={{ display: TabHide ? "list-item" : "none" }}>
-                    //   <div
-                    //     // id="PackageAdditionalInfo"
-                    //     // onClick={() =>
-                    //     //   handleChangeTab(3, "PackageAdditionalInfo")
-                    //     // }
-                    //     className={`${
-                    //       activeTab === ProposalHeader.AdditionalInformation
-                    //         ? "step tab-field-center"
-                    //         : isValidForm.SelectService === true
-                    //         ? "step tab-field-center"
-                    //         : "step disabled cursor-not-allowed tab-field-center"
-                    //     } w-90`}
-                    //   >
-                    //     <span className="stepCount">3</span>
-                    //     <span className="stepTitle">
-                    //       Additional Information
-                    //     </span>
-                    //   </div>
-                    // </li>
-                    <li style={{ display: TabHide ? "list-item" : "none" }}>
-                      <div
-                        id="AdditionalInfo3"
-                        onClick={() => HandleBack(3, "AdditionalInfo3")}
                         className={`${
-                          activeTab === ProposalHeader.AdditionalInformation
-                            ? "step tab-field-center"
-                            : isValidForm.AdditionalInfo === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
+                          activeTab === ProposalHeader.SelectPackages
+                            ? "step"
+                            : "step disabled cursor-not-allowed"
                         } w-90`}
                       >
-                        <span class="stepCount">3</span>
-                        <span class="stepTitle"> Additional Information</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.AdditionalInformation &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
-                          )}
+                        <span className="stepCount">2</span>
+                        <span className="stepTitle">Select Packages</span>
                       </div>
-                    </li>
-                  )}
-                  {ProposalObject.selectedProposalTypeValue === 4 && (
-                    // <li style={{ display: TabHide ? "list-item" : "none" }}>
-                    //   <div
-                    //     // id="PackageAdditionalInfo"
-                    //     // onClick={() =>
-                    //     //   handleChangeTab(3, "PackageAdditionalInfo")
-                    //     // }
-                    //     className={`${
-                    //       activeTab === ProposalHeader.AdditionalInformation
-                    //         ? "step tab-field-center"
-                    //         : isValidForm.SelectService === true
-                    //         ? "step tab-field-center"
-                    //         : "step disabled cursor-not-allowed tab-field-center"
-                    //     } w-90`}
-                    //   >
-                    //     <span className="stepCount">3</span>
-                    //     <span className="stepTitle">
-                    //       Additional Information
-                    //     </span>
-                    //   </div>
-                    // </li>
-                    <li style={{ display: TabHide ? "list-item" : "none" }}>
-                      <div
-                        id="AdditionalInfo4"
-                        onClick={() => HandleBack(3, "AdditionalInfo4")}
-                        className={`${
-                          activeTab === ProposalHeader.AdditionalInformation
-                            ? "step tab-field-center"
-                            : isValidForm.AdditionalInfo === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">3</span>
-                        <span class="stepTitle"> Additional Information</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.AdditionalInformation &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
-                          )}
-                      </div>
-                    </li>
-                  )}
-                  {(ProposalObject.selectedProposalTypeValue === 3 ||
-                    ProposalObject.selectedProposalTypeValue === null) && (
-                    <li>
-                      <div
-                        id="ReviewService"
-                        onClick={() => HandleBack(6, "ReviewService")}
-                        class={`${
-                          activeTab === ProposalHeader.ReviewServices
-                            ? "step tab-field-center"
-                            : isValidForm.ReviewService === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">{TabHide ? 4 : 3}</span>
-                        <span class="stepTitle">Review Services</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.ReviewServices &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
-                          )}
-                      </div>
-                    </li>
-                  )}
+                    </li> */}
+                        <li>
+                          <div
+                            id="SelectedPackages2"
+                            onClick={() => HandleBack(5, "SelectedPackages2")}
+                            className={getStepClass(
+                              ProposalHeader.SelectPackages,
+                              isValidForm.SelectPackages,
+                            )}
+                          >
+                            <span class="stepCount">2</span>
+                            <span class="stepTitle">Select Packages</span>
+                            &nbsp;
+                            {activeTab == ProposalHeader.SelectPackages &&
+                              requireMessage && (
+                                <span className="validation">
+                                  <InvalidFormIcon />
+                                </span>
+                              )}
+                          </div>
+                        </li>
+                      </>
+                    )}
 
-                  {ProposalObject.selectedProposalTypeValue === 2 && (
-                    <li>
-                      <div
-                        id="ReviewPackage"
-                        onClick={() => HandleBack(7, "ReviewPackage")}
-                        class={`${
-                          activeTab === ProposalHeader.ReviewPackages
-                            ? "step tab-field-center"
-                            : isValidForm.ReviewPackages === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">3</span>
-                        <span class="stepTitle">Review Packages</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.ReviewPackages &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
+                    {(ProposalObject.selectedProposalTypeValue === 3 ||
+                      ProposalObject.selectedProposalTypeValue === null) && (
+                      <li>
+                        <div
+                          id="PackageSelectService3"
+                          onClick={() => HandleBack(2, "PackageSelectService3")}
+                          className={getStepClass(
+                            ProposalHeader.SelectServices,
+                            isValidForm.SelectService,
                           )}
-                      </div>
-                    </li>
-                  )}
-                  {ProposalObject.selectedProposalTypeValue === 1 && (
-                    <li style={{ display: TabHide ? "list-item" : "none" }}>
-                      <div
-                        id="AdditionalInfo"
-                        onClick={() => HandleBack(3, "AdditionalInfo")}
-                        className={`${
-                          activeTab === ProposalHeader.AdditionalInformation
-                            ? "step tab-field-center"
-                            : isValidForm.AdditionalInfo === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">4</span>
-                        <span class="stepTitle"> Additional Information</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.AdditionalInformation &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
+                        >
+                          <span class="stepCount">2</span>
+                          <span class="stepTitle">Select Service</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.SelectServices &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {(ProposalObject.selectedProposalTypeValue === 4 ||
+                      ProposalObject.selectedProposalTypeValue === null) && (
+                      <li>
+                        <div
+                          id="PackageSelectService4"
+                          onClick={() => HandleBack(2, "PackageSelectService4")}
+                          className={getStepClass(
+                            ProposalHeader.SelectServices,
+                            isValidForm.SelectService,
                           )}
-                      </div>
-                    </li>
-                  )}
-                  {ProposalObject.selectedProposalTypeValue === 1 && (
-                    <li>
-                      <div
-                        id="ReviewPackage1"
-                        onClick={() => HandleBack(7, "ReviewPackage1")}
-                        class={`${
-                          activeTab === ProposalHeader.ReviewPackages
-                            ? "step tab-field-center"
-                            : isValidForm.ReviewPackages === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">{TabHide ? 5 : 4}</span>
-                        <span class="stepTitle">Review Packages</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.ReviewPackages &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
+                        >
+                          <span class="stepCount">2</span>
+                          <span class="stepTitle">Select Service</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.SelectServices &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {ProposalObject.selectedProposalTypeValue === 3 && (
+                      // <li style={{ display: TabHide ? "list-item" : "none" }}>
+                      //   <div
+                      //     // id="PackageAdditionalInfo"
+                      //     // onClick={() =>
+                      //     //   handleChangeTab(3, "PackageAdditionalInfo")
+                      //     // }
+                      //     className={`${
+                      //       activeTab === ProposalHeader.AdditionalInformation
+                      //         ? "step tab-field-center"
+                      //         : isValidForm.SelectService === true
+                      //         ? "step tab-field-center"
+                      //         : "step disabled cursor-not-allowed tab-field-center"
+                      //     } w-90`}
+                      //   >
+                      //     <span className="stepCount">3</span>
+                      //     <span className="stepTitle">
+                      //       Additional Information
+                      //     </span>
+                      //   </div>
+                      // </li>
+                      <li style={{ display: TabHide ? "list-item" : "none" }}>
+                        <div
+                          id="AdditionalInfo3"
+                          onClick={() => HandleBack(3, "AdditionalInfo3")}
+                          className={getStepClass(
+                            ProposalHeader.AdditionalInformation,
+                            isValidForm.AdditionalInfo,
                           )}
-                      </div>
-                    </li>
-                  )}
-                  {ProposalObject.selectedProposalTypeValue === 1 && (
-                    <li>
-                      <div
-                        id="Preview1"
-                        onClick={() => HandleBack(4, "Preview1")}
-                        class={`${
-                          activeTab === ProposalHeader.Preview
-                            ? "step tab-field-center"
-                            : isValidForm.Preview === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">{TabHide ? 6 : 5}</span>
-                        <span class="stepTitle">Preview</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.Preview &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
+                        >
+                          <span class="stepCount">3</span>
+                          <span class="stepTitle"> Additional Information</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.AdditionalInformation &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {ProposalObject.selectedProposalTypeValue === 4 && (
+                      // <li style={{ display: TabHide ? "list-item" : "none" }}>
+                      //   <div
+                      //     // id="PackageAdditionalInfo"
+                      //     // onClick={() =>
+                      //     //   handleChangeTab(3, "PackageAdditionalInfo")
+                      //     // }
+                      //     className={`${
+                      //       activeTab === ProposalHeader.AdditionalInformation
+                      //         ? "step tab-field-center"
+                      //         : isValidForm.SelectService === true
+                      //         ? "step tab-field-center"
+                      //         : "step disabled cursor-not-allowed tab-field-center"
+                      //     } w-90`}
+                      //   >
+                      //     <span className="stepCount">3</span>
+                      //     <span className="stepTitle">
+                      //       Additional Information
+                      //     </span>
+                      //   </div>
+                      // </li>
+                      <li style={{ display: TabHide ? "list-item" : "none" }}>
+                        <div
+                          id="AdditionalInfo4"
+                          onClick={() => HandleBack(3, "AdditionalInfo4")}
+                          className={getStepClass(
+                            ProposalHeader.AdditionalInformation,
+                            isValidForm.AdditionalInfo,
                           )}
-                      </div>
-                    </li>
-                  )}
-                  {ProposalObject.selectedProposalTypeValue === 2 && (
-                    <li>
-                      <div
-                        id="Preview2"
-                        onClick={() => HandleBack(4, "Preview2")}
-                        class={`${
-                          activeTab === ProposalHeader.Preview
-                            ? "step tab-field-center"
-                            : isValidForm.Preview === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">4</span>
-                        <span class="stepTitle">Preview</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.Preview &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
+                        >
+                          <span class="stepCount">3</span>
+                          <span class="stepTitle"> Additional Information</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.AdditionalInformation &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {(ProposalObject.selectedProposalTypeValue === 3 ||
+                      ProposalObject.selectedProposalTypeValue === null) && (
+                      <li>
+                        <div
+                          id="ReviewService"
+                          onClick={() => HandleBack(6, "ReviewService")}
+                          className={getStepClass(
+                            ProposalHeader.ReviewServices,
+                            isValidForm.ReviewService,
                           )}
-                      </div>
-                    </li>
-                  )}
-                  {ProposalObject.selectedProposalTypeValue === 3 && (
-                    <li>
-                      <div
-                        id="Preview3"
-                        onClick={() => HandleBack(4, "Preview3")}
-                        class={`${
-                          activeTab === ProposalHeader.Preview
-                            ? "step tab-field-center"
-                            : isValidForm.Preview === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">{TabHide ? 5 : 4}</span>
-                        <span class="stepTitle">Preview</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.Preview &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
+                        >
+                          <span class="stepCount">{TabHide ? 4 : 3}</span>
+                          <span class="stepTitle">Review Services</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.ReviewServices &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+
+                    {ProposalObject.selectedProposalTypeValue === 2 && (
+                      <li>
+                        <div
+                          id="ReviewPackage"
+                          onClick={() => HandleBack(7, "ReviewPackage")}
+                          className={getStepClass(
+                            ProposalHeader.ReviewPackages,
+                            isValidForm.ReviewPackages,
                           )}
-                      </div>
-                    </li>
-                  )}
-                  {ProposalObject.selectedProposalTypeValue === 4 && (
-                    <li>
-                      <div
-                        id="Preview4"
-                        onClick={() => HandleBack(4, "Preview4")}
-                        class={`${
-                          activeTab === ProposalHeader.Preview
-                            ? "step tab-field-center"
-                            : isValidForm.Preview === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span class="stepCount">{TabHide ? 4 : 3}</span>
-                        <span class="stepTitle">Preview</span>
-                        &nbsp;
-                        {activeTab == ProposalHeader.Preview &&
-                          requireMessage && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
+                        >
+                          <span class="stepCount">3</span>
+                          <span class="stepTitle">Review Packages</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.ReviewPackages &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {ProposalObject.selectedProposalTypeValue === 1 && (
+                      <li style={{ display: TabHide ? "list-item" : "none" }}>
+                        <div
+                          id="AdditionalInfo"
+                          onClick={() => HandleBack(3, "AdditionalInfo")}
+                          className={getStepClass(
+                            ProposalHeader.AdditionalInformation,
+                            isValidForm.AdditionalInfo,
                           )}
-                      </div>
-                    </li>
-                  )}
-                </ul>
+                        >
+                          <span class="stepCount">4</span>
+                          <span class="stepTitle"> Additional Information</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.AdditionalInformation &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {ProposalObject.selectedProposalTypeValue === 1 && (
+                      <li>
+                        <div
+                          id="ReviewPackage1"
+                          onClick={() => HandleBack(7, "ReviewPackage1")}
+                          className={getStepClass(
+                            ProposalHeader.ReviewPackages,
+                            isValidForm.ReviewPackages,
+                          )}
+                        >
+                          <span class="stepCount">{TabHide ? 5 : 4}</span>
+                          <span class="stepTitle">Review Packages</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.ReviewPackages &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {ProposalObject.selectedProposalTypeValue === 1 && (
+                      <li>
+                        <div
+                          id="Preview1"
+                          onClick={() => HandleBack(4, "Preview1")}
+                          className={getStepClass(
+                            ProposalHeader.Preview,
+                            isValidForm.Preview,
+                          )}
+                        >
+                          <span class="stepCount">{TabHide ? 6 : 5}</span>
+                          <span class="stepTitle">Preview</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.Preview &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {ProposalObject.selectedProposalTypeValue === 2 && (
+                      <li>
+                        <div
+                          id="Preview2"
+                          onClick={() => HandleBack(4, "Preview2")}
+                          className={getStepClass(
+                            ProposalHeader.Preview,
+                            isValidForm.Preview,
+                          )}
+                        >
+                          <span class="stepCount">4</span>
+                          <span class="stepTitle">Preview</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.Preview &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {ProposalObject.selectedProposalTypeValue === 3 && (
+                      <li>
+                        <div
+                          id="Preview3"
+                          onClick={() => HandleBack(4, "Preview3")}
+                          className={getStepClass(
+                            ProposalHeader.Preview,
+                            isValidForm.Preview,
+                          )}
+                        >
+                          <span class="stepCount">{TabHide ? 5 : 4}</span>
+                          <span class="stepTitle">Preview</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.Preview &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                    {ProposalObject.selectedProposalTypeValue === 4 && (
+                      <li>
+                        <div
+                          id="Preview4"
+                          onClick={() => HandleBack(4, "Preview4")}
+                          className={getStepClass(
+                            ProposalHeader.Preview,
+                            isValidForm.Preview,
+                          )}
+                        >
+                          <span class="stepCount">{TabHide ? 4 : 3}</span>
+                          <span class="stepTitle">Preview</span>
+                          &nbsp;
+                          {activeTab == ProposalHeader.Preview &&
+                            requireMessage && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  className="proposal-header__close"
+                  aria-label="Close"
+                  onClick={handleCancelBtn}
+                >
+                  <CloseIcon />
+                </button>
               </div>
+
               {activeTab === ProposalHeader.BasicInformation && (
                 <BasicInformationComponent
                   selectedProposalValue={selectedProposalValue}
@@ -25005,6 +24983,7 @@ const Add_Update_Proposal = (props) => {
               {activeTab === ProposalHeader.SelectServices && (
                 <Suspense>
                   <SelectServices
+                    serviceThemeID={serviceThemeID}
                     selectedProposalValue={selectedProposalValue}
                     ongoingServiceObj={ongoingServiceObj}
                     setOngoingServiceObj={setOngoingServiceObj}
@@ -25167,7 +25146,7 @@ const Add_Update_Proposal = (props) => {
                   setSelectedTemplateIDOneOff={setSelectedTemplateIDOneOff}
                   selectedTemplateID={selectedTemplateID}
                   selectedTemplateIDOneOff={selectedTemplateIDOneOff}
-                  setVisibleFieldsCustomTemp={setVisibleFieldsCustomTemp}
+                  // setVisibleFieldsCustomTemp={setVisibleFieldsCustomTemp}
                   visibleFieldsCustomTemp={visibleFieldsCustomTemp}
                 />
               )}
@@ -25278,7 +25257,7 @@ const Add_Update_Proposal = (props) => {
                   setSelectedTemplateIDOneOff={setSelectedTemplateIDOneOff}
                   selectedTemplateID={selectedTemplateID}
                   selectedTemplateIDOneOff={selectedTemplateIDOneOff}
-                  setVisibleFieldsCustomTemp={setVisibleFieldsCustomTemp}
+                  // setVisibleFieldsCustomTemp={setVisibleFieldsCustomTemp}
                   visibleFieldsCustomTemp={visibleFieldsCustomTemp}
                   currencySymbol={currencySymbol}
                   isVatEnabledForOrg={isVatEnabledForOrg}
@@ -25417,10 +25396,10 @@ const Add_Update_Proposal = (props) => {
                     selectedTemplateIDOneOff={selectedTemplateIDOneOff}
                     selectedTemplateID={selectedTemplateID}
                     visibleFieldsCustomTemp={visibleFieldsCustomTemp}
-                    currencyID={currencyID}
-                    taxName={taxName}
-                    currencySymbol={currencySymbol}
-                    pricingSettingObj={pricingSettingObj}
+                    // currencyID={currencyID}
+                    // taxName={taxName}
+                    // currencySymbol={currencySymbol}
+                    // pricingSettingObj={pricingSettingObj}
                     vatPercentageOneOff={vatPercentageOneOff}
                   />
                 </Suspense>

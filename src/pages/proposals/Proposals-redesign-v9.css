@@ -1,10 +1,11 @@
+/* Every selector below uses .proposal-list-v4 twice on purpose: the extra class raises specificity so these rules keep winning over unscoped global CSS (e.g. configure/packages/Package.css) that gets injected later when returning to this page from Add/Update screens. */
 /* =========================================================
    PROPOSAL LIST REDESIGN V4
    VISUAL CHANGES ONLY.
    Existing functionality is intentionally untouched.
    ========================================================= */
 
-.proposal-list-v4 {
+.proposal-list-v4.proposal-list-v4 {
   --pl4-bg: #f7f9fc;
   --pl4-card: #ffffff;
   --pl4-heading: #14243a;
@@ -25,8 +26,8 @@
   color: var(--pl4-text);
 }
 
-.proposal-list-v4,
-.proposal-list-v4 * {
+.proposal-list-v4.proposal-list-v4,
+.proposal-list-v4.proposal-list-v4 * {
   box-sizing: border-box;
 }
 
@@ -34,19 +35,19 @@
    LEGACY LAYOUT RESET
    ========================================================= */
 
-.proposal-list-v4 .services.page-background {
+.proposal-list-v4.proposal-list-v4 .services.page-background {
   background: transparent !important;
 }
 
-.proposal-list-v4 .services > div > .row {
+.proposal-list-v4.proposal-list-v4 .services > div > .row {
   margin: 0 !important;
 }
 
-.proposal-list-v4 .services > div > .row > .col-lg-12 {
+.proposal-list-v4.proposal-list-v4 .services > div > .row > .col-lg-12 {
   padding: 0 !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .services
   > div
   > .row
@@ -57,7 +58,7 @@
   box-shadow: none !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .services
   > div
   > .row
@@ -68,11 +69,11 @@
   padding: 0 !important;
 }
 
-.proposal-list-v4 #customerList[style] {
+.proposal-list-v4.proposal-list-v4 #customerList[style] {
   margin-top: 0 !important;
 }
 
-.proposal-list-v4 .row.g-4.mb-3 {
+.proposal-list-v4.proposal-list-v4 .row.g-4.mb-3 {
   display: none !important;
 }
 
@@ -81,7 +82,7 @@
    Same visual pattern as Prospect / API Prospect screens.
    ========================================================= */
 
-.proposal-list-v4 .bg-light.border-bottom.px-2 {
+.proposal-list-v4.proposal-list-v4 .bg-light.border-bottom.px-2 {
   min-height: 86px;
   margin: 0 !important;
   padding: 10px 28px 0 !important;
@@ -95,13 +96,13 @@
   background: transparent !important;
 }
 
-.proposal-list-v4 .bg-light.border-bottom.px-2 > .row,
-.proposal-list-v4 .bg-light.border-bottom.px-2 .col-md-12 {
+.proposal-list-v4.proposal-list-v4 .bg-light.border-bottom.px-2 > .row,
+.proposal-list-v4.proposal-list-v4 .bg-light.border-bottom.px-2 .col-md-12 {
   width: 100%;
   margin: 0 !important;
 }
 
-.proposal-list-v4 .nav.nav-tabs {
+.proposal-list-v4.proposal-list-v4 .nav.nav-tabs {
   min-height: 70px;
 
   display: flex;
@@ -111,11 +112,11 @@
   border: 0 !important;
 }
 
-.proposal-list-v4 .nav-tabs .nav-item {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-item {
   margin: 0 !important;
 }
 
-.proposal-list-v4 .nav-tabs .nav-link {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link {
   position: relative;
 
   min-height: 70px;
@@ -139,11 +140,11 @@
   box-shadow: none !important;
 }
 
-.proposal-list-v4 .nav-tabs .nav-link b {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link b {
   font-weight: 600 !important;
 }
 
-.proposal-list-v4 .nav-tabs .nav-link::after {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link::after {
   content: "";
 
   position: absolute;
@@ -157,15 +158,15 @@
   background: transparent;
 }
 
-.proposal-list-v4 .nav-tabs .nav-link:hover {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link:hover {
   color: #213149 !important;
 }
 
-.proposal-list-v4 .nav-tabs .nav-link.active {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link.active {
   color: #17263d !important;
 }
 
-.proposal-list-v4 .nav-tabs .nav-link.active::after {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link.active::after {
   background: var(--pl4-cyan);
 }
 
@@ -173,14 +174,14 @@
    LIST CARD
    ========================================================= */
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .bg-light.border-bottom.px-2
   + div
   > .row {
   margin: 16px 0 0 !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .bg-light.border-bottom.px-2
   + div
   > .row
@@ -188,7 +189,7 @@
   padding: 0 !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .bg-light.border-bottom.px-2
   + div
   > .row
@@ -206,7 +207,7 @@
     0 12px 30px rgba(15, 27, 51, 0.025) !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .bg-light.border-bottom.px-2
   + div
   .card-body {
@@ -217,7 +218,7 @@
    TOOLBAR
    ========================================================= */
 
-.proposal-list-v4 .table-responsive.table-card {
+.proposal-list-v4.proposal-list-v4 .table-responsive.table-card {
   width: 100%;
 
   margin: 0 !important;
@@ -239,7 +240,7 @@
   scrollbar-color: #cbd4df #f7f9fc;
 }
 
-.proposal-list-v4 .table-responsive.table-card > .row {
+.proposal-list-v4.proposal-list-v4 .table-responsive.table-card > .row {
   min-height: 88px;
 
   margin: 0 !important;
@@ -253,7 +254,7 @@
   background: #ffffff;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .table-responsive.table-card
   > .row
   > [class*="col-"] {
@@ -262,17 +263,17 @@
 
 /* Search */
 
-.proposal-list-v4 .search-box {
+.proposal-list-v4.proposal-list-v4 .search-box {
   position: relative;
 }
 
-.proposal-list-v4 .search-box.width-searchbox,
-.proposal-list-v4 .search-box.col-md-5 {
+.proposal-list-v4.proposal-list-v4 .search-box.width-searchbox,
+.proposal-list-v4.proposal-list-v4 .search-box.col-md-5 {
   width: 390px !important;
   max-width: 390px !important;
 }
 
-.proposal-list-v4 .search-box .search-icon {
+.proposal-list-v4.proposal-list-v4 .search-box .search-icon {
   position: absolute;
   top: 50%;
   left: 16px;
@@ -286,7 +287,7 @@
   pointer-events: none;
 }
 
-.proposal-list-v4 .search-box input.search {
+.proposal-list-v4.proposal-list-v4 .search-box input.search {
   width: 100% !important;
   min-height: 52px !important;
 
@@ -303,18 +304,18 @@
   box-shadow: none !important;
 }
 
-.proposal-list-v4 .search-box input.search::placeholder {
+.proposal-list-v4.proposal-list-v4 .search-box input.search::placeholder {
   color: #7f8a99;
 }
 
-.proposal-list-v4 .search-box input.search:focus {
+.proposal-list-v4.proposal-list-v4 .search-box input.search:focus {
   border-color: #74cfdf !important;
   box-shadow: 0 0 0 3px rgba(24, 181, 209, 0.08) !important;
 }
 
 /* Export / filter / selected-delete buttons */
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .table-responsive.table-card
   > .row
   .filter {
@@ -342,7 +343,7 @@
   box-shadow: none !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .table-responsive.table-card
   > .row
   .filter:hover {
@@ -352,7 +353,7 @@
   color: #087f98 !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .table-responsive.table-card
   > .row
   .create-item-btn.filter {
@@ -362,7 +363,7 @@
   color: #087f98 !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .table-responsive.table-card
   > .row
   .filter
@@ -370,7 +371,7 @@
   display: none !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .table-responsive.table-card
   > .row
   .filter
@@ -381,7 +382,7 @@
 }
 
 /* Disabled API selected-delete button remains visually disabled. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .table-responsive.table-card
   > .row
   button.filter:disabled {
@@ -391,7 +392,7 @@
 
 /* Clear filter */
 
-.proposal-list-v4 .create-Filter-item-btn {
+.proposal-list-v4.proposal-list-v4 .create-Filter-item-btn {
   min-height: 52px !important;
   padding: 0 14px !important;
 
@@ -407,7 +408,7 @@
   box-shadow: none !important;
 }
 
-.proposal-list-v4 .create-Filter-item-btn:hover {
+.proposal-list-v4.proposal-list-v4 .create-Filter-item-btn:hover {
   border-color: #edcbd0 !important;
 
   background: #fff5f6 !important;
@@ -416,9 +417,9 @@
 
 /* Add Proposal */
 
-.proposal-list-v4 .add-new-btn .create-item-btn,
-.proposal-list-v4 .add-new-btn .btn-success,
-.proposal-list-v4 .add-new-btn button {
+.proposal-list-v4.proposal-list-v4 .add-new-btn .create-item-btn,
+.proposal-list-v4.proposal-list-v4 .add-new-btn .btn-success,
+.proposal-list-v4.proposal-list-v4 .add-new-btn button {
   min-height: 52px !important;
   padding: 0 24px !important;
 
@@ -436,15 +437,15 @@
   box-shadow: none !important;
 }
 
-.proposal-list-v4 .add-new-btn .create-item-btn:hover,
-.proposal-list-v4 .add-new-btn .btn-success:hover,
-.proposal-list-v4 .add-new-btn button:hover {
+.proposal-list-v4.proposal-list-v4 .add-new-btn .create-item-btn:hover,
+.proposal-list-v4.proposal-list-v4 .add-new-btn .btn-success:hover,
+.proposal-list-v4.proposal-list-v4 .add-new-btn button:hover {
   border-color: var(--pl4-cyan-hover) !important;
   background: var(--pl4-cyan-hover) !important;
 }
 
 /* API toolbar uses full width so delete-selected stays on the right. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .table-responsive.table-card
   > .row
   > .col-md-3.col-lg-3 {
@@ -459,7 +460,7 @@
    No vertical cell grid lines.
    ========================================================= */
 
-.proposal-list-v4 #customerTable {
+.proposal-list-v4.proposal-list-v4 #customerTable {
   width: 100% !important;
   min-width: 1240px;
 
@@ -469,16 +470,16 @@
   table-layout: fixed !important;
 }
 
-.proposal-list-v4 #customerTable.table {
+.proposal-list-v4.proposal-list-v4 #customerTable.table {
   margin-bottom: 0 !important;
 }
 
-.proposal-list-v4 #customerTable thead,
-.proposal-list-v4 #customerTable .table-light {
+.proposal-list-v4.proposal-list-v4 #customerTable thead,
+.proposal-list-v4.proposal-list-v4 #customerTable .table-light {
   background: var(--pl4-navy) !important;
 }
 
-.proposal-list-v4 #customerTable thead td {
+.proposal-list-v4.proposal-list-v4 #customerTable thead td {
   height: 58px !important;
   padding: 0 22px !important;
 
@@ -495,7 +496,7 @@
   white-space: nowrap;
 }
 
-.proposal-list-v4 #customerTable tbody td {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td {
   height: 78px !important;
   padding: 13px 22px !important;
 
@@ -513,35 +514,35 @@
   vertical-align: middle !important;
 }
 
-.proposal-list-v4 #customerTable tbody tr:last-child td {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:last-child td {
   border-bottom: 0 !important;
 }
 
-.proposal-list-v4 #customerTable tbody tr:hover td {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:hover td {
   background: #fbfdff !important;
 }
 
 /* Explicitly prevent spreadsheet-style vertical grid lines. */
-.proposal-list-v4 #customerTable th,
-.proposal-list-v4 #customerTable td {
+.proposal-list-v4.proposal-list-v4 #customerTable th,
+.proposal-list-v4.proposal-list-v4 #customerTable td {
   border-left: 0 !important;
   border-right: 0 !important;
 }
 
 /* Ref / Prospect name */
-.proposal-list-v4 #customerTable tbody td:nth-child(1),
-.proposal-list-v4 #customerTable tbody td:nth-child(2) {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(1),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(2) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.proposal-list-v4 #customerTable tbody td:nth-child(1) {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(1) {
   color: #1b2a40 !important;
   font-weight: 600;
 }
 
-.proposal-list-v4 #customerTable tbody td:nth-child(2) {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(2) {
   color: #24364d !important;
   font-weight: 600;
 }
@@ -551,55 +552,55 @@
    ========================================================= */
 
 /* Proposal: 8 columns */
-.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(1),
-.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(1) {
+.proposal-list-v4.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(1),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(1) {
   width: 9%;
 }
 
-.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(2),
-.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(2) {
+.proposal-list-v4.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(2),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(2) {
   width: 15%;
 }
 
-.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(3),
-.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(3) {
+.proposal-list-v4.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(3),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(3) {
   width: 10%;
 }
 
-.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(4),
-.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(4) {
+.proposal-list-v4.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(4),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(4) {
   width: 21%;
 }
 
-.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(5),
-.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(5) {
+.proposal-list-v4.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(5),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(5) {
   width: 10%;
 }
 
-.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(6),
-.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(6) {
+.proposal-list-v4.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(6),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(6) {
   width: 14%;
 }
 
-.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(7),
-.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(7) {
+.proposal-list-v4.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(7),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(7) {
   width: 13%;
 }
 
-.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(8),
-.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(8) {
+.proposal-list-v4.proposal-list-v4 #customerTable thead tr:has(td:nth-child(8)) td:nth-child(8),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody tr:has(td:nth-child(8)) td:nth-child(8) {
   width: 8%;
   overflow: visible;
   text-align: center;
 }
 
 /* API Proposal: 6 columns */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(1),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -607,12 +608,12 @@
   width: 15%;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(2),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -620,12 +621,12 @@
   width: 25%;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(3),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -633,12 +634,12 @@
   width: 14%;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(4),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -646,12 +647,12 @@
   width: 27%;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(5),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -659,12 +660,12 @@
   width: 12%;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(6),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -675,12 +676,12 @@
 }
 
 /* Migrated Proposal: 5 columns */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(1),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -688,12 +689,12 @@
   width: 14%;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(2),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -701,12 +702,12 @@
   width: 28%;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(3),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -714,12 +715,12 @@
   width: 15%;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(4),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -727,12 +728,12 @@
   width: 26%;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(5),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -745,7 +746,7 @@
    Existing conditions/values remain exactly the same.
    ========================================================= */
 
-.proposal-list-v4 #customerTable tbody td:nth-child(3) > p {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p {
   width: fit-content;
   min-width: 68px;
   min-height: 27px;
@@ -766,27 +767,27 @@
   white-space: nowrap;
 }
 
-.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="DAA520"] {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="DAA520"] {
   background: #fff6df !important;
   color: #9b7118 !important;
 }
 
-.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="626ED4"] {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="626ED4"] {
   background: #f0eefc !important;
   color: #6255af !important;
 }
 
-.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="008000"] {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="008000"] {
   background: #eaf8f3 !important;
   color: #18845f !important;
 }
 
-.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="FF0000"] {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="FF0000"] {
   background: #fff0f2 !important;
   color: #cf4052 !important;
 }
 
-.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="38A4F8"] {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="38A4F8"] {
   background: #eaf7fb !important;
   color: #177d9a !important;
 }
@@ -795,7 +796,7 @@
    VALUE / DOCUMENT / LAST UPDATED
    ========================================================= */
 
-.proposal-list-v4 #customerTable tbody p.mb-0 {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody p.mb-0 {
   margin-bottom: 2px !important;
 
   color: #536176;
@@ -803,16 +804,16 @@
   line-height: 1.45;
 }
 
-.proposal-list-v4 #customerTable tbody p.mb-0:last-child {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody p.mb-0:last-child {
   margin-bottom: 0 !important;
 }
 
-.proposal-list-v4 #customerTable tbody p.mb-0 b {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody p.mb-0 b {
   color: #20314a;
   font-weight: 700;
 }
 
-.proposal-list-v4 #customerTable tbody td:nth-child(5) > p[style] {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(5) > p[style] {
   width: fit-content;
   min-height: 28px;
 
@@ -833,7 +834,7 @@
   cursor: pointer;
 }
 
-.proposal-list-v4 #customerTable tbody td:nth-child(6) span {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(6) span {
   color: #657386;
 
   font-size: 10px;
@@ -844,7 +845,7 @@
    SEND REMINDER
    ========================================================= */
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -860,7 +861,7 @@
   white-space: nowrap;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -876,8 +877,8 @@
   font-weight: 500;
 }
 
-.proposal-list-v4 #customerTable tbody td .MuiFormGroup-root,
-.proposal-list-v4 #customerTable tbody td .MuiFormControlLabel-root {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td .MuiFormGroup-root,
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td .MuiFormControlLabel-root {
   width: auto !important;
 
   margin: 0 !important;
@@ -892,11 +893,11 @@
    ellipsis control visually, without changing its click/dropdown logic.
    ========================================================= */
 
-.proposal-list-v4 #customerTable .dropdown {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown {
   display: inline-flex;
 }
 
-.proposal-list-v4 #customerTable .dropdown > button.create-item-btn {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown > button.create-item-btn {
   width: 36px !important;
   min-width: 36px !important;
   max-width: 36px !important;
@@ -922,7 +923,7 @@
   box-shadow: none !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   .dropdown
   > button.create-item-btn
@@ -934,7 +935,7 @@
   color: transparent !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   .dropdown
   > button.create-item-btn
@@ -943,7 +944,7 @@
   display: none !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   .dropdown
   > button.create-item-btn::before {
@@ -956,11 +957,11 @@
   line-height: 1;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   .dropdown
   > button.create-item-btn:hover,
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   .dropdown.show
   > button.create-item-btn {
@@ -969,11 +970,11 @@
   background: #f4f8fa !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   .dropdown
   > button.create-item-btn:hover::before,
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   .dropdown.show
   > button.create-item-btn::before {
@@ -981,7 +982,7 @@
 }
 
 /* Dropdown itself */
-.proposal-list-v4 #customerTable .dropdown-menu {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown-menu {
   min-width: 220px;
   padding: 6px !important;
 
@@ -995,7 +996,7 @@
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
 }
 
-.proposal-list-v4 #customerTable .dropdown-item {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown-item {
   min-height: 36px;
   padding: 8px 10px;
 
@@ -1013,12 +1014,12 @@
   cursor: pointer;
 }
 
-.proposal-list-v4 #customerTable .dropdown-item:hover {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown-item:hover {
   background: #f1f9fb;
   color: #087f98;
 }
 
-.proposal-list-v4 #customerTable .dropdown-item i {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown-item i {
   width: 16px;
 
   margin: 0 !important;
@@ -1028,7 +1029,7 @@
   text-align: center;
 }
 
-.proposal-list-v4 #customerTable .dropdown-item:hover i {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown-item:hover i {
   color: #087f98;
 }
 
@@ -1036,7 +1037,7 @@
    API PROPOSAL CHECKBOX / DELETE ACTION
    ========================================================= */
 
-.proposal-list-v4 #customerTable input[type="checkbox"] {
+.proposal-list-v4.proposal-list-v4 #customerTable input[type="checkbox"] {
   width: 15px;
   height: 15px;
 
@@ -1048,7 +1049,7 @@
   accent-color: var(--pl4-cyan);
 }
 
-.proposal-list-v4 .actionButtonsStyle {
+.proposal-list-v4.proposal-list-v4 .actionButtonsStyle {
   width: 36px !important;
   min-width: 36px !important;
   max-width: 36px !important;
@@ -1075,14 +1076,14 @@
   box-shadow: none !important;
 }
 
-.proposal-list-v4 .actionButtonsStyle:hover {
+.proposal-list-v4.proposal-list-v4 .actionButtonsStyle:hover {
   border-color: #efc4c9 !important;
 
   background: #fff3f4 !important;
   color: #c53a49 !important;
 }
 
-.proposal-list-v4 .actionButtonsStyle i {
+.proposal-list-v4.proposal-list-v4 .actionButtonsStyle i {
   margin: 0 !important;
   color: inherit !important;
 }
@@ -1093,7 +1094,7 @@
    Keep it in normal flow for this page.
    ========================================================= */
 
-.proposal-list-v4 .fixed-bottom {
+.proposal-list-v4.proposal-list-v4 .fixed-bottom {
   position: static !important;
 
   inset: auto !important;
@@ -1110,12 +1111,12 @@
   z-index: auto !important;
 }
 
-.proposal-list-v4 .fixed-bottom .row {
+.proposal-list-v4.proposal-list-v4 .fixed-bottom .row {
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
 
-.proposal-list-v4 .pagination {
+.proposal-list-v4.proposal-list-v4 .pagination {
   margin-bottom: 0 !important;
 }
 
@@ -1154,44 +1155,44 @@
    ========================================================= */
 
 @media (min-width: 1500px) {
-  .proposal-list-v4 #customerTable {
+  .proposal-list-v4.proposal-list-v4 #customerTable {
     min-width: 100%;
   }
 }
 
 @media (max-width: 1499px) {
-  .proposal-list-v4 #customerTable {
+  .proposal-list-v4.proposal-list-v4 #customerTable {
     min-width: 1260px;
   }
 }
 
 @media (max-width: 991px) {
-  .proposal-list-v4 {
+  .proposal-list-v4.proposal-list-v4 {
     width: calc(100% - 12px) !important;
 
     margin-left: 12px !important;
     padding-right: 10px !important;
   }
 
-  .proposal-list-v4 .table-responsive.table-card > .row {
+  .proposal-list-v4.proposal-list-v4 .table-responsive.table-card > .row {
     align-items: stretch;
   }
 }
 
 @media (max-width: 767px) {
-  .proposal-list-v4 {
+  .proposal-list-v4.proposal-list-v4 {
     width: 100% !important;
 
     margin-left: 0 !important;
     padding: 18px 8px 0 !important;
   }
 
-  .proposal-list-v4 .bg-light.border-bottom.px-2 {
+  .proposal-list-v4.proposal-list-v4 .bg-light.border-bottom.px-2 {
     min-height: auto;
     padding: 6px 8px 0 !important;
   }
 
-  .proposal-list-v4 .nav.nav-tabs {
+  .proposal-list-v4.proposal-list-v4 .nav.nav-tabs {
     min-height: auto;
 
     gap: 18px;
@@ -1199,14 +1200,14 @@
     overflow-x: auto;
   }
 
-  .proposal-list-v4 .nav-tabs .nav-link {
+  .proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link {
     min-height: 58px;
     padding-bottom: 18px !important;
 
     font-size: 17px !important;
   }
 
-  .proposal-list-v4 .table-responsive.table-card > .row {
+  .proposal-list-v4.proposal-list-v4 .table-responsive.table-card > .row {
     min-height: auto;
 
     padding: 12px !important;
@@ -1216,7 +1217,7 @@
     gap: 10px;
   }
 
-  .proposal-list-v4
+  .proposal-list-v4.proposal-list-v4
     .table-responsive.table-card
     > .row
     > [class*="col-"] {
@@ -1225,14 +1226,14 @@
     flex: 0 0 100% !important;
   }
 
-  .proposal-list-v4 .search-box.width-searchbox,
-  .proposal-list-v4 .search-box.col-md-5 {
+  .proposal-list-v4.proposal-list-v4 .search-box.width-searchbox,
+  .proposal-list-v4.proposal-list-v4 .search-box.col-md-5 {
     width: 100% !important;
     max-width: 100% !important;
   }
 
-  .proposal-list-v4 .add-new-btn,
-  .proposal-list-v4 .add-new-btn > * {
+  .proposal-list-v4.proposal-list-v4 .add-new-btn,
+  .proposal-list-v4.proposal-list-v4 .add-new-btn > * {
     width: 100%;
   }
 }
@@ -1245,34 +1246,34 @@
    ========================================================= */
 
 /* Top tabs: closer to Prospect List proportions */
-.proposal-list-v4 .nav-tabs .nav-link {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link {
   font-size: 18px !important;
   font-weight: 600 !important;
   line-height: 1.15 !important;
 }
 
 /* Table headings: readable without feeling oversized */
-.proposal-list-v4 #customerTable thead td {
+.proposal-list-v4.proposal-list-v4 #customerTable thead td {
   font-size: 11.5px !important;
   font-weight: 600 !important;
   letter-spacing: 0 !important;
 }
 
 /* Main row content */
-.proposal-list-v4 #customerTable tbody td {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td {
   font-size: 13px !important;
   line-height: 1.45 !important;
 }
 
 /* Ref ID / Prospect Name */
-.proposal-list-v4 #customerTable tbody td:nth-child(1),
-.proposal-list-v4 #customerTable tbody td:nth-child(2) {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(1),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(2) {
   font-size: 13px !important;
   font-weight: 600 !important;
 }
 
 /* Status pill */
-.proposal-list-v4 #customerTable tbody td:nth-child(3) > p {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p {
   min-height: 30px !important;
   padding: 0 11px !important;
 
@@ -1281,17 +1282,17 @@
 }
 
 /* Value / package / recurring text */
-.proposal-list-v4 #customerTable tbody p.mb-0 {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody p.mb-0 {
   font-size: 11.5px !important;
   line-height: 1.5 !important;
 }
 
-.proposal-list-v4 #customerTable tbody p.mb-0 b {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody p.mb-0 b {
   font-size: 11.75px !important;
 }
 
 /* Documents pill */
-.proposal-list-v4 #customerTable tbody td:nth-child(5) > p[style] {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(5) > p[style] {
   min-height: 30px !important;
   padding: 0 10px !important;
 
@@ -1299,14 +1300,14 @@
 }
 
 /* Last updated */
-.proposal-list-v4 #customerTable tbody td:nth-child(6),
-.proposal-list-v4 #customerTable tbody td:nth-child(6) span {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(6),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(6) span {
   font-size: 11.5px !important;
   line-height: 1.45 !important;
 }
 
 /* Send reminder label */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -1317,22 +1318,22 @@
 }
 
 /* Dropdown menu content */
-.proposal-list-v4 #customerTable .dropdown-item {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown-item {
   font-size: 11.5px !important;
 }
 
 /* Toolbar search text */
-.proposal-list-v4 .search-box input.search {
+.proposal-list-v4.proposal-list-v4 .search-box input.search {
   font-size: 13.5px !important;
 }
 
 /* Keep mobile tab text proportionate */
 @media (max-width: 767px) {
-  .proposal-list-v4 .nav-tabs .nav-link {
+  .proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link {
     font-size: 16px !important;
   }
 
-  .proposal-list-v4 #customerTable tbody td {
+  .proposal-list-v4.proposal-list-v4 #customerTable tbody td {
     font-size: 12.5px !important;
   }
 }
@@ -1346,7 +1347,7 @@
    ========================================================= */
 
 /* The whole Proposal screen is one normal-flow column. */
-.proposal-list-v4 {
+.proposal-list-v4.proposal-list-v4 {
   display: flex !important;
   flex-direction: column !important;
 
@@ -1357,22 +1358,22 @@
 }
 
 /* Legacy wrappers must expand to the real content height. */
-.proposal-list-v4 .services,
-.proposal-list-v4 .services > div,
-.proposal-list-v4 .services > div > .row,
-.proposal-list-v4 .services > div > .row > .col-lg-12,
-.proposal-list-v4 .services > div > .row > .col-lg-12 > .card,
-.proposal-list-v4 .services > div > .row > .col-lg-12 > .card > .card-body,
-.proposal-list-v4 #customerList,
-.proposal-list-v4 .tab-content,
-.proposal-list-v4 .tab-pane {
+.proposal-list-v4.proposal-list-v4 .services,
+.proposal-list-v4.proposal-list-v4 .services > div,
+.proposal-list-v4.proposal-list-v4 .services > div > .row,
+.proposal-list-v4.proposal-list-v4 .services > div > .row > .col-lg-12,
+.proposal-list-v4.proposal-list-v4 .services > div > .row > .col-lg-12 > .card,
+.proposal-list-v4.proposal-list-v4 .services > div > .row > .col-lg-12 > .card > .card-body,
+.proposal-list-v4.proposal-list-v4 #customerList,
+.proposal-list-v4.proposal-list-v4 .tab-content,
+.proposal-list-v4.proposal-list-v4 .tab-pane {
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
 }
 
 /* Table/list content must contribute its full height to document flow. */
-.proposal-list-v4 .table-responsive.table-card {
+.proposal-list-v4.proposal-list-v4 .table-responsive.table-card {
   position: relative !important;
 
   height: auto !important;
@@ -1383,13 +1384,13 @@
   overflow-y: visible !important;
 }
 
-.proposal-list-v4 #customerTable {
+.proposal-list-v4.proposal-list-v4 #customerTable {
   position: static !important;
 }
 
 /* Pagination must never be viewport-fixed. */
-.proposal-list-v4 .fixed-bottom,
-.proposal-list-v4 [class*="fixed-bottom"] {
+.proposal-list-v4.proposal-list-v4 .fixed-bottom,
+.proposal-list-v4.proposal-list-v4 [class*="fixed-bottom"] {
   position: static !important;
 
   top: auto !important;
@@ -1407,7 +1408,7 @@
 }
 
 /* Dedicated footer wrapper starts only after list + pagination. */
-.proposal-list-v4 .proposal-list-v4-footer-wrap {
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap {
   position: static !important;
 
   top: auto !important;
@@ -1437,12 +1438,12 @@
 }
 
 /* Neutralize every known legacy positioning variant inside Footer. */
-.proposal-list-v4 .proposal-list-v4-footer-wrap > *,
-.proposal-list-v4 .proposal-list-v4-footer-wrap footer,
-.proposal-list-v4 .proposal-list-v4-footer-wrap .footer,
-.proposal-list-v4 .proposal-list-v4-footer-wrap .fixed-bottom,
-.proposal-list-v4 .proposal-list-v4-footer-wrap [class*="footer"],
-.proposal-list-v4 .proposal-list-v4-footer-wrap [id*="footer"] {
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap > *,
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap footer,
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap .footer,
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap .fixed-bottom,
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap [class*="footer"],
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap [id*="footer"] {
   position: static !important;
 
   top: auto !important;
@@ -1465,13 +1466,13 @@
 }
 
 /* Keep a normal footer height and stop legacy viewport calculations. */
-.proposal-list-v4 .proposal-list-v4-footer-wrap .footer,
-.proposal-list-v4 .proposal-list-v4-footer-wrap footer {
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap .footer,
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap footer {
   min-height: 52px !important;
 }
 
 /* The list/card itself must not create a clipped height context. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .bg-light.border-bottom.px-2
   + div
   > .row
@@ -1484,11 +1485,11 @@
 }
 
 /* Ensure the last table row has breathing room before pagination/footer. */
-.proposal-list-v4 .table-responsive.table-card {
+.proposal-list-v4.proposal-list-v4 .table-responsive.table-card {
   margin-bottom: 0 !important;
 }
 
-.proposal-list-v4 .proposal-list-v4-footer-wrap {
+.proposal-list-v4.proposal-list-v4 .proposal-list-v4-footer-wrap {
   margin-top: 0 !important;
 }
 
@@ -1504,22 +1505,22 @@
    ========================================================= */
 
 /* Overall page should feel less padded/heavy. */
-.proposal-list-v4 {
+.proposal-list-v4.proposal-list-v4 {
   padding-top: 20px !important;
 }
 
 /* Tabs: same compact scale as Prospect / API Prospect. */
-.proposal-list-v4 .bg-light.border-bottom.px-2 {
+.proposal-list-v4.proposal-list-v4 .bg-light.border-bottom.px-2 {
   min-height: 70px !important;
   padding: 6px 18px 0 !important;
 }
 
-.proposal-list-v4 .nav.nav-tabs {
+.proposal-list-v4.proposal-list-v4 .nav.nav-tabs {
   min-height: 58px !important;
   gap: 26px !important;
 }
 
-.proposal-list-v4 .nav-tabs .nav-link {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link {
   min-height: 58px !important;
   padding: 0 5px 17px !important;
 
@@ -1528,19 +1529,19 @@
   line-height: 1.15 !important;
 }
 
-.proposal-list-v4 .nav-tabs .nav-link::after {
+.proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link::after {
   height: 3px !important;
 }
 
 /* Card: slightly tighter radius/shadow like Prospect list. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .bg-light.border-bottom.px-2
   + div
   > .row {
   margin-top: 14px !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .bg-light.border-bottom.px-2
   + div
   > .row
@@ -1554,18 +1555,18 @@
 }
 
 /* Toolbar: compact like Prospect list. */
-.proposal-list-v4 .table-responsive.table-card > .row {
+.proposal-list-v4.proposal-list-v4 .table-responsive.table-card > .row {
   min-height: 76px !important;
   padding: 11px 16px !important;
 }
 
-.proposal-list-v4 .search-box.width-searchbox,
-.proposal-list-v4 .search-box.col-md-5 {
+.proposal-list-v4.proposal-list-v4 .search-box.width-searchbox,
+.proposal-list-v4.proposal-list-v4 .search-box.col-md-5 {
   width: 365px !important;
   max-width: 365px !important;
 }
 
-.proposal-list-v4 .search-box input.search {
+.proposal-list-v4.proposal-list-v4 .search-box input.search {
   min-height: 46px !important;
   padding: 9px 13px 9px 42px !important;
 
@@ -1574,12 +1575,12 @@
   font-size: 12.5px !important;
 }
 
-.proposal-list-v4 .search-box .search-icon {
+.proposal-list-v4.proposal-list-v4 .search-box .search-icon {
   left: 14px !important;
   font-size: 17px !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .table-responsive.table-card
   > .row
   .filter {
@@ -1594,7 +1595,7 @@
   border-radius: 9px !important;
 }
 
-.proposal-list-v4 .create-Filter-item-btn {
+.proposal-list-v4.proposal-list-v4 .create-Filter-item-btn {
   min-height: 46px !important;
   padding: 0 12px !important;
 
@@ -1603,9 +1604,9 @@
   font-size: 10.5px !important;
 }
 
-.proposal-list-v4 .add-new-btn .create-item-btn,
-.proposal-list-v4 .add-new-btn .btn-success,
-.proposal-list-v4 .add-new-btn button {
+.proposal-list-v4.proposal-list-v4 .add-new-btn .create-item-btn,
+.proposal-list-v4.proposal-list-v4 .add-new-btn .btn-success,
+.proposal-list-v4.proposal-list-v4 .add-new-btn button {
   min-height: 46px !important;
   padding: 0 20px !important;
 
@@ -1619,7 +1620,7 @@
    TABLE TYPOGRAPHY + DENSITY
    ========================================================= */
 
-.proposal-list-v4 #customerTable thead td {
+.proposal-list-v4.proposal-list-v4 #customerTable thead td {
   height: 52px !important;
   padding: 0 18px !important;
 
@@ -1628,7 +1629,7 @@
   letter-spacing: 0 !important;
 }
 
-.proposal-list-v4 #customerTable tbody td {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td {
   height: 68px !important;
   padding: 10px 18px !important;
 
@@ -1638,26 +1639,26 @@
 }
 
 /* Keep only the subtle horizontal row divider. */
-.proposal-list-v4 #customerTable th,
-.proposal-list-v4 #customerTable td {
+.proposal-list-v4.proposal-list-v4 #customerTable th,
+.proposal-list-v4.proposal-list-v4 #customerTable td {
   border-left: 0 !important;
   border-right: 0 !important;
 }
 
-.proposal-list-v4 #customerTable tbody td {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td {
   border-bottom: 1px solid #e8edf3 !important;
 }
 
 /* Key identifiers can remain slightly stronger, without looking heavy. */
-.proposal-list-v4 #customerTable tbody td:nth-child(1),
-.proposal-list-v4 #customerTable tbody td:nth-child(2) {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(1),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(2) {
   font-size: 11.75px !important;
   font-weight: 600 !important;
 }
 
 /* Value column should be normal-weight unless the original markup explicitly
    marks an amount as bold. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -1669,18 +1670,18 @@
 }
 
 /* Existing bold numeric values retain hierarchy, but not oversized weight. */
-.proposal-list-v4 #customerTable tbody p.mb-0 {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody p.mb-0 {
   font-size: 10.75px !important;
   line-height: 1.45 !important;
 }
 
-.proposal-list-v4 #customerTable tbody p.mb-0 b {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody p.mb-0 b {
   font-size: 10.9px !important;
   font-weight: 600 !important;
 }
 
 /* Documents — compact cyan soft pill. */
-.proposal-list-v4 #customerTable tbody td:nth-child(5) > p[style] {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(5) > p[style] {
   min-height: 28px !important;
   padding: 0 9px !important;
 
@@ -1689,8 +1690,8 @@
 }
 
 /* Last updated text should be readable but visually secondary. */
-.proposal-list-v4 #customerTable tbody td:nth-child(6),
-.proposal-list-v4 #customerTable tbody td:nth-child(6) span {
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(6),
+.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(6) span {
   color: #68778b !important;
 
   font-size: 10.5px !important;
@@ -1699,7 +1700,7 @@
 }
 
 /* Send Reminder: lighter typography, same switch/functionality. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -1719,7 +1720,7 @@
    Same states, lighter styling like Prospect list.
    ========================================================= */
 
-.proposal-list-v4 .proposal-status-pill {
+.proposal-list-v4.proposal-list-v4 .proposal-status-pill {
   width: auto !important;
   min-width: 62px !important;
   min-height: 26px !important;
@@ -1740,29 +1741,29 @@
   white-space: nowrap;
 }
 
-.proposal-list-v4 .proposal-status-draft {
+.proposal-list-v4.proposal-list-v4 .proposal-status-draft {
   background: #fff6df !important;
   color: #9b7118 !important;
 }
 
-.proposal-list-v4 .proposal-status-sent,
-.proposal-list-v4 .proposal-status-awaiting {
+.proposal-list-v4.proposal-list-v4 .proposal-status-sent,
+.proposal-list-v4.proposal-list-v4 .proposal-status-awaiting {
   background: #f0eefc !important;
   color: #6255af !important;
 }
 
-.proposal-list-v4 .proposal-status-accepted,
-.proposal-list-v4 .proposal-status-signed {
+.proposal-list-v4.proposal-list-v4 .proposal-status-accepted,
+.proposal-list-v4.proposal-list-v4 .proposal-status-signed {
   background: #eaf8f3 !important;
   color: #18845f !important;
 }
 
-.proposal-list-v4 .proposal-status-declined {
+.proposal-list-v4.proposal-list-v4 .proposal-status-declined {
   background: #fff0f2 !important;
   color: #cf4052 !important;
 }
 
-.proposal-list-v4 .proposal-status-skipped {
+.proposal-list-v4.proposal-list-v4 .proposal-status-skipped {
   background: #eaf7fb !important;
   color: #177d9a !important;
 }
@@ -1771,7 +1772,7 @@
    ACTIONS
    ========================================================= */
 
-.proposal-list-v4 #customerTable .dropdown > button.create-item-btn {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown > button.create-item-btn {
   width: 32px !important;
   min-width: 32px !important;
   max-width: 32px !important;
@@ -1781,18 +1782,18 @@
   max-height: 32px !important;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   #customerTable
   .dropdown
   > button.create-item-btn::before {
   font-size: 22px !important;
 }
 
-.proposal-list-v4 #customerTable .dropdown-menu {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown-menu {
   min-width: 205px !important;
 }
 
-.proposal-list-v4 #customerTable .dropdown-item {
+.proposal-list-v4.proposal-list-v4 #customerTable .dropdown-item {
   min-height: 34px !important;
   padding: 7px 9px !important;
 
@@ -1800,7 +1801,7 @@
 }
 
 /* API delete action remains compact. */
-.proposal-list-v4 .actionButtonsStyle {
+.proposal-list-v4.proposal-list-v4 .actionButtonsStyle {
   width: 32px !important;
   min-width: 32px !important;
   max-width: 32px !important;
@@ -1816,23 +1817,23 @@
    ========================================================= */
 
 @media (min-width: 1500px) {
-  .proposal-list-v4 #customerTable {
+  .proposal-list-v4.proposal-list-v4 #customerTable {
     min-width: 100% !important;
   }
 }
 
 @media (max-width: 1499px) {
-  .proposal-list-v4 #customerTable {
+  .proposal-list-v4.proposal-list-v4 #customerTable {
     min-width: 1180px !important;
   }
 }
 
 @media (max-width: 767px) {
-  .proposal-list-v4 .nav-tabs .nav-link {
+  .proposal-list-v4.proposal-list-v4 .nav-tabs .nav-link {
     font-size: 15px !important;
   }
 
-  .proposal-list-v4 #customerTable tbody td {
+  .proposal-list-v4.proposal-list-v4 #customerTable tbody td {
     font-size: 11px !important;
   }
 }
@@ -1852,7 +1853,7 @@
    It must NOT be the horizontal scroll container anymore.
    --------------------------------------------------------- */
 
-.proposal-list-v4 .table-responsive.table-card {
+.proposal-list-v4.proposal-list-v4 .table-responsive.table-card {
   overflow-x: visible !important;
   overflow-y: visible !important;
 
@@ -1861,7 +1862,7 @@
 }
 
 /* Keep toolbar fixed in the card while the table below scrolls. */
-.proposal-list-v4 .table-responsive.table-card > .row {
+.proposal-list-v4.proposal-list-v4 .table-responsive.table-card > .row {
   position: relative !important;
   z-index: 20;
 
@@ -1876,7 +1877,7 @@
    Only this section moves horizontally.
    --------------------------------------------------------- */
 
-.proposal-list-v4 .proposal-table-scroll {
+.proposal-list-v4.proposal-list-v4 .proposal-table-scroll {
   position: relative;
 
   width: 100%;
@@ -1891,25 +1892,25 @@
   scrollbar-color: #cbd4df #f5f7fa;
 }
 
-.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar {
+.proposal-list-v4.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar {
   height: 8px;
 }
 
-.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar-track {
+.proposal-list-v4.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar-track {
   background: #f5f7fa;
 }
 
-.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar-thumb {
+.proposal-list-v4.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar-thumb {
   border-radius: 999px;
   background: #cbd4df;
 }
 
-.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar-thumb:hover {
+.proposal-list-v4.proposal-list-v4 .proposal-table-scroll::-webkit-scrollbar-thumb:hover {
   background: #aebbc9;
 }
 
 /* The actual table may be wider than the viewport. */
-.proposal-list-v4 .proposal-table-scroll #customerTable {
+.proposal-list-v4.proposal-list-v4 .proposal-table-scroll #customerTable {
   margin: 0 !important;
 
   width: 100% !important;
@@ -1920,7 +1921,7 @@
    Applies only to cells explicitly marked in JSX.
    --------------------------------------------------------- */
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column {
@@ -1946,7 +1947,7 @@
 }
 
 /* Sticky header must stay above the scrolling body cells. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   thead
@@ -1960,7 +1961,7 @@
 }
 
 /* Keep sticky cell visually consistent when a row is hovered. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
@@ -1970,7 +1971,7 @@
 }
 
 /* Keep the action controls centered inside the pinned column. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column
@@ -1983,7 +1984,7 @@
 }
 
 /* Dropdown must render above the neighbouring scrolling cells. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column
@@ -1992,7 +1993,7 @@
   z-index: 30;
 }
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column
@@ -2001,7 +2002,7 @@
 }
 
 /* Raise the pinned cell when its action menu is open. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column:has(.dropdown.show) {
@@ -2009,7 +2010,7 @@
 }
 
 /* API Proposal delete button remains centered in the pinned column. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column
@@ -2022,25 +2023,25 @@
    Previous percentage width rules should not enlarge Action.
    --------------------------------------------------------- */
 
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   thead
   tr:has(td:nth-child(8))
   td.proposal-action-column,
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
   tr:has(td:nth-child(8))
   td.proposal-action-column,
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td.proposal-action-column,
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
@@ -2057,14 +2058,14 @@
    --------------------------------------------------------- */
 
 @media (max-width: 991px) {
-  .proposal-list-v4 .proposal-table-scroll {
+  .proposal-list-v4.proposal-list-v4 .proposal-table-scroll {
     width: 100%;
     max-width: 100%;
   }
 }
 
 @media (max-width: 767px) {
-  .proposal-list-v4
+  .proposal-list-v4.proposal-list-v4
     .proposal-table-scroll
     #customerTable
     .proposal-action-column {
@@ -2086,7 +2087,7 @@
    ========================================================= */
 
 /* Default sticky Action cells stay low in the stacking order. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
@@ -2095,7 +2096,7 @@
 }
 
 /* Keep the sticky Action header above normal body cells. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   thead
@@ -2105,17 +2106,17 @@
 
 /* Bootstrap places .show on the dropdown menu/button.
    Raise the CURRENT action cell when its menu is open. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
   .proposal-action-column:has(.dropdown-menu.show),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
   .proposal-action-column:has(.dropdown-toggle.show),
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
@@ -2124,7 +2125,7 @@
 }
 
 /* Raise the dropdown wrapper itself. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column
@@ -2134,7 +2135,7 @@
 }
 
 /* The actual popup must be above all sticky cells and row content. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column
@@ -2143,7 +2144,7 @@
 }
 
 /* When open, make the popup stacking explicit. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column
@@ -2154,7 +2155,7 @@
 
 /* Also raise the row that owns the open dropdown so later rows
    cannot paint over the menu. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
@@ -2164,7 +2165,7 @@
 }
 
 /* Other rows stay below the currently opened menu. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
@@ -2175,7 +2176,7 @@
 
 /* Avoid neighbouring sticky action buttons appearing on top
    of the open menu. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
@@ -2185,7 +2186,7 @@
 }
 
 /* Keep the open row's action column + menu at the top. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   tbody
@@ -2195,7 +2196,7 @@
 }
 
 /* Slightly stronger shadow so the popup reads clearly above the table. */
-.proposal-list-v4
+.proposal-list-v4.proposal-list-v4
   .proposal-table-scroll
   #customerTable
   .proposal-action-column

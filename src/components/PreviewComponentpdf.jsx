@@ -12255,7 +12255,7 @@ ${
           <div className="d-flex flex-wrap" style={{ gap: "4px" }}>
             {/* <div class="d-flex flex-row justify-content-end align-items-center overflow-auto custom-scroll"> */}
             <button
-              class="btn btn-md btn-light mr-1 text-nowrap"
+              class="btn btn-md btn-light mr-1 text-nowrap pf-btn--cancel"
               onClick={() => props.handleCancelBtn()}
             >
               <span>Cancel</span>
@@ -12263,7 +12263,7 @@ ${
             {props?.ProposalObject?.selectedProposalTypeValue === 1 && (
               <button
                 style={{ paddingTop: "5px", marginRight: "4px" }}
-                class="btn btn-md btn-success create-item-btn text-nowrap"
+                class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--back"
                 onClick={() => props.HandleTabChange(7)}
               >
                 <span>Back</span>
@@ -12272,7 +12272,7 @@ ${
             {props.moduleName == "Contract" && (
               <button
                 style={{ paddingTop: "5px", marginRight: "4px" }}
-                class="btn btn-md btn-success create-item-btn  text-nowrap"
+                class="btn btn-md btn-success create-item-btn  text-nowrap pf-btn--back"
                 onClick={() =>
                   props?.HandleBack(
                     props.ProposalObject?.selectSourceId === 3 ||
@@ -12291,7 +12291,7 @@ ${
             {props?.ProposalObject?.selectedProposalTypeValue === 2 && (
               <button
                 style={{ paddingTop: "5px", marginRight: "4px" }}
-                class="btn btn-md btn-success create-item-btn  text-nowrap"
+                class="btn btn-md btn-success create-item-btn  text-nowrap pf-btn--back"
                 onClick={() => props.HandleTabChange(7)}
               >
                 <span>Back</span>
@@ -12300,7 +12300,7 @@ ${
             {props?.ProposalObject?.selectedProposalTypeValue === 3 && (
               <button
                 style={{ paddingTop: "5px", marginRight: "4px" }}
-                class="btn btn-md btn-success create-item-btn text-nowrap"
+                class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--back"
                 onClick={() => props.HandleTabChange(6)}
               >
                 <span>Back</span>
@@ -12309,7 +12309,7 @@ ${
             {props?.ProposalObject?.selectedProposalTypeValue === 4 && (
               <button
                 style={{ paddingTop: "5px", marginRight: "4px" }}
-                className="btn btn-md btn-success create-item-btn text-nowrap"
+                className="btn btn-md btn-success create-item-btn text-nowrap pf-btn--back"
                 onClick={() => {
                   const shouldGoToAdditionalInfo =
                     props.additionalInformationList?.length > 0;
@@ -12324,7 +12324,7 @@ ${
             {props.moduleName == "Quote" && (
               <button
                 style={{ paddingTop: "5px", marginRight: "4px" }}
-                class="btn btn-md btn-success create-item-btn  text-nowrap"
+                class="btn btn-md btn-success create-item-btn  text-nowrap pf-btn--draft"
                 onClick={() =>
                   props.handleSaveAsDraft(
                     4,
@@ -12339,7 +12339,7 @@ ${
             {props.moduleName == "Contract" && (
               <button
                 style={{ paddingTop: "5px", marginRight: "4px" }}
-                class="btn btn-md btn-success create-item-btn  text-nowrap"
+                class="btn btn-md btn-success create-item-btn  text-nowrap pf-btn--draft"
                 onClick={() => props.handleSaveAsDraft(2, statusID.Draft)}
               >
                 <span>Save as a Draft</span>
@@ -12353,7 +12353,7 @@ ${
               >
                 <div className="btn-group d-flex align-items-stretch">
                   <button
-                    class="btn btn-md btn-success create-item-btn"
+                    class="btn btn-md btn-success create-item-btn pf-btn--send"
                     type="button"
                     id="dropdownMenuButton"
                     // data-bs-toggle="dropdown"
@@ -12377,7 +12377,7 @@ ${
                     </span>
                   </button>
                   <button
-                    class="btn btn-md btn-success create-item-btn d-flex rounded-end-2"
+                    class="btn btn-md btn-success create-item-btn d-flex rounded-end-2 pf-btn--send-caret"
                     type="button"
                     id="dropdownMenuButton"
                     data-bs-toggle="dropdown"
@@ -12534,7 +12534,7 @@ ${
               props.moduleName == "Quote" && (
                 <button
                   style={{ paddingTop: "5px", marginRight: "4px" }}
-                  class="btn btn-md btn-success create-item-btn text-nowrap"
+                  class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--secondary"
                   onClick={() => {
                     if (!activeOrganizationSubscriptionPlan.prepareContract) {
                       setShowModal(true);
@@ -12562,7 +12562,7 @@ ${
                       borderBottomRightRadius: 0,
                       borderRight: "none",
                     }}
-                    className="btn btn-md btn-success create-item-btn text-nowrap"
+                    className="btn btn-md btn-success create-item-btn text-nowrap pf-btn--send"
                     id="dropdownMenuButton"
                     onClick={() => {
                       if (!activeOrganizationSubscriptionPlan.sendContract) {
@@ -12581,7 +12581,7 @@ ${
                     </span>
                   </button>
                   <button
-                    class="btn btn-md btn-success create-item-btn d-flex rounded-end-2"
+                    class="btn btn-md btn-success create-item-btn d-flex rounded-end-2 pf-btn--send-caret"
                     type="button"
                     id="dropdownMenuButton"
                     data-bs-toggle="dropdown"
