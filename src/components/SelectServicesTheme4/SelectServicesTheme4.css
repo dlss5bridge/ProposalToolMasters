@@ -1,0 +1,469 @@
+/* ==========================================================================
+   Select Services — Theme 4  (flowing category cards + pill services)
+   Tokens come from proposal-ui.css (--pu-*); fallbacks keep it standalone.
+   ========================================================================== */
+
+.sst4 {
+  --sst4-ink: var(--pu-ink, #0f172a);
+  --sst4-text: var(--pu-text, #334155);
+  --sst4-muted: var(--pu-muted, #64748b);
+  --sst4-line: var(--pu-line, #e2e8f0);
+  --sst4-soft: var(--pu-soft, #f8fafc);
+  --sst4-accent: var(--pu-accent, #12b5d6);
+  --sst4-accent-soft: var(--pu-accent-soft, #f0fbfe);
+  --sst4-success: var(--pu-success, #3fcf9f);
+  --sst4-tile: var(--pu-icon-tile, #eef2fb);
+
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  flex: 1 1 100%;
+  grid-column: 1 / -1;
+  padding: 24px 0 32px;
+  color: var(--sst4-ink);
+}
+
+.sst4 *,
+.sst4 *::before,
+.sst4 *::after {
+  box-sizing: border-box;
+}
+
+.sst4__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(300px, 28%, 380px);
+  gap: 28px;
+  align-items: start;
+}
+
+.sst4.is-summary-below .sst4__layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.sst4__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sst4-alert {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid #f1c3be;
+  border-radius: 10px;
+  background: #fef3f2;
+  color: var(--pu-danger, #d92d20);
+  font-size: 13px;
+}
+
+.sst4-empty-card {
+  margin: 0;
+  padding: 24px 16px;
+  border: 1px dashed var(--sst4-line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--sst4-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---------- Category cards ---------- */
+/* Cards size to their own content (a category with more services needs a
+   wider card to lay its pills out on one line) and wrap onto the next row
+   once they no longer fit, instead of a fixed grid of equal columns. */
+
+.sst4-card-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.sst4-card {
+  flex: 0 1 auto;
+  min-width: 260px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border: 1.5px solid var(--sst4-line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.sst4-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sst4-card__icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sst4-accent-soft);
+  color: var(--sst4-accent);
+}
+
+.sst4-card__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sst4-ink);
+}
+
+.sst4-card__badge {
+  flex: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--sst4-accent-soft);
+  color: var(--sst4-text);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---------- Service pills ---------- */
+
+.sst4-pill-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sst4-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 5px 16px;
+  border: 1px solid var(--sst4-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--sst4-ink);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.sst4-pill:hover:not(:disabled) {
+  border-color: #cbd5e1;
+  background: var(--sst4-soft);
+}
+
+.sst4-pill.is-selected {
+  border-color: var(--sst4-accent);
+  background: var(--sst4-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Without this, ".sst4-pill:hover" above (higher specificity, being a
+   hover + :not() rule) would win over ".is-selected" and swap a selected
+   pill's fill back to the near-white hover background while its text
+   stayed white - unreadable, as reported. Keep it filled, just darker. */
+.sst4-pill.is-selected:hover:not(:disabled) {
+  border-color: #0f9cba;
+  background: #0f9cba;
+  color: #fff;
+}
+
+.sst4-pill:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Recurring / One-off tag, so a service's billing type is visible without
+   having to select it first. Two distinct colours, muted enough to stay
+   secondary to the service name. */
+.sst4-pill__tag {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.sst4-pill--recurring .sst4-pill__tag {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.sst4-pill--oneoff .sst4-pill__tag {
+  background: #fdf2e9;
+  color: #b45309;
+}
+
+/* Selected pills fill with the accent colour - give the tag enough
+   contrast against that background instead of clashing with it. */
+.sst4-pill.is-selected .sst4-pill__tag {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+/* ---------- Selected service details (pricing drivers) ---------- */
+/* Existing pricing-driver inputs render in here unchanged */
+
+.sst4-card__details {
+  padding: 14px;
+  border: 1px solid var(--sst4-line);
+  border-radius: 12px;
+  background: var(--sst4-soft);
+}
+
+.sst4-card__details + .sst4-card__details {
+  margin-top: -2px;
+}
+
+.sst4-card__details-label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--sst4-muted);
+}
+
+.sst4-card__details > div {
+  float: none !important;
+  width: 100% !important;
+}
+
+.sst4-card__details > div + div {
+  margin-top: 10px;
+}
+
+.sst4-card__details label {
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--sst4-text);
+}
+
+.sst4-card__details .text-danger {
+  font-size: 12px;
+}
+
+/* Fixed-price services have no visible pricing drivers, but the existing
+   render functions still emit an empty wrapper div. Hide the details card
+   unless a real control or label is inside it (same fix as Theme 2/3). */
+.sst4-card__details:not(
+    :has(input, select, textarea, label, button, [class*="-control"])
+  ) {
+  display: none;
+}
+
+/* ---------- Summary sidebar ---------- */
+
+.sst4-summary {
+  position: sticky;
+  top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--sst4-line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.sst4.is-summary-below .sst4-summary {
+  position: static;
+}
+
+.sst4-summary__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sst4-summary__head h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--sst4-ink);
+}
+
+.sst4-summary__badge {
+  flex: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--sst4-ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sst4-summary__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sst4-summary__empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--sst4-muted);
+}
+
+.sst4-summary__group h4 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sst4-muted);
+}
+
+.sst4-summary__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sst4-summary__list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sst4-ink);
+}
+
+.sst4-summary__remove {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sst4-muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sst4-summary__remove:hover {
+  background: var(--sst4-soft);
+  color: var(--pu-danger, #d92d20);
+}
+
+.sst4-summary__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--sst4-line);
+}
+
+.sst4-summary__helper {
+  margin: 0;
+  font-size: 12px;
+  color: var(--sst4-muted);
+  text-align: center;
+}
+
+.sst4-summary__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sst4-summary__cancel {
+  align-self: center;
+}
+
+/* ---------- Buttons ---------- */
+
+.sst4-btn {
+  height: 42px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.sst4-btn--block {
+  width: 100%;
+}
+
+.sst4-btn--primary {
+  background: var(--sst4-ink);
+  color: #fff;
+}
+
+.sst4-btn--primary:hover {
+  background: #1e293b;
+}
+
+.sst4-btn--outline {
+  border-color: var(--sst4-line);
+  background: #fff;
+  color: var(--sst4-ink);
+}
+
+.sst4-btn--outline:hover {
+  background: var(--sst4-soft);
+}
+
+.sst4-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--sst4-accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sst4-link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Accessibility & responsive ---------- */
+
+.sst4 button:focus-visible {
+  outline: 2px solid var(--sst4-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sst4 * {
+    transition: none !important;
+  }
+}

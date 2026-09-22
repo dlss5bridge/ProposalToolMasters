@@ -11,6 +11,7 @@ import "react-calendar/dist/Calendar.css";
 import { format, parse, isValid } from "date-fns";
 import SelectServicesTheme2 from "./SelectServicesTheme2/SelectServicesTheme2";
 import SelectServicesTheme3 from "./SelectServicesTheme3/SelectServicesTheme3";
+import SelectServicesTheme4 from "./SelectServicesTheme4/SelectServicesTheme4";
 
 // Stable references so Theme 2 memoisation is not reset on every render
 const isServiceSelectedForTheme = (service) => service?.isSelected === true;
@@ -2859,7 +2860,7 @@ export default function SelectServices(props) {
       );
     });
 
-  // ---------------- Theme 2 / Theme 3 (UI only, same handlers as theme 1) ----------------
+  // ---------------- Theme 2 / Theme 3 / Theme 4 (UI only, same handlers as theme 1) ----------------
   const proposalTypeValue = props?.ProposalObject?.selectedProposalTypeValue;
   const isContractOrPackage =
     props?.moduleName == "Contract" || props.moduleName === "Package";
@@ -2936,6 +2937,41 @@ export default function SelectServices(props) {
   if (props.serviceThemeID === 3) {
     return (
       <SelectServicesTheme3
+        recurringServiceList={props.recurringServiceList}
+        oneOffServiceList={props.oneOffServiceList}
+        requireMessage={props.requireMessage}
+        isServiceSelected={isServiceSelectedForTheme}
+        isServiceLocked={isServiceLockedForTheme}
+        onToggleService={({ serviceType, category, service }) => {
+          if (serviceType === 1) {
+            handleRecurringServiceCheckboxClick(category, service);
+          } else {
+            handleOneOffServiceCheckboxClick(category, service);
+          }
+        }}
+        renderServiceDetails={(service, category, serviceType, serviceIndex) =>
+          serviceType === 1
+            ? renderRecurringDrivers(category, service, serviceIndex)
+            : renderOneOffDrivers(category, service, serviceIndex)
+        }
+        onBack={theme2Back}
+        onNext={theme2Next}
+        onSaveDraft={theme2SaveDraft}
+        onCancel={
+          props.getSAChanges
+            ? () => props.DeclineSuperAdminChangesData("Decline")
+            : props.handleCancel
+        }
+        cancelLabel={
+          props.getSAChanges ? "Decline" : getCrudButtonTextName("Cancel")
+        }
+      />
+    );
+  }
+
+  if (props.serviceThemeID === 4) {
+    return (
+      <SelectServicesTheme4
         recurringServiceList={props.recurringServiceList}
         oneOffServiceList={props.oneOffServiceList}
         requireMessage={props.requireMessage}
