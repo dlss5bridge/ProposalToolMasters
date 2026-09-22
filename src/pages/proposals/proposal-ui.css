@@ -320,7 +320,23 @@
 
 .proposal-ui .table .head-grey-row,
 .proposal-ui .table .head-grey-row > td {
-  background-color: #475569;
+  /* #888888 to match the reference design exactly (same grey the legacy,
+     unscoped ".head-grey-row" rule in Package.css / Proposals.css already
+     used). !important because that legacy rule is also !important, at
+     equal specificity to this one - without it, whichever stylesheet a
+     given page happens to load last would win. Declaring it explicitly
+     here, instead of relying on that scattered legacy rule, keeps every
+     table using this class (Review Services, Review Packages, on both the
+     Proposal and Engagement Letter screens) in sync from one place. */
+  background-color: #888888 !important;
+}
+
+.proposal-ui .table .a-la-carte-services-review-head-row {
+  /* Same issue as .head-grey-row above: Package.css has an unscoped
+     ".a-la-carte-services-review-head-row { background-color: #eee
+     !important }" that otherwise wins and leaves this category-grouping
+     row a visibly different, darker grey than the rest of the table. */
+  background-color: var(--pu-soft) !important;
 }
 
 .proposal-ui .table .a-la-carte-services-review-head-row > th {

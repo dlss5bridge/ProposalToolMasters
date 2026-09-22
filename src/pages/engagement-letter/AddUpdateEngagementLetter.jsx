@@ -85,7 +85,7 @@ import {
 import { getServiceScopeDriverList } from "../../lib/utils";
 import PriceAdjustedToZeroFloorValue from "../../components/PriceAdjustedToZeroFloorValue";
 const SelectServices = lazy(() => import("../../components/SelectServices"));
-const serviceThemeID = 2;
+const serviceThemeID = 3;
 const PreviewComponentPdf = lazy(
   () => import("../../components/PreviewComponentpdf"),
 );
@@ -18560,7 +18560,9 @@ const Add_Update_Engagement_Letter = () => {
     <div>
       <div
         className={`container-fluid proposal-ui${
-          serviceThemeID === 2 ? " proposal-ui--fluid" : ""
+          serviceThemeID === 2 || serviceThemeID === 3
+            ? " proposal-ui--fluid"
+            : ""
         }`}
       >
         <div>

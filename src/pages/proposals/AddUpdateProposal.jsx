@@ -106,7 +106,7 @@ const PricingTableTemplatesModal = lazy(
 //   () => import("../../components/PricingTableTemplatesModal"),
 // );
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-const serviceThemeID = 2;
+const serviceThemeID = 3;
 
 const BasicInformationComponent = (props) => {
   const navigate = useNavigate();
@@ -24395,7 +24395,9 @@ const Add_Update_Proposal = (props) => {
     <div>
       <div
         className={`container-fluid new-item-page-container proposal-ui${
-          serviceThemeID === 2 ? " proposal-ui--fluid" : ""
+          serviceThemeID === 2 || serviceThemeID === 3
+            ? " proposal-ui--fluid"
+            : ""
         }`}
       >
         <div className="new-item-page-content">
