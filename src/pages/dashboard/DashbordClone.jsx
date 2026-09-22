@@ -1284,33 +1284,6 @@ const Dashboard = () => {
                 />
               </div>
 
-              {showDatePicker && (
-                <>
-                  <div className="col-lg-2 col-md-5 col-sm-5 mt-1">
-                    <DatePicker
-                      label="From Date"
-                      value={fromDate.toDate()}
-                      maxDate={toDate.subtract(0, "day").toDate()}
-                      onChange={handleFromDateChange}
-                      renderInput={(params) => <input {...params.inputProps} />}
-                      popperPlacement="bottom-start"
-                    />
-                  </div>
-
-                  <div className="col-lg-2 col-md-5 col-sm-5 mt-1">
-                    <DatePicker
-                      label="To Date"
-                      value={toDate.toDate()}
-                      minDate={fromDate.toDate()}
-                      maxDate={dayjs().toDate()}
-                      onChange={handleToDateChange}
-                      renderInput={(params) => <input {...params.inputProps} />}
-                      popperPlacement="bottom-start"
-                    />
-                  </div>
-                </>
-              )}
-
               <div className="col-lg-6 col-sm-4 mt-1 dashboard-export-col">
                 <div className="add-new-btn">
                   <button
@@ -1326,6 +1299,29 @@ const Dashboard = () => {
                 <div className="date-picker-div"></div>
               </div>
             </div>
+
+            {showDatePicker && (
+              <div className="new-dashboard-figma__custom-dates">
+                <DatePicker
+                  label="From Date"
+                  value={fromDate.toDate()}
+                  maxDate={toDate.subtract(0, "day").toDate()}
+                  onChange={handleFromDateChange}
+                  renderInput={(params) => <input {...params.inputProps} />}
+                  popperPlacement="bottom-start"
+                />
+
+                <DatePicker
+                  label="To Date"
+                  value={toDate.toDate()}
+                  minDate={fromDate.toDate()}
+                  maxDate={dayjs().toDate()}
+                  onChange={handleToDateChange}
+                  renderInput={(params) => <input {...params.inputProps} />}
+                  popperPlacement="bottom-start"
+                />
+              </div>
+            )}
 
             <div className="row dashboard-top-class">
               <div className="col">
