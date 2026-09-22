@@ -12144,10 +12144,10 @@ ${
           {!flagForTemplatePdf && (
             <button
               onClick={toggleLandscape}
-              className="btn btn-primary btn-sm mt-2"
+              className="btn btn-sm preview-orientation-toggle"
               style={{ marginBottom: 10 }}
             >
-              <Landscape />
+              <Landscape fontSize="small" />
               {landscapeMode ? "Switch to Portrait" : "Switch to Landscape"}
             </button>
           )}

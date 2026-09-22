@@ -1219,3 +1219,35 @@
   .tab-pane:has(> .row > .col-12 > .SOF-SD-Customization:only-child:empty) {
   display: none;
 }
+
+/* ==========================================================================
+   Preview tab: "Switch to Landscape / Portrait" toggle (PreviewComponentpdf)
+   Was the raw Bootstrap .btn-primary blue; restyled to match the rest of
+   the redesign's outlined utility-button look.
+   ========================================================================== */
+
+.proposal-ui .preview-orientation-toggle {
+  height: 38px;
+  padding: 0 16px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--pu-line) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: var(--pu-ink) !important;
+  font-size: 13px !important;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: none !important;
+}
+
+.proposal-ui .preview-orientation-toggle:hover {
+  border-color: #cbd5e1 !important;
+  background: var(--pu-soft) !important;
+}
+
+.proposal-ui .preview-orientation-toggle svg {
+  color: var(--pu-accent);
+  font-size: 18px;
+}
