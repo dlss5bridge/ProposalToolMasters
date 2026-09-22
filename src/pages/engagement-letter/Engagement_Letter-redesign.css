@@ -1,3 +1,4 @@
+/* Every selector below uses .engagement-list-redesign twice on purpose: the extra class raises specificity so these rules keep winning over unscoped global CSS (e.g. configure/packages/Package.css) that gets injected later when returning to this page from Add/Update screens. */
 /* =========================================================
    ENGAGEMENT LETTER LIST REDESIGN
    UI / layout only.
@@ -6,7 +7,7 @@
    exactly as implemented in Engagement_Letter.jsx.
    ========================================================= */
 
-.engagement-list-redesign {
+.engagement-list-redesign.engagement-list-redesign {
   --el-bg: #f7f9fc;
   --el-card: #ffffff;
   --el-heading: #14243a;
@@ -28,8 +29,8 @@
   color: var(--el-text);
 }
 
-.engagement-list-redesign,
-.engagement-list-redesign * {
+.engagement-list-redesign.engagement-list-redesign,
+.engagement-list-redesign.engagement-list-redesign * {
   box-sizing: border-box;
 }
 
@@ -37,25 +38,25 @@
    LEGACY PAGE RESET
    ========================================================= */
 
-.engagement-list-redesign .services.page-background {
+.engagement-list-redesign.engagement-list-redesign .services.page-background {
   background: transparent !important;
 }
 
-.engagement-list-redesign .services > div > .row {
+.engagement-list-redesign.engagement-list-redesign .services > div > .row {
   margin: 0 !important;
 }
 
-.engagement-list-redesign .services > div > .row > .col-lg-12 {
+.engagement-list-redesign.engagement-list-redesign .services > div > .row > .col-lg-12 {
   padding: 0 !important;
 }
 
-.engagement-list-redesign .services > div > .row > .col-lg-12 > .card {
+.engagement-list-redesign.engagement-list-redesign .services > div > .row > .col-lg-12 > .card {
   border: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .services
   > div
   > .row
@@ -66,11 +67,11 @@
   padding: 0 !important;
 }
 
-.engagement-list-redesign #customerList[style] {
+.engagement-list-redesign.engagement-list-redesign #customerList[style] {
   margin-top: 0 !important;
 }
 
-.engagement-list-redesign .row.g-4.mb-3 {
+.engagement-list-redesign.engagement-list-redesign .row.g-4.mb-3 {
   display: none !important;
 }
 
@@ -79,7 +80,7 @@
    Matches Prospect / Proposal visual system.
    ========================================================= */
 
-.engagement-list-redesign .bg-light.border-bottom.px-2 {
+.engagement-list-redesign.engagement-list-redesign .bg-light.border-bottom.px-2 {
   min-height: 70px;
   margin: 0 !important;
   padding: 6px 18px 0 !important;
@@ -93,13 +94,13 @@
   background: transparent !important;
 }
 
-.engagement-list-redesign .bg-light.border-bottom.px-2 > .row,
-.engagement-list-redesign .bg-light.border-bottom.px-2 .col-md-12 {
+.engagement-list-redesign.engagement-list-redesign .bg-light.border-bottom.px-2 > .row,
+.engagement-list-redesign.engagement-list-redesign .bg-light.border-bottom.px-2 .col-md-12 {
   width: 100%;
   margin: 0 !important;
 }
 
-.engagement-list-redesign .nav.nav-tabs {
+.engagement-list-redesign.engagement-list-redesign .nav.nav-tabs {
   min-height: 58px;
 
   display: flex;
@@ -109,11 +110,11 @@
   border: 0 !important;
 }
 
-.engagement-list-redesign .nav-tabs .nav-item {
+.engagement-list-redesign.engagement-list-redesign .nav-tabs .nav-item {
   margin: 0 !important;
 }
 
-.engagement-list-redesign .nav-tabs .nav-link {
+.engagement-list-redesign.engagement-list-redesign .nav-tabs .nav-link {
   position: relative;
 
   min-height: 58px;
@@ -137,11 +138,11 @@
   box-shadow: none !important;
 }
 
-.engagement-list-redesign .nav-tabs .nav-link b {
+.engagement-list-redesign.engagement-list-redesign .nav-tabs .nav-link b {
   font-weight: 600 !important;
 }
 
-.engagement-list-redesign .nav-tabs .nav-link::after {
+.engagement-list-redesign.engagement-list-redesign .nav-tabs .nav-link::after {
   content: "";
 
   position: absolute;
@@ -156,15 +157,15 @@
   background: transparent;
 }
 
-.engagement-list-redesign .nav-tabs .nav-link:hover {
+.engagement-list-redesign.engagement-list-redesign .nav-tabs .nav-link:hover {
   color: #213149 !important;
 }
 
-.engagement-list-redesign .nav-tabs .nav-link.active {
+.engagement-list-redesign.engagement-list-redesign .nav-tabs .nav-link.active {
   color: #17263d !important;
 }
 
-.engagement-list-redesign .nav-tabs .nav-link.active::after {
+.engagement-list-redesign.engagement-list-redesign .nav-tabs .nav-link.active::after {
   background: var(--el-cyan);
 }
 
@@ -172,11 +173,11 @@
    LIST CARD
    ========================================================= */
 
-.engagement-list-redesign .bg-light.border-bottom.px-2 + div > .row {
+.engagement-list-redesign.engagement-list-redesign .bg-light.border-bottom.px-2 + div > .row {
   margin: 14px 0 0 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .bg-light.border-bottom.px-2
   + div
   > .row
@@ -184,7 +185,7 @@
   padding: 0 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .bg-light.border-bottom.px-2
   + div
   > .row
@@ -202,7 +203,7 @@
     0 8px 22px rgba(15, 27, 51, 0.02) !important;
 }
 
-.engagement-list-redesign .bg-light.border-bottom.px-2 + div .card-body {
+.engagement-list-redesign.engagement-list-redesign .bg-light.border-bottom.px-2 + div .card-body {
   padding: 0 !important;
 }
 
@@ -212,7 +213,7 @@
    Only .engagement-table-scroll below it does.
    ========================================================= */
 
-.engagement-list-redesign .table-responsive.table-card {
+.engagement-list-redesign.engagement-list-redesign .table-responsive.table-card {
   width: 100% !important;
   max-width: 100% !important;
 
@@ -232,7 +233,7 @@
   background: #ffffff;
 }
 
-.engagement-list-redesign .table-responsive.table-card > .row {
+.engagement-list-redesign.engagement-list-redesign .table-responsive.table-card > .row {
   position: relative;
   z-index: 20;
 
@@ -251,7 +252,7 @@
   background: #ffffff;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .table-responsive.table-card
   > .row
   > [class*="col-"] {
@@ -260,17 +261,17 @@
 
 /* Search */
 
-.engagement-list-redesign .search-box {
+.engagement-list-redesign.engagement-list-redesign .search-box {
   position: relative;
 }
 
-.engagement-list-redesign .search-box.width-searchbox,
-.engagement-list-redesign .search-box.col-md-5 {
+.engagement-list-redesign.engagement-list-redesign .search-box.width-searchbox,
+.engagement-list-redesign.engagement-list-redesign .search-box.col-md-5 {
   width: 365px !important;
   max-width: 365px !important;
 }
 
-.engagement-list-redesign .search-box .search-icon {
+.engagement-list-redesign.engagement-list-redesign .search-box .search-icon {
   position: absolute;
   top: 50%;
   left: 14px;
@@ -284,7 +285,7 @@
   pointer-events: none;
 }
 
-.engagement-list-redesign .search-box input.search {
+.engagement-list-redesign.engagement-list-redesign .search-box input.search {
   width: 100% !important;
   min-height: 46px !important;
 
@@ -301,18 +302,18 @@
   box-shadow: none !important;
 }
 
-.engagement-list-redesign .search-box input.search::placeholder {
+.engagement-list-redesign.engagement-list-redesign .search-box input.search::placeholder {
   color: #7f8a99;
 }
 
-.engagement-list-redesign .search-box input.search:focus {
+.engagement-list-redesign.engagement-list-redesign .search-box input.search:focus {
   border-color: #74cfdf !important;
   box-shadow: 0 0 0 3px rgba(24, 181, 209, 0.08) !important;
 }
 
 /* Export / filter / delete-selected */
 
-.engagement-list-redesign .table-responsive.table-card > .row .filter {
+.engagement-list-redesign.engagement-list-redesign .table-responsive.table-card > .row .filter {
   width: 46px !important;
   min-width: 46px !important;
   max-width: 46px !important;
@@ -337,14 +338,14 @@
   box-shadow: none !important;
 }
 
-.engagement-list-redesign .table-responsive.table-card > .row .filter:hover {
+.engagement-list-redesign.engagement-list-redesign .table-responsive.table-card > .row .filter:hover {
   border-color: #b7dfe7 !important;
 
   background: #f1fafc !important;
   color: #087f98 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .table-responsive.table-card
   > .row
   .create-item-btn.filter {
@@ -354,7 +355,7 @@
   color: #087f98 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .table-responsive.table-card
   > .row
   .filter
@@ -362,13 +363,13 @@
   display: none !important;
 }
 
-.engagement-list-redesign .table-responsive.table-card > .row .filter i {
+.engagement-list-redesign.engagement-list-redesign .table-responsive.table-card > .row .filter i {
   margin: 0 !important;
   color: inherit !important;
   font-size: 17px !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .table-responsive.table-card
   > .row
   button.filter:disabled {
@@ -378,7 +379,7 @@
 
 /* Clear filter */
 
-.engagement-list-redesign .create-Filter-item-btn {
+.engagement-list-redesign.engagement-list-redesign .create-Filter-item-btn {
   min-height: 46px !important;
   padding: 0 12px !important;
 
@@ -394,7 +395,7 @@
   box-shadow: none !important;
 }
 
-.engagement-list-redesign .create-Filter-item-btn:hover {
+.engagement-list-redesign.engagement-list-redesign .create-Filter-item-btn:hover {
   border-color: #edcbd0 !important;
 
   background: #fff5f6 !important;
@@ -403,9 +404,9 @@
 
 /* Add Engagement Letter */
 
-.engagement-list-redesign .add-new-btn .create-item-btn,
-.engagement-list-redesign .add-new-btn .btn-success,
-.engagement-list-redesign .add-new-btn button {
+.engagement-list-redesign.engagement-list-redesign .add-new-btn .create-item-btn,
+.engagement-list-redesign.engagement-list-redesign .add-new-btn .btn-success,
+.engagement-list-redesign.engagement-list-redesign .add-new-btn button {
   min-height: 46px !important;
   padding: 0 20px !important;
 
@@ -423,9 +424,9 @@
   box-shadow: none !important;
 }
 
-.engagement-list-redesign .add-new-btn .create-item-btn:hover,
-.engagement-list-redesign .add-new-btn .btn-success:hover,
-.engagement-list-redesign .add-new-btn button:hover {
+.engagement-list-redesign.engagement-list-redesign .add-new-btn .create-item-btn:hover,
+.engagement-list-redesign.engagement-list-redesign .add-new-btn .btn-success:hover,
+.engagement-list-redesign.engagement-list-redesign .add-new-btn button:hover {
   border-color: var(--el-cyan-hover) !important;
   background: var(--el-cyan-hover) !important;
 }
@@ -434,7 +435,7 @@
    TABLE-ONLY HORIZONTAL SCROLL
    ========================================================= */
 
-.engagement-list-redesign .engagement-table-scroll {
+.engagement-list-redesign.engagement-list-redesign .engagement-table-scroll {
   position: relative;
 
   width: 100%;
@@ -449,20 +450,20 @@
   scrollbar-color: #cbd4df #f5f7fa;
 }
 
-.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar {
+.engagement-list-redesign.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar {
   height: 8px;
 }
 
-.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar-track {
+.engagement-list-redesign.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar-track {
   background: #f5f7fa;
 }
 
-.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar-thumb {
+.engagement-list-redesign.engagement-list-redesign .engagement-table-scroll::-webkit-scrollbar-thumb {
   border-radius: 999px;
   background: #cbd4df;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll::-webkit-scrollbar-thumb:hover {
   background: #aebbc9;
 }
@@ -473,7 +474,7 @@
    horizontal separators only.
    ========================================================= */
 
-.engagement-list-redesign .engagement-table-scroll #customerTable {
+.engagement-list-redesign.engagement-list-redesign .engagement-table-scroll #customerTable {
   width: 100% !important;
   min-width: 1180px;
 
@@ -483,16 +484,16 @@
   table-layout: fixed !important;
 }
 
-.engagement-list-redesign #customerTable.table {
+.engagement-list-redesign.engagement-list-redesign #customerTable.table {
   margin-bottom: 0 !important;
 }
 
-.engagement-list-redesign #customerTable thead,
-.engagement-list-redesign #customerTable .table-light {
+.engagement-list-redesign.engagement-list-redesign #customerTable thead,
+.engagement-list-redesign.engagement-list-redesign #customerTable .table-light {
   background: var(--el-navy) !important;
 }
 
-.engagement-list-redesign #customerTable thead td {
+.engagement-list-redesign.engagement-list-redesign #customerTable thead td {
   height: 52px !important;
   padding: 0 18px !important;
 
@@ -511,7 +512,7 @@
   white-space: nowrap;
 }
 
-.engagement-list-redesign #customerTable tbody td {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody td {
   height: 68px !important;
   padding: 10px 18px !important;
 
@@ -532,25 +533,25 @@
   vertical-align: middle !important;
 }
 
-.engagement-list-redesign #customerTable tbody tr:last-child td {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody tr:last-child td {
   border-bottom: 0 !important;
 }
 
-.engagement-list-redesign #customerTable tbody tr:hover td {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody tr:hover td {
   background: #fbfdff !important;
 }
 
 /* No vertical grid lines anywhere. */
-.engagement-list-redesign #customerTable th,
-.engagement-list-redesign #customerTable td {
+.engagement-list-redesign.engagement-list-redesign #customerTable th,
+.engagement-list-redesign.engagement-list-redesign #customerTable td {
   border-left: 0 !important;
   border-right: 0 !important;
 }
 
 /* Main identifiers */
 
-.engagement-list-redesign #customerTable tbody td:nth-child(1),
-.engagement-list-redesign #customerTable tbody td:nth-child(2) {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody td:nth-child(1),
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody td:nth-child(2) {
   overflow: hidden;
 
   color: #1f3047 !important;
@@ -567,12 +568,12 @@
    ========================================================= */
 
 /* Current Engagement Letter: 8 columns */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(8))
   td:nth-child(1),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -580,12 +581,12 @@
   width: 9%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(8))
   td:nth-child(2),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -593,12 +594,12 @@
   width: 15%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(8))
   td:nth-child(3),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -606,12 +607,12 @@
   width: 10%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(8))
   td:nth-child(4),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -619,12 +620,12 @@
   width: 18%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(8))
   td:nth-child(5),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -632,12 +633,12 @@
   width: 11%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(8))
   td:nth-child(6),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -645,12 +646,12 @@
   width: 14%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(8))
   td:nth-child(7),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -659,12 +660,12 @@
 }
 
 /* API Engagement: 6 columns */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(1),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -672,12 +673,12 @@
   width: 16%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(2),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -685,12 +686,12 @@
   width: 25%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(3),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -698,12 +699,12 @@
   width: 15%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(4),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -711,12 +712,12 @@
   width: 25%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td:nth-child(5),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -725,12 +726,12 @@
 }
 
 /* Migrated Engagement: 5 columns */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(1),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -738,12 +739,12 @@
   width: 14%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(2),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -751,12 +752,12 @@
   width: 28%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(3),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -764,12 +765,12 @@
   width: 16%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(4),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -777,12 +778,12 @@
   width: 25%;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(5):last-child)
   td:nth-child(5),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(5):last-child)
@@ -795,7 +796,7 @@
    Conditions and values are unchanged; only colors are softened.
    ========================================================= */
 
-.engagement-list-redesign #customerTable tbody td:nth-child(3) > p {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody td:nth-child(3) > p {
   width: fit-content;
   min-width: 62px;
   min-height: 26px;
@@ -817,7 +818,7 @@
 }
 
 /* Draft */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   td:nth-child(3)
@@ -827,7 +828,7 @@
 }
 
 /* Sent / Awaiting */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   td:nth-child(3)
@@ -837,7 +838,7 @@
 }
 
 /* Accepted / Signed */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   td:nth-child(3)
@@ -847,7 +848,7 @@
 }
 
 /* Declined */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   td:nth-child(3)
@@ -857,7 +858,7 @@
 }
 
 /* Skipped */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   td:nth-child(3)
@@ -867,7 +868,7 @@
 }
 
 /* Void */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   td:nth-child(3)
@@ -880,7 +881,7 @@
    VALUE / DOCUMENTS / DATES
    ========================================================= */
 
-.engagement-list-redesign #customerTable tbody p.mb-0 {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody p.mb-0 {
   margin-bottom: 2px !important;
 
   color: #536176;
@@ -889,11 +890,11 @@
   line-height: 1.45;
 }
 
-.engagement-list-redesign #customerTable tbody p.mb-0:last-child {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody p.mb-0:last-child {
   margin-bottom: 0 !important;
 }
 
-.engagement-list-redesign #customerTable tbody p.mb-0 b {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody p.mb-0 b {
   color: #20314a;
 
   font-size: 10.9px;
@@ -901,7 +902,7 @@
 }
 
 /* Engagement PDF link */
-.engagement-list-redesign #customerTable tbody td:nth-child(5) > p[style] {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody td:nth-child(5) > p[style] {
   width: fit-content;
   min-height: 28px;
 
@@ -922,12 +923,12 @@
   cursor: pointer;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
   td:nth-child(6),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -943,7 +944,7 @@
    SEND REMINDER
    ========================================================= */
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -959,7 +960,7 @@
   white-space: nowrap;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
@@ -975,8 +976,8 @@
   font-weight: 400 !important;
 }
 
-.engagement-list-redesign #customerTable tbody td .MuiFormGroup-root,
-.engagement-list-redesign #customerTable tbody td .MuiFormControlLabel-root {
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody td .MuiFormGroup-root,
+.engagement-list-redesign.engagement-list-redesign #customerTable tbody td .MuiFormControlLabel-root {
   width: auto !important;
 
   margin: 0 !important;
@@ -991,7 +992,7 @@
    Always remains visible while table scrolls horizontally.
    ========================================================= */
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   .engagement-action-column {
@@ -1016,7 +1017,7 @@
   box-shadow: -10px 0 14px -14px rgba(15, 27, 51, 0.55);
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   thead
@@ -1029,7 +1030,7 @@
   box-shadow: -10px 0 14px -14px rgba(0, 0, 0, 0.65);
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   tbody
@@ -1038,7 +1039,7 @@
   background: #fbfdff !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   .engagement-action-column
@@ -1051,22 +1052,22 @@
 }
 
 /* Force percentage width rules not to enlarge Action. */
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(8))
   td.engagement-action-column,
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(8))
   td.engagement-action-column,
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   thead
   tr:has(td:nth-child(6):last-child)
   td.engagement-action-column,
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   tbody
   tr:has(td:nth-child(6):last-child)
@@ -1081,11 +1082,11 @@
    Existing Bootstrap dropdown functionality is unchanged.
    ========================================================= */
 
-.engagement-list-redesign #customerTable .dropdown {
+.engagement-list-redesign.engagement-list-redesign #customerTable .dropdown {
   display: inline-flex;
 }
 
-.engagement-list-redesign #customerTable .dropdown > button.create-item-btn {
+.engagement-list-redesign.engagement-list-redesign #customerTable .dropdown > button.create-item-btn {
   width: 32px !important;
   min-width: 32px !important;
   max-width: 32px !important;
@@ -1111,7 +1112,7 @@
   box-shadow: none !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   .dropdown
   > button.create-item-btn
@@ -1125,7 +1126,7 @@
   font-size: 0 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   .dropdown
   > button.create-item-btn
@@ -1134,7 +1135,7 @@
   display: none !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   .dropdown
   > button.create-item-btn::before {
@@ -1147,11 +1148,11 @@
   line-height: 1;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   .dropdown
   > button.create-item-btn:hover,
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   .dropdown.show
   > button.create-item-btn {
@@ -1160,11 +1161,11 @@
   background: #f4f8fa !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   .dropdown
   > button.create-item-btn:hover::before,
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   #customerTable
   .dropdown.show
   > button.create-item-btn::before {
@@ -1173,7 +1174,7 @@
 
 /* Dropdown menu */
 
-.engagement-list-redesign #customerTable .dropdown-menu {
+.engagement-list-redesign.engagement-list-redesign #customerTable .dropdown-menu {
   min-width: 210px;
   padding: 6px !important;
 
@@ -1187,7 +1188,7 @@
     0 4px 12px rgba(15, 23, 42, 0.07);
 }
 
-.engagement-list-redesign #customerTable .dropdown-item {
+.engagement-list-redesign.engagement-list-redesign #customerTable .dropdown-item {
   min-height: 34px;
   padding: 7px 9px;
 
@@ -1205,12 +1206,12 @@
   cursor: pointer;
 }
 
-.engagement-list-redesign #customerTable .dropdown-item:hover {
+.engagement-list-redesign.engagement-list-redesign #customerTable .dropdown-item:hover {
   background: #f1f9fb;
   color: #087f98;
 }
 
-.engagement-list-redesign #customerTable .dropdown-item i {
+.engagement-list-redesign.engagement-list-redesign #customerTable .dropdown-item i {
   width: 16px;
 
   margin: 0 !important;
@@ -1220,7 +1221,7 @@
   text-align: center;
 }
 
-.engagement-list-redesign #customerTable .dropdown-item:hover i {
+.engagement-list-redesign.engagement-list-redesign #customerTable .dropdown-item:hover i {
   color: #087f98;
 }
 
@@ -1229,7 +1230,7 @@
    Open menu always appears over sticky cells / lower rows.
    ========================================================= */
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   tbody
@@ -1237,17 +1238,17 @@
   z-index: 3 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   tbody
   .engagement-action-column:has(.dropdown-menu.show),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   tbody
   .engagement-action-column:has(.dropdown-toggle.show),
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   tbody
@@ -1255,7 +1256,7 @@
   z-index: 5000 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   .engagement-action-column
@@ -1264,7 +1265,7 @@
   z-index: 5001 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   .engagement-action-column
@@ -1272,7 +1273,7 @@
   z-index: 9999 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   .engagement-action-column
@@ -1281,7 +1282,7 @@
   z-index: 99999 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   tbody
@@ -1290,7 +1291,7 @@
   z-index: 4000 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   tbody
@@ -1299,7 +1300,7 @@
   z-index: 1;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   tbody
@@ -1308,7 +1309,7 @@
   z-index: 2 !important;
 }
 
-.engagement-list-redesign
+.engagement-list-redesign.engagement-list-redesign
   .engagement-table-scroll
   #customerTable
   tbody
@@ -1321,7 +1322,7 @@
    API CHECKBOXES
    ========================================================= */
 
-.engagement-list-redesign #customerTable input[type="checkbox"] {
+.engagement-list-redesign.engagement-list-redesign #customerTable input[type="checkbox"] {
   width: 15px;
   height: 15px;
 
@@ -1339,7 +1340,7 @@
    Keep it in normal page flow.
    ========================================================= */
 
-.engagement-list-redesign .fixed-bottom {
+.engagement-list-redesign.engagement-list-redesign .fixed-bottom {
   position: static !important;
 
   inset: auto !important;
@@ -1356,12 +1357,12 @@
   z-index: auto !important;
 }
 
-.engagement-list-redesign .fixed-bottom .row {
+.engagement-list-redesign.engagement-list-redesign .fixed-bottom .row {
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
 
-.engagement-list-redesign .pagination {
+.engagement-list-redesign.engagement-list-redesign .pagination {
   margin-bottom: 0 !important;
 }
 
@@ -1403,44 +1404,44 @@
    ========================================================= */
 
 @media (min-width: 1500px) {
-  .engagement-list-redesign .engagement-table-scroll #customerTable {
+  .engagement-list-redesign.engagement-list-redesign .engagement-table-scroll #customerTable {
     min-width: 100% !important;
   }
 }
 
 @media (max-width: 1499px) {
-  .engagement-list-redesign .engagement-table-scroll #customerTable {
+  .engagement-list-redesign.engagement-list-redesign .engagement-table-scroll #customerTable {
     min-width: 1180px !important;
   }
 }
 
 @media (max-width: 991px) {
-  .engagement-list-redesign {
+  .engagement-list-redesign.engagement-list-redesign {
     width: calc(100% - 12px) !important;
 
     margin-left: 12px !important;
     padding-right: 10px !important;
   }
 
-  .engagement-list-redesign .table-responsive.table-card > .row {
+  .engagement-list-redesign.engagement-list-redesign .table-responsive.table-card > .row {
     align-items: stretch;
   }
 }
 
 @media (max-width: 767px) {
-  .engagement-list-redesign {
+  .engagement-list-redesign.engagement-list-redesign {
     width: 100% !important;
 
     margin-left: 0 !important;
     padding: 18px 8px 0 !important;
   }
 
-  .engagement-list-redesign .bg-light.border-bottom.px-2 {
+  .engagement-list-redesign.engagement-list-redesign .bg-light.border-bottom.px-2 {
     min-height: auto;
     padding: 6px 8px 0 !important;
   }
 
-  .engagement-list-redesign .nav.nav-tabs {
+  .engagement-list-redesign.engagement-list-redesign .nav.nav-tabs {
     min-height: auto;
 
     gap: 18px;
@@ -1448,14 +1449,14 @@
     overflow-x: auto;
   }
 
-  .engagement-list-redesign .nav-tabs .nav-link {
+  .engagement-list-redesign.engagement-list-redesign .nav-tabs .nav-link {
     min-height: 54px;
     padding-bottom: 16px !important;
 
     font-size: 15px !important;
   }
 
-  .engagement-list-redesign .table-responsive.table-card > .row {
+  .engagement-list-redesign.engagement-list-redesign .table-responsive.table-card > .row {
     min-height: auto;
 
     padding: 12px !important;
@@ -1465,7 +1466,7 @@
     gap: 10px;
   }
 
-  .engagement-list-redesign
+  .engagement-list-redesign.engagement-list-redesign
     .table-responsive.table-card
     > .row
     > [class*="col-"] {
@@ -1474,18 +1475,18 @@
     flex: 0 0 100% !important;
   }
 
-  .engagement-list-redesign .search-box.width-searchbox,
-  .engagement-list-redesign .search-box.col-md-5 {
+  .engagement-list-redesign.engagement-list-redesign .search-box.width-searchbox,
+  .engagement-list-redesign.engagement-list-redesign .search-box.col-md-5 {
     width: 100% !important;
     max-width: 100% !important;
   }
 
-  .engagement-list-redesign .add-new-btn,
-  .engagement-list-redesign .add-new-btn > * {
+  .engagement-list-redesign.engagement-list-redesign .add-new-btn,
+  .engagement-list-redesign.engagement-list-redesign .add-new-btn > * {
     width: 100%;
   }
 
-  .engagement-list-redesign
+  .engagement-list-redesign.engagement-list-redesign
     .engagement-table-scroll
     #customerTable
     .engagement-action-column {

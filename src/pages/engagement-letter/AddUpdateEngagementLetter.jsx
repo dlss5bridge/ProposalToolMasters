@@ -411,21 +411,21 @@ const BasicInformationComponent = (props) => {
         <div class="col-lg-12 hstack  gap-2 justify-content-end text-right mt-3">
           <div class="d-flex" style={{ overflowX: "auto" }}>
             <button
-              class="btn btn-md btn-light mr-1"
+              class="btn btn-md btn-light mr-1 pf-btn--cancel"
               onClick={() => props.handleCancel()}
             >
               <span>{props.getCrudButtonTextName("Cancel")}</span>
             </button>
             <button
               type="submit"
-              class="btn btn-md btn-success create-item-btn"
+              class="btn btn-md btn-success create-item-btn pf-btn--next"
               onClick={() => props.HandleTabChange(2)}
             >
               <span>Next</span>
             </button>
             <button
               type="submit"
-              class="btn btn-md btn-success create-item-btn "
+              class="btn btn-md btn-success create-item-btn pf-btn--draft"
               onClick={() => props.HandleTabChange(2, statusID.Draft)}
               style={{ marginLeft: "5px" }}
             >
@@ -2238,12 +2238,12 @@ const ReviewServicesComponent = (props) => {
                     </div>
                   </div>
                   <div className="row fieldset">
-                    <div className="col-lg-2 text-lg-right">
+                    <div className="col-md-2 col-sm-12 text-md-end">
                       <label className="fieldset-label required">
                         Show Discount
                       </label>
                     </div>
-                    <div className="col-lg-10">
+                    <div className="col-md-10 col-sm-12">
                       <div className="input-group">
                         {/* Replace Select with Checkbox */}
                         <input
@@ -2286,6 +2286,14 @@ const ReviewServicesComponent = (props) => {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="tab-content">
+            <div className="tab-pane p-3 active">
+              <div className="row">
+                <div className="col-12">
                   {props.selectedRecurringServiceList?.length !== 0 && (
                     <>
                       <div className="separator mb-2"></div>
@@ -2628,7 +2636,7 @@ const ReviewServicesComponent = (props) => {
                       </div>
                       <div className="mb-3"></div>
                       {props.selectedTemplateID === 0 ? (
-                        <table class="table align-middle table-nowrap">
+                        <div className="table-responsive"><table class="table align-middle table-nowrap">
                           <thead class="table-light table-header-font">
                             <tr class="head-row">
                               <td className="tr-table-class text-white">
@@ -2873,7 +2881,7 @@ const ReviewServicesComponent = (props) => {
                               </>
                             )}
                           </tbody>
-                        </table>
+                        </table></div>
                       ) : (
                         <div
                           style={{ marginTop: "0px" }}
@@ -3300,10 +3308,18 @@ const ReviewServicesComponent = (props) => {
                       )}
                     </>
                   )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="tab-content">
+            <div className="tab-pane p-3 active">
+              <div className="row">
+                <div className="col-12">
                   {props.selectedOneOffServiceList?.length !== 0 && (
                     <>
                       <div className="separator mt-3  mb-2"></div>
-                      <h6>One Off Services</h6>
+                      <h6>One-Off Services</h6>
                       <div className="separator mb-3"></div>
                       <div className="row fieldset">
                         <div className="col-md-2 col-sm-12  text-md-end">
@@ -3578,7 +3594,7 @@ const ReviewServicesComponent = (props) => {
                       </div>
                       <div className="mb-3"></div>
                       {props.selectedTemplateID === 0 ? (
-                        <table class="table align-middle table-nowrap">
+                        <div className="table-responsive"><table class="table align-middle table-nowrap">
                           <thead class="table-light table-header-font">
                             <tr class="head-row">
                               <td className="tr-table-class text-white">
@@ -3813,7 +3829,7 @@ const ReviewServicesComponent = (props) => {
                               </>
                             )}
                           </tbody>
-                        </table>
+                        </table></div>
                       ) : (
                         <div
                           style={{ marginTop: "0px" }}
@@ -4248,6 +4264,14 @@ const ReviewServicesComponent = (props) => {
                     </>
                   )}
 
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="tab-content">
+            <div className="tab-pane p-3 active">
+              <div className="row">
+                <div className="col-12">
                   {/* Statement of facts - Service description customization */}
 
                   <div className="SOF-SD-Customization d-flex flex-column gap-2">
@@ -4330,7 +4354,7 @@ const ReviewServicesComponent = (props) => {
         <div class="col-lg-12 hstack  gap-2 justify-content-end text-right mt-3">
           <div class="d-flex" style={{ overflowX: "auto" }}>
             <button
-              class="btn btn-md btn-light mr-1"
+              class="btn btn-md btn-light mr-1 pf-btn--cancel"
               onClick={() => props.handleCancel()}
             >
               <span>{props.getCrudButtonTextName("Cancel")}</span>
@@ -4338,14 +4362,14 @@ const ReviewServicesComponent = (props) => {
             <button
               onClick={() => props.HandleBack(3)}
               style={{ paddingTop: "5px", marginRight: "4px" }}
-              className="btn btn-md btn-success create-item-btn"
+              className="btn btn-md btn-success create-item-btn pf-btn--back"
             >
               <span>Back</span>
             </button>
 
             <button
               type="submit"
-              class="btn btn-md btn-success create-item-btn"
+              class="btn btn-md btn-success create-item-btn pf-btn--next"
               onClick={() => {
                 // props.GetTemplateModalData(); // Call GetTemplateModalData function
                 props.HandleTabChange(5); // Call HandleTabChange function as before
@@ -4355,7 +4379,7 @@ const ReviewServicesComponent = (props) => {
             </button>
             <button
               type="submit"
-              class="btn btn-md btn-success create-item-btn text-nowrap"
+              class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
               onClick={() => props.HandleTabChange(5, statusID.Draft)}
               style={{ marginLeft: "5px" }}
             >
@@ -6291,12 +6315,12 @@ const ReviewPackagesComponent = (props) => {
                     </div>
                   </div>
                   <div className="row fieldset">
-                    <div className="col-lg-2 text-lg-right">
+                    <div className="col-md-2 col-sm-12 text-md-end">
                       <label className="fieldset-label required">
                         Show Discount
                       </label>
                     </div>
-                    <div className="col-lg-10">
+                    <div className="col-md-10 col-sm-12">
                       <div className="input-group">
                         {/* Replace Select with Checkbox */}
                         <input
@@ -9575,7 +9599,7 @@ const ReviewPackagesComponent = (props) => {
       <div class="row fieldset">
         <div class="col-lg-12 hstack gap-2 justify-content-end text-right mt-3">
           <button
-            class="btn btn-md btn-light"
+            class="btn btn-md btn-light pf-btn--cancel"
             onClick={() => props.handleCancelBtn()}
           >
             <span>Cancel</span>
@@ -9583,14 +9607,14 @@ const ReviewPackagesComponent = (props) => {
           <button
             onClick={() => props.HandleBack(3)}
             style={{ paddingTop: "5px", marginRight: "4px" }}
-            className="btn btn-md btn-success create-item-btn"
+            className="btn btn-md btn-success create-item-btn pf-btn--back"
           >
             <span>Back</span>
           </button>
 
           <button
             type="submit"
-            class="btn btn-md btn-success create-item-btn"
+            class="btn btn-md btn-success create-item-btn pf-btn--next"
             onClick={() => {
               // props.GetTemplateModalData(); // Call GetTemplateModalData function
               props.HandleTabChange(5); // Call HandleTabChange function as before
@@ -9600,7 +9624,7 @@ const ReviewPackagesComponent = (props) => {
           </button>
           <button
             type="submit"
-            class="btn btn-md btn-success create-item-btn text-nowrap"
+            class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
             onClick={() => props.HandleTabChange(5, statusID.Draft)}
             style={{ marginLeft: "5px" }}
           >

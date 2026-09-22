@@ -432,7 +432,7 @@ const AdditionalInformation = (props) => {
     <div>
       <div className="create-practice-height scrollbar">
         <div className="tab-content">
-          <div class="tab-pane p-3 active">
+          <div class="tab-pane p-3 active additional-info-pane">
             {props.additionalInformationList
               ?.filter((item) => item.driverTypeID !== 1)
               ?.map((i) => {

@@ -991,3 +991,215 @@
   border-color: #1e293b !important;
   background: #1e293b !important;
 }
+
+/* ==========================================================================
+   Additional Information tab
+   Labels sit above their fields (left aligned), fields flow in two columns,
+   and Signatories / Terms & Conditions get proper section headings with each
+   signatory shown as its own card. Markup is unchanged apart from one class.
+   ========================================================================== */
+
+.proposal-ui .additional-info-pane {
+  /* !important: this element also matches the unscoped
+     ".tab-content > .active { display: block }" rule in
+     configure/packages/Package.css at equal specificity, so whichever
+     stylesheet a given page happens to load last would otherwise win. */
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 28px;
+  align-content: start;
+}
+
+.proposal-ui .additional-info-pane > * {
+  min-width: 0;
+}
+
+/* Rows: stacked label + field, no legacy gutters */
+.proposal-ui .additional-info-pane .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.proposal-ui .additional-info-pane .row.fieldset {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.proposal-ui .additional-info-pane .row.fieldset:empty {
+  display: none;
+}
+
+.proposal-ui .additional-info-pane .row.fieldset > [class*="col-"] {
+  flex: none;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  text-align: left !important;
+}
+
+.proposal-ui .additional-info-pane .form-label,
+.proposal-ui .additional-info-pane .fieldset-label {
+  display: block;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600 !important;
+  color: var(--pu-text);
+}
+
+.proposal-ui .additional-info-pane .form-label:empty {
+  display: none;
+}
+
+/* Section headings: title + hairline */
+.proposal-ui .additional-info-pane h3.modal-title {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--pu-ink);
+}
+
+.proposal-ui .additional-info-pane h3.modal-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--pu-line);
+}
+
+.proposal-ui .additional-info-pane .separator {
+  display: none;
+}
+
+/* Signatories block lays out on the same two-column grid */
+.proposal-ui .additional-info-pane #SignatoryBlockDiv {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 28px;
+  align-content: start;
+}
+
+.proposal-ui .additional-info-pane #SignatoryBlockDiv > h3.modal-title,
+.proposal-ui .additional-info-pane #SignatoryBlockDiv > .fieldset-group,
+.proposal-ui .additional-info-pane #SignatoryBlockDiv > .validation {
+  grid-column: 1 / -1;
+}
+
+.proposal-ui .additional-info-pane #SignatoryBlockDiv > .row.mt-3 {
+  margin-top: 0 !important;
+}
+
+/* Each signatory is a card */
+.proposal-ui .additional-info-pane .fieldset-group {
+  margin: 0 0 18px !important;
+  padding: 18px 20px 2px !important;
+  border: 1px solid var(--pu-line);
+  border-radius: 12px;
+  background: var(--pu-soft);
+}
+
+.proposal-ui .additional-info-pane .fieldset-group > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 28px;
+  align-items: start;
+}
+
+.proposal-ui .additional-info-pane .fieldset-group-label,
+.proposal-ui .additional-info-pane .fieldset-group-label-1 {
+  position: static;
+  grid-row: 1;
+  align-self: center;
+  margin: 0 0 16px;
+  padding: 0;
+  background: none;
+  top: auto;
+}
+
+.proposal-ui .additional-info-pane .fieldset-group-label {
+  grid-column: 1;
+  font-size: 14px;
+  font-weight: 600 !important;
+  color: var(--pu-ink);
+}
+
+.proposal-ui .additional-info-pane .fieldset-group-label-1 {
+  grid-column: 2;
+  justify-self: end;
+}
+
+.proposal-ui .additional-info-pane .fieldset-group .row.fieldset {
+  margin-bottom: 16px;
+}
+
+/* Delete signature: quiet outlined button instead of a floating red badge */
+.proposal-ui .additional-info-pane .delete-fieldset-group {
+  position: static !important;
+  height: 32px;
+  padding: 0 12px !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #f1c3be !important;
+  border-radius: 8px;
+  background: #fff !important;
+  font-size: 13px !important;
+  font-weight: 600;
+  color: var(--pu-danger) !important;
+}
+
+.proposal-ui .additional-info-pane .delete-fieldset-group:hover {
+  background: #fef3f2 !important;
+}
+
+.proposal-ui .additional-info-pane .delete-fieldset-group .margin-right {
+  margin: 0;
+}
+
+/* Terms & Conditions: template picker takes one column, preview/editor full width */
+.proposal-ui .additional-info-pane #TnC-PdfDiv,
+.proposal-ui .additional-info-pane #TnC-EditorDiv {
+  grid-column: 1 / -1;
+}
+
+.proposal-ui .additional-info-pane #TnC-Div {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 767px) {
+  .proposal-ui .additional-info-pane,
+  .proposal-ui .additional-info-pane #SignatoryBlockDiv,
+  .proposal-ui .additional-info-pane .fieldset-group > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .proposal-ui .additional-info-pane .fieldset-group-label-1 {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
+}
+
+/* ==========================================================================
+   Review Services: same card layout for Proposal and Engagement Letter
+   The EL screen now splits its content into the same cards (fees, recurring,
+   one-off, statement of facts). Cards that end up with no content are hidden.
+   ========================================================================== */
+
+.proposal-ui .create-practice-height > .container {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.proposal-ui .tab-pane:has(> .row > .col-12:empty),
+.proposal-ui
+  .tab-pane:has(> .row > .col-12 > .SOF-SD-Customization:only-child:empty) {
+  display: none;
+}
