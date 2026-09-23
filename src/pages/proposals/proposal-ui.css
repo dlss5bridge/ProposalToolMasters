@@ -895,7 +895,16 @@
 
 .proposal-ui .hstack > .d-flex {
   gap: 10px !important;
-  flex-wrap: wrap;
+  /* Bootstrap's own .flex-wrap utility class (on this same element in
+     PreviewComponentpdf.jsx) is !important and was dropping "Skip To
+     Engagement Letter" onto a second line whenever the buttons didn't
+     quite fit - keep them on one row and let it scroll instead. */
+  flex-wrap: nowrap !important;
+  /* !important: an earlier ".proposal-ui .hstack > .d-flex" rule (same
+     selector, used for the Additional Information footer) sets
+     "overflow: visible !important", which would otherwise also win here
+     and stop this row from scrolling. */
+  overflow-x: auto !important;
   justify-content: flex-end;
 }
 

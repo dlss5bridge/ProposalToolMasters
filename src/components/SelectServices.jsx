@@ -3330,21 +3330,21 @@ export default function SelectServices(props) {
         <div class="col-lg-12 hstack gap-2 justify-content-end text-right mt-3 ">
           <div class="d-flex" style={{ overflowX: "auto" }}>
             {/* <button
-              class="btn btn-md  btn-light mr-1"
+              class="btn btn-md  btn-light mr-1 pf-btn--cancel"
               onClick={props.handleCancel}
             >
               <span>{getCrudButtonTextName("Cancel")}</span>
             </button> */}
             {props.getSAChanges ? (
               <button
-                class="btn btn-md btn-success declined-item-btn mr-1"
+                class="btn btn-md btn-success declined-item-btn mr-1 pf-btn--cancel"
                 onClick={() => props.DeclineSuperAdminChangesData("Decline")}
               >
                 <span>Decline</span>
               </button>
             ) : (
               <button
-                class="btn btn-md  btn-light mr-1"
+                class="btn btn-md  btn-light mr-1 pf-btn--cancel"
                 onClick={props.handleCancel}
               >
                 <span>{getCrudButtonTextName("Cancel")}</span>
@@ -3354,7 +3354,7 @@ export default function SelectServices(props) {
               <button
                 onClick={() => props.HandleBack(5)}
                 style={{ marginRight: "5px" }}
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn pf-btn--back"
               >
                 <span>Back</span>
               </button>
@@ -3363,7 +3363,7 @@ export default function SelectServices(props) {
               <button
                 onClick={() => props.HandleBack(1)}
                 style={{ marginRight: "5px" }}
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn pf-btn--back"
               >
                 <span>Back</span>
               </button>
@@ -3372,7 +3372,7 @@ export default function SelectServices(props) {
               <button
                 onClick={() => props.HandleBack(1)}
                 style={{ marginRight: "5px" }}
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn pf-btn--back"
               >
                 <span>Back</span>
               </button>
@@ -3383,12 +3383,12 @@ export default function SelectServices(props) {
                 <button
                   onClick={() => props.HandleBack(1)}
                   style={{ marginRight: "5px" }}
-                  className="btn btn-md btn-success create-item-btn"
+                  className="btn btn-md btn-success create-item-btn pf-btn--back"
                 >
                   <span>Back</span>
                 </button>
                 <button
-                  class="btn btn-md btn-success create-item-btn"
+                  class="btn btn-md btn-success create-item-btn pf-btn--next"
                   onClick={async () => {
                     await props.HandleTabChange(3);
                   }}
@@ -3400,7 +3400,7 @@ export default function SelectServices(props) {
             {props?.ProposalObject &&
               props?.ProposalObject?.selectedProposalTypeValue === 1 && (
                 <button
-                  className="btn btn-md btn-success create-item-btn"
+                  className="btn btn-md btn-success create-item-btn pf-btn--next"
                   onClick={async () => {
                     await props.HandleTabChange(7);
                   }}
@@ -3411,7 +3411,7 @@ export default function SelectServices(props) {
             {props?.ProposalObject &&
               props?.ProposalObject?.selectedProposalTypeValue === 3 && (
                 <button
-                  className="btn btn-md btn-success create-item-btn"
+                  className="btn btn-md btn-success create-item-btn pf-btn--next"
                   onClick={async () => {
                     await props.HandleTabChange(6);
                   }}
@@ -3422,7 +3422,7 @@ export default function SelectServices(props) {
             {props?.ProposalObject &&
               props?.ProposalObject?.selectedProposalTypeValue === 4 && (
                 <button
-                  className="btn btn-md btn-success create-item-btn"
+                  className="btn btn-md btn-success create-item-btn pf-btn--next"
                   onClick={async () => {
                     await props.HandleTabChange(4);
                   }}
@@ -3433,7 +3433,7 @@ export default function SelectServices(props) {
             {props.moduleName == "Quote" && (
               <button
                 type="submit"
-                class="btn btn-md btn-success create-item-btn text-nowrap"
+                class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
                 onClick={() =>
                   props.handleSaveAsDraft(
                     2,
@@ -3449,7 +3449,7 @@ export default function SelectServices(props) {
             {props.moduleName == "Contract" && (
               <button
                 type="submit"
-                class="btn btn-md btn-success create-item-btn text-nowrap"
+                class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
                 onClick={() => props.HandleTabChange(3, statusID.Draft)}
                 style={{ marginLeft: "5px" }}
               >

@@ -27,6 +27,7 @@ import LogoutModal from "./LogoutModal";
 import "../components/UpdateImageModel/UploadImageStyle.css";
 import SuccessModal from "./SuccessModal";
 import SetTimeoutComponent from "./SetTimeoutComponent";
+import ProposalThemeSettingModal from "./ProposalThemeSettingModal";
 import UserModelNew from "./UserModelNew";
 import ViewPlan from "./ViewPlan";
 
@@ -2840,6 +2841,30 @@ const Topbar = () => {
                                         </a>
                                       </li>
                                     )}
+
+                                    {/* Super Admin only, and only at the
+                                        true platform level - not while
+                                        viewing as a specific organisation -
+                                        since this setting applies to every
+                                        organisation at once. */}
+                                    {common.organisationKeyID == null && (
+                                      <li class="nav-item">
+                                        <a
+                                          onClick={() => {
+                                            closeDropdown("Setting");
+                                            NotificationCountData();
+                                          }}
+                                          class="nav-link"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#ProposalThemeSettingModal"
+                                          style={{ cursor: "pointer" }}
+                                        >
+                                          <span class="align-middle">
+                                            Proposal Theme
+                                          </span>
+                                        </a>
+                                      </li>
+                                    )}
                                   </ul>
                                 </div>
                               </li>
@@ -3300,6 +3325,8 @@ const Topbar = () => {
 
       {/* ----------Set Logout Time modal-------- */}
       <SetTimeoutComponent id="SetLogoutTimeModal" />
+      {/* ----------Super Admin: Proposal Theme modal-------- */}
+      <ProposalThemeSettingModal />
       {/* ...............personalize setting modal............. */}
       <div
         class="modal fade zoomIn"

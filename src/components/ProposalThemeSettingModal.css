@@ -1,0 +1,311 @@
+/* ==========================================================================
+   Super Admin > Settings > Proposal Theme modal
+   Self-contained: this modal lives in the app shell (TopbarClone), which
+   isn't guaranteed to have proposal-ui.css loaded, so tokens are defined
+   locally instead of relying on --pu-* variables from that file.
+   ========================================================================== */
+
+.pts-modal {
+  --pts-ink: #0f172a;
+  --pts-text: #334155;
+  --pts-muted: #64748b;
+  --pts-line: #e2e8f0;
+  --pts-soft: #f8fafc;
+  --pts-accent: #12b5d6;
+  --pts-accent-soft: #f0fbfe;
+  --pts-success: #3fcf9f;
+  --pts-danger: #d92d20;
+}
+
+.pts-modal__content {
+  border: 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.pts-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--pts-line);
+}
+
+.pts-modal__heading h5 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--pts-ink);
+}
+
+.pts-modal__heading p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--pts-muted);
+}
+
+.pts-modal__body {
+  padding: 20px 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.pts-status {
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+  color: var(--pts-muted);
+  font-size: 14px;
+}
+
+/* ---------- Option cards ---------- */
+
+.pts-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .pts-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pts-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1.5px solid var(--pts-line);
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pts-option:hover {
+  border-color: #cbd5e1;
+}
+
+.pts-option.is-selected {
+  border-color: var(--pts-accent);
+  box-shadow: 0 0 0 3px var(--pts-accent-soft);
+}
+
+.pts-option input[type="radio"] {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--pts-accent);
+  cursor: pointer;
+}
+
+.pts-option__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 24px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pts-ink);
+}
+
+.pts-option__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.pts-option__desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--pts-muted);
+}
+
+/* ---------- Illustrative previews (not live screens - see component
+   comment) ---------- */
+
+.pts-preview {
+  height: 110px;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  border: 1px solid var(--pts-line);
+  border-radius: 10px;
+  background: var(--pts-soft);
+}
+
+/* Theme 1: stacked list rows */
+.pts-preview--1 {
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pts-preview__row {
+  height: 12px;
+  border-radius: 4px;
+  background: #dbe3ee;
+}
+
+.pts-preview__row--head {
+  width: 55%;
+  background: var(--pts-ink);
+}
+
+/* Theme 2: accordion column + summary strip */
+.pts-preview--2 {
+  align-items: stretch;
+}
+
+.pts-preview__col {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pts-preview__bar {
+  height: 16px;
+  border-radius: 5px;
+  background: #dbe3ee;
+}
+
+.pts-preview__bar--open {
+  background: var(--pts-accent);
+}
+
+.pts-preview__side {
+  flex: 0 0 28%;
+  border-radius: 6px;
+  background: #e7ecf3;
+}
+
+/* Theme 3: rail + card grid + summary strip */
+.pts-preview--3 {
+  align-items: stretch;
+}
+
+.pts-preview__rail {
+  flex: 0 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.pts-preview__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+
+.pts-preview__dot--active {
+  background: var(--pts-accent);
+}
+
+.pts-preview__grid {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.pts-preview__tile {
+  border-radius: 6px;
+  background: #dbe3ee;
+}
+
+/* Theme 4: flowing pills + summary strip */
+.pts-preview--4 {
+  align-items: stretch;
+}
+
+.pts-preview__flow {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 6px;
+}
+
+.pts-preview__pill {
+  height: 16px;
+  width: 40%;
+  border-radius: 999px;
+  background: #dbe3ee;
+}
+
+.pts-preview__pill--wide {
+  width: 58%;
+  background: var(--pts-accent);
+}
+
+/* ---------- Feedback + footer ---------- */
+
+.pts-feedback {
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.pts-feedback--success {
+  border: 1px solid #a7e8d0;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.pts-feedback--error {
+  border: 1px solid #f1c3be;
+  background: #fef3f2;
+  color: var(--pts-danger);
+}
+
+.pts-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--pts-line);
+}
+
+.pts-btn {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pts-btn--primary {
+  background: var(--pts-ink);
+  border-color: var(--pts-ink);
+}
+
+.pts-btn--primary:hover:not(:disabled) {
+  background: #1e293b;
+  border-color: #1e293b;
+}
+
+.pts-btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

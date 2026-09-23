@@ -69,6 +69,7 @@ import ViewPlan from "../../components/ViewPlan";
 import ErrorModel from "../../components/ErrorModel";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { GetPaymentGatewayModel } from "../../redux/Services/Setting/PaymentGatewayApi";
+import { GetProposalDesignTheme } from "../../redux/Services/Setting/ProposalDesignThemeApi";
 import PaymentGatewayModel from "../../components/PaymentGatewayModel";
 import RecordsAvailablePopupModel from "../../components/RecordsAvailablePopupModel";
 import Text_Editor from "../../components/Text_Editor";
@@ -85,7 +86,24 @@ import {
 import { getServiceScopeDriverList } from "../../lib/utils";
 import PriceAdjustedToZeroFloorValue from "../../components/PriceAdjustedToZeroFloorValue";
 const SelectServices = lazy(() => import("../../components/SelectServices"));
-const serviceThemeID = 4;
+
+// Which Select Services design is currently live, set once for every
+// organisation from Super Admin > Settings > Proposal Theme. Cached in
+// localStorage (same pattern as userThemeSettingLocalStorage, and the same
+// cache key AddUpdateProposal.jsx uses) so this page doesn't flash Theme 1
+// before the fetch resolves.
+const PROPOSAL_DESIGN_THEME_CACHE_KEY = "proposalDesignThemeID";
+const DEFAULT_PROPOSAL_DESIGN_THEME_ID = 1;
+
+const getCachedProposalDesignThemeID = () => {
+  const cached = Number(
+    localStorage.getItem(PROPOSAL_DESIGN_THEME_CACHE_KEY),
+  );
+  return [1, 2, 3, 4].includes(cached)
+    ? cached
+    : DEFAULT_PROPOSAL_DESIGN_THEME_ID;
+};
+
 const PreviewComponentPdf = lazy(
   () => import("../../components/PreviewComponentpdf"),
 );
@@ -9666,6 +9684,30 @@ const Add_Update_Engagement_Letter = () => {
     isValueGreaterThan20000,
     updateTemplateList,
   } = useContext(AuthContextProvider);
+
+  // Set once for every organisation from Super Admin > Settings > Proposal
+  // Theme (see ProposalThemeSettingModal.jsx). Read the cached value first
+  // so this doesn't flash Theme 1 while the fetch below resolves.
+  const [serviceThemeID, setServiceThemeID] = useState(
+    getCachedProposalDesignThemeID,
+  );
+  useEffect(() => {
+    GetProposalDesignTheme()
+      .then((res) => {
+        const fetchedID = res?.data?.responseData?.serviceThemeID;
+        if ([1, 2, 3, 4].includes(fetchedID)) {
+          setServiceThemeID(fetchedID);
+          localStorage.setItem(
+            PROPOSAL_DESIGN_THEME_CACHE_KEY,
+            String(fetchedID),
+          );
+        }
+      })
+      .catch(() => {
+        // Keep whatever was cached/defaulted above.
+      });
+  }, []);
+
   // SD, SOF states
   const [serviceDescriptionHTML, setServiceDescriptionHTML] = useState("");
   const [statementOfFactsHTML, setStatementOfFactsHTML] = useState("");
