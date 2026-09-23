@@ -1335,11 +1335,23 @@ export const generateAmendmentPdfUrl = async ({
     .filter(Boolean)
     .map((html) => ({ textbox: html }));
 
+  // Service Description is often short on its own (just the section heading
+  // and a couple of service names, no long description text) — sending it
+  // as its own standalone call reproduces the same isolated-short-call
+  // blank-page issue the cover page hit earlier, which was fixed there by
+  // merging it into the next call instead of sending it alone. Same fix
+  // here: bundled with Additional Information into one call.
+  const serviceDescriptionAndAdditionalInfoPage = [
+    serviceDescriptionHtml,
+    additionalInformationHtml,
+  ]
+    .filter(Boolean)
+    .map((html) => ({ textbox: html }));
+
   const pages = [
     coverAndServicesPage,
-    ...[serviceDescriptionHtml, additionalInformationHtml, paymentTermsHtml]
-      .filter(Boolean)
-      .map((html) => [{ textbox: html }]),
+    serviceDescriptionAndAdditionalInfoPage,
+    ...[paymentTermsHtml].filter(Boolean).map((html) => [{ textbox: html }]),
   ].filter((page) => page.length > 0);
   if (pages.length === 0) return null;
 
