@@ -536,31 +536,23 @@ function FeeSection({
     0,
   );
 
-  // Service (non-package) proposals only: give the title the same dark-theme
-  // treatment as the Package Name headers in the comparison grid, for a
-  // consistent look. Package/Custom Package's own title row is untouched.
-  const isServiceTitle = !isPackageBased;
-  const titleWrapperClassName = isServiceTitle
-    ? "mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-3 sm:px-5 sm:py-3.5"
-    : "flex flex-wrap items-center justify-between gap-2 pb-3";
-  const titleWrapperStyle = isServiceTitle
-    ? { backgroundColor: theme.secondary }
-    : undefined;
-  const titleIconBg = isServiceTitle ? "rgba(255,255,255,0.16)" : `${accent}1F`;
-  const titleColor = isServiceTitle ? theme.headerText : accent;
-  const titleBadgeBg = isServiceTitle
-    ? "rgba(255,255,255,0.16)"
-    : `${accent}1A`;
-  const titleCountBg = isServiceTitle
-    ? "rgba(255,255,255,0.16)"
-    : theme.background;
-  const titleCountColor = isServiceTitle
-    ? theme.headerText
-    : theme.textSecondary;
+  // Every proposal type (Service, Package, Custom Package alike) gets the
+  // same dark-theme title bar, matching the Package Name headers in the
+  // comparison grid below — same header color theme everywhere, no
+  // per-type branching. Calculations/functionality below are unaffected;
+  // only these color/class tokens changed.
+  const titleWrapperClassName =
+    "mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-3 sm:px-5 sm:py-3.5";
+  const titleWrapperStyle = { backgroundColor: theme.secondary };
+  const titleIconBg = "rgba(255,255,255,0.16)";
+  const titleColor = theme.headerText;
+  const titleBadgeBg = "rgba(255,255,255,0.16)";
+  const titleCountBg = "rgba(255,255,255,0.16)";
+  const titleCountColor = theme.headerText;
 
   return (
-    // Package/Custom Package: plain accent-icon title row. Service: a dark
-    // theme-background title bar matching the Package Name headers below.
+    // Same dark theme-background title bar for every proposal type,
+    // matching the Package Name headers below.
     <div>
       <div className={titleWrapperClassName} style={titleWrapperStyle}>
         <div className="flex items-center gap-2.5">
