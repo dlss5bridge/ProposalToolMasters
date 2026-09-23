@@ -505,12 +505,13 @@ function FeeSection({
 }) {
   const hasPackageColumns = (packageColumns?.length || 0) > 1;
 
-  // Standard Package quotes only: drop a service that isn't mapped to any
-  // of this proposal's packages instead of rendering a dead "—" row.
-  // Custom Package keeps its full row set — client-added services are real
-  // selections, not package mappings.
+  // Standard Package quotes only: drop a service that isn't mapped to the
+  // proposal's package(s) instead of rendering a dead "—" row — applies
+  // whether there's one package (single-column layout) or several (the
+  // comparison grid). Custom Package keeps its full row set — client-added
+  // services are real selections, not package mappings.
   const visibleCategoryGroups =
-    hasPackageColumns && isStandardPackage
+    isStandardPackage && (packageColumns?.length || 0) > 0
       ? categoryGroups
           .map((group) => ({
             ...group,
@@ -987,7 +988,7 @@ function FeeSection({
             {/* Service details, grouped under a header per category;
               horizontal dividers alone separate items. */}
             <div>
-              {categoryGroups.map((group) => (
+              {visibleCategoryGroups.map((group) => (
                 <div key={group.serviceCatID ?? group.categoryName}>
                   <div
                     className="border-t px-3.5 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider first:border-t-0"
