@@ -1,0 +1,212 @@
+/* ==========================================================================
+   Payment success page (Stripe redirect landing).
+   Self-contained: this route renders outside the proposal wizard shell, so
+   tokens are defined locally rather than relying on proposal-ui.css.
+   ========================================================================== */
+
+.sp-page {
+  --sp-ink: #0f172a;
+  --sp-text: #334155;
+  --sp-muted: #64748b;
+  --sp-line: #e2e8f0;
+  --sp-soft: #f8fafc;
+  --sp-accent: #12b5d6;
+  --sp-success: #3fcf9f;
+  --sp-success-soft: #ecfdf5;
+
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f0fbfe 0%, var(--sp-soft) 45%);
+}
+
+/* Soft decorative glow behind the card, so the page reads as a proper
+   confirmation moment rather than a bare, floating box. */
+.sp-page::before,
+.sp-page::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  z-index: 0;
+}
+
+.sp-page::before {
+  width: 420px;
+  height: 420px;
+  top: -140px;
+  left: -120px;
+  background: radial-gradient(
+    circle,
+    rgba(63, 207, 159, 0.22),
+    transparent 70%
+  );
+}
+
+.sp-page::after {
+  width: 420px;
+  height: 420px;
+  bottom: -160px;
+  right: -140px;
+  background: radial-gradient(
+    circle,
+    rgba(18, 181, 214, 0.18),
+    transparent 70%
+  );
+}
+
+.sp-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 44px 36px 36px;
+  border: 1px solid var(--sp-line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 48px -24px rgba(15, 23, 42, 0.22);
+  text-align: center;
+}
+
+.sp-card__icon {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 14px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sp-success-soft);
+  color: var(--sp-success);
+  font-size: 42px;
+}
+
+.sp-card__icon-ring {
+  position: absolute;
+  inset: -8px;
+  border: 1.5px solid rgba(63, 207, 159, 0.35);
+  border-radius: 50%;
+}
+
+.sp-card__eyebrow {
+  padding: 4px 12px;
+  margin-bottom: 4px;
+  border-radius: 999px;
+  background: var(--sp-success-soft);
+  color: #047857;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sp-card__title {
+  margin: 4px 0 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--sp-ink);
+}
+
+.sp-card__message {
+  margin: 6px 0 0;
+  max-width: 360px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--sp-text);
+}
+
+.sp-card__receipt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 16px;
+  margin-top: 18px;
+  padding: 10px 16px;
+  border: 1px dashed var(--sp-line);
+  border-radius: 12px;
+  background: var(--sp-soft);
+  font-size: 12.5px;
+  color: var(--sp-muted);
+}
+
+.sp-card__receipt span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sp-card__divider {
+  width: 100%;
+  height: 1px;
+  margin: 22px 0 0;
+  background: var(--sp-line);
+}
+
+.sp-card__actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.sp-btn {
+  height: 44px;
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.sp-btn--primary {
+  background: var(--sp-ink);
+  color: #fff;
+}
+
+.sp-btn--primary:hover {
+  background: #1e293b;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.sp-btn--outline {
+  border-color: var(--sp-line);
+  background: #fff;
+  color: var(--sp-ink);
+}
+
+.sp-btn--outline:hover {
+  background: var(--sp-soft);
+  color: var(--sp-ink);
+}
+
+@media (min-width: 420px) {
+  .sp-card__actions {
+    flex-direction: row;
+  }
+
+  .sp-btn {
+    flex: 1 1 0;
+  }
+}

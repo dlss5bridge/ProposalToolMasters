@@ -1033,6 +1033,12 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 28px;
   align-content: start;
+  /* Without this, grid items default to stretching to match the tallest
+     item in their row (same class of bug as the Theme 3/4 card grids) -
+     a short field next to a taller one would stretch, and its child's own
+     border (an input, a react-select control, ...) would stretch with it
+     into a long thin line down the empty space. */
+  align-items: start;
 }
 
 .proposal-ui .additional-info-pane > * {
@@ -1108,6 +1114,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 28px;
   align-content: start;
+  align-items: start;
 }
 
 .proposal-ui .additional-info-pane #SignatoryBlockDiv > h3.modal-title,
@@ -1259,4 +1266,217 @@
 .proposal-ui .preview-orientation-toggle svg {
   color: var(--pu-accent);
   font-size: 18px;
+}
+
+/* ==========================================================================
+   Additional Information: "Selected Services" reference sidebar
+   Read-only - this tab is for entering pricing-driver/signatory details,
+   not for changing the selection (that stays Select Services' job), so
+   items are listed without a remove control, unlike the Select Services
+   themes' summary panels.
+   ========================================================================== */
+
+.proposal-ui .additional-info-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(260px, 26%, 320px);
+  align-items: start;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .proposal-ui .additional-info-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Themes 2/3/4 only (this layout doesn't exist on Theme 1): drop the
+   generic ".tab-pane" card border/background/padding here, same as
+   Select Services' own flat page - fields sit directly on the page,
+   only individual pieces (signatory cards etc.) keep their own border.
+   Without this, a short tab (e.g. one field) still shows the full-height
+   empty box the taller sidebar forces the grid row to. */
+.proposal-ui .additional-info-layout .tab-pane.additional-info-pane {
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.proposal-ui .additional-info-summary {
+  position: sticky;
+  top: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--pu-line);
+  border-radius: 14px;
+  background: #fff;
+  /* Same lifted look as the Select Services summary card. */
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+@media (max-width: 900px) {
+  .proposal-ui .additional-info-summary {
+    position: static;
+  }
+}
+
+.proposal-ui .additional-info-summary__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 24px;
+  border-bottom: 1px solid var(--pu-line);
+  background: var(--pu-soft);
+}
+
+.proposal-ui .additional-info-summary__head h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pu-ink);
+}
+
+.proposal-ui .additional-info-summary__badge {
+  flex: none;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--pu-ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.proposal-ui .additional-info-summary__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+  /* Same as Select Services' own summary card: cap the list and let it
+     scroll internally, so "View all" doesn't push the action buttons
+     below the card down the page - they stay put at the bottom. */
+  max-height: 52vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .proposal-ui .additional-info-summary__body {
+    max-height: none;
+  }
+}
+
+.proposal-ui .additional-info-summary__empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--pu-muted);
+}
+
+.proposal-ui .additional-info-summary__body h4 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pu-muted);
+}
+
+.proposal-ui .additional-info-summary__body ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.proposal-ui .additional-info-summary__body li {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--pu-ink);
+}
+
+.proposal-ui .additional-info-summary__toggle {
+  height: 38px;
+  margin-top: 4px;
+  padding: 0 16px;
+  border: 1px solid var(--pu-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--pu-ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.proposal-ui .additional-info-summary__toggle:hover {
+  background: var(--pu-soft);
+}
+
+.proposal-ui .additional-info-summary__body li small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--pu-muted);
+}
+
+/* ---------- Selected Services sidebar: action buttons ---------- */
+/* Same <button> elements/handlers as the classic footer (see
+   AdditionalInformation.jsx's `footerActions`) - this container is also
+   ".hstack", so they keep the existing .pf-btn--* colours/sizing from
+   above for free. Only the layout changes here, to match Select Services'
+   own summary card: primary action full width on top, Back/Save Draft as
+   a row beneath it, Cancel as a centred link at the bottom. */
+
+.proposal-ui .additional-info-summary__actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--pu-line);
+  background: var(--pu-soft);
+}
+
+.proposal-ui .additional-info-summary__actions .pf-btn--secondary {
+  grid-column: 1 / -1;
+  order: 0;
+  margin: 0 !important;
+}
+
+.proposal-ui .additional-info-summary__actions .pf-btn--next {
+  grid-column: 1 / -1;
+  order: 1;
+  width: 100%;
+  margin: 0 !important;
+}
+
+.proposal-ui .additional-info-summary__actions .pf-btn--back,
+.proposal-ui .additional-info-summary__actions .pf-btn--draft {
+  order: 2;
+  width: 100%;
+  margin: 0 !important;
+}
+
+/* ".btn" added so this matches (and, coming later in the file, wins over)
+   the equal-!important ".proposal-ui .hstack .btn.pf-btn--cancel" rule
+   above, rather than losing on specificity alone. */
+.proposal-ui .additional-info-summary__actions .btn.pf-btn--cancel {
+  grid-column: 1 / -1;
+  order: 3;
+  justify-self: center;
+  border: 0 !important;
+  background: none !important;
+  color: var(--pu-accent) !important;
+  font-weight: 600;
+}
+
+.proposal-ui .additional-info-summary__actions .btn.pf-btn--cancel:hover {
+  background: none !important;
+  text-decoration: underline;
 }

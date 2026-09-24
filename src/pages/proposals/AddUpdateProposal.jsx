@@ -16089,7 +16089,7 @@ const Add_Update_Proposal = (props) => {
   //   getCachedProposalDesignThemeID,
   // );
 
-  const [serviceThemeID, setServiceThemeID] = useState(1);
+  const [serviceThemeID, setServiceThemeID] = useState(3);
 
   useEffect(() => {
     GetProposalDesignTheme()
@@ -25123,6 +25123,9 @@ const Add_Update_Proposal = (props) => {
                     handleSaveAsDraft={handleSaveAsDraft}
                     moduleName={"Quote"}
                     proposalName={proposalName}
+                    serviceThemeID={serviceThemeID}
+                    recurringServiceList={recurringServiceList}
+                    oneOffServiceList={oneOffServiceList}
                   />
                 </Suspense>
               )}

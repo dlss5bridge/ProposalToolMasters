@@ -13,7 +13,14 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-calendar/dist/Calendar.css";
 import dayjs from "dayjs";
 
+// Matches Select Services' own summary sidebar (Theme 2/3/4): show this
+// many items per group before collapsing the rest behind "View all".
+const SUMMARY_ITEMS_PER_GROUP = 4;
+
 const AdditionalInformation = (props) => {
+  const [showAllSelectedForSummary, setShowAllSelectedForSummary] =
+    useState(false);
+
   useEffect(() => {
     if (
       !props.additionalInformationList ||
@@ -428,13 +435,168 @@ const AdditionalInformation = (props) => {
     props?.setContractSignatoriesList(updatedSignatoriesList); // Update the state with the modified list
   };
 
+  // Read-only reference list for the "Selected Services" sidebar - same
+  // source (recurringServiceList / oneOffServiceList) Select Services
+  // itself reads isSelected from, just displayed here rather than toggled.
+  const selectedRecurringForSummary = (props.recurringServiceList || [])
+    .flatMap((category) =>
+      (category.servicesList || [])
+        .filter((service) => service.isSelected && !service.isHidden)
+        .map((service) => ({
+          key: `r-${category.serviceCatID}-${service.serviceID}`,
+          serviceName: service.serviceName,
+          categoryName: category.serviceCatName,
+        })),
+    );
+  const selectedOneOffForSummary = (props.oneOffServiceList || [])
+    .flatMap((category) =>
+      (category.servicesList || [])
+        .filter((service) => service.isSelected && !service.isHidden)
+        .map((service) => ({
+          key: `o-${category.serviceCatID}-${service.serviceID}`,
+          serviceName: service.serviceName,
+          categoryName: category.serviceCatName,
+        })),
+    );
+  const totalSelectedForSummary =
+    selectedRecurringForSummary.length + selectedOneOffForSummary.length;
+  const visibleRecurringForSummary = showAllSelectedForSummary
+    ? selectedRecurringForSummary
+    : selectedRecurringForSummary.slice(0, SUMMARY_ITEMS_PER_GROUP);
+  const visibleOneOffForSummary = showAllSelectedForSummary
+    ? selectedOneOffForSummary
+    : selectedOneOffForSummary.slice(0, SUMMARY_ITEMS_PER_GROUP);
+  const hiddenSelectedForSummaryCount =
+    Math.max(selectedRecurringForSummary.length - SUMMARY_ITEMS_PER_GROUP, 0) +
+    Math.max(selectedOneOffForSummary.length - SUMMARY_ITEMS_PER_GROUP, 0);
+
+  // Theme 1 (the original design) keeps its classic full-width layout with
+  // a plain footer. Every theme after it (2/3/4) gets the card-style
+  // sidebar, matching Select Services' own summary card - same buttons,
+  // same handlers, just moved into that card instead of a footer strip.
+  const isEnhancedTheme = Number(props.serviceThemeID) > 1;
+  const showSelectedServicesSummary =
+    isEnhancedTheme &&
+    (Array.isArray(props.recurringServiceList) ||
+      Array.isArray(props.oneOffServiceList));
+
+  // The exact same buttons/handlers as before, just extracted so they can
+  // be rendered in the classic footer (Theme 1) OR inside the sidebar's
+  // action area (Theme 2/3/4) without duplicating this logic in two places.
+  const footerActions = (
+    <>
+      {props.moduleName == "Contract" && (
+        <button
+          className="btn btn-md btn-primary create-item-btn  mr-1 text-nowrap pf-btn--secondary"
+          onClick={() => {
+            props.AddSignatory();
+          }}
+        >
+          <i class="bi bi-plus-circle "></i>
+          <span style={{ paddingLeft: "5px" }}>Add Signatory</span>
+        </button>
+      )}
+      <button
+        onClick={() => props.HandleBack(2)}
+        style={{ marginRight: "5px" }}
+        className="btn btn-md btn-success create-item-btn text-nowrap pf-btn--back"
+      >
+        <span>Back</span>
+      </button>
+      {props?.ProposalObject?.selectedProposalTypeValue === 1 && (
+        <button
+          className="btn btn-md btn-success create-item-btn pf-btn--next"
+          onClick={async () => {
+            await props.HandleTabChange(7);
+          }}
+        >
+          <span>Next</span>
+        </button>
+      )}
+      {props?.ProposalObject?.selectedProposalTypeValue === 2 && (
+        <button
+          className="btn btn-md btn-success create-item-btn pf-btn--next"
+          onClick={async () => {
+            await props.HandleTabChange(7);
+          }}
+        >
+          <span>Next</span>
+        </button>
+      )}
+      {props?.ProposalObject?.selectedProposalTypeValue === 3 && (
+        <button
+          className="btn btn-md btn-success create-item-btn pf-btn--next"
+          onClick={async () => {
+            await props.HandleTabChange(6);
+          }}
+        >
+          <span>Next</span>
+        </button>
+      )}
+      {props?.ProposalObject?.selectedProposalTypeValue === 4 && (
+        <button
+          className="btn btn-md btn-success create-item-btn pf-btn--next"
+          onClick={async () => {
+            await props.HandleTabChange(4);
+          }}
+        >
+          <span>Next</span>
+        </button>
+      )}
+      {(props.moduleName == "Contract" ||
+        props.moduleName === "Package") && (
+        <button
+          className="btn btn-md btn-success create-item-btn pf-btn--next"
+          onClick={async () => {
+            await props.HandleTabChange(4);
+          }}
+        >
+          <span>Next</span>
+        </button>
+      )}
+      {props.moduleName == "Quote" && (
+        <button
+          type="submit"
+          class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
+          onClick={() =>
+            props.handleSaveAsDraft(
+              3,
+              moduleNameForSaveAsDraft,
+              statusID.Draft,
+            )
+          }
+          style={{ marginLeft: "5px" }}
+        >
+          <span>Save as a Draft</span>
+        </button>
+      )}
+      {props.moduleName == "Contract" && (
+        <button
+          type="submit"
+          class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
+          onClick={() => props.HandleTabChange(4, statusID.Draft)}
+          style={{ marginLeft: "5px" }}
+        >
+          <span>Save as a Draft</span>
+        </button>
+      )}
+    </>
+  );
+
   return (
     <div>
-      <div className="create-practice-height scrollbar">
-        <div className="tab-content">
-          <div class="tab-pane p-3 active additional-info-pane">
-            {props.additionalInformationList
-              ?.filter((item) => item.driverTypeID !== 1)
+      <div
+        className={
+          showSelectedServicesSummary
+            ? "additional-info-layout"
+            : undefined
+        }
+      >
+        <div className="create-practice-height scrollbar">
+          <div className="tab-content">
+            <div class="tab-pane p-3 active additional-info-pane">
+              {props.additionalInformationList
+                ?.filter((item) => item.driverTypeID !== 1)
               ?.map((i) => {
                 return (
                   <div class="row fieldset add-new-package">
@@ -1238,123 +1400,88 @@ const AdditionalInformation = (props) => {
           </div>
         </div>
       </div>
-      <div class="separator"></div>
-      <div class="row fieldset modal-footer">
-        <div class="col-lg-12 hstack gap-1 justify-content-end text-right mt-3">
-          <div class="d-flex" style={{ overflowX: "auto" }}>
-            {props.moduleName == "Contract" && (
-              <button
-                className="btn btn-md btn-primary create-item-btn  mr-1 text-nowrap pf-btn--secondary"
-                onClick={() => {
-                  props.AddSignatory();
-                }}
-              >
-                <i class="bi bi-plus-circle "></i>
-                <span style={{ paddingLeft: "5px" }}>Add Signatory</span>
-              </button>
-            )}
-            {props.getSAChanges ? (
-              <button
-                class="btn btn-md btn-success declined-item-btn mr-1 pf-btn--cancel"
-                onClick={() => props.DeclineSuperAdminChangesData("Decline")}
-              >
-                <span>Decline</span>
-              </button>
+
+      {showSelectedServicesSummary && (
+        <aside
+          className="additional-info-summary"
+          aria-label="Selected services"
+        >
+          <div className="additional-info-summary__head">
+            <h3>Selected Services</h3>
+            <span className="additional-info-summary__badge">
+              {totalSelectedForSummary}
+            </span>
+          </div>
+
+          <div className="additional-info-summary__body">
+            {totalSelectedForSummary === 0 ? (
+              <p className="additional-info-summary__empty">
+                No services selected yet.
+              </p>
             ) : (
-              <button
-                class="btn btn-md  btn-light mr-1 pf-btn--cancel"
-                onClick={props.handleCancel}
-              >
-                <span>{props.getCrudButtonTextName("Cancel")}</span>
-              </button>
-            )}
-            <button
-              onClick={() => props.HandleBack(2)}
-              style={{ marginRight: "5px" }}
-              className="btn btn-md btn-success create-item-btn text-nowrap pf-btn--back"
-            >
-              <span>Back</span>
-            </button>
-            {props?.ProposalObject?.selectedProposalTypeValue === 1 && (
-              <button
-                className="btn btn-md btn-success create-item-btn pf-btn--next"
-                onClick={async () => {
-                  await props.HandleTabChange(7);
-                }}
-              >
-                <span>Next</span>
-              </button>
-            )}
-            {props?.ProposalObject?.selectedProposalTypeValue === 2 && (
-              <button
-                className="btn btn-md btn-success create-item-btn pf-btn--next"
-                onClick={async () => {
-                  await props.HandleTabChange(7);
-                }}
-              >
-                <span>Next</span>
-              </button>
-            )}
-            {props?.ProposalObject?.selectedProposalTypeValue === 3 && (
-              <button
-                className="btn btn-md btn-success create-item-btn pf-btn--next"
-                onClick={async () => {
-                  await props.HandleTabChange(6);
-                }}
-              >
-                <span>Next</span>
-              </button>
-            )}
-            {props?.ProposalObject?.selectedProposalTypeValue === 4 && (
-              <button
-                className="btn btn-md btn-success create-item-btn pf-btn--next"
-                onClick={async () => {
-                  await props.HandleTabChange(4);
-                }}
-              >
-                <span>Next</span>
-              </button>
-            )}
-            {(props.moduleName == "Contract" ||
-              props.moduleName === "Package") && (
-              <button
-                className="btn btn-md btn-success create-item-btn pf-btn--next"
-                onClick={async () => {
-                  await props.HandleTabChange(4);
-                }}
-              >
-                <span>Next</span>
-              </button>
-            )}
-            {props.moduleName == "Quote" && (
-              <button
-                type="submit"
-                class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
-                onClick={() =>
-                  props.handleSaveAsDraft(
-                    3,
-                    moduleNameForSaveAsDraft,
-                    statusID.Draft,
-                  )
-                }
-                style={{ marginLeft: "5px" }}
-              >
-                <span>Save as a Draft</span>
-              </button>
-            )}
-            {props.moduleName == "Contract" && (
-              <button
-                type="submit"
-                class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
-                onClick={() => props.HandleTabChange(4, statusID.Draft)}
-                style={{ marginLeft: "5px" }}
-              >
-                <span>Save as a Draft</span>
-              </button>
+              <>
+                {selectedRecurringForSummary.length > 0 && (
+                  <section>
+                    <h4>Recurring Services</h4>
+                    <ul>
+                      {visibleRecurringForSummary.map((item) => (
+                        <li key={item.key}>
+                          <span>{item.serviceName}</span>
+                          <small>{item.categoryName}</small>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+                {selectedOneOffForSummary.length > 0 && (
+                  <section>
+                    <h4>One-Off Services</h4>
+                    <ul>
+                      {visibleOneOffForSummary.map((item) => (
+                        <li key={item.key}>
+                          <span>{item.serviceName}</span>
+                          <small>{item.categoryName}</small>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+                {hiddenSelectedForSummaryCount > 0 && (
+                  <button
+                    type="button"
+                    className="additional-info-summary__toggle"
+                    onClick={() =>
+                      setShowAllSelectedForSummary((prev) => !prev)
+                    }
+                  >
+                    {showAllSelectedForSummary
+                      ? "Show fewer"
+                      : `View all ${totalSelectedForSummary} items`}
+                  </button>
+                )}
+              </>
             )}
           </div>
-        </div>
+
+          <div className="hstack additional-info-summary__actions">
+            {footerActions}
+          </div>
+        </aside>
+      )}
       </div>
+
+      {!showSelectedServicesSummary && (
+        <>
+          <div class="separator"></div>
+          <div class="row fieldset modal-footer">
+            <div class="col-lg-12 hstack gap-1 justify-content-end text-right mt-3">
+              <div class="d-flex" style={{ overflowX: "auto" }}>
+                {footerActions}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

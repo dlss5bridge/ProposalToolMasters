@@ -18885,6 +18885,9 @@ const Add_Update_Engagement_Letter = () => {
                     getCrudButtonTextName={getCrudButtonTextName}
                     getCrudPopUpTitleName={getCrudPopUpTitleName}
                     handleCancel={handleCancel}
+                    serviceThemeID={serviceThemeID}
+                    recurringServiceList={recurringServiceList}
+                    oneOffServiceList={oneOffServiceList}
                   />
                 </Suspense>
               )}
