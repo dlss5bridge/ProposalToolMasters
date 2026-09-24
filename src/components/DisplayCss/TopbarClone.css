@@ -2809,6 +2809,36 @@
   color: #ffffff !important;
 }
 
+/* ---------------- Centered popup, not a side drawer ---------------- */
+/* MUI's Modal has no built-in sizing/centering of its own - this flexes
+   the backdrop to centre whatever's inside it (.tc-modal-paper), instead
+   of the old Drawer sliding a fixed-width panel in from the right. */
+.tc-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.tc-modal-paper {
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 24px 48px -20px rgba(15, 23, 42, 0.35);
+  outline: none;
+}
+
+.tc-modal-paper .tc-header {
+  border-radius: 14px 14px 0 0;
+}
+
+.tc-modal-paper .tc-footer.color-sidebar {
+  border-radius: 0 0 14px 14px;
+}
+
 /* =========================================================
    PERSONALIZE VARIABLE NAME MODAL
    UI only

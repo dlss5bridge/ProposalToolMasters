@@ -15,7 +15,7 @@ import {
   NotificationCount,
   VanishCount,
 } from "../redux/Services/Setting/NotificationApi";
-import { Box, Button, Drawer, Tooltip } from "@mui/material";
+import { Box, Button, Modal, Tooltip } from "@mui/material";
 import { ColorContext } from "../AuthContext/ColorContext";
 import {
   GetOrganisationLookupList,
@@ -1131,7 +1131,7 @@ const TopbarClone = () => {
 
       <Box
         className="color-sidebar tc-body"
-        sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 300 }}
+        sx={{ width: "100%" }}
         role="presentation"
         onClick={() => {
           ToggleDrawer(anchor, true);
@@ -1210,7 +1210,7 @@ const TopbarClone = () => {
 
       <Box
         className="color-sidebar ApplyChanges tc-footer"
-        sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 300 }}
+        sx={{ width: "100%" }}
         role="presentation"
       >
         <button
@@ -3762,9 +3762,15 @@ const TopbarClone = () => {
                           </span>
                         </Button>
 
-                        <Drawer anchor={anchor} open={state[anchor]}>
-                          {List(anchor)}
-                        </Drawer>
+                        <Modal
+                          open={Boolean(state[anchor])}
+                          onClose={ToggleDrawer(anchor, false)}
+                          className="tc-modal"
+                        >
+                          <Box className="tc-modal-paper">
+                            {List(anchor)}
+                          </Box>
+                        </Modal>
                       </React.Fragment>
                     ))}
                   </span>

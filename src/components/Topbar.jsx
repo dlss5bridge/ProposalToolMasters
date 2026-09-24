@@ -14,7 +14,7 @@ import {
   NotificationCount,
   VanishCount,
 } from "../redux/Services/Setting/NotificationApi";
-import { Box, Button, Drawer, Tooltip } from "@mui/material";
+import { Box, Button, Modal, Tooltip } from "@mui/material";
 import { ColorContext } from "../AuthContext/ColorContext";
 import {
   GetOrganisationLookupList,
@@ -3256,9 +3256,29 @@ const Topbar = () => {
                               >
                                 Appearance
                               </Button>
-                              <Drawer anchor={anchor} open={state[anchor]}>
-                                {List(anchor)}
-                              </Drawer>
+                              <Modal
+                                open={Boolean(state[anchor])}
+                                onClose={ToggleDrawer(anchor, false)}
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  padding: "16px",
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: "100%",
+                                    maxWidth: 320,
+                                    maxHeight: "calc(100vh - 32px)",
+                                    overflow: "auto",
+                                    borderRadius: "10px",
+                                    outline: "none",
+                                  }}
+                                >
+                                  {List(anchor)}
+                                </Box>
+                              </Modal>
                             </React.Fragment>
                           ))}
                         </span>
