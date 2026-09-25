@@ -16083,7 +16083,7 @@ const Add_Update_Proposal = (props) => {
   // const [updatePackage, setIsUpdatePackage] = useState(true);
 
   // Set once for every organisation from Super Admin > Settings > Proposal
-  // Theme (see ProposalThemeSettingModal.jsx). Read the cached value first
+  // Theme (see ProposalThemeSection.jsx). Read the cached value first
   // so this doesn't flash Theme 1 while the fetch below resolves.
   // const [serviceThemeID, setServiceThemeID] = useState(
   //   getCachedProposalDesignThemeID,

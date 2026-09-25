@@ -27,7 +27,7 @@ import LogoutModal from "./LogoutModal";
 import "../components/UpdateImageModel/UploadImageStyle.css";
 import SuccessModal from "./SuccessModal";
 import SetTimeoutComponent from "./SetTimeoutComponent";
-import ProposalThemeSettingModal from "./ProposalThemeSettingModal";
+import ProposalThemeSection from "./ProposalThemeSection";
 import UserModelNew from "./UserModelNew";
 import ViewPlan from "./ViewPlan";
 
@@ -855,6 +855,12 @@ const Topbar = () => {
     UserDefaultTheme();
   };
 
+  // Same gate as ProposalThemeSection below: true Super Admin, not
+  // currently viewing as a specific organisation.
+  const isSuperAdminPlatformLevel =
+    common.roleTypeId == USER_ROLE_TYPE.SuperAdmin &&
+    common.organisationKeyID == null;
+
   // Color function sidebar menu
   const List = (anchor) => (
     <>
@@ -969,6 +975,22 @@ const Topbar = () => {
           </div>
         </div>
       </Box>
+
+      {/* Kept separate from Color Scheme / Apply Changes above - Super
+          Admin only, and only at the true platform level (not while
+          viewing as a specific organisation), since this setting applies
+          to every organisation at once. Everyone else never sees this. */}
+      {isSuperAdminPlatformLevel && (
+        <Box
+          className="color-sidebar"
+          sx={{
+            width: anchor === "top" || anchor === "bottom" ? "auto" : 275,
+            borderTop: "1px solid #eef2f7",
+          }}
+        >
+          <ProposalThemeSection />
+        </Box>
+      )}
     </>
   );
 
@@ -2842,29 +2864,10 @@ const Topbar = () => {
                                       </li>
                                     )}
 
-                                    {/* Super Admin only, and only at the
-                                        true platform level - not while
-                                        viewing as a specific organisation -
-                                        since this setting applies to every
-                                        organisation at once. */}
-                                    {common.organisationKeyID == null && (
-                                      <li class="nav-item">
-                                        <a
-                                          onClick={() => {
-                                            closeDropdown("Setting");
-                                            NotificationCountData();
-                                          }}
-                                          class="nav-link"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#ProposalThemeSettingModal"
-                                          style={{ cursor: "pointer" }}
-                                        >
-                                          <span class="align-middle">
-                                            Proposal Theme
-                                          </span>
-                                        </a>
-                                      </li>
-                                    )}
+                                    {/* Proposal Theme moved into the
+                                        "Theme Customizer" popup
+                                        (Appearance) instead of its own
+                                        sidebar link + modal. */}
                                   </ul>
                                 </div>
                               </li>
@@ -3269,7 +3272,12 @@ const Topbar = () => {
                                 <Box
                                   sx={{
                                     width: "100%",
-                                    maxWidth: 320,
+                                    // Wider for Super Admin - the same popup
+                                    // then also shows the Proposal Theme
+                                    // section below Color Scheme.
+                                    maxWidth: isSuperAdminPlatformLevel
+                                      ? 700
+                                      : 320,
                                     maxHeight: "calc(100vh - 32px)",
                                     overflow: "auto",
                                     borderRadius: "10px",
@@ -3345,8 +3353,6 @@ const Topbar = () => {
 
       {/* ----------Set Logout Time modal-------- */}
       <SetTimeoutComponent id="SetLogoutTimeModal" />
-      {/* ----------Super Admin: Proposal Theme modal-------- */}
-      <ProposalThemeSettingModal />
       {/* ...............personalize setting modal............. */}
       <div
         class="modal fade zoomIn"

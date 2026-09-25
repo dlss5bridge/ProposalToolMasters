@@ -29,7 +29,7 @@ import "../components/UpdateImageModel/UploadImageStyle.css";
 import "./DisplayCss/TopbarClone.css";
 import SuccessModal from "./SuccessModal";
 import SetTimeoutComponent from "./SetTimeoutComponent";
-import ProposalThemeSettingModal from "./ProposalThemeSettingModal";
+import ProposalThemeSection from "./ProposalThemeSection";
 import UserModelNew from "./UserModelNew";
 import ViewPlan from "./ViewPlan";
 import AuthButton from "./Sidebar/AuthenticationButton";
@@ -1111,6 +1111,12 @@ const TopbarClone = () => {
     UserDefaultTheme();
   };
 
+  // Same gate as ProposalThemeSection below: true Super Admin, not
+  // currently viewing as a specific organisation.
+  const isSuperAdminPlatformLevel =
+    common.roleTypeId == USER_ROLE_TYPE.SuperAdmin &&
+    common.organisationKeyID == null;
+
   // Color function sidebar menu
   const List = (anchor) => (
     <>
@@ -1224,6 +1230,16 @@ const TopbarClone = () => {
           <span>Apply Changes</span>
         </button>
       </Box>
+
+      {/* Kept separate from Color Scheme / Apply Changes above - Super
+          Admin only, and only at the true platform level (not while
+          viewing as a specific organisation), since this setting applies
+          to every organisation at once. Everyone else never sees this. */}
+      {isSuperAdminPlatformLevel && (
+        <Box className="color-sidebar tc-body tc-proposal-theme-body">
+          <ProposalThemeSection />
+        </Box>
+      )}
     </>
   );
 
@@ -3355,29 +3371,10 @@ const TopbarClone = () => {
                                     </li>
                                   )}
 
-                                  {/* Super Admin only, and only at the true
-                                      platform level - not while viewing as a
-                                      specific organisation - since this
-                                      setting applies to every organisation
-                                      at once. */}
-                                  {common.organisationKeyID == null && (
-                                    <li class="nav-item">
-                                      <a
-                                        onClick={() => {
-                                          closeDropdown("UserRole");
-                                          NotificationCountData();
-                                        }}
-                                        class="nav-link"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#ProposalThemeSettingModal"
-                                        style={{ cursor: "pointer" }}
-                                      >
-                                        <span class="align-middle">
-                                          Proposal Theme
-                                        </span>
-                                      </a>
-                                    </li>
-                                  )}
+                                  {/* Proposal Theme moved into the
+                                      "Theme Customizer" popup (Appearance,
+                                      below) instead of its own sidebar link
+                                      + modal. */}
                                   {/* deleted superadmin workflows */}
                                 </ul>
                               </div>
@@ -3767,7 +3764,13 @@ const TopbarClone = () => {
                           onClose={ToggleDrawer(anchor, false)}
                           className="tc-modal"
                         >
-                          <Box className="tc-modal-paper">
+                          <Box
+                            className={`tc-modal-paper${
+                              isSuperAdminPlatformLevel
+                                ? " tc-modal-paper--wide"
+                                : ""
+                            }`}
+                          >
                             {List(anchor)}
                           </Box>
                         </Modal>
@@ -3889,8 +3892,6 @@ const TopbarClone = () => {
 
       {/* ----------Set Logout Time modal-------- */}
       <SetTimeoutComponent id="SetLogoutTimeModal" />
-      {/* ----------Super Admin: Proposal Theme modal-------- */}
-      <ProposalThemeSettingModal />
       {/* ...............personalize setting modal............. */}
       <div
         className="modal fade zoomIn variable-name-modal"

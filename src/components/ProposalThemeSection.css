@@ -1,11 +1,11 @@
 /* ==========================================================================
-   Super Admin > Settings > Proposal Theme modal
-   Self-contained: this modal lives in the app shell (TopbarClone), which
+   Proposal Theme section, embedded in the "Theme Customizer" popup
+   Self-contained: this popup lives in the app shell (TopbarClone), which
    isn't guaranteed to have proposal-ui.css loaded, so tokens are defined
    locally instead of relying on --pu-* variables from that file.
    ========================================================================== */
 
-.pts-modal {
+.pts-section {
   --pts-ink: #0f172a;
   --pts-text: #334155;
   --pts-muted: #64748b;
@@ -17,73 +17,40 @@
   --pts-danger: #d92d20;
 }
 
-.pts-modal__content {
-  border: 0;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.pts-modal__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--pts-line);
-}
-
-.pts-modal__heading h5 {
-  margin: 0 0 4px;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--pts-ink);
-}
-
-.pts-modal__heading p {
-  margin: 0;
-  font-size: 13px;
-  color: var(--pts-muted);
-}
-
-.pts-modal__body {
-  padding: 20px 24px;
-  max-height: 70vh;
-  overflow-y: auto;
-}
-
 .pts-status {
   margin: 0;
-  padding: 24px 0;
+  padding: 16px 0;
   text-align: center;
   color: var(--pts-muted);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* ---------- Option cards ---------- */
+/* Two columns - the popup this section lives in ("Theme Customizer",
+   Super Admin only) is widened to fit it; see .tc-modal-paper--wide in
+   TopbarClone.css. Wraps to one column if that popup is ever made
+   narrower than this can fit. */
 
 .pts-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-@media (max-width: 640px) {
-  .pts-options {
-    grid-template-columns: minmax(0, 1fr);
-  }
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .pts-option {
   position: relative;
+  flex: 1 1 260px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px;
+  gap: 8px;
+  padding: 12px;
   border: 1.5px solid var(--pts-line);
-  border-radius: 14px;
+  border-radius: 12px;
   background: #fff;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .pts-option:hover {
@@ -97,8 +64,8 @@
 
 .pts-option input[type="radio"] {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 12px;
+  right: 12px;
   width: 16px;
   height: 16px;
   accent-color: var(--pts-accent);
@@ -110,7 +77,7 @@
   align-items: center;
   gap: 8px;
   padding-right: 24px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--pts-ink);
 }
@@ -131,7 +98,7 @@
 
 .pts-option__desc {
   margin: 0;
-  font-size: 12px;
+  font-size: 11.5px;
   line-height: 1.5;
   color: var(--pts-muted);
 }
@@ -140,12 +107,12 @@
    comment) ---------- */
 
 .pts-preview {
-  height: 110px;
-  padding: 10px;
+  height: 80px;
+  padding: 8px;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   border: 1px solid var(--pts-line);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--pts-soft);
 }
 
@@ -156,8 +123,8 @@
 }
 
 .pts-preview__row {
-  height: 12px;
-  border-radius: 4px;
+  height: 9px;
+  border-radius: 3px;
   background: #dbe3ee;
 }
 
@@ -176,12 +143,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .pts-preview__bar {
-  height: 16px;
-  border-radius: 5px;
+  height: 12px;
+  border-radius: 4px;
   background: #dbe3ee;
 }
 
@@ -191,7 +158,7 @@
 
 .pts-preview__side {
   flex: 0 0 28%;
-  border-radius: 6px;
+  border-radius: 5px;
   background: #e7ecf3;
 }
 
@@ -201,17 +168,17 @@
 }
 
 .pts-preview__rail {
-  flex: 0 0 14px;
+  flex: 0 0 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   align-items: center;
   justify-content: center;
 }
 
 .pts-preview__dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #cbd5e1;
 }
@@ -225,11 +192,11 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 6px;
+  gap: 5px;
 }
 
 .pts-preview__tile {
-  border-radius: 6px;
+  border-radius: 5px;
   background: #dbe3ee;
 }
 
@@ -243,11 +210,11 @@
   display: flex;
   flex-wrap: wrap;
   align-content: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .pts-preview__pill {
-  height: 16px;
+  height: 12px;
   width: 40%;
   border-radius: 999px;
   background: #dbe3ee;
@@ -258,13 +225,13 @@
   background: var(--pts-accent);
 }
 
-/* ---------- Feedback + footer ---------- */
+/* ---------- Feedback + save button ---------- */
 
 .pts-feedback {
-  margin: 16px 0 0;
-  padding: 10px 14px;
+  margin: 14px 0 0;
+  padding: 10px 12px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 12.5px;
 }
 
 .pts-feedback--success {
@@ -279,33 +246,16 @@
   color: var(--pts-danger);
 }
 
-.pts-modal__footer {
+.pts-save-btn.btn.create-item-btn {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 16px 24px;
-  border-top: 1px solid var(--pts-line);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 42px;
+  margin-top: 14px !important;
 }
 
-.pts-btn {
-  height: 40px;
-  padding: 0 18px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.pts-btn--primary {
-  background: var(--pts-ink);
-  border-color: var(--pts-ink);
-}
-
-.pts-btn--primary:hover:not(:disabled) {
-  background: #1e293b;
-  border-color: #1e293b;
-}
-
-.pts-btn--primary:disabled {
-  opacity: 0.5;
+.pts-save-btn.btn.create-item-btn:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
 }

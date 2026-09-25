@@ -2835,8 +2835,28 @@
   border-radius: 14px 14px 0 0;
 }
 
-.tc-modal-paper .tc-footer.color-sidebar {
+/* Rounds whichever section actually ends up last - .tc-footer (Apply
+   Changes) for everyone, or the Proposal Theme section below it for
+   Super Admin - instead of hardcoding which one that is. */
+.tc-modal-paper > *:last-child {
   border-radius: 0 0 14px 14px;
+}
+
+/* Proposal Theme is kept as its own section, separate from Color Scheme
+   / Apply Changes above it - same body padding/background (.tc-body),
+   with its own top border as the section break. Super Admin only; see
+   the isSuperAdminPlatformLevel check in TopbarClone.jsx. */
+.tc-proposal-theme-body {
+  border-top: 1px solid var(--tc-border-soft, #eef2f7);
+}
+
+/* Super Admin sees Color Scheme + Proposal Theme in the same popup, so it
+   gets more room ("3xl"). Color Scheme's own layout is untouched - see
+   ProposalThemeSection.css for how its cards use the extra width
+   (ProposalThemeSection is only ever rendered for this same audience, so
+   its two-column layout doesn't need its own "wide" condition here). */
+.tc-modal-paper--wide {
+  max-width: 768px;
 }
 
 /* =========================================================
