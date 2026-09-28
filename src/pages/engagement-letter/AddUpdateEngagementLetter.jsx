@@ -115,6 +115,14 @@ const AdditionalInformation = lazy(
 // );
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
+// This tab's fields sit inside ".create-practice-height", a fixed-height
+// (max-height: 62vh) scrollable pane, so a dropdown opened near its bottom
+// edge gets clipped by that ancestor's overflow. Portalling the menu to
+// <body> renders it outside that pane entirely, so it's never clipped.
+const SELECT_MENU_PORTAL_STYLES = {
+  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+};
+
 const BasicInformationComponent = (props) => {
   const navigate = useNavigate();
   const handleAddClient = () => {
@@ -167,6 +175,8 @@ const BasicInformationComponent = (props) => {
                       onChange={(e) => {
                         props.handleChangeSourceType(e);
                       }}
+                      menuPortalTarget={document.body}
+                      styles={SELECT_MENU_PORTAL_STYLES}
                     />
                     {props.requireMessage &&
                     (props.engagementObj.selectSourceId === undefined ||
@@ -207,6 +217,8 @@ const BasicInformationComponent = (props) => {
                         onChange={(e) => {
                           props.handleChangeClient(e);
                         }}
+                        menuPortalTarget={document.body}
+                        styles={SELECT_MENU_PORTAL_STYLES}
                       />
                       {props.requireMessage &&
                       (props.engagementObj.ClientID === undefined ||
@@ -232,6 +244,8 @@ const BasicInformationComponent = (props) => {
                         onChange={(e) => {
                           props.handleChangeProposal(e);
                         }}
+                        menuPortalTarget={document.body}
+                        styles={SELECT_MENU_PORTAL_STYLES}
                       />
                       {props.requireMessage &&
                       (props.engagementObj.QuoteKeyID === undefined ||
@@ -278,6 +292,8 @@ const BasicInformationComponent = (props) => {
                         onChange={(e) => {
                           props.handleChangePackage(e);
                         }}
+                        menuPortalTarget={document.body}
+                        styles={SELECT_MENU_PORTAL_STYLES}
                       />
                       {props.requireMessage &&
                       (props.engagementObj.acceptedServicePackageID ===
@@ -399,6 +415,8 @@ const BasicInformationComponent = (props) => {
                         }
                         props.setIsTemplateManuallySelected(true);
                       }}
+                      menuPortalTarget={document.body}
+                      styles={SELECT_MENU_PORTAL_STYLES}
                     />
                     {props.requireMessage &&
                     (props.engagementObj.templateKeyID === undefined ||

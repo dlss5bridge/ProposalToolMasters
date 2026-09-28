@@ -780,7 +780,10 @@
 }
 
 .proposal-ui .row .hstack > .btn.btn-light:hover,
-.proposal-ui .row .hstack > .btn.btn-success:not(:nth-last-child(-n + 2)):hover {
+.proposal-ui
+  .row
+  .hstack
+  > .btn.btn-success:not(:nth-last-child(-n + 2)):hover {
   background: var(--pu-soft) !important;
 }
 
@@ -1021,7 +1024,11 @@
    Additional Information tab
    Labels sit above their fields (left aligned), fields flow in two columns,
    and Signatories / Terms & Conditions get proper section headings with each
-   signatory shown as its own card. Markup is unchanged apart from one class.
+   signatory shown as its own card. All of this now sits inside a
+   ".basicinfo-card" (see that section further down), matching Basic
+   Information's header-card look - the ".additional-info-pane" class moved
+   from the ".tab-pane" itself onto the card's ".basicinfo-card__body", so
+   every selector below still targets the same descendants as before.
    ========================================================================== */
 
 .proposal-ui .additional-info-pane {
@@ -1291,11 +1298,13 @@
 
 /* Themes 2/3/4 only (this layout doesn't exist on Theme 1): drop the
    generic ".tab-pane" card border/background/padding here, same as
-   Select Services' own flat page - fields sit directly on the page,
-   only individual pieces (signatory cards etc.) keep their own border.
-   Without this, a short tab (e.g. one field) still shows the full-height
-   empty box the taller sidebar forces the grid row to. */
-.proposal-ui .additional-info-layout .tab-pane.additional-info-pane {
+   Select Services' own flat page - fields sit directly on the page.
+   The ".basicinfo-card" inside it (added below) is now what shows the
+   border/shadow, so the outer tab-pane itself must stay a plain, invisible
+   wrapper here or the two would double up into a nested-border look.
+   Without this, a short tab (e.g. one field) also still shows the
+   full-height empty box the taller sidebar forces the grid row to. */
+.proposal-ui .additional-info-layout .tab-pane {
   padding: 0 !important;
   margin-bottom: 0 !important;
   border: 0 !important;
@@ -1490,10 +1499,13 @@
   border: 1px solid var(--pu-line);
   border-radius: 14px;
   background: #fff;
-  overflow: hidden;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
+/* Rounded on the header itself (not "overflow: hidden" on the card) so the
+   header's own background still follows the card's corners, but a
+   react-select menu (or anything else that pops out of the body below)
+   isn't clipped by the card's edge. */
 .proposal-ui .basicinfo-card__head {
   display: flex;
   align-items: flex-start;
@@ -1501,6 +1513,8 @@
   padding: 22px 24px;
   background: var(--pu-accent-soft);
   border-bottom: 1px solid var(--pu-line);
+  border-top-left-radius: 13px;
+  border-top-right-radius: 13px;
 }
 
 .proposal-ui .basicinfo-card__icon {

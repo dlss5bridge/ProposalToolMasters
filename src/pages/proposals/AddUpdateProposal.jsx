@@ -122,6 +122,14 @@ const getCachedProposalDesignThemeID = () => {
     : DEFAULT_PROPOSAL_DESIGN_THEME_ID;
 };
 
+// This tab's fields sit inside ".create-practice-height", a fixed-height
+// (max-height: 62vh) scrollable pane, so a dropdown opened near its bottom
+// edge gets clipped by that ancestor's overflow. Portalling the menu to
+// <body> renders it outside that pane entirely, so it's never clipped.
+const SELECT_MENU_PORTAL_STYLES = {
+  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+};
+
 const BasicInformationComponent = (props) => {
   const navigate = useNavigate();
   const isEnabledMasterProposalType = props?.isEnabledMasterProposal;
@@ -333,6 +341,8 @@ const BasicInformationComponent = (props) => {
                       options={props.clientLookUpOptions}
                       value={selectedClientValue}
                       onChange={handleClientSelectChange}
+                      menuPortalTarget={document.body}
+                      styles={SELECT_MENU_PORTAL_STYLES}
                     />
                     {/* Validation error message for Client */}
                     {props.requireMessage &&
@@ -355,6 +365,8 @@ const BasicInformationComponent = (props) => {
                       options={props.templateLookUpOptions}
                       value={selectedTemplateValue}
                       onChange={handleTemplateSelectChange}
+                      menuPortalTarget={document.body}
+                      styles={SELECT_MENU_PORTAL_STYLES}
                     />
                     {/* Validation error message for Template */}
                     {props.requireMessage &&
@@ -16164,7 +16176,7 @@ const Add_Update_Proposal = (props) => {
   //   getCachedProposalDesignThemeID,
   // );
 
-  const [serviceThemeID, setServiceThemeID] = useState(3);
+  const [serviceThemeID, setServiceThemeID] = useState(2);
 
   useEffect(() => {
     GetProposalDesignTheme()

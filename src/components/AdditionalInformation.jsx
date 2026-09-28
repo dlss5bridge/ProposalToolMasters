@@ -17,6 +17,14 @@ import dayjs from "dayjs";
 // many items per group before collapsing the rest behind "View all".
 const SUMMARY_ITEMS_PER_GROUP = 4;
 
+// This tab's fields sit inside ".create-practice-height", a fixed-height
+// (max-height: 62vh) scrollable pane, so a dropdown opened near its bottom
+// edge gets clipped by that ancestor's overflow. Portalling the menu to
+// <body> renders it outside that pane entirely, so it's never clipped.
+const SELECT_MENU_PORTAL_STYLES = {
+  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+};
+
 const AdditionalInformation = (props) => {
   const [showAllSelectedForSummary, setShowAllSelectedForSummary] =
     useState(false);
@@ -594,7 +602,24 @@ const AdditionalInformation = (props) => {
       >
         <div className="create-practice-height scrollbar">
           <div className="tab-content">
-            <div class="tab-pane p-3 active additional-info-pane">
+            <div class="tab-pane p-3 active">
+              <div className="basicinfo-card">
+                <div className="basicinfo-card__head">
+                  <div className="basicinfo-card__icon">
+                    <i className="bi-card-checklist"></i>
+                  </div>
+                  <div className="basicinfo-card__head-text">
+                    <p className="basicinfo-card__title">
+                      Additional Information
+                      <span className="basicinfo-card__badge">Required</span>
+                    </p>
+                    <p className="basicinfo-card__desc">
+                      Fill in the pricing details and any other information
+                      needed before moving on.
+                    </p>
+                  </div>
+                </div>
+                <div className="basicinfo-card__body additional-info-pane">
               {props.additionalInformationList
                 ?.filter((item) => item.driverTypeID !== 1)
               ?.map((i) => {
@@ -762,6 +787,8 @@ const AdditionalInformation = (props) => {
                                     i,
                                   )
                                 }
+                                menuPortalTarget={document.body}
+                                styles={SELECT_MENU_PORTAL_STYLES}
                               />
                               {props.requireMessage &&
                               (i.driverValue === null ||
@@ -1053,6 +1080,8 @@ const AdditionalInformation = (props) => {
                                     i.globalPricingDriverID,
                                   )
                                 }
+                                menuPortalTarget={document.body}
+                                styles={SELECT_MENU_PORTAL_STYLES}
                               />
                               {props.requireMessage &&
                               i?.slab?.some(
@@ -1177,6 +1206,8 @@ const AdditionalInformation = (props) => {
                           );
                           props.setContractSignatoriesList(updatedList);
                         }}
+                        menuPortalTarget={document.body}
+                        styles={SELECT_MENU_PORTAL_STYLES}
                       />
                     </div>
                     {props.requireMessage &&
@@ -1365,6 +1396,8 @@ const AdditionalInformation = (props) => {
                         onChange={(e) => {
                           props.handleSelectTncTemplate(e);
                         }}
+                        menuPortalTarget={document.body}
+                        styles={SELECT_MENU_PORTAL_STYLES}
                       />
                     </div>
                     {props.requireMessage &&
@@ -1397,9 +1430,11 @@ const AdditionalInformation = (props) => {
                 ) : null}
               </>
             )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
       {showSelectedServicesSummary && (
         <aside
