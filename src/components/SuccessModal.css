@@ -1,0 +1,166 @@
+/* ==================================================================
+   SuccessModal – redesigned UI
+   Self-contained: this modal is used from ~80 places across the whole
+   app, so tokens are defined locally rather than depending on another
+   page's stylesheet being loaded. Matches ConfirmModel's "success" tone.
+   ================================================================== */
+
+.sm-dialog {
+  width: 480px;
+  max-width: calc(100vw - 32px);
+}
+
+.sm-content {
+  --sm-accent: #22c55e;
+  --sm-accent-strong: #16a34a;
+  --sm-accent-rgb: 34, 197, 94;
+  --sm-text: #111827;
+  --sm-muted: #5b6474;
+
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 24px 48px -20px rgba(15, 23, 42, 0.35);
+  padding: 32px 32px 28px;
+  text-align: center;
+}
+
+/* ---------- Icon ---------- */
+
+.sm-icon-halo {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--sm-accent-rgb), 0.12);
+}
+
+.sm-icon-halo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--sm-accent-rgb), 0.35);
+  animation: sm-pulse 1.8s ease-out 0.15s 2;
+}
+
+@keyframes sm-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+.sm-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: var(--sm-accent-strong);
+}
+
+/* ---------- Message body ---------- */
+
+.sm-body {
+  max-height: 46vh;
+  overflow-y: auto;
+  padding: 0 2px 4px;
+}
+
+.sm-message {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--sm-muted);
+}
+
+.sm-message .text-muted {
+  color: var(--sm-muted) !important;
+}
+
+.sm-message .ServicesUpdated-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  text-align: left;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #e6e9ee;
+  border-radius: 10px;
+}
+
+.sm-message .ServicesUpdated-list li {
+  padding: 8px 14px;
+  font-size: 13.5px;
+  color: var(--sm-text);
+}
+
+.sm-message .ServicesUpdated-list li + li {
+  border-top: 1px solid #eef1f5;
+}
+
+.sm-notify-row {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.sm-notify-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--sm-text);
+  cursor: pointer;
+}
+
+.sm-notify-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--sm-accent-strong);
+  cursor: pointer;
+}
+
+/* ---------- Footer ---------- */
+
+.sm-footer {
+  padding-top: 24px;
+}
+
+.sm-footer .sm-ok-btn {
+  min-width: 140px;
+  min-height: 46px;
+  padding: 10px 28px !important;
+  border-radius: 12px !important;
+  background: var(--sm-accent-strong) !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  box-shadow: 0 10px 20px -10px rgba(var(--sm-accent-rgb), 0.9);
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.sm-footer .sm-ok-btn:hover {
+  background: var(--sm-accent) !important;
+}
+
+.sm-footer .sm-ok-btn:active {
+  transform: translateY(1px);
+}
+
+.sm-footer .sm-ok-btn span {
+  padding: 0 !important;
+}
