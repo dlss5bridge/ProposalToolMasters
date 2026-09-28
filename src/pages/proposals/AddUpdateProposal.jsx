@@ -261,109 +261,184 @@ const BasicInformationComponent = (props) => {
   const handleAddClient = () => {
     navigate("/create-new-client", { state: { ModuleName: "Proposal" } });
   };
+
+  const PROPOSAL_TYPE_META = {
+    1: {
+      icon: "bi-sliders",
+      desc: "Build a bespoke bundle from scratch with your own services and pricing.",
+      tags: ["Fully flexible", "Complex clients"],
+      next: `Next: you'll build a custom package in step 2.`,
+    },
+    2: {
+      icon: "bi-stack",
+      desc: "Offer ready-made tiered bundles and let the client pick the one that fits.",
+      tags: ["Tiered pricing", "Fastest setup"],
+      next: `Next: you'll choose from your saved packages in step 2.`,
+    },
+    3: {
+      icon: "bi-list-check",
+      desc: "Pick individual services à la carte and price each one on its own.",
+      tags: ["Line-item pricing", "One-off work"],
+      next: `Next: you'll select services individually in step 2.`,
+    },
+    4: {
+      icon: "bi-file-earmark-ruled",
+      desc: "Set a custom variable fee under a single ongoing master agreement.",
+      tags: ["Custom fee", "Ongoing agreement"],
+      next: `Next: you'll select services for this agreement in step 2.`,
+    },
+  };
+  const selectedTypeMeta =
+    PROPOSAL_TYPE_META[props.ProposalObject.selectedProposalTypeValue];
+
   return (
     <>
       <div className="create-practice-height scrollbar">
         <div className="tab-content">
           <div className="tab-pane p-3 active">
-            <div className="row fieldset">
-              <div className="col-md-3 mt-4  col-sm-12 text-start text-md-end">
-                <label className="form-label">
-                  Select {props.prospectName}
-                </label>
-                <span class="text-danger">*</span>
-              </div>
-              <div className="col-md-9 col-sm-12">
+            <div className="basicinfo-card">
+              <div className="basicinfo-card__head">
+                <div className="basicinfo-card__icon">
+                  <i className="bi-file-earmark-text"></i>
+                </div>
+                <div className="basicinfo-card__head-text">
+                  <p className="basicinfo-card__title">
+                    Basic Information
+                    <span className="basicinfo-card__badge">Required</span>
+                  </p>
+                  <p className="basicinfo-card__desc">
+                    Choose the {props.prospectName}, {props.proposalName}{" "}
+                    template, and {props.proposalName} structure to begin.
+                  </p>
+                </div>
                 <button
-                  style={{
-                    fontSize: "12px",
-                    float: "right",
-                    border: "none",
-                    background: "transparent",
-                    color: "#626ed4",
-                  }}
-                  className="float-sm-end"
+                  type="button"
+                  className="basicinfo-card__cta"
                   onClick={handleAddClient}
                 >
-                  + Add New {props.prospectName}
+                  <i className="bi-person-plus"></i>
+                  <span>Add New {props.prospectName}</span>
                 </button>
+              </div>
 
-                <div className="mb-1 input-group">
-                  <Select
-                    className="user-role-select"
-                    options={props.clientLookUpOptions}
-                    value={selectedClientValue}
-                    onChange={handleClientSelectChange}
-                  />
-                  {/* Validation error message for Client */}
-                  {props.requireMessage &&
-                  (props.ProposalObject.clientID === undefined ||
-                    props.ProposalObject.clientID === null ||
-                    props.ProposalObject.clientID === "") ? (
-                    <span className="validation">{ERROR_MESSAGES}</span>
-                  ) : (
-                    ""
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="row fieldset">
-              <div className="col-md-3 col-sm-12 text-start text-md-end">
-                <label className="form-label">Select Template</label>
-                <span class="text-danger">*</span>
-              </div>
-              <div className="col-md-9 col-sm-12">
-                <div className="mb-1 input-group">
-                  <Select
-                    className="user-role-select"
-                    options={props.templateLookUpOptions}
-                    value={selectedTemplateValue}
-                    onChange={handleTemplateSelectChange}
-                  />
-                  {/* Validation error message for Template */}
-                  {/* {props.requireMessage &&
-                    (props.ProposalObject.selectTemplateTypeId === undefined ||
-                      props.ProposalObject.selectTemplateTypeId === null ||
-                      props.ProposalObject.selectTemplateTypeId === "") ? (
-                    <span className="validation">{ERROR_MESSAGES}</span>
-                  ) : (
-                    ""
-                  )} */}
-                  {props.requireMessage &&
-                  (!props.ProposalObject.templateID ||
-                    props.ProposalObject.templateID === "") ? (
-                    <span className="validation">{ERROR_MESSAGES}</span>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-            <div className="row fieldset">
-              <div class="col-3 text-right">
-                <label class="form-label text-nowrap">
-                  Select {props.proposalName} Type
-                  <span class="text-danger">*</span>
-                </label>
-              </div>
-              <div className="col-md-9 col-sm-12">
-                <div className="mb-3">
-                  <div className="mb-1 input-group">
+              <div className="basicinfo-card__body">
+                <div className="bi-field-grid">
+                  <div className="bi-field">
+                    <label className="bi-field__label">
+                      Select {props.prospectName}
+                      <span class="text-danger">*</span>
+                    </label>
                     <Select
                       className="user-role-select"
-                      // options={Utils.select_Quote_Type}
-                      options={modifiedProposalType}
-                      value={props.ProposalType}
-                      onChange={handleProposalSelectChange}
+                      options={props.clientLookUpOptions}
+                      value={selectedClientValue}
+                      onChange={handleClientSelectChange}
                     />
+                    {/* Validation error message for Client */}
                     {props.requireMessage &&
-                    (props.ProposalObject.selectedProposalTypeValue ===
-                      undefined ||
-                      props.ProposalObject.selectedProposalTypeValue === null ||
-                      props.ProposalObject.selectedProposalTypeValue === "") ? (
+                    (props.ProposalObject.clientID === undefined ||
+                      props.ProposalObject.clientID === null ||
+                      props.ProposalObject.clientID === "") ? (
                       <span className="validation">{ERROR_MESSAGES}</span>
                     ) : (
                       ""
                     )}
                   </div>
+
+                  <div className="bi-field">
+                    <label className="bi-field__label">
+                      Select Template
+                      <span class="text-danger">*</span>
+                    </label>
+                    <Select
+                      className="user-role-select"
+                      options={props.templateLookUpOptions}
+                      value={selectedTemplateValue}
+                      onChange={handleTemplateSelectChange}
+                    />
+                    {/* Validation error message for Template */}
+                    {props.requireMessage &&
+                    (!props.ProposalObject.templateID ||
+                      props.ProposalObject.templateID === "") ? (
+                      <span className="validation">{ERROR_MESSAGES}</span>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="bi-type-section">
+                  <div className="bi-type-head">
+                    <label className="bi-field__label">
+                      Select {props.proposalName} Type
+                      <span class="text-danger">*</span>
+                    </label>
+                    <p className="bi-type-head__desc">
+                      Choose how services will be structured and priced for
+                      this client.
+                    </p>
+                  </div>
+
+                  <div className="bi-type-cards">
+                    {modifiedProposalType.map((option) => {
+                      const meta = PROPOSAL_TYPE_META[option.value] || {};
+                      const isSelected =
+                        props.ProposalObject.selectedProposalTypeValue ===
+                        option.value;
+                      return (
+                        <button
+                          type="button"
+                          key={option.value}
+                          className={`bi-type-card${isSelected ? " is-selected" : ""}`}
+                          onClick={() => handleProposalSelectChange(option)}
+                        >
+                          <div className="bi-type-card__top">
+                            <span className="bi-type-card__icon">
+                              <i className={meta.icon}></i>
+                            </span>
+                            <span className="bi-type-card__radio">
+                              {isSelected && <i className="bi-check-lg"></i>}
+                            </span>
+                          </div>
+                          <div className="bi-type-card__title">
+                            {option.label}
+                          </div>
+                          {meta.desc && (
+                            <div className="bi-type-card__desc">
+                              {meta.desc}
+                            </div>
+                          )}
+                          {meta.tags && (
+                            <div className="bi-type-card__tags">
+                              {meta.tags.map((tag) => (
+                                <span
+                                  className="bi-type-card__tag"
+                                  key={tag}
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {props.requireMessage &&
+                  (props.ProposalObject.selectedProposalTypeValue ===
+                    undefined ||
+                    props.ProposalObject.selectedProposalTypeValue === null ||
+                    props.ProposalObject.selectedProposalTypeValue === "") ? (
+                    <span className="validation">{ERROR_MESSAGES}</span>
+                  ) : (
+                    ""
+                  )}
+
+                  {selectedTypeMeta && (
+                    <div className="bi-info-banner">
+                      <i className="bi-info-circle"></i>
+                      <span>{selectedTypeMeta.next}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -375,20 +450,20 @@ const BasicInformationComponent = (props) => {
       <div class="row fieldset">
         <div class="col-lg-12 hstack  gap-2 justify-content-end text-right mt-3">
           <button
-            class="btn btn-md btn-light"
+            class="btn btn-md btn-light pf-btn--cancel me-auto"
             onClick={() => props.handleCancelBtn()}
           >
             <span>Cancel</span>
           </button>
           <button
-            class="btn btn-md btn-success create-item-btn"
+            class="btn btn-md btn-success create-item-btn pf-btn--next"
             // onClick={() => props.HandleTabChange(2)}
             onClick={() => props.HandleTabChange(2)}
           >
             <span>Next</span>
           </button>
           <button
-            class="btn btn-md btn-success create-item-btn  text-nowrap"
+            class="btn btn-md btn-success create-item-btn  text-nowrap pf-btn--draft"
             onClick={() =>
               props.handleSaveAsDraft(1, moduleNameForSaveAsDraft, StatusId)
             }

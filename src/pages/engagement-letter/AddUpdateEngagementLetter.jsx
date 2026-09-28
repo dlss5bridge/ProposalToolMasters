@@ -136,14 +136,30 @@ const BasicInformationComponent = (props) => {
       <div className="create-practice-height scrollbar">
         <div className="tab-content">
           <div className="tab-pane p-3 active">
-            <div className="row fieldset">
-              <div class="col-md-3  text-start text-md-end">
-                <label class="form-label">Select Source</label>
-                <span class="text-danger">*</span>
+            <div className="basicinfo-card">
+              <div className="basicinfo-card__head">
+                <div className="basicinfo-card__icon">
+                  <i className="bi-file-earmark-text"></i>
+                </div>
+                <div className="basicinfo-card__head-text">
+                  <p className="basicinfo-card__title">
+                    Basic Information
+                    <span className="basicinfo-card__badge">Required</span>
+                  </p>
+                  <p className="basicinfo-card__desc">
+                    Choose how this {props.EngagementName} will be created,
+                    then select a template.
+                  </p>
+                </div>
               </div>
-              <div className="col-md-9">
-                <div>
-                  <div className="mb-1 input-group">
+
+              <div className="basicinfo-card__body">
+                <div className="bi-field-grid">
+                  <div className="bi-field">
+                    <label className="bi-field__label">
+                      Select Source
+                      <span class="text-danger">*</span>
+                    </label>
                     <Select
                       className="phone-input-country-code selectDropDown"
                       value={props.SelectSourceValue}
@@ -161,33 +177,25 @@ const BasicInformationComponent = (props) => {
                       ""
                     )}
                   </div>
-                </div>
-              </div>
-            </div>
-            {(props.engagementObj.selectSourceId === 1 ||
-              props.engagementObj.selectSourceId === 3 ||
-              props.engagementObj.selectSourceId === 4) && (
-              <div className="row fieldset">
-                <div class="col-md-3  text-start margin-prospect text-md-end">
-                  <label class="form-label">Select {props.prospectName}</label>
-                  <span class="text-danger">*</span>
-                </div>
-                <div className="col-md-9">
-                  <div>
-                    <button
-                      style={{
-                        fontSize: "12px",
-                        float: "right",
-                        border: "none",
-                        background: "transparent",
-                        color: "#626ed4",
-                      }}
-                      className="float-sm-end"
-                      onClick={handleAddClient}
-                    >
-                      + Add New {props.prospectName}
-                    </button>
-                    <div className="mb-1 input-group ">
+
+                  {(props.engagementObj.selectSourceId === 1 ||
+                    props.engagementObj.selectSourceId === 3 ||
+                    props.engagementObj.selectSourceId === 4) && (
+                    <div className="bi-field">
+                      <div className="bi-field__label-row">
+                        <label className="bi-field__label">
+                          Select {props.prospectName}
+                          <span class="text-danger">*</span>
+                        </label>
+                        <button
+                          type="button"
+                          className="bi-field__add-btn"
+                          onClick={handleAddClient}
+                        >
+                          <i className="bi-person-plus"></i>
+                          <span>Add New {props.prospectName}</span>
+                        </button>
+                      </div>
                       <Select
                         className="phone-input-country-code selectDropDown"
                         value={
@@ -209,20 +217,14 @@ const BasicInformationComponent = (props) => {
                         ""
                       )}
                     </div>
-                  </div>
-                </div>
-              </div>
-            )}
+                  )}
 
-            {props.engagementObj.selectSourceId === 2 && (
-              <div className="row fieldset">
-                <div class="col-md-3  text-start text-md-end">
-                  <label class="form-label">Select {props.proposalName}</label>
-                  <span class="text-danger">*</span>
-                </div>
-                <div className="col-md-9">
-                  <div>
-                    <div className="mb-1 input-group ">
+                  {props.engagementObj.selectSourceId === 2 && (
+                    <div className="bi-field">
+                      <label className="bi-field__label">
+                        Select {props.proposalName}
+                        <span class="text-danger">*</span>
+                      </label>
                       <Select
                         className="phone-input-country-code selectDropDown"
                         value={props.SelectProposalTypeValue}
@@ -240,22 +242,16 @@ const BasicInformationComponent = (props) => {
                         ""
                       )}
                     </div>
-                  </div>
-                </div>
-              </div>
-            )}
+                  )}
 
-            {(props.getServicePackageLookupList?.length > 0 ||
-              props.engagementObj.selectSourceId === 3 ||
-              props.engagementObj.selectSourceId === 4) && (
-              <div className="row fieldset">
-                <div class="col-md-3  text-start text-md-end">
-                  <label class="form-label">Select Package</label>
-                  <span class="text-danger">*</span>
-                </div>
-                <div className="col-md-9">
-                  <div>
-                    <div className="mb-1 input-group ">
+                  {(props.getServicePackageLookupList?.length > 0 ||
+                    props.engagementObj.selectSourceId === 3 ||
+                    props.engagementObj.selectSourceId === 4) && (
+                    <div className="bi-field">
+                      <label className="bi-field__label">
+                        Select Package
+                        <span class="text-danger">*</span>
+                      </label>
                       <Select
                         className="phone-input-country-code selectDropDown"
                         value={
@@ -293,18 +289,13 @@ const BasicInformationComponent = (props) => {
                         ""
                       )}
                     </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div class="row fieldset">
-              <div class="col-md-3  text-start text-md-end">
-                <label class="form-label">Select Template</label>
-                <span class="text-danger">*</span>
-              </div>
-              <div class="col-md-9">
-                <div>
-                  <div className="mb-1 input-group ">
+                  )}
+
+                  <div className="bi-field">
+                    <label className="bi-field__label">
+                      Select Template
+                      <span class="text-danger">*</span>
+                    </label>
                     <Select
                       className="user-role-select"
                       options={props.templateLookUpOptions}
@@ -427,13 +418,13 @@ const BasicInformationComponent = (props) => {
       <div class="separator"></div>
       <div class="row fieldset">
         <div class="col-lg-12 hstack  gap-2 justify-content-end text-right mt-3">
+          <button
+            class="btn btn-md btn-light mr-1 pf-btn--cancel me-auto"
+            onClick={() => props.handleCancel()}
+          >
+            <span>{props.getCrudButtonTextName("Cancel")}</span>
+          </button>
           <div class="d-flex" style={{ overflowX: "auto" }}>
-            <button
-              class="btn btn-md btn-light mr-1 pf-btn--cancel"
-              onClick={() => props.handleCancel()}
-            >
-              <span>{props.getCrudButtonTextName("Cancel")}</span>
-            </button>
             <button
               type="submit"
               class="btn btn-md btn-success create-item-btn pf-btn--next"

@@ -1480,3 +1480,304 @@
   background: none !important;
   text-decoration: underline;
 }
+
+/* ==========================================================================
+   Basic Information — header card + field grid + proposal-type cards
+   Shared between Add/Update Proposal and Add/Update Engagement Letter.
+   ========================================================================== */
+
+.proposal-ui .basicinfo-card {
+  border: 1px solid var(--pu-line);
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.proposal-ui .basicinfo-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px 24px;
+  background: var(--pu-accent-soft);
+  border-bottom: 1px solid var(--pu-line);
+}
+
+.proposal-ui .basicinfo-card__icon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--pu-accent);
+  font-size: 19px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.proposal-ui .basicinfo-card__head-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.proposal-ui .basicinfo-card__title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--pu-ink);
+}
+
+.proposal-ui .basicinfo-card__badge {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(18, 181, 214, 0.12);
+  color: var(--pu-accent);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.proposal-ui .basicinfo-card__desc {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--pu-muted);
+}
+
+.proposal-ui .basicinfo-card__cta {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--pu-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.proposal-ui .basicinfo-card__cta:hover {
+  background: #0fa2c2;
+}
+
+.proposal-ui .basicinfo-card__body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ---------- Field grid (label-above-field) ---------- */
+
+.proposal-ui .bi-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 780px) {
+  .proposal-ui .bi-field-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.proposal-ui .bi-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.proposal-ui .bi-field__label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pu-ink);
+}
+
+.proposal-ui .bi-field__label .text-danger {
+  margin-left: 2px;
+}
+
+.proposal-ui .bi-field__label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.proposal-ui .bi-field__label-row .bi-field__label {
+  margin: 0;
+}
+
+.proposal-ui .bi-field__add-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--pu-accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.proposal-ui .bi-field__add-btn:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Proposal type: selectable cards ---------- */
+
+.proposal-ui .bi-type-section {
+  border-top: 1px solid var(--pu-line);
+  padding-top: 20px;
+}
+
+.proposal-ui .bi-type-head {
+  margin-bottom: 14px;
+}
+
+.proposal-ui .bi-type-head__desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--pu-muted);
+}
+
+.proposal-ui .bi-type-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.proposal-ui .bi-type-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 18px;
+  border: 1.5px solid var(--pu-line);
+  border-radius: 12px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.proposal-ui .bi-type-card:hover {
+  border-color: var(--pu-accent);
+}
+
+.proposal-ui .bi-type-card.is-selected {
+  border-color: var(--pu-accent);
+  background: var(--pu-accent-soft);
+  box-shadow: var(--pu-focus);
+}
+
+.proposal-ui .bi-type-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.proposal-ui .bi-type-card__icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--pu-icon-tile);
+  color: var(--pu-accent);
+  font-size: 17px;
+}
+
+.proposal-ui .bi-type-card.is-selected .bi-type-card__icon {
+  background: var(--pu-accent);
+  color: #fff;
+}
+
+.proposal-ui .bi-type-card__radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--pu-line);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 12px;
+  flex: none;
+}
+
+.proposal-ui .bi-type-card.is-selected .bi-type-card__radio {
+  border-color: var(--pu-accent);
+  background: var(--pu-accent);
+}
+
+.proposal-ui .bi-type-card__title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--pu-ink);
+}
+
+.proposal-ui .bi-type-card__desc {
+  font-size: 12.5px;
+  color: var(--pu-muted);
+  line-height: 1.5;
+}
+
+.proposal-ui .bi-type-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.proposal-ui .bi-type-card__tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--pu-soft);
+  color: var(--pu-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.proposal-ui .bi-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--pu-accent-soft);
+  color: var(--pu-text);
+  font-size: 12.5px;
+}
+
+.proposal-ui .bi-info-banner i {
+  color: var(--pu-accent);
+  font-size: 15px;
+  margin-top: 1px;
+}
+
+/* ---------- Footer: Cancel pinned left of Next/Save Draft ---------- */
+
+.proposal-ui .hstack .btn.pf-btn--cancel.me-auto {
+  margin-right: auto !important;
+}
