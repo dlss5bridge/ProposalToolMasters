@@ -305,7 +305,10 @@ function Predefined_Templates() {
       );
       if (data?.data?.statusCode) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
         GetTemplateListData(isCurrentPage);
       } else {
         setLoader(false);
@@ -327,7 +330,10 @@ function Predefined_Templates() {
       );
       if (data?.data?.statusCode) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
         GetTemplatePdfListData(isCurrentPage);
       } else {
         setLoader(false);
@@ -534,7 +540,10 @@ function Predefined_Templates() {
                 // GetTemplateListData(currentPage);
               } else {
                 GetTemplateListData(currentPage);
-                setOpenSuccessModal(true);
+                $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                  setOpenSuccessModal(true);
+                });
+                $("#" + "ConfirmModel").modal("hide");
               }
             } else {
               let ErrorMessage = Data?.response?.data?.errorMessage;
@@ -589,7 +598,10 @@ function Predefined_Templates() {
           if (Data) {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               let ErrorMessage = Data?.response?.data?.errorMessage;
               if (
@@ -659,7 +671,10 @@ function Predefined_Templates() {
               // GetTemplateListData(currentPage);
             } else {
               GetTemplateListData(currentPage);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
@@ -705,7 +720,10 @@ function Predefined_Templates() {
                 // GetTemplatePdfListData(currentPageUsers, null, null, null);
               } else {
                 GetTemplatePdfListData(currentPageUsers, null, null, null);
-                setOpenSuccessModal(true);
+                $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                  setOpenSuccessModal(true);
+                });
+                $("#" + "ConfirmModel").modal("hide");
               }
             } else {
               let ErrorMessage = Data?.response?.data?.errorMessage;
@@ -778,7 +796,10 @@ function Predefined_Templates() {
               // GetTemplatePdfListData(currentPageUsers, null, null, null);
             } else {
               GetTemplatePdfListData(currentPageUsers, null, null, null);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
@@ -804,7 +825,10 @@ function Predefined_Templates() {
         if (Data) {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
             setOpenErrorModal(true);
@@ -823,7 +847,10 @@ function Predefined_Templates() {
         if (Data) {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
             setOpenErrorModal(true);

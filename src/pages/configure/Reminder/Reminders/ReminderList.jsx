@@ -241,10 +241,11 @@ function ReminderList() {
           if (Data) {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
-
               GetEmailTemplatesListData(currentPage);
-              // setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               setErrorMessage(Data?.response?.data?.errorMessage);
               setOpenErrorModal(true);
@@ -264,10 +265,11 @@ function ReminderList() {
         if (Data) {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
-
             GetEmailTemplatesListData(currentPage);
-            // setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
             setOpenErrorModal(true);
@@ -424,7 +426,10 @@ function ReminderList() {
       );
       if (data?.data?.statusCode === 200) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
         GetEmailTemplatesListData(isCurrentPage);
       } else {
         setLoader(false);

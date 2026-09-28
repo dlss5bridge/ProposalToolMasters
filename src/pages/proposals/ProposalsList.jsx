@@ -507,7 +507,10 @@ const Proposals = () => {
 
         if (data.data.statusCode === 200) {
           setLoader(false);
-          setOpenSuccessModal(true);
+          $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#" + "ConfirmModel").modal("hide");
         } else {
           $("#" + "ConfirmModel").modal("hide");
           setLoader(false);
@@ -1073,7 +1076,10 @@ const Proposals = () => {
           }
         }
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
       } else {
         $("#" + "ConfirmModel").modal("hide");
         setLoader(false);
@@ -1219,12 +1225,15 @@ const Proposals = () => {
         modelRequestData.quoteKeyID,
         common.userKeyID,
       );
-      $("#ConfirmModel").modal("hide");
       if (data) {
         if (data.data?.statusCode === 200) {
           setLoader(false);
-          setOpenSuccessModal(true);
+          $("#ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#ConfirmModel").modal("hide");
         } else {
+          $("#ConfirmModel").modal("hide");
           setLoader(false);
           setErrorMessage(data?.response?.data?.errorMessage);
           setOpenErrorModal(true);
@@ -1282,7 +1291,10 @@ const Proposals = () => {
         if (Data) {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
 
             // GetProposalListData(currentPage);
             // setOpenSuccessModal(true);
@@ -1308,7 +1320,10 @@ const Proposals = () => {
         });
         if (data?.data?.statusCode === 200) {
           setLoader(false);
-          setOpenSuccessModal(true);
+          $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#" + "ConfirmModel").modal("hide");
           GetProposalListSingleApiData(currentPage);
         } else {
           setLoader(false);
@@ -1323,7 +1338,10 @@ const Proposals = () => {
         );
         if (data?.data?.statusCode === 200) {
           setLoader(false);
-          setOpenSuccessModal(true);
+          $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#" + "ConfirmModel").modal("hide");
           // GetProposalListData(currentPage);
         } else {
           $("#" + "ConfirmModel").modal("hide");
@@ -1367,7 +1385,10 @@ const Proposals = () => {
       );
       if (data?.data?.statusCode === 200) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
       } else {
         setLoader(false);
         setErrorMessage(data?.data?.errorMessage);

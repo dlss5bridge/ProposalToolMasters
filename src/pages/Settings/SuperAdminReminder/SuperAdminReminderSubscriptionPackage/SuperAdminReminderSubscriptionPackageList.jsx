@@ -258,7 +258,10 @@ function SuperAdminReminderSubscriptionPackageList() {
           if (Data) {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
 
               // GetEmailTemplatesListData(currentPage);
               // setOpenSuccessModal(true);
@@ -281,7 +284,10 @@ function SuperAdminReminderSubscriptionPackageList() {
         if (Data) {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
 
             // GetEmailTemplatesListData(currentPage);
             // setOpenSuccessModal(true);

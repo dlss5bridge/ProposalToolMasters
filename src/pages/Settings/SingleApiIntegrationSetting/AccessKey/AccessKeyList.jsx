@@ -183,7 +183,10 @@ const AccessKeyList = () => {
         if (Data) {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
             setOpenErrorModal(true);
@@ -202,7 +205,10 @@ const AccessKeyList = () => {
         if (Data) {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
             setOpenErrorModal(true);
@@ -222,7 +228,10 @@ const AccessKeyList = () => {
         if (Data) {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
             setOpenErrorModal(true);

@@ -1258,7 +1258,14 @@ const Update_Practice_Details = () => {
           }
           if (showSuccessModalWhen === "OrganisationSuccess") {
             setLoader(false);
-            setOpenSuccessModal(true);
+            if ($("#" + "ConfirmModel").hasClass("show")) {
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
+            } else {
+              setOpenSuccessModal(true);
+            }
             // navigate("/");
           }
           if (
@@ -1288,7 +1295,14 @@ const Update_Practice_Details = () => {
           }
           if (uploadSignatureResponse || uploadLogoResponse) {
             setLoader(false);
-            setOpenSuccessModal(true);
+            if ($("#" + "ConfirmModel").hasClass("show")) {
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
+            } else {
+              setOpenSuccessModal(true);
+            }
           }
         } else {
           setLoader(false);

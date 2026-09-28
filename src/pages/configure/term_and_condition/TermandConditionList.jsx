@@ -224,7 +224,10 @@ function Term_and_Condition() {
       );
       if (data?.data?.statusCode === 200) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
         GetTermsAndConditionsListData(currentPage);
       } else {
         setLoader(false);
@@ -271,7 +274,10 @@ function Term_and_Condition() {
                 GetTermsAndConditionsListData(currentPage);
               } else {
                 GetTermsAndConditionsListData(currentPage);
-                setOpenSuccessModal(true);
+                $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                  setOpenSuccessModal(true);
+                });
+                $("#" + "ConfirmModel").modal("hide");
               }
             } else {
               let ErrorMessage = Data?.response?.data?.errorMessage;
@@ -326,7 +332,10 @@ function Term_and_Condition() {
           if (Data) {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               let ErrorMessage = Data?.response?.data?.errorMessage;
               if (
@@ -395,7 +404,10 @@ function Term_and_Condition() {
               GetTermsAndConditionsListData(currentPage);
             } else {
               GetTermsAndConditionsListData(currentPage);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);

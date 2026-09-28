@@ -760,7 +760,10 @@ const Prospects = () => {
               $("#" + "DeleteDriverModel").modal("show");
               $("#" + "ConfirmModel").modal("hide");
             } else {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
               getClientsListSingleApiData(currentPage);
             }
           } else {
@@ -778,7 +781,10 @@ const Prospects = () => {
             setLoader(false);
 
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               if (Data?.response?.data?.errorMessage?.includes("Prospect")) {
                 let ErrorMessage = Data?.response?.data?.errorMessage;
@@ -810,7 +816,10 @@ const Prospects = () => {
           setLoader(false);
 
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
             setOpenErrorModal(true);
@@ -845,7 +854,10 @@ const Prospects = () => {
           const url = res.data.connectionUrl;
 
           window.open(url, "_blank", "noopener,noreferrer");
-          setOpenSuccessModal(true);
+          $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#" + "ConfirmModel").modal("hide");
         } else {
           setOpenErrorModal(true);
           setErrorMessage(res?.response?.data?.message);
@@ -873,13 +885,16 @@ const Prospects = () => {
         );
 
         if (res?.status === 201) {
-          setOpenSuccessModal(true);
-
           setModelRequestData({
             ...modelRequestData,
             Action: "AddContact",
             message: "Record added successfully",
           });
+
+          $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#" + "ConfirmModel").modal("hide");
 
           dispatch(
             fetchContactsLookup({
@@ -916,7 +931,10 @@ const Prospects = () => {
       dispatch(addContactMapping({ ...payload }))
         .unwrap()
         .then(() => {
-          setOpenSuccessModal(true);
+          $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#" + "ConfirmModel").modal("hide");
         })
         .catch((err) => {
           setErrorMessage(err?.error || "Something went wrong");

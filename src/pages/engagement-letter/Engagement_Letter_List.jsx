@@ -728,7 +728,10 @@ const Engagement_Letter = () => {
           if (Data) {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
 
               // GetEngagementListData(currentPage);
               // setOpenSuccessModal(true);
@@ -760,7 +763,10 @@ const Engagement_Letter = () => {
       );
       if (data?.data?.statusCode === 200) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
       } else {
         setLoader(false);
         setErrorMessage(data?.response?.data?.errorMessage);
@@ -907,7 +913,10 @@ const Engagement_Letter = () => {
       if (data?.data?.statusCode === 200) {
         setLoader(false);
         setOpenEmailFailurePopUp(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
       } else {
         $("#" + "ConfirmModel").modal("hide");
         setLoader(false);
@@ -980,7 +989,10 @@ const Engagement_Letter = () => {
           }
         }
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
       } else {
         $("#" + "ConfirmModel").modal("hide");
         setLoader(false);
@@ -1002,7 +1014,10 @@ const Engagement_Letter = () => {
       );
       if (data?.data?.statusCode === 200) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
       } else {
         $("#" + "ConfirmModel").modal("hide");
         setLoader(false);
@@ -1317,13 +1332,16 @@ const Engagement_Letter = () => {
         modelRequestData.contractKeyID,
         common.userKeyID,
       );
-      $("#ConfirmModel").modal("hide");
       // console.log(response);
       if (response) {
         if (response?.data?.statusCode === 200) {
           setLoader(false);
-          setOpenSuccessModal(true);
+          $("#ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#ConfirmModel").modal("hide");
         } else {
+          $("#ConfirmModel").modal("hide");
           setLoader(false);
           setErrorMessage(response?.response?.data?.errorMessage);
           setOpenErrorModal(true);
@@ -1365,7 +1383,10 @@ const Engagement_Letter = () => {
         });
         if (data?.data?.statusCode === 200) {
           setLoader(false);
-          setOpenSuccessModal(true);
+          $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#" + "ConfirmModel").modal("hide");
           GetEngagementListForSingleApiData(currentPage);
         } else {
           setLoader(false);
@@ -1412,7 +1433,10 @@ const Engagement_Letter = () => {
       });
       if (data?.data?.statusCode === 200) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
         GetEngagementListData(currentPage);
       } else {
         setLoader(false);

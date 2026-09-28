@@ -194,7 +194,10 @@ const SecurityList = () => {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
               GetAuthListData(currentPage);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               setErrorMessage(Data?.response?.data?.errorMessage);
               setOpenErrorModal(true);
@@ -214,7 +217,10 @@ const SecurityList = () => {
           if (Data) {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               setErrorMessage(Data?.response?.data?.errorMessage);
               setOpenErrorModal(true);
@@ -235,7 +241,10 @@ const SecurityList = () => {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
             GetAuthListData(currentPage);
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
             setOpenErrorModal(true);
@@ -254,7 +263,10 @@ const SecurityList = () => {
         if (response) {
           setLoader(false);
           if (response.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(response.response.data.errorMessage);
             setOpenErrorModal(true);

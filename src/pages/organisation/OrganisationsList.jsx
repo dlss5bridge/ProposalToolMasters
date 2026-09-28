@@ -365,7 +365,10 @@ const Organisation = () => {
                 toDate,
               );
 
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
@@ -394,7 +397,10 @@ const Organisation = () => {
         if (Data) {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errors?.OrgKeyID[0]);
             setOpenErrorModal(true);

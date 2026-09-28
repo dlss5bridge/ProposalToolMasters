@@ -214,7 +214,10 @@ const Predefined_Package = () => {
               GetPackageListData(isCurrentPage);
             } else {
               GetPackageListData(isCurrentPage);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
@@ -252,7 +255,10 @@ const Predefined_Package = () => {
               GetPackageListData(isCurrentPage);
             } else {
               GetPackageListData(isCurrentPage);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
@@ -271,7 +277,10 @@ const Predefined_Package = () => {
         );
         if (CopyPackageData.data.statusCode === 200) {
           setLoader(false);
-          setOpenSuccessModal(true);
+          $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#" + "ConfirmModel").modal("hide");
           GetPackageListData(currentPage);
         }
       } catch (error) {

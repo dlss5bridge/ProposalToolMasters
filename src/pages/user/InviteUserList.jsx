@@ -378,7 +378,10 @@ const InviteUser = () => {
           if (Data) {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               setErrorMessage(Data?.response?.data?.errors?.InviteUserKeyID[0]);
               setOpenErrorModal(true);
@@ -397,7 +400,10 @@ const InviteUser = () => {
           if (Data) {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               setErrorMessage(Data?.response?.data?.errors?.InviteUserKeyID[0]);
               setOpenErrorModal(true);
@@ -419,7 +425,10 @@ const InviteUser = () => {
           if (Data) {
             setLoader(false);
             if (Data?.data?.statusCode === 200) {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               setErrorMessage(Data?.response?.data?.errors?.inviteUserKeyID[0]);
               setOpenErrorModal(true);
@@ -469,7 +478,10 @@ const InviteUser = () => {
                 GetUsersListData(currentPageUsers);
               } else {
                 GetUsersListData(currentPageUsers);
-                setOpenSuccessModal(true);
+                $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                  setOpenSuccessModal(true);
+                });
+                $("#" + "ConfirmModel").modal("hide");
               }
             } else {
               setErrorMessage(Data?.response?.data?.errorMessage);

@@ -239,10 +239,24 @@ function PaymentGatewayModel(props) {
                         return
                     }
                     if (apiRequestParams.Action === "Update") {
-                        setOpenSuccessModal(true);
+                        if ($("#" + "ConfirmModel").hasClass("show")) {
+                            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                                setOpenSuccessModal(true);
+                            });
+                            $("#" + "ConfirmModel").modal("hide");
+                        } else {
+                            setOpenSuccessModal(true);
+                        }
                         props.setIsAddUpdatePricingActionDone(true);
                     } else {
-                        setOpenSuccessModal(true);
+                        if ($("#" + "ConfirmModel").hasClass("show")) {
+                            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                                setOpenSuccessModal(true);
+                            });
+                            $("#" + "ConfirmModel").modal("hide");
+                        } else {
+                            setOpenSuccessModal(true);
+                        }
                         props.setIsAddUpdatePricingActionDone(true);
                     }
                 } else {
@@ -458,7 +472,10 @@ function PaymentGatewayModel(props) {
                         setLoader(false);
                         if (data?.data?.statusCode === 200) {
                             GetPaymentGatewayModelData(common.organisationKeyID);
-                            setOpenSuccessModal(true);
+                            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                                setOpenSuccessModal(true);
+                            });
+                            $("#" + "ConfirmModel").modal("hide");
                             props.setIsAddUpdatePricingActionDone(true);
                         } else {
                             GetPaymentGatewayModelData(common.organisationKeyID);

@@ -298,7 +298,10 @@ function Predefined_Global_Pricing_Drivers() {
                 null,
                 modelRequestData.addedFor,
               );
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(response?.response?.data?.errorMessage);
@@ -355,7 +358,10 @@ function Predefined_Global_Pricing_Drivers() {
                 null,
                 modelRequestData.addedFor,
               );
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(response?.response?.data?.errorMessage);
@@ -385,7 +391,10 @@ function Predefined_Global_Pricing_Drivers() {
       );
       if (data?.data?.statusCode === 200) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
         GetGlobalPricingDriverListData(currentPage);
       } else {
         setLoader(false);

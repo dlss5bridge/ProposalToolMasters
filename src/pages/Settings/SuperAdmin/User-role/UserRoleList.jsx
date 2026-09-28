@@ -226,7 +226,10 @@ const UserRoleList = () => {
               GetUserRoleListData(currentPage);
             } else {
               GetUserRoleListData(currentPage);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
@@ -263,7 +266,10 @@ const UserRoleList = () => {
               GetUserRoleListData(currentPage);
             } else {
               GetUserRoleListData(currentPage);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);

@@ -521,9 +521,11 @@ const View_Engagement_Latter = () => {
         common.userKeyID,
       );
       if (response.data.statusCode === 200) {
-        setOpenSuccessModal(true);
         setLoader(false);
         setISUpload(false);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
         $("#" + "ConfirmModel").modal("hide");
         GetContractDetailsModelData(EngagementObj.contractKeyID);
       } else {
@@ -531,9 +533,11 @@ const View_Engagement_Latter = () => {
         setOpenErrorModal(true);
       }
     } else {
-      setOpenSuccessModal(true);
       setLoader(false);
       setISUpload(false);
+      $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+        setOpenSuccessModal(true);
+      });
       $("#" + "ConfirmModel").modal("hide");
     }
   };

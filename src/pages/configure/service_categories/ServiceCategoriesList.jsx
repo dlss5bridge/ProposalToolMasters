@@ -228,7 +228,10 @@ const Service_Categories = () => {
       );
       if (data?.data?.statusCode === 200) {
         setLoader(false);
-        setOpenSuccessModal(true);
+        $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+          setOpenSuccessModal(true);
+        });
+        $("#" + "ConfirmModel").modal("hide");
         GetServiceCategoryListData(currentPage);
       } else {
         setLoader(false);
@@ -271,7 +274,10 @@ const Service_Categories = () => {
               GetServiceCategoryListData(currentPage);
             } else {
               GetServiceCategoryListData(currentPage);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);
@@ -311,7 +317,10 @@ const Service_Categories = () => {
               GetServiceCategoryListData(currentPage);
             } else {
               GetServiceCategoryListData(currentPage);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             }
           } else {
             setErrorMessage(Data?.response?.data?.errorMessage);

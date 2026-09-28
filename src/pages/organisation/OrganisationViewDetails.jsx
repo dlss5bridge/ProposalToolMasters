@@ -929,7 +929,10 @@ const OrganisationViewDetails = () => {
           setLoader(false);
           if (Data?.data?.statusCode === 200) {
             setSuccessMessage(`User ${modelRequestData.userName}`);
-            setOpenSuccessModal(true);
+            $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+              setOpenSuccessModal(true);
+            });
+            $("#" + "ConfirmModel").modal("hide");
           } else {
             setErrorMessage(Data?.response?.data?.errors?.InviteUserKeyID[0]);
             setOpenErrorModal(true);

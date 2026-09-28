@@ -374,10 +374,24 @@ const Payment_Gateway = () => {
           }
 
           if (apiRequestParams.Action === "Update") {
-            setOpenSuccessModal(true);
+            if ($("#" + "ConfirmModel").hasClass("show")) {
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
+            } else {
+              setOpenSuccessModal(true);
+            }
             setIsAddUpdateActionDone(true);
           } else {
-            setOpenSuccessModal(true);
+            if ($("#" + "ConfirmModel").hasClass("show")) {
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
+            } else {
+              setOpenSuccessModal(true);
+            }
             setIsAddUpdateActionDone(true);
           }
         } else {
@@ -533,7 +547,10 @@ const Payment_Gateway = () => {
             setLoader(false);
             if (data?.data?.statusCode === 200) {
               GetPaymentGatewayModelData(common.organisationKeyID);
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
             } else {
               GetPaymentGatewayModelData(common.organisationKeyID);
               setErrorMessage(data?.response?.data?.errorMessage);

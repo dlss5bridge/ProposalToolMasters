@@ -603,11 +603,25 @@ const Email_Config = () => {
         setLoader(false);
         if (response?.data?.statusCode === 200) {
           if (apiRequestParams.Action === "Update") {
-            setOpenSuccessModal(true);
+            if ($("#" + "ConfirmModel").hasClass("show")) {
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
+            } else {
+              setOpenSuccessModal(true);
+            }
             setIsAddUpdateActionDone(true);
             GetEmailConfigModelData(common.organisationKeyID);
           } else {
-            setOpenSuccessModal(true);
+            if ($("#" + "ConfirmModel").hasClass("show")) {
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
+            } else {
+              setOpenSuccessModal(true);
+            }
             setIsAddUpdateActionDone(true);
             GetEmailConfigModelData(common.organisationKeyID);
           }

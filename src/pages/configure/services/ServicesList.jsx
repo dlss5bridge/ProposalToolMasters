@@ -274,7 +274,10 @@ const Services = () => {
               $("#" + "ConfirmModel").modal("show");
               //  GetServiceListData(null, null, null);
             } else {
-              setOpenSuccessModal(true);
+              $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+                setOpenSuccessModal(true);
+              });
+              $("#" + "ConfirmModel").modal("hide");
               GetServiceListData(null, null, null);
             }
           } else {
@@ -294,7 +297,10 @@ const Services = () => {
         );
         if (CopyServiceData.data.statusCode === 200) {
           setLoader(false);
-          setOpenSuccessModal(true);
+          $("#" + "ConfirmModel").one("hidden.bs.modal", () => {
+            setOpenSuccessModal(true);
+          });
+          $("#" + "ConfirmModel").modal("hide");
           GetServiceListData(null, null, null);
         }
       } catch (error) {
