@@ -273,7 +273,7 @@ const BasicInformationComponent = (props) => {
   const PROPOSAL_TYPE_META = {
     1: {
       icon: "bi-sliders",
-      desc: "Build a bespoke bundle from scratch with your own services and pricing.",
+      desc: "Build a bespoke bundle with your own services and pricing.",
       tags: ["Fully flexible", "Complex clients"],
       next: `Next: you'll build a custom package in step 2.`,
     },
@@ -285,7 +285,7 @@ const BasicInformationComponent = (props) => {
     },
     3: {
       icon: "bi-list-check",
-      desc: "Pick individual services à la carte and price each one on its own.",
+      desc: "Pick individual services and price each one on its own.",
       tags: ["Line-item pricing", "One-off work"],
       next: `Next: you'll select services individually in step 2.`,
     },
@@ -298,6 +298,16 @@ const BasicInformationComponent = (props) => {
   };
   const selectedTypeMeta =
     PROPOSAL_TYPE_META[props.ProposalObject.selectedProposalTypeValue];
+
+  // Display order only (Services, Packages, Custom Packages, then Master
+  // Agreement) - doesn't touch the option values themselves, so selection/
+  // validation logic is unaffected either way.
+  const PROPOSAL_TYPE_DISPLAY_ORDER = { 3: 0, 2: 1, 1: 2, 4: 3 };
+  const displayOrderedProposalType = [...modifiedProposalType].sort(
+    (a, b) =>
+      PROPOSAL_TYPE_DISPLAY_ORDER[a.value] -
+      PROPOSAL_TYPE_DISPLAY_ORDER[b.value],
+  );
 
   return (
     <>
@@ -384,13 +394,13 @@ const BasicInformationComponent = (props) => {
                       <span class="text-danger">*</span>
                     </label>
                     <p className="bi-type-head__desc">
-                      Choose how services will be structured and priced for
-                      this client.
+                      Choose how services will be structured and priced for this
+                      client.
                     </p>
                   </div>
 
                   <div className="bi-type-cards">
-                    {modifiedProposalType.map((option) => {
+                    {displayOrderedProposalType.map((option) => {
                       const meta = PROPOSAL_TYPE_META[option.value] || {};
                       const isSelected =
                         props.ProposalObject.selectedProposalTypeValue ===
@@ -421,10 +431,7 @@ const BasicInformationComponent = (props) => {
                           {meta.tags && (
                             <div className="bi-type-card__tags">
                               {meta.tags.map((tag) => (
-                                <span
-                                  className="bi-type-card__tag"
-                                  key={tag}
-                                >
+                                <span className="bi-type-card__tag" key={tag}>
                                   {tag}
                                 </span>
                               ))}
