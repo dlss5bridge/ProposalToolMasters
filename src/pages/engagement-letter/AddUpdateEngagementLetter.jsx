@@ -436,13 +436,13 @@ const BasicInformationComponent = (props) => {
       <div class="separator"></div>
       <div class="row fieldset">
         <div class="col-lg-12 hstack  gap-2 justify-content-end text-right mt-3">
-          <button
-            class="btn btn-md btn-light mr-1 pf-btn--cancel me-auto"
-            onClick={() => props.handleCancel()}
-          >
-            <span>{props.getCrudButtonTextName("Cancel")}</span>
-          </button>
           <div class="d-flex" style={{ overflowX: "auto" }}>
+            <button
+              class="btn btn-md btn-light mr-1 pf-btn--cancel"
+              onClick={() => props.handleCancel()}
+            >
+              <span>{props.getCrudButtonTextName("Cancel")}</span>
+            </button>
             <button
               type="submit"
               class="btn btn-md btn-success create-item-btn pf-btn--next"
@@ -9703,7 +9703,7 @@ const Add_Update_Engagement_Letter = () => {
   useEffect(() => {
     GetProposalDesignTheme()
       .then((res) => {
-        const fetchedID = res?.data?.responseData?.serviceThemeID;
+        const fetchedID = res?.data?.responseData?.data;
         if ([1, 2, 3, 4].includes(fetchedID)) {
           setServiceThemeID(fetchedID);
           localStorage.setItem(

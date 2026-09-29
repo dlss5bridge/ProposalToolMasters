@@ -451,6 +451,7 @@ const SelectServicesTheme2 = ({
       <div className="sst2__layout">
         <div className="sst2__main">
           <div className="sst2-toolbar">
+            <div className="sst2-toolbar__filters">
             <label className="sst2-search">
               <SearchIcon aria-hidden="true" />
               <input
@@ -484,6 +485,7 @@ const SelectServicesTheme2 = ({
                 aria-hidden="true"
               />
             </label>
+            </div>
 
             <div className="sst2-toolbar__end">
               <span className="sst2-pill">{totalSelected} Selected</span>

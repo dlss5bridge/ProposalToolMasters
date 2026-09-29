@@ -52,11 +52,38 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 16px;
   border: 1px solid var(--sst2-line);
   border-radius: 14px;
   background: #fff;
+}
+
+/* Groups search + category together so ".sst2-toolbar"'s own
+   "justify-content: space-between" only ever has to place two things: this
+   group and ".sst2-toolbar__end". When there's room, that puts the usual
+   gap between them (end pushed to the far right). When there isn't (e.g.
+   the app's own nav sidebar is open, narrowing this whole tab), ".sst2-
+   toolbar__end" wraps onto its own line - and on a line with only one
+   item, "space-between" naturally left-aligns it instead of a stray
+   "margin-left: auto" shoving it back over to the right with a big empty
+   gap in front of it. */
+.sst2-toolbar__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  /* Grows exactly like ".sst2-search" did as a direct ".sst2-toolbar"
+     child before: it absorbs the row's leftover space, letting the search
+     box (which has its own "flex-grow" and "max-width: 360px") widen into
+     it, with any space past that just sitting empty before ".sst2-toolbar
+     __end" - visually the same gap "margin-left: auto" used to create.
+     ".justify-content: space-between" only matters once this group wraps
+     onto its own line and ".sst2-toolbar__end" is alone on the next one -
+     with a single item, "space-between" leaves it at the start (left). */
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .sst2-search,
@@ -133,10 +160,10 @@
 }
 
 .sst2-toolbar__end {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 14px;
+  flex-wrap: wrap;
 }
 
 .sst2-pill {
@@ -568,7 +595,6 @@
 
 .sst2.is-compact-toolbar .sst2-toolbar__end {
   width: 100%;
-  margin-left: 0;
   justify-content: space-between;
 }
 

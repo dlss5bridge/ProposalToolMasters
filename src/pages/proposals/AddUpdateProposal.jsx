@@ -469,7 +469,7 @@ const BasicInformationComponent = (props) => {
       <div class="row fieldset">
         <div class="col-lg-12 hstack  gap-2 justify-content-end text-right mt-3">
           <button
-            class="btn btn-md btn-light pf-btn--cancel me-auto"
+            class="btn btn-md btn-light pf-btn--cancel"
             onClick={() => props.handleCancelBtn()}
           >
             <span>Cancel</span>
@@ -16179,16 +16179,16 @@ const Add_Update_Proposal = (props) => {
   // Set once for every organisation from Super Admin > Settings > Proposal
   // Theme (see ProposalThemeSection.jsx). Read the cached value first
   // so this doesn't flash Theme 1 while the fetch below resolves.
-  // const [serviceThemeID, setServiceThemeID] = useState(
-  //   getCachedProposalDesignThemeID,
-  // );
+  const [serviceThemeID, setServiceThemeID] = useState(
+    getCachedProposalDesignThemeID,
+  );
 
-  const [serviceThemeID, setServiceThemeID] = useState(2);
+  // const [serviceThemeID, setServiceThemeID] = useState(2);
 
   useEffect(() => {
     GetProposalDesignTheme()
       .then((res) => {
-        const fetchedID = res?.data?.responseData?.serviceThemeID;
+        const fetchedID = res?.data?.responseData?.data;
         if ([1, 2, 3, 4].includes(fetchedID)) {
           setServiceThemeID(fetchedID);
           localStorage.setItem(

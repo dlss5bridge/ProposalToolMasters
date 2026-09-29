@@ -13,28 +13,27 @@ import {
  * userKeyID on the read side: it is one value for every organisation,
  * changed only from the Super Admin > Settings > Proposal Theme screen.
  *
- * NOTE: these two endpoints follow this codebase's existing REST/query
- * conventions but do not exist on the backend yet (searched this repo for
- * an equivalent - none found). The frontend below is fully wired and
- * ready; the backend needs a matching route before "Save" here actually
- * persists. If an equivalent endpoint already exists under another name,
- * point this file at it instead of adding a new one.
+ * GetProposalServiceTheme is confirmed live: it returns
+ * { statusCode: 200, errorMessage: null, totalCount: 0, responseData: { data: 1 | 2 | 3 | 4 } }
+ * - the theme id sits at responseData.data, not responseData.serviceThemeID.
+ * UpdateProposalServiceTheme's shape hasn't been confirmed against a real
+ * response yet; verify it the same way if "Save" doesn't persist.
  */
 
-const proposalDesignThemeUrl = `${Base_Url}/GlobalVariables`;
+const proposalDesignThemeUrl = `${Base_Url}/ServiceTheme`;
 
-// Expected response shape: { data: { statusCode: 200, responseData: { serviceThemeID: 1 | 2 | 3 | 4 } } }
+// Confirmed response shape: { data: { statusCode: 200, responseData: { data: 1 | 2 | 3 | 4 } } }
 export const GetProposalDesignTheme = async () => {
   const res = await getListWithAuthenticated(
-    `${proposalDesignThemeUrl}/GetProposalDesignTheme`,
+    `${proposalDesignThemeUrl}/GetProposalServiceTheme`,
   );
   return res;
 };
 
 // param shape: { serviceThemeID: 1 | 2 | 3 | 4 }
-export const UpdateProposalDesignTheme = async (userKeyID, param) => {
+export const UpdateProposalDesignTheme = async (param) => {
   const res = await postApiWithAuthenticated(
-    `${proposalDesignThemeUrl}/UpdateProposalDesignTheme?UserKeyID=${userKeyID}`,
+    `${proposalDesignThemeUrl}/UpdateProposalServiceTheme`,
     param,
   );
   return res;

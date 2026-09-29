@@ -25,6 +25,7 @@ export const SelectedProposalCustomize = (props) => {
                 )}
 
               <div className="separator mb-2"></div>
+              <div className="table-responsive package-select-table">
               <table
                 className="table align-middle table-nowrap"
                 id="customerTable"
@@ -54,31 +55,44 @@ export const SelectedProposalCustomize = (props) => {
                     </tr>
                   )}
                   {props?.getServicePackageLookupList.map(
-                    (servicePackage, index) => (
+                    (servicePackage, index) => {
+                      const isSelected =
+                        Array.isArray(props.selectedPackages) &&
+                        servicePackage &&
+                        props.selectedPackages.includes(
+                          servicePackage.servicePackageID
+                        );
+                      const handleToggle = () => {
+                        if (servicePackage) {
+                          props.handlePackageCheckboxClick(servicePackage);
+                        }
+                      };
+                      return (
                       <tr
                         key={servicePackage.servicePackageID}
-                        className="table_new table-content-font"
+                        className={`table_new table-content-font package-row${
+                          isSelected ? " is-selected" : ""
+                        }`}
+                        onClick={handleToggle}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleToggle();
+                          }
+                        }}
                       >
                         <td>
-                          <div className="select-row ">
+                          <div className="select-row package-row__name-cell">
                             <input
                               type="checkbox"
-                              className="check check_tick"
+                              className="check check_tick package-row__checkbox"
                               id={`packageCheckbox_${servicePackage?.servicePackageID}`}
-                              onChange={() => {
-                                if (servicePackage) {
-                                  props.handlePackageCheckboxClick(
-                                    servicePackage
-                                  );
-                                }
-                              }}
-                              checked={
-                                Array.isArray(props.selectedPackages) &&
-                                servicePackage &&
-                                props.selectedPackages.includes(
-                                  servicePackage.servicePackageID
-                                )
-                              }
+                              onChange={handleToggle}
+                              checked={isSelected}
+                              tabIndex={-1}
+                              aria-hidden="true"
                             />
                             {
                               servicePackage.needToUpdate && (
@@ -86,7 +100,7 @@ export const SelectedProposalCustomize = (props) => {
                               )}
                             <label
                               htmlFor={`packageCheckbox_${servicePackage.servicePackageID}`}
-                              className="fieldset-label required client-font"
+                              className="fieldset-label required client-font package-row__name"
                             >
                               {isMobile ? (
                                 <>
@@ -165,7 +179,11 @@ export const SelectedProposalCustomize = (props) => {
                                 </>
                               )}
                             </label>
-
+                            {isSelected && (
+                              <span className="package-row__badge">
+                                Selected
+                              </span>
+                            )}
 
                           </div>
                         </td>
@@ -216,10 +234,12 @@ export const SelectedProposalCustomize = (props) => {
                           </span>
                         </td>
                       </tr>
-                    )
+                      );
+                    }
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         </div>
@@ -241,7 +261,7 @@ export const SelectedProposalCustomize = (props) => {
       <div className="row fieldset modal-footer">
         <div className="col-lg-12 hstack gap-2 justify-content-end text-right">
           <button
-            className="btn btn-md btn-light"
+            className="btn btn-md btn-light pf-btn--cancel me-auto"
             onClick={props.handleCancelBtn}
           >
             <span>Cancel</span>
@@ -249,13 +269,13 @@ export const SelectedProposalCustomize = (props) => {
           <button
             onClick={() => props.HandleBack(1)}
             style={{ marginRight: "5px" }}
-            className="btn btn-md btn-success create-item-btn"
+            className="btn btn-md btn-success create-item-btn pf-btn--back"
           >
             <span>Back</span>
           </button>
           {ProposalObject && ProposalObject.selectedProposalTypeValue === 1 && (
             <button
-              className="btn btn-md btn-success create-item-btn"
+              className="btn btn-md btn-success create-item-btn pf-btn--next"
               onClick={async () => {
                 await props.HandleTabChange(2);
               }}
@@ -265,7 +285,7 @@ export const SelectedProposalCustomize = (props) => {
           )}
           {ProposalObject && ProposalObject.selectedProposalTypeValue === 2 && (
             <button
-              className="btn btn-md btn-success create-item-btn"
+              className="btn btn-md btn-success create-item-btn pf-btn--next"
               onClick={async () => {
                 await props.HandleTabChange(7);
               }}
@@ -276,7 +296,7 @@ export const SelectedProposalCustomize = (props) => {
 
           <button
             type="submit"
-            class="btn btn-md btn-success create-item-btn text-nowrap"
+            class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
             onClick={() =>
               props.handleSaveAsDraft(5, moduleNameForSaveAsDraft, statusId)
             }

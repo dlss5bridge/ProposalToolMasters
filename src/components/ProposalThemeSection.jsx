@@ -128,7 +128,7 @@ const ProposalThemeSection = () => {
     (async () => {
       try {
         const res = await GetProposalDesignTheme();
-        const fetchedID = res?.data?.responseData?.serviceThemeID;
+        const fetchedID = res?.data?.responseData?.data;
         const current = THEME_OPTIONS.some((option) => option.id === fetchedID)
           ? fetchedID
           : 1;
@@ -157,7 +157,8 @@ const ProposalThemeSection = () => {
     setIsSaving(true);
     setFeedback(null);
     try {
-      const res = await UpdateProposalDesignTheme(common.userKeyID, {
+      const res = await UpdateProposalDesignTheme({
+        userKeyID: common.userKeyID,
         serviceThemeID: selectedThemeID,
       });
       if (res?.data?.statusCode === 200) {
