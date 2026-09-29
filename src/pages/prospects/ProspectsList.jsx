@@ -6,6 +6,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import "./Prospects.css";
 import { parse, isValid, format } from "date-fns";
 import { AuthContextProvider } from "../../AuthContext/AuthContext";
 import FilterModel from "../../components/FilterModel";
@@ -35,11 +36,17 @@ import {
   GetAllCachedXeroContacts,
   GetAllClientLookupList,
   ProspectConnectionAuthentication,
+  ClientConnectionStatus,
+  DisconnectClient,
 } from "../../redux/Services/Xero/XeroApi";
+import { xeroConnectionStatus, quickBooksConnectionStatus } from "../../redux/reducer/authSlice";
 import IntegrationDialog from "./IntegrationDialog";
 import {
   addContactMapping,
   fetchContactsLookup,
+  fetchCachedContactsLookup,
+  deleteQuickBooksContactMapping,
+  deleteXeroContactMapping,
 } from "../../redux/reducer/quickBookSlice";
 
 const Prospects = () => {
@@ -57,7 +64,7 @@ const Prospects = () => {
 
   const contactsLookup = useSelector((state) => state.quickBook.contactsLookup);
   const bookkeeping = useSelector((state) => state.auth.bookkeeping);
-
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState("Prospect");
   const [errorMessage, setErrorMessage] = useState("");
   const [openErrorModal, setOpenErrorModal] = React.useState(false);
@@ -92,7 +99,14 @@ const Prospects = () => {
     userAccessData,
     handleErrorMessage,
     activeOrganizationSubscriptionPlan,
+    hasBookkeeping,
   } = useContext(AuthContextProvider);
+  //  const hasBookkeeping =
+  //     (() => {
+  //         const bookkeeping = JSON.parse(localStorage.getItem("bookkeeping") || "{}");
+  //         return bookkeeping.Xero === true || bookkeeping.QuickBooks === true;
+  //     })();
+  console.log(hasBookkeeping, "hasBookkeeping");
   const moduleName = `${prospectName}`;
   const [currentPage, setCurrentPage] = useState(1);
   const [SingleCurrentPage, setSingleCurrentPage] = useState(1);
@@ -123,15 +137,82 @@ const Prospects = () => {
   const [shouldFetch, setShouldFetch] = useState(false);
   const [contactsLookupList, setContactsLookupList] = useState([]);
   const [contactDetails, setContactDetails] = useState();
+  const [showMapPopup, setShowMapPopup] = useState(false);
+  const [mapStep, setMapStep] = useState("platform");
+  const [mapPlatform, setMapPlatform] = useState(null);
+  const [mapClient, setMapClient] = useState(null);
+  const [mapContact, setMapContact] = useState(null);
+  const [mapLoading, setMapLoading] = useState(false);
   const [openIntegrationDialog, setOpenIntegrationDialog] = useState(false);
+  const [clientConnectionResults, setClientConnectionResults] = useState([]);
   const [invalidFieldIds, setInvalidFieldIds] = useState([]);
   //=====================useEffects==============================
+
+  useEffect(() => {
+    if (!organisationKeyID) return;
+    dispatch(xeroConnectionStatus(organisationKeyID));
+    dispatch(quickBooksConnectionStatus(organisationKeyID));
+  }, [organisationKeyID]);
+
   useEffect(() => {
     setTopbar("block");
+
     getClientsListData(1, null, null, null);
     getClientsListSingleApiData(1, null, null, null);
-    dispatch(fetchContactsLookup({ organisationKeyID, activePlatform }));
-  }, []);
+    if(activePlatform){
+    const getContactsLookup = async () => {
+      if (activePlatform) {
+        const result = await dispatch(
+          fetchCachedContactsLookup({
+            organisationKeyID,
+            activePlatform,
+          })
+        ).unwrap();
+        setContactsLookupList(result);
+      }
+    };
+
+    getContactsLookup();
+  }
+  }, [isRefreshing, activePlatform]);
+  // check client's individual connection
+  useEffect(() => {
+    if (!clientList?.length || !activePlatform) return;
+
+    const checkClientConnections = async () => {
+      const results = await Promise.all(
+        clientList.map(async (client) => {
+          try {
+            const result = await ClientConnectionStatus(
+              null,
+              organisationKeyID,
+              client.clientKeyID,
+              activePlatform
+            );
+
+            return {
+              clientID: client.clientID,
+              result,
+            };
+          } catch (error) {
+            console.error(
+              `Connection check failed for client ${client.clientID}`,
+              error
+            );
+
+            return {
+              clientID: client.clientID,
+              isConnected: false,
+            };
+          }
+        })
+      );
+
+      setClientConnectionResults(results);
+    };
+
+    checkClientConnections();
+  }, [clientList, activePlatform, organisationKeyID]);
 
   useEffect(() => {
     if (isAddUpdateActionDone) {
@@ -184,6 +265,20 @@ const Prospects = () => {
       }
     }
   }, [modelRequestData]);
+
+  // Get mapped Client Name
+  const getClientName = (clientID) => {
+    debugger;
+    if(!clientID) return "No Client Found";
+    if (clientList && clientList.length > 0) {
+    const clientName = clientList.find((client) => client.clientID === clientID)?.clientName;
+    
+    // Return the name if found, otherwise return a fallback
+    return clientName ? `: ${clientName}` : `with Client ID: ${clientID}`;
+  }
+    return "";
+  } 
+
 
   const formatNumber = (num, decimalPlaces) => {
     if (num == null || num === "") return ""; // empty safety
@@ -307,6 +402,18 @@ const Prospects = () => {
               return;
             }
             setListCount(totalCount);
+            // const updatedClientList = clientList.map((client) => {
+            //   const mappedContact = contactsLookupList?.find(
+            //     (contact) => contact.ClientID === client.clientID
+            //   );
+            //   return {
+            //     ...client,
+            //     isMapped: mappedContact ? true : false,
+            //     mappedContactID: mappedContact ? mappedContact.value : null,
+            //     mappedContactName: mappedContact ? mappedContact.label : null,
+            //   };
+            // })
+            // console.log(updatedClientList, "updatedClientList");
             setClientList(clientList);
             setTotalRecords(clientList.length);
           }
@@ -480,6 +587,17 @@ const Prospects = () => {
       console.error(error);
     } finally {
       // setVarSubmitLoading(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      setLoader(true);
+      await dispatch(fetchContactsLookup({ organisationKeyID, activePlatform })).unwrap();
+    } finally {
+      setIsRefreshing(false);
+      setLoader(false);
     }
   };
 
@@ -728,7 +846,7 @@ const Prospects = () => {
             Action: "AddContact",
             message: "Record added successfully",
           });
-          dispatch(fetchContactsLookup({ organisationKeyID, activePlatform }));
+          dispatch(fetchCachedContactsLookup({ organisationKeyID, activePlatform }));
         } else {
           console.log("res", res);
           setOpenErrorModal(true);
@@ -746,14 +864,14 @@ const Prospects = () => {
       const payload =
         activePlatform === "Xero"
           ? {
-              xeroContactId: contactDetails?.value || null,
+              xeroContactId: Number(contactDetails?.value || null),
               clientId: modelRequestData?.clientID || null,
               // userId:
               organisationKeyId: organisationKeyID,
               activePlatform,
             }
           : {
-              qbCustomerId: contactDetails?.value || null,
+              qbCustomerId: Number(contactDetails?.value || null),
               clientId: modelRequestData?.clientID || null,
               //userId: 1
               organisationKeyId: organisationKeyID,
@@ -765,12 +883,17 @@ const Prospects = () => {
           setOpenSuccessModal(true);
         })
         .catch((err) => {
-          setErrorMessage(err?.error || "Something went wrong");
+          console.log("Current err object state:", err);
+          setErrorMessage(err ? `${err.error || "An error occurred"} ${getClientName(err.currentClientId)}` : "Something went wrong");
           setOpenErrorModal(true);
         })
         .finally(() => {
           setLoader(false);
         });
+    } else if (modelRequestData.Action === "Unmap Contact") {
+      handleUnmapContact(modelRequestData.clientID);
+    } else if (modelRequestData.Action === "Disconnect Client") {
+      handleDisconnectClient(modelRequestData.clientKeyID)
     }
   };
 
@@ -800,6 +923,172 @@ const Prospects = () => {
       clientKeyID: Prospect.clientKeyID, // Change ClientKeyID to clientKeyID
       Action: "View",
     });
+  };
+  // Mapping to Xero/Qbo handler functions
+  const handlePlatformSelect = async (platform) => {
+    debugger;
+    setMapPlatform(platform);
+    setMapLoading(true);
+    try {
+      await dispatch(fetchCachedContactsLookup({ organisationKeyID, activePlatform: platform })).unwrap();
+    } finally {
+      setMapLoading(false);
+      setMapStep("contact");
+    }
+  };
+
+  const handleIntegrationPlatformSelect = async (platform) => {
+    // No "noopener" here — we need a real reference to navigate later.
+    const authWindow = window.open("", "_blank");
+
+    try {
+      setLoader(true);
+
+      const res = await ProspectConnectionAuthentication(
+        organisationKeyID,
+        modelRequestData.clientKeyID,
+        platform
+      );
+
+      setOpenIntegrationDialog(false);
+
+      if (res?.data?.connectionUrl) {
+        if (authWindow) {
+          authWindow.opener = null;
+          authWindow.location.href = res.data.connectionUrl;
+        } else {
+          window.open(res.data.connectionUrl, "_blank", "noopener,noreferrer");
+        }
+      } else if (authWindow) {
+        authWindow.close();
+      }
+    } catch (error) {
+      console.error("Platform connection error:", error);
+      if (authWindow) authWindow.close();
+      setOpenIntegrationDialog(false);
+    } finally {
+      setLoader(false);
+    }
+  };
+
+  // map contact handler
+  const handleContactMapSubmit = () => {
+    debugger;
+    const payload =
+      mapPlatform === "Xero"
+        ? {
+          xeroContactId: Number(mapContact?.value || null),
+          clientId: mapClient?.clientID || null,
+          organisationKeyId: organisationKeyID,
+          activePlatform: mapPlatform,
+        }
+        : {
+          qbCustomerId: Number(mapContact?.value || null),
+          clientId: mapClient?.clientID || null,
+          organisationKeyId: organisationKeyID,
+          activePlatform: mapPlatform,
+        };
+
+    setLoader(true);
+    dispatch(addContactMapping(payload))
+      .unwrap()
+      .then(() => {
+        setShowMapPopup(false);
+        setOpenSuccessModal(true);
+        getClientsListData(currentPage); // refresh row so mapped state reflects
+      })
+      .catch((err) => {
+        console.log("Current err object state:", err);
+        setErrorMessage(err ? `${err.error || "An error occurred"} ${getClientName(err.currentClientId)}` : "Something went wrong");
+        setShowMapPopup(false);
+        setOpenErrorModal(true);
+      })
+      .finally(() => setLoader(false));
+      setIsRefreshing(true);
+  };
+
+  // Unmap or delete mapping handler
+  const handleUnmapContact = async (contactID) => {
+    debugger;
+    const now = Date.now();
+    if (now - lastClickRef.current < 1500) return;
+    lastClickRef.current = now;
+
+    try {
+      setLoader(true);
+
+      const payload = {
+        organisationKeyId: organisationKeyID,
+        xeroContactId: contactID,
+      };
+
+      const res =
+        activePlatform === "Xero"
+          ? await dispatch(deleteXeroContactMapping(payload)).unwrap()
+          : await dispatch(deleteQuickBooksContactMapping(payload)).unwrap();
+
+      if (res?.status === 200) {
+        setOpenSuccessModal(true);
+        setModelRequestData({
+          ...modelRequestData,
+          Action: "Unmap",
+          message: "Contact unmapped successfully",
+        });
+        getClientsListData(currentPage);
+      } else {
+        setErrorMessage(res?.response?.data?.errorMessage || "Something went wrong");
+        setOpenErrorModal(true);
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      setErrorMessage("Something went wrong");
+      setOpenErrorModal(true);
+    } finally {
+      setLoader(false);
+    }
+  };
+
+  // disconnect client from Xero/QBO handler
+  const handleDisconnectClient = async () => {
+    const now = Date.now();
+    if (now - lastClickRef.current < 1500) return;
+    lastClickRef.current = now;
+
+    try {
+      setLoader(true);
+      const result = await DisconnectClient(
+        null,
+        organisationKeyID,
+        modelRequestData.clientKeyID,
+        activePlatform
+      );
+
+      if (result?.status !== 200) {
+        setErrorMessage(result?.response?.data?.message || "Something went wrong");
+        setOpenErrorModal(true);
+        return;
+      }
+
+      // Close the confirm modal
+      const modalEl = document.getElementById("ConfirmModel");
+      if (modalEl) {
+        const instance =
+          window.bootstrap.Modal.getInstance(modalEl) ||
+          new window.bootstrap.Modal(modalEl);
+        instance.hide();
+      }
+
+      // Re-check every client's connection so the badge clears without a refresh
+      setIsRefreshing((prev) => !prev);
+
+      setOpenSuccessModal(true);
+    } catch (err) {
+      console.error("Error:", err);
+      setErrorMessage("Something went wrong");
+      setOpenErrorModal(true);
+    } finally {
+      setLoader(false);
+    }
   };
 
   const AddClientBtn = () => {
@@ -1131,7 +1420,7 @@ const Prospects = () => {
                           {activeTab === "Prospect" && (
                             <div className="col-lg-9 col-md-9 col-3 text-nowrap mb-2">
                               <div className="d-flex justify-content-end align-items-center gap-2">
-                                <div style={{ minWidth: "200px" }}>
+                                {/* <div style={{ minWidth: "200px" }}>
                                   <Select
                                     className="user-role-select"
                                     options={contactsLookup}
@@ -1141,8 +1430,18 @@ const Prospects = () => {
                                       setContactDetails(selectedOption);
                                     }}
                                   />
-                                </div>
-
+                                </div> */}
+                                <button
+                                  type="button"
+                                  className={`refresh-btn ${isRefreshing ? 'refreshing' : ''}`}
+                                  onClick={handleRefresh}
+                                  title="Refresh to fetch latest contacts"
+                                  aria-label="Refresh to fetch latest contacts"
+                                >
+                                  <span className="refresh-icon">
+                                    <i className="fas fa-sync-alt"></i>
+                                  </span>
+                                </button>
                                 <div>
                                   {userAccessData.Admin_Prospect_CanAdd && (
                                     <CommonButtonComponent
@@ -1562,6 +1861,13 @@ const Prospects = () => {
                                       <>Action</>
                                     )}
                                   </td>
+                                  {(contactsLookup.length !== 0 || 
+                                   (hasBookkeeping.Xero || hasBookkeeping.Quickbooks)) && (
+                                    <div>
+                                      <td className="tr-table-class" style={{ border: "none" }}></td>
+                                      <td className="tr-table-class" style={{ border: "none" }}></td>
+                                    </div>
+                                  )}
                                 </tr>
                               </thead>
                               <tbody class="list form-check-all">
@@ -1579,6 +1885,19 @@ const Prospects = () => {
                                         ? emailArray[0]
                                         : "";
                                     const hasMoreEmails = emailArray.length > 1;
+                                    const mappedContact = contactsLookupList?.find(
+                                      (contact) => contact.ClientID === Prospect.clientID
+                                    );
+                                    const mappingDetails = {
+                                      isMapped: !!mappedContact,
+                                      label: mappedContact ? mappedContact.label : null,
+                                      value: mappedContact ? mappedContact.value : null,
+                                      clientID: mappedContact ? mappedContact.ClientID : null,
+                                    };
+                                    const connectedClient = clientConnectionResults.find(
+                                      (result) => result.clientID === Prospect.clientID
+                                    );
+                                    const isConnected = connectedClient?.result?.data?.connected === true;
                                     return (
                                       <>
                                         <tr
@@ -1587,6 +1906,16 @@ const Prospects = () => {
                                         >
                                           <td className="table-content-font">
                                             {Prospect.clientName}
+                                            {mappingDetails.isMapped && (
+                                              <span className="badge bg-success ms-2 text-white">
+                                                {" "}mapped to {mappingDetails.label}
+                                              </span>
+                                            )}
+                                            {isConnected && (
+                                              <span className="badge bg-primary ms-2 text-white">
+                                                {" "}connected
+                                              </span>
+                                            )}
                                           </td>
                                           <td className="table-content-font">
                                             {/* {Prospect.emailID}
@@ -1902,37 +2231,49 @@ const Prospects = () => {
                                                   )}
 
                                                   {/* Authenticate Xero */}
-                                                  {bookkeeping &&
-                                                    Object.values(
-                                                      bookkeeping,
-                                                    ).some((val) => val) && (
+                                                  {(hasBookkeeping.Xero || hasBookkeeping.Quickbooks) && (
+                                                    <>
+                                                    {!isConnected ? (
+                                                    <li>
+                                                      <a
+                                                        className="dropdown-item cursor-pointer"
+                                                        onClick={() => {
+                                                          setModelRequestData({
+                                                            ...modelRequestData,
+                                                            clientKeyID: Prospect.clientKeyID,
+                                                          });
+                                                          setOpenIntegrationDialog(true);
+                                                        }}
+                                                      >
+                                                        <span className="d-flex">
+                                                          <i className="ri-links-line me-2"></i>
+                                                          Connect
+                                                        </span>
+                                                      </a>
+                                                    </li>
+                                                    ) : (
                                                       <li>
                                                         <a
                                                           className="dropdown-item cursor-pointer"
                                                           data-bs-toggle="modal"
                                                           data-bs-target="#ConfirmModel"
-                                                          onClick={() =>
-                                                            setModelRequestData(
-                                                              {
-                                                                ...modelRequestData,
-                                                                Action:
-                                                                  "Redirect",
-                                                                clientKeyID:
-                                                                  Prospect.clientKeyID,
-                                                              },
-                                                            )
-                                                          }
+                                                          onClick={() => {
+                                                            setModelRequestData({
+                                                              ...modelRequestData,
+                                                              clientKeyID: Prospect.clientKeyID,
+                                                              Action: "Disconnect Client"
+                                                            });
+                                                          }}
                                                         >
                                                           <span className="d-flex">
-                                                            {" "}
                                                             <i className="ri-links-line me-2"></i>
-                                                            Connect To{" "}
-                                                            {activePlatform ||
-                                                              ""}
+                                                            Disconnect
                                                           </span>
                                                         </a>
                                                       </li>
                                                     )}
+                                                    </>
+                                                  )} 
 
                                                   {/* Migrate Xero */}
 
@@ -1982,40 +2323,130 @@ const Prospects = () => {
                                                     </a>
                                                   </li> */}
 
-                                                  {bookkeeping &&
-                                                    Object.values(
-                                                      bookkeeping,
-                                                    ).some((val) => val) && (
-                                                      <li>
-                                                        <a
-                                                          className="dropdown-item cursor-pointer"
-                                                          data-bs-toggle="modal"
-                                                          data-bs-target="#ConfirmModel"
-                                                          onClick={() => {
-                                                            setModelRequestData(
-                                                              {
-                                                                ...modelRequestData,
-                                                                Action:
-                                                                  "Add Contact Mapping",
-                                                                clientID:
-                                                                  Prospect.clientID,
-                                                                // xeroContactId: contactDetails.value
-                                                              },
-                                                            );
-                                                          }}
-                                                        >
-                                                          <span className="d-flex">
-                                                            <i className="ri-links-line me-2"></i>
-                                                            Map Contact & Client{" "}
-                                                            {/* mappings/{organisationKeyId} */}
-                                                          </span>
-                                                        </a>
-                                                      </li>
-                                                    )}
                                                 </ul>
                                               </div>
                                             </div>
                                           </td>
+                                          <td className="table-content-font">
+                                            {(hasBookkeeping.Xero || hasBookkeeping.Quickbooks) && (
+                                              <>
+                                                {contactsLookupList.length > 0 && (
+                                                  <>
+                                                {!mappingDetails.isMapped ? (
+                                                  <button
+                                                    className="btn btn-md btn-success w-20"
+                                                    type="button"
+                                                    onClick={() => {
+                                                      setMapClient({
+                                                        clientID: Prospect.clientID,
+                                                        clientKeyID: Prospect.clientKeyID,
+                                                        clientName: Prospect.clientName, // adjust to actual field name
+                                                      });
+                                                      setMapPlatform(null);
+                                                      setMapContact(null);
+                                                      setMapStep("platform");
+                                                      setShowMapPopup(true);
+                                                    }}
+                                                  >
+                                                    Link
+                                                  </button>
+                                                ) : (
+                                                  <button
+                                                    className="btn btn-md btn-danger w-20"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#ConfirmModel"
+                                                    onClick={() => {
+                                                      setModelRequestData(
+                                                        {
+                                                          ...modelRequestData,
+                                                          Action:
+                                                            "Unmap Contact",
+                                                          clientID:
+                                                            mappingDetails.clientID,
+                                                          // xeroContactId: contactDetails.value
+                                                        },
+                                                      );
+                                                    }}
+                                                  // onClick={() => handleUnmapContact(mappingDetails.clientID)}
+                                                  >
+                                                    Unlink
+                                                  </button>
+                                                )}
+                                                </>
+                                              )}
+                                              </>
+                                            )}
+                                          </td>
+                                          {showMapPopup && (
+                                            <div
+                                              className="modal show"
+                                              style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)", zIndex: 9999 }}
+                                              onClick={() => setShowMapPopup(false)}
+                                            >
+                                              <div
+                                                className="modal-dialog modal-md modal-dialog-centered"
+                                                style={{ height: '20vh' }}
+                                                onClick={(e) => e.stopPropagation()}
+                                              >
+                                                <div className="modal-content" style={{ height: '50%' }}>
+                                                  <div className="modal-header">
+                                                    <h5 className="modal-title">
+                                                      {mapStep === "platform" ? "Select Platform" : `Select ${mapPlatform} Contact`}
+                                                    </h5>
+                                                    <button className="btn-close" onClick={() => setShowMapPopup(false)} />
+                                                  </div>
+
+                                                  <div className="modal-body" style={{ flex: '1 1 auto', overflowY: 'auto' }}>
+                                                    {mapStep === "platform" && (
+                                                      <div className="d-flex gap-2 justify-content-center">
+                                                        <button
+                                                          className="btn btn-success"
+                                                          onClick={() => handlePlatformSelect("Xero")}
+                                                        >
+                                                          Xero
+                                                        </button>
+                                                        <button
+                                                          className="btn btn-success"
+                                                          onClick={() => handlePlatformSelect("QuickBooks")}
+                                                        >
+                                                          QuickBooks
+                                                        </button>
+                                                      </div>
+                                                    )}
+
+                                                    {mapStep === "contact" && (
+                                                      <Select
+                                                        className="user-role-select"
+                                                        options={contactsLookup}
+                                                        getOptionLabel={(e) => e.label}
+                                                        getOptionValue={(e) => e.value}
+                                                        value={mapContact}
+                                                        isLoading={mapLoading}
+                                                        onChange={(selectedOption) => setMapContact(selectedOption)}
+                                                        autoFocus
+                                                        
+                                                      />
+                                                    )}
+                                                  </div>
+
+                                                  <div className="modal-footer">
+                                                    <button className="btn btn-sm btn-secondary" onClick={() => setShowMapPopup(false)}>
+                                                      Cancel
+                                                    </button>
+                                                    {mapStep === "contact" && (
+                                                      <button
+                                                        className="btn btn-sm create-item-btn"
+                                                        disabled={!mapContact}
+                                                        onClick={handleContactMapSubmit}
+                                                      >
+                                                        Map
+                                                      </button>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          )}
                                         </tr>
                                       </>
                                     );
@@ -2670,6 +3101,7 @@ const Prospects = () => {
         <IntegrationDialog
           open={openIntegrationDialog}
           onClose={() => setOpenIntegrationDialog(false)}
+          onPlatformSelect={handleIntegrationPlatformSelect}
         />
       </div>
       <Footer />

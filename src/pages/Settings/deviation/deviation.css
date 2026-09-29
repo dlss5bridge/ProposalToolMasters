@@ -1,0 +1,433 @@
+/* Fee Assurance history workspace */
+.deviation-page {
+    --deviation-ink: #1f2937;
+    --deviation-muted: #64748b;
+    --deviation-line: #e5e7eb;
+    --deviation-accent: #4f46e5;
+    max-width: 1480px;
+    margin: 0 auto;
+    padding-bottom: 32px;
+}
+
+.deviation-page > .services {
+    background: transparent;
+}
+
+.deviation-page > .services > .row > .col-lg-12 > .card {
+    overflow: hidden;
+    border: 1px solid var(--deviation-line);
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.deviation-page .card-body {
+    padding: 0 20px 20px;
+}
+
+.deviation-history-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;   /* pushes button to the far right */
+    gap: 16px;
+    width: 100%;
+    min-height: 112px;
+    margin: 0 -20px 20px;
+    padding: 22px 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+    border-bottom: 1px solid var(--deviation-line);
+}
+
+.deviation-toolbar-left {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* title and toggle side by side */
+.deviation-heading-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.deviation-history-heading h1 {
+    margin: 2px 0 ;
+    color: var(--deviation-ink);
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.deviation-history-heading h1,
+.deviation-toolbar-left h1 {
+    margin: 2px 0;
+    color: var(--deviation-ink);
+    font-size: 1.45rem;
+    font-weight: 700;
+}
+
+.deviation-eyebrow {
+    color: var(--deviation-accent);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.deviation-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: #475569;
+    font-weight: 600;
+}
+
+.deviation-filter .form-check-input {
+    float: none;
+    width: 2.25rem;
+    height: 1.2rem;
+    margin: 0;
+    cursor: pointer;
+}
+
+.deviation-filter .form-check-input:checked {
+    background-color: var(--deviation-accent);
+    border-color: var(--deviation-accent);
+}
+
+.deviation-run-button {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 0;
+    border-radius: 8px;
+    box-shadow: 0 5px 12px rgba(79, 70, 229, 0.2);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.deviation-run-button:disabled {
+    opacity: 0.65;
+    box-shadow: none;
+}
+
+.deviation-history-table {
+    overflow-x: auto;
+    border: 1px solid var(--deviation-line);
+    border-radius: 10px;
+}
+
+.deviation-history-table > table {
+    min-width: 760px;
+    margin-bottom: 0;
+}
+
+.deviation-history-table > table thead td {
+    padding: 12px 14px;
+    background: #273449;
+    border: 0;
+    color: #f8fafc;
+    font-size: 0.69rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.deviation-history-table > table tbody > tr.dev-run-row > td {
+    padding: 14px;
+    color: var(--deviation-ink);
+    border-bottom: 1px solid #eef2f7;
+    font-size: 0.84rem;
+}
+
+.deviation-history-table > table tbody > tr.dev-run-row:last-of-type > td {
+    border-bottom: 0;
+}
+
+.deviation-history-table > table tbody > tr.dev-run-row:hover > td {
+    background: #f8faff;
+}
+
+.deviation-history-table .dev-toggle {
+    min-width: 74px;
+    justify-content: center;
+}
+
+.deviation-history-table .dev-empty {
+    padding: 36px 18px;
+    background: #fff;
+}
+
+@media (max-width: 767px) {
+    .deviation-page {
+        padding-right: 8px;
+        padding-left: 8px;
+    }
+
+    .deviation-page .card-body {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .deviation-history-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        margin-right: -12px;
+        margin-left: -12px;
+        padding: 18px 16px;
+    }
+
+    .deviation-history-heading h1 {
+        font-size: 1.25rem;
+    }
+
+    .deviation-run-button {
+        width: 100%;
+        margin-top: 4px;
+    }
+}
+
+/* ── Run rows ─────────────────────────────────────────────── */
+.dev-run-row {
+    cursor: pointer;
+}
+.dev-run-row > td {
+    transition: background-color 200ms ease, box-shadow 250ms ease;
+}
+.dev-run-row:hover > td {
+    background-color: #f8fafc;
+}
+
+/* Open row lifts above the panel beneath it */
+.table > tbody > tr.dev-run-row.is-open > td {
+    position: relative;
+    z-index: 2;
+    background-color: #ffffff;
+    border-bottom-color: transparent;
+    box-shadow: 0 8px 12px -10px rgba(15, 23, 42, 0.45);
+}
+.table > tbody > tr.dev-run-row.is-open > td:first-child {
+    box-shadow:
+        inset 3px 0 0 var(--bs-primary, #405189),
+        0 8px 12px -10px rgba(15, 23, 42, 0.45);
+}
+
+/* ── Detail row shell: no padding/border so a closed row is truly 0px ── */
+.table > tbody > tr.dev-detail-row > td {
+    padding: 0;
+    border-bottom-width: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.table > tbody > tr.dev-detail-row.is-open > td {
+    border-bottom: 1px solid #e5e9f0;
+}
+
+/* ── Height animation (animates to real content height, no JS) ── */
+.dev-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition:
+        grid-template-rows 340ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        visibility 0s linear 340ms;          /* hide only after closing finishes */
+}
+.dev-collapse.is-open {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition:
+        grid-template-rows 340ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        visibility 0s;
+}
+.dev-collapse > .dev-panel {
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* ── The recessed panel ─────────────────────────────────────── */
+.dev-panel {
+    position: relative;
+    align-self: start;
+    margin: 0 14px 16px 30px;
+    padding: 0 14px 14px;
+    background: #f3f6fa;
+    border: 1px solid #e1e7ef;
+    border-top: 0;                            /* tucked under the row above */
+    border-radius: 0 0 12px 12px;
+    box-shadow:
+        inset 0 10px 12px -10px rgba(15, 23, 42, 0.28),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+        opacity 220ms ease,
+        transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dev-collapse.is-open .dev-panel {
+    opacity: 1;
+    transform: none;
+    transition-delay: 70ms;
+}
+/* Faint connector line from the open row down into the panel */
+.dev-panel::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    top: 0;
+    bottom: 20px;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(var(--bs-primary, #405189), transparent);
+    opacity: 0.35;
+}
+
+/* ── Inner table ───────────────────────────────────────────── */
+.dev-inner-table-wrap {
+    height: fit-content;
+    max-height: 65vh;
+    overflow: auto;
+}
+
+.dev-inner-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+    border: 1px solid #e5e9f0;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 0.8125rem;
+}
+.dev-inner-table thead th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 9px 12px;
+    border-bottom: 1px solid #e5e9f0;
+    white-space: nowrap;
+}
+.dev-inner-table td {
+    padding: 9px 12px;
+    color: #1e293b;
+    vertical-align: middle;
+    border-bottom: 1px solid #eef2f6;
+    white-space: nowrap;
+    transition: background-color 150ms ease;
+}
+/* One <tbody> per contract: separator between contracts, hover per contract */
+.dev-inner-table tbody + tbody tr:first-child td {
+    border-top: 1px solid #dfe5ed;
+}
+.dev-inner-table tbody:last-child tr:last-child td {
+    border-bottom: 0;
+}
+.dev-inner-table tbody:hover td {
+    background-color: #fbfcfe;
+}
+.dev-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.dev-delta--up   { color: #b42318; font-weight: 600; }
+.dev-delta--down { color: #b54708; font-weight: 600; }
+.dev-muted       { color: #94a3b8; }
+.dev-client      { font-weight: 600; }
+.dev-ref         { color: #64748b; font-size: 0.75rem; }
+
+.dev-empty {
+    padding: 18px;
+    text-align: center;
+    color: #64748b;
+}
+
+/* ── Pills ─────────────────────────────────────────────────── */
+.dev-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.6;
+    text-transform: capitalize;
+}
+.dev-pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.dev-pill--completed { color: #067647; background: #ecfdf3; border-color: #abefc6; }
+.dev-pill--failed    { color: #b42318; background: #fef3f2; border-color: #fecdca; }
+.dev-pill--running   { color: #175cd3; background: #eff8ff; border-color: #b2ddff; }
+.dev-pill--running::before { animation: dev-pulse 1.2s ease-in-out infinite; }
+.dev-pill--manual    { color: #3538cd; background: #eef4ff; border-color: #c7d7fe; }
+.dev-pill--scheduled { color: #475467; background: #f2f4f7; border-color: #e4e7ec; }
+
+.dev-count {
+    display: inline-block;
+    min-width: 24px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: #fff4ed;
+    color: #b93815;
+    font-weight: 700;
+    text-align: center;
+}
+
+@keyframes dev-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.35; transform: scale(0.7); }
+}
+
+/* ── Toggle button ─────────────────────────────────────────── */
+.dev-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid #dfe5ed;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 0.78rem;
+    transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+.dev-toggle:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+.dev-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(64, 81, 137, 0.25);
+}
+.dev-chevron {
+    width: 14px;
+    height: 14px;
+    transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dev-toggle[aria-expanded="true"] .dev-chevron {
+    transform: rotate(180deg);
+}
+
+/* ── Respect reduced-motion preferences ───────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .dev-collapse,
+    .dev-collapse.is-open,
+    .dev-panel,
+    .dev-chevron,
+    .dev-run-row > td {
+        transition: none !important;
+    }
+    .dev-pill--running::before {
+        animation: none;
+    }
+}

@@ -11,6 +11,12 @@ function ViewPlan(props) {
     activeOrganizationSubscriptionPlan,
 
   } = useContext(AuthContextProvider);
+  const remainingEL = Number(
+    activeOrganizationSubscriptionPlan?.remainingESignatures,
+);
+
+const hasNoRemainingEL = remainingEL <= 0;
+
   const handleRedirectSubscription = async () => {
     props.setShowModal(false);
     // await ChoosePlanApiModelData();
@@ -47,7 +53,7 @@ function ViewPlan(props) {
           <div className="text-center mb-3">
             <img src={errorImage} alt="error_Img" height="70px" width="70px" />
           </div>
-          {activeOrganizationSubscriptionPlan?.prepareContract && activeOrganizationSubscriptionPlan?.remainingESignatures < 0 && props?.moduleName !== undefined ? (
+          {activeOrganizationSubscriptionPlan?.prepareContract && hasNoRemainingEL && props?.moduleName !== undefined ? (
             <p className="text-center mb-3">
               You have reached the monthly e-signature limit for your current plan. To increase your monthly e-signature quota, please upgrade your plan.
             </p>

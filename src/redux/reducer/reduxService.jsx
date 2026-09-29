@@ -71,3 +71,18 @@ export const postApiWithAuthenticated = async (url, params) => {
         return error;
     }
 };
+
+//......................Put Api With Authorization........................................
+export const putApiWithAuthenticated = async (url, params) => {
+    try {
+        const res = await Api.put(url, params);
+
+        if (res?.data?.statusCode === 401) {
+            <Navigate to={<Login />} />;
+            return;
+        }
+        return res;
+    } catch (error) {
+        return error;
+    }
+};

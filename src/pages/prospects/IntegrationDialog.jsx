@@ -9,12 +9,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
 
-const IntegrationDialog = ({ open, onClose }) => {
+const IntegrationDialog = ({ open, onClose, onPlatformSelect }) => {
     const handleQuickbooks = async () => {
+        onPlatformSelect("QuickBooks");
         console.log("QuickBooks API Call");
     };
 
     const handleXero = async () => {
+        onPlatformSelect("Xero");
         console.log("Xero API Call");
     };
 

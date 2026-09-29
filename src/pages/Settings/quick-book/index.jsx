@@ -116,7 +116,7 @@ function QuickBookAuthentication() {
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h4 className="fw-semibold mb-0" style={{ color: "#111827" }}>
-          Quick Book Integration
+          QuickBooks Integration
         </h4>
 
         <AuthButton

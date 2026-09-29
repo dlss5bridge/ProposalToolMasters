@@ -127,3 +127,55 @@ export const CreateXeroContactFromOutbooks = async (
   const res = await postApiWithAuthenticated(`${baseUrl}`, param);
   return res;
 };
+
+export const ClientConnectionStatus = async (
+  param,
+  organisationKeyId,
+  clientKeyId,
+  activePlatform,
+) => {
+  let baseUrl;
+  switch (activePlatform) {
+    case "QuickBooks":
+      baseUrl = `${QuickBookUrl}client/connection-status/${organisationKeyId}/${clientKeyId}`;
+      break;
+    case "Xero":
+      baseUrl = `${XeroBaseUrl}client/connection-status/${organisationKeyId}/${clientKeyId}`;
+      break;
+    default:
+      throw new Error("Invalid platform selected");
+  }
+  const res = await getListWithAuthenticated(baseUrl);
+  return res;
+};
+
+export const DisconnectClient = async (
+  param,
+  organisationKeyId,
+  clientKeyId,
+  activePlatform,
+) => {
+  debugger;
+  let baseUrl;
+  switch (activePlatform) {
+    case "QuickBooks":
+      baseUrl = `${QuickBookUrl}client/disconnect/${organisationKeyId}/${clientKeyId}`;
+      break;
+    case "Xero":
+      baseUrl = `${XeroBaseUrl}client/disconnect/${organisationKeyId}/${clientKeyId}`;
+      break;
+    default:
+      throw new Error("Invalid platform selected");
+  }
+  const res = await postApiWithAuthenticated(baseUrl);
+  return res;
+};
+
+export const GetDisconnectImpact = async (organisationKeyId, activePlatform) => {
+  const baseUrl =
+    activePlatform === "QuickBooks"
+      ? `${QuickBookUrl}disconnect-impact/${organisationKeyId}`
+      : `${XeroBaseUrl}disconnect-impact/${organisationKeyId}`;
+  const res = await getListWithAuthenticated(baseUrl);
+  return res;
+};

@@ -1,5 +1,5 @@
 import { ColorProvider } from "../AuthContext/ColorContext";
-import { lazy, useContext, useEffect, Suspense } from "react";
+import { lazy, useContext, useEffect, Suspense, useState } from "react";
 import { OutBooksTitle } from "../components/GlobalMessage";
 // -------------------------------CSS File--------------------------------------------------------
 import "../App.css";
@@ -321,6 +321,61 @@ const Edit_Sub_package = Loadable(
 const New_Engagement_Model = Loadable(
   lazy(() => import("../pages/engagement-letter/AddUpdateEngagementLetter")),
 );
+
+// Wrapper around new EL
+function AddEngagementLetterRoute() {
+  const navigate = useNavigate();
+  const common = useSelector((state) => state.Storage);
+
+  const {
+    activeOrganizationSubscriptionPlan,
+    userAccessData,
+    accessCount,
+  } = useContext(AuthContextProvider);
+
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    // Wait until permissions/subscription data are initialized.
+    if (accessCount === -1) {
+      return;
+    }
+
+    const remainingEL = Number(
+      activeOrganizationSubscriptionPlan?.remainingEL ??
+        activeOrganizationSubscriptionPlan?.remainingESignatures,
+    );
+
+    const canAddEngagementLetter =
+      common.enableEL === 1 &&
+      activeOrganizationSubscriptionPlan?.prepareContract === true &&
+      remainingEL > 0 &&
+      userAccessData?.Admin_Engagement_Latter_CanAdd === true;
+
+    if (!canAddEngagementLetter) {
+      navigate("/engagement-letters", {
+        replace: true,
+        state: { showOutOfELModal: true },
+      });
+      return;
+    }
+
+    setIsChecking(false);
+  }, [
+    accessCount,
+    common.enableEL,
+    activeOrganizationSubscriptionPlan,
+    userAccessData,
+    navigate,
+  ]);
+
+  if (isChecking) {
+    return <Loader />;
+  }
+
+  return <New_Engagement_Model />;
+}
+
 const User = Loadable(lazy(() => import("../pages/subscription/User/User")));
 const Invoices = Loadable(
   lazy(() => import("../pages/subscription/Invoices/Invoices")),
@@ -417,6 +472,8 @@ function AppContent() {
     handleReloadClick,
   } = useContext(AuthContextProvider);
   const common = useSelector((state) => state.Storage);
+  const bookkeepingStatus = useSelector((state) => state.auth.bookkeeping);
+  const bookkeepingLoading = useSelector((state) => state.auth.loading);
   const location = useLocation();
   // Define the title dynamically based on the current location
   let title = `${OutBooksTitle}`;
@@ -426,6 +483,19 @@ function AppContent() {
   useEffect(() => {
     const { pathname } = location;
     const currentPathname = pathname; // Store current pathname
+    const isBookkeepingRoute = currentPathname === "/fee-assurance";
+    const hasConnectedBookkeeping =
+      bookkeepingStatus.Xero || bookkeepingStatus.QuickBooks;
+
+    if (
+      isBookkeepingRoute &&
+      !bookkeepingLoading &&
+      !hasConnectedBookkeeping
+    ) {
+      navigate("/", { replace: true });
+      return;
+    }
+
     // Check if common.enableEL is not equal to 1
     if (common.enableEL !== 1) {
       // If the current path is "/engagement-letters" or "/add-engagement-letter",
@@ -567,7 +637,14 @@ function AppContent() {
     ) {
       navigate("/"); // Navigate back if the user doesn't have permission
     }
-  }, [common.enableEL, userAccessData]);
+  }, [
+    common.enableEL,
+    userAccessData,
+    location.pathname,
+    bookkeepingLoading,
+    bookkeepingStatus.Xero,
+    bookkeepingStatus.QuickBooks,
+  ]);
 
   useEffect(() => {
     const { pathname } = location;
@@ -691,7 +768,7 @@ function AppContent() {
       title = `Xero | ` + title;
       break;
     case "/quick-book":
-      title = `Quick Book | ` + title;
+      title = `QuickBooks | ` + title;
       break;
     case "/pricing-setting":
       title = `Pricing | ` + title;
@@ -1035,6 +1112,7 @@ function Index() {
     prospectName,
     proposalName,
     EngagementName,
+    hasBookkeeping,
   } = useContext(AuthContextProvider);
 
   return (
@@ -1221,7 +1299,7 @@ function Index() {
                           />
                           <Route path="/xero" element={<Xero />} />
                           <Route path="/quickbooks" element={<QuickBook />} />
-                          <Route path="/deviation" element={<Deviation />} />
+                          <Route path="/fee-assurance" element={<Deviation />} />
                           <Route
                             path="/activity-logs"
                             element={<Activity_Logs />}
@@ -1343,7 +1421,7 @@ function Index() {
                           />
                           <Route
                             path="/add-engagement-letter"
-                            element={<New_Engagement_Model />}
+                            element={<AddEngagementLetterRoute />}
                           />
                           <Route path="/view-letter" element={<ViewLetter />} />
                           <Route
