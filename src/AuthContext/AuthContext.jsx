@@ -406,6 +406,16 @@ const AuthContext = ({ children }) => {
     setMenuVisible(!isMenuVisible);
   };
 
+  const hasBookkeeping = (() => {
+    const data = JSON.parse(
+      localStorage.getItem("persist:Bookkeeping") || "{}"
+    );
+
+    const bookkeeping = JSON.parse(data.bookkeeping || "{}");
+
+    return {Xero: bookkeeping.Xero === true, Quickbooks: bookkeeping.QuickBooks === true};
+  })();
+
   // const updateImageUrlsInHtml = async (htmlContent) => {
   //   // Regular expression to match base64 images
   //   const base64ImageRegex =
@@ -3837,6 +3847,7 @@ const AuthContext = ({ children }) => {
         toggleMenuVisibility,
         maxCountToRecallApi,
         setMaxCountToRecallApi,
+        hasBookkeeping,
       }}
     >
       {children}

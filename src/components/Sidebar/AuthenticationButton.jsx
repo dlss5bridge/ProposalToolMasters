@@ -6,6 +6,8 @@ import { getActivePlatform } from "../../lib/utils";
 export default function AuthButton({
   onAuthenticate,
   onDisconnect,
+  onDisconnectOpen,
+  disconnectExtraContent,
   activeBtn,
   moduleName,
   activePlatform,
@@ -68,6 +70,7 @@ export default function AuthButton({
           <button
             onClick={() => {
               setActionType("Disconnect");
+              if (onDisconnectOpen) onDisconnectOpen();
               setOpenSuccessModal(true);
               const modal = new window.bootstrap.Modal(
                 document.getElementById("ConfirmModel"),
@@ -94,6 +97,7 @@ export default function AuthButton({
         modelRequestData={{
           Action: actionType === "Disconnect" ? "Disconnect" : "Redirect",
         }}
+        extraContent={actionType === "Disconnect" ? disconnectExtraContent : null}
       />
     </>
   );

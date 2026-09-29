@@ -136,6 +136,8 @@ const TopbarClone = () => {
   const subListColor = lightenColor(TopbarStyle.backgroundColor, 0.55);
   console.log(subListColor);
   const common = useSelector((state) => state.Storage);
+  const bookkeepingStatus = useSelector((state) => state.auth.bookkeeping);
+  const bookkeepingLoading = useSelector((state) => state.auth.loading);
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpens, setIsOpens] = useState(false);
@@ -153,6 +155,8 @@ const TopbarClone = () => {
     backgroundColor: windowWidth < 1200 ? "inherit" : "",
     border: "none",
   };
+  const hasConnectedBookkeeping =
+    bookkeepingStatus.Xero || bookkeepingStatus.QuickBooks;
 
   useEffect(() => {
     // Update localStorage whenever sidebar state changes
@@ -486,6 +490,10 @@ const TopbarClone = () => {
           currencyID: organisationData?.currencyID,
         }),
       );
+      // if(common.roleTypeId !== USER_ROLE_TYPE.SuperAdmin) {
+      //   dispatch(xeroConnectionStatus(common.organisationKeyID));
+      //   dispatch(quickBooksConnectionStatus(common.organisationKeyID));
+      // }
 
       navigate("/");
       if (
@@ -2305,15 +2313,16 @@ const TopbarClone = () => {
                                         </Link>
                                       </li>
 
-                                      <li
-                                        className="nav-item"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toggleSettingSubList(
-                                            "BookKeepingConfig",
-                                          );
-                                        }}
-                                      >
+                                      {(bookkeeping?.enableXERO || bookkeeping?.enableQBO) && (
+                                          <li
+                                            className="nav-item"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              toggleSettingSubList(
+                                                "BookKeepingConfig",
+                                              );
+                                            }}
+                                          >
                                         <a
                                           href="#BookKeepingConfig"
                                           className="nav-link collapsed d-flex justify-content-between align-items-center"
@@ -2323,7 +2332,7 @@ const TopbarClone = () => {
                                           }}
                                           style={{ textDecoration: "none" }}
                                         >
-                                          Bookkeeping Gateway
+                                          Bookkeeping Platforms
                                           <span className="sub-arrow"></span>
                                         </a>
 
@@ -2356,16 +2365,17 @@ const TopbarClone = () => {
                                             )}
                                             <li className="nav-item">
                                               <Link
-                                                to="/deviation"
+                                                to="/fee-assurance"
                                                 onClick={togglenav}
                                                 className="nav-link"
                                               >
-                                                Deviation
+                                                Fee Assurance
                                               </Link>
                                             </li>
                                           </ul>
                                         </div>
-                                      </li>
+                                          </li>
+                                        )}
 
                                       <li class="nav-item">
                                         <Link

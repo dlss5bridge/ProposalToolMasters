@@ -11,6 +11,7 @@ function ConfirmModel({
   setModelRequestData,
   openSuccessModal,
   modelAction,
+  extraContent
 }) {
   const { EngagementName } = useContext(AuthContextProvider);
   return (
@@ -101,6 +102,22 @@ function ConfirmModel({
                   src="https://cdn.lordicon.com/mecwbjnp.json"
                   trigger="loop"
                   colors="primary:#22c55e,secondary:#16a34a"
+                  style={{ width: "75px", height: "60px" }}
+                ></lord-icon>
+              )}
+              {modelRequestData.Action === "Unmap Contact" && (
+                <lord-icon
+                  src="https://cdn.lordicon.com/mecwbjnp.json"
+                  trigger="loop"
+                  colors="primary:#f7b84b,secondary:#f06548"
+                  style={{ width: "75px", height: "60px" }}
+                ></lord-icon>
+              )}
+              {modelRequestData.Action === "Disconnect Client" && (
+                <lord-icon
+                  src="https://cdn.lordicon.com/mecwbjnp.json"
+                  trigger="loop"
+                  colors="primary:#f7b84b,secondary:#f06548"
                   style={{ width: "75px", height: "60px" }}
                 ></lord-icon>
               )}
@@ -241,7 +258,17 @@ function ConfirmModel({
                 )}
                 {modelRequestData.Action === "Add Contact Mapping" && (
                   <span class="text-muted mb-0">
-                    Are you sure you want to add this record into Xero?
+                    Are you sure you want to link this prospect?
+                  </span>
+                )}
+                {modelRequestData.Action === "Unmap Contact" && (
+                  <span class="text-muted mb-0">
+                    Are you sure you want to unlink this prospect?
+                  </span>
+                )}
+                {modelRequestData.Action === "Disconnect Client" && (
+                  <span class="text-muted mb-0">
+                    Are you sure you want to disconnect this client?
                   </span>
                 )}
                 {modelRequestData.Action === "Archive" && (
@@ -557,6 +584,7 @@ function ConfirmModel({
                 )}
               </div>
             </div>
+            {extraContent}
             <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
               <button
                 type="button"
@@ -610,6 +638,8 @@ function ConfirmModel({
                 modelRequestData.Action === "Disconnect" ||
                 modelRequestData.Action === "Add Contact" ||
                 modelRequestData.Action === "Add Contact Mapping" ||
+                modelRequestData.Action === "Unmap Contact" ||
+                modelRequestData.Action === "Disconnect Client" ||
                 modelRequestData.Action === "ResetPaymentGatewayChange") && (
                 <button
                   onClick={() => {
@@ -629,6 +659,8 @@ function ConfirmModel({
                     modelRequestData.Action === "Redirect" ||
                     modelRequestData.Action === "Add Contact" ||
                     modelRequestData.Action === "Add Contact Mapping" ||
+                    modelRequestData.Action === "Unmap Contact" ||
+                    modelRequestData.Action === "Disconnect Client" ||
                     modelRequestData.Action === "emailStatusChange") && (
                     <span>Yes, Change It!</span>
                   )}

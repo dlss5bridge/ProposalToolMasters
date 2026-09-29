@@ -10000,6 +10000,9 @@ const Add_Update_Engagement_Letter = () => {
   });
   const [refIdStore, setRefIdStore] = useState("");
   const [servicePackageName, setServicePackageName] = useState("");
+  const [deviationAutoAdvance, setDeviationAutoAdvance] = useState(
+    Boolean(location.state?.jumpToPricingTab),
+  );
   // B] Initial useEffect :
 
   // 1) Will Call Initial Api Like List Api
@@ -10072,6 +10075,36 @@ const Add_Update_Engagement_Letter = () => {
       setIsAddUpdatePricingActionDone(false);
     }
   }, [isAddUpdatePricingActionDone]);
+
+  // Step 1: contract model loaded -> leave Basic Information
+  useEffect(() => {
+    if (!deviationAutoAdvance) return;
+    if (activeTab !== EngagementLetterHeader.BasicInformation) return;
+    if (!engagementObj.contractKeyID || !engagementObj.ClientID) return;
+    HandleTabChange(EngagementLetterHeader.SelectServices, statusID.Sent);
+  }, [deviationAutoAdvance, activeTab, engagementObj.contractKeyID, engagementObj.ClientID]);
+
+  // Step 2: service lists loaded -> leave Select Services
+  // (does not fire for sourceID 2, which skips straight to tab 3 — handled naturally)
+  useEffect(() => {
+    if (!deviationAutoAdvance) return;
+    if (activeTab !== EngagementLetterHeader.SelectServices) return;
+    const hasSelection =
+      recurringServiceList?.some((c) => c.servicesList?.some((s) => s.isSelected)) ||
+      oneOffServiceList?.some((c) => c.servicesList?.some((s) => s.isSelected));
+    if (!hasSelection) return;
+    HandleTabChange(EngagementLetterHeader.AdditionalInformation, statusID.Sent);
+  }, [deviationAutoAdvance, activeTab, recurringServiceList, oneOffServiceList]);
+
+  // Step 3: additional info loaded -> compute pricing and land
+  useEffect(() => {
+    if (!deviationAutoAdvance) return;
+    if (activeTab !== EngagementLetterHeader.AdditionalInformation) return;
+    if (additionalInformationList === null) return;
+    const target = location.state?.jumpToPricingTab;
+    if (target) HandleTabChange(target, statusID.Sent);
+    setDeviationAutoAdvance(false);
+  }, [deviationAutoAdvance, activeTab, additionalInformationList]);
 
   function getFontNameById(id) {
     const font = Utils.FontFamily.find((f) => f.value === id);

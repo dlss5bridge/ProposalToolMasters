@@ -104,3 +104,10 @@ export const ArchiveContract = async (ContractKeyID, UserKeyID, IsArchived) => {
   );
   return res;
 };
+export const CreateContractFromDeviation = async (params) => {
+  const res = await postApiWithAuthenticated(
+    `${Engagement_Letters}/CreateContractFromDeviation`,
+    params
+  );
+  return res;
+};
