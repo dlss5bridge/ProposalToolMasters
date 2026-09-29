@@ -10040,8 +10040,13 @@ const ReviewPackagesComponent = (props) => {
               Number(netTotal) + Number(currentServicePriceWithToFixed),
             )?.toFixed(2);
 
+            // Use the same discount percentage shown in the Discount (%)
+            // input for this package (RecurringPricingInfo), not the
+            // hidden higher-precision RecurringFrequencyPricingInfo value
+            // — otherwise the discount amount shown doesn't match the
+            // percentage displayed next to it.
             defaultDiscountPercentage =
-              props.RecurringFrequencyPricingInfo.DiscountPercentagePackageOne;
+              props.RecurringPricingInfo.DiscountPercentagePackageOne;
           }
 
           // Check if the packageTwoID is in servicePackageIDs and packageTwoValue is not null
@@ -10060,7 +10065,7 @@ const ReviewPackagesComponent = (props) => {
             )?.toFixed(2);
 
             defaultDiscountPercentage =
-              props.RecurringFrequencyPricingInfo.DiscountPercentagePackageTwo;
+              props.RecurringPricingInfo.DiscountPercentagePackageTwo;
           }
 
           // Check if the packageThreeID is in servicePackageIDs and packageThreeValue is not null
@@ -10079,8 +10084,7 @@ const ReviewPackagesComponent = (props) => {
             )?.toFixed(2);
 
             defaultDiscountPercentage =
-              props.RecurringFrequencyPricingInfo
-                .DiscountPercentagePackageThree;
+              props.RecurringPricingInfo.DiscountPercentagePackageThree;
           }
         }
       });
@@ -10358,8 +10362,11 @@ const ReviewPackagesComponent = (props) => {
               Number(netTotal) + Number(currentServicePriceWithToFixed),
             )?.toFixed(2);
 
+            // Same reasoning as the recurring packages above: use the
+            // discount percentage shown in the input (OneOffPricingInfo),
+            // not the hidden higher-precision OneOffPricingInfoCopy value.
             defaultDiscountPercentage =
-              props.OneOffPricingInfoCopy.DiscountPercentagePackageOne;
+              props.OneOffPricingInfo.DiscountPercentagePackageOne;
           }
 
           // Check if the packageTwoID is in servicePackageIDs and packageTwoValue is not null
@@ -10378,7 +10385,7 @@ const ReviewPackagesComponent = (props) => {
             )?.toFixed(2);
 
             defaultDiscountPercentage =
-              props.OneOffPricingInfoCopy.DiscountPercentagePackageTwo;
+              props.OneOffPricingInfo.DiscountPercentagePackageTwo;
           }
 
           // Check if the packageThreeID is in servicePackageIDs and packageThreeValue is not null
