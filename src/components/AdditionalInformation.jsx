@@ -446,18 +446,19 @@ const AdditionalInformation = (props) => {
   // Read-only reference list for the "Selected Services" sidebar - same
   // source (recurringServiceList / oneOffServiceList) Select Services
   // itself reads isSelected from, just displayed here rather than toggled.
-  const selectedRecurringForSummary = (props.recurringServiceList || [])
-    .flatMap((category) =>
-      (category.servicesList || [])
-        .filter((service) => service.isSelected && !service.isHidden)
-        .map((service) => ({
-          key: `r-${category.serviceCatID}-${service.serviceID}`,
-          serviceName: service.serviceName,
-          categoryName: category.serviceCatName,
-        })),
-    );
-  const selectedOneOffForSummary = (props.oneOffServiceList || [])
-    .flatMap((category) =>
+  const selectedRecurringForSummary = (
+    props.recurringServiceList || []
+  ).flatMap((category) =>
+    (category.servicesList || [])
+      .filter((service) => service.isSelected && !service.isHidden)
+      .map((service) => ({
+        key: `r-${category.serviceCatID}-${service.serviceID}`,
+        serviceName: service.serviceName,
+        categoryName: category.serviceCatName,
+      })),
+  );
+  const selectedOneOffForSummary = (props.oneOffServiceList || []).flatMap(
+    (category) =>
       (category.servicesList || [])
         .filter((service) => service.isSelected && !service.isHidden)
         .map((service) => ({
@@ -465,7 +466,7 @@ const AdditionalInformation = (props) => {
           serviceName: service.serviceName,
           categoryName: category.serviceCatName,
         })),
-    );
+  );
   const totalSelectedForSummary =
     selectedRecurringForSummary.length + selectedOneOffForSummary.length;
   const visibleRecurringForSummary = showAllSelectedForSummary
@@ -485,6 +486,7 @@ const AdditionalInformation = (props) => {
   const isEnhancedTheme = Number(props.serviceThemeID) > 1;
   const showSelectedServicesSummary =
     isEnhancedTheme &&
+    !props.hideSelectedServicesSummary &&
     (Array.isArray(props.recurringServiceList) ||
       Array.isArray(props.oneOffServiceList));
 
@@ -551,8 +553,7 @@ const AdditionalInformation = (props) => {
           <span>Next</span>
         </button>
       )}
-      {(props.moduleName == "Contract" ||
-        props.moduleName === "Package") && (
+      {(props.moduleName == "Contract" || props.moduleName === "Package") && (
         <button
           className="btn btn-md btn-success create-item-btn pf-btn--next"
           onClick={async () => {
@@ -567,11 +568,7 @@ const AdditionalInformation = (props) => {
           type="submit"
           class="btn btn-md btn-success create-item-btn text-nowrap pf-btn--draft"
           onClick={() =>
-            props.handleSaveAsDraft(
-              3,
-              moduleNameForSaveAsDraft,
-              statusID.Draft,
-            )
+            props.handleSaveAsDraft(3, moduleNameForSaveAsDraft, statusID.Draft)
           }
           style={{ marginLeft: "5px" }}
         >
@@ -595,9 +592,7 @@ const AdditionalInformation = (props) => {
     <div>
       <div
         className={
-          showSelectedServicesSummary
-            ? "additional-info-layout"
-            : undefined
+          showSelectedServicesSummary ? "additional-info-layout" : undefined
         }
       >
         <div className="create-practice-height scrollbar">
@@ -620,889 +615,931 @@ const AdditionalInformation = (props) => {
                   </div>
                 </div>
                 <div className="basicinfo-card__body additional-info-pane">
-              {props.additionalInformationList
-                ?.filter((item) => item.driverTypeID !== 1)
-              ?.map((i) => {
-                return (
-                  <div class="row fieldset add-new-package">
-                    {i.driverVisibility && i.driverTypeID === 2 && (
-                      <>
-                        <div
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-md-5 col-sm-12 text-start text-md-start"
-                              : "col-md-3 col-sm-12 text-start text-md-end"
-                          }
-                        >
-                          <div class="">
-                            <label class="form-label">
-                              {isMobile ? (
-                                <>
-                                  {i?.driverName
-                                    .substring(0, 30)
-                                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                                </>
-                              ) : (
-                                <>
-                                  {props.moduleName === "Package" ||
-                                  props.moduleName === "Quote" ? (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  ) : i?.driverName.length > 20 ? (
-                                    <Tooltip title={i?.driverName}>
-                                      {i?.driverName
-                                        .substring(0, 25)
-                                        .replace(/\b\w/g, (l) =>
-                                          l.toUpperCase(),
-                                        ) + "..."}
-                                    </Tooltip>
-                                  ) : (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  )}
-                                </>
-                              )}
-                              <span class="text-danger">*</span>
-                            </label>
-                          </div>
-                        </div>
-
-                        <div
-                          id={`${i?.driverName}`}
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-lg-7 col-md-9 col-sm-12"
-                              : "col-lg-9 col-md-9 col-sm-12"
-                          }
-                        >
-                          <div class="mb-1">
-                            <div class="input-group">
-                              <input
-                                type="text"
-                                class="input-text"
-                                placeholder={i?.driverName}
-                                value={
-                                  i.driverValue === null ? "" : i.driverValue
+                  {props.additionalInformationList
+                    ?.filter((item) => item.driverTypeID !== 1)
+                    ?.map((i) => {
+                      return (
+                        <div class="row fieldset add-new-package">
+                          {i.driverVisibility && i.driverTypeID === 2 && (
+                            <>
+                              <div
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-md-5 col-sm-12 text-start text-md-start"
+                                    : "col-md-3 col-sm-12 text-start text-md-end"
                                 }
-                                onChange={(e) =>
-                                  HandleAdditionalInformation(
-                                    e.target.value,
-                                    i.globalPricingDriverID,
-                                  )
-                                }
-                              />
-                              {props.requireMessage &&
-                              (i.driverValue === null ||
-                                i.driverValue === undefined ||
-                                i.driverValue === "") ? (
-                                <label className="validation">
-                                  {ERROR_MESSAGES}
-                                </label>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    {i.driverVisibility && i.driverTypeID === 3 && (
-                      <>
-                        <div
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-md-5 col-sm-12 text-start text-md-start"
-                              : "col-md-3 col-sm-12 text-start text-md-end"
-                          }
-                        >
-                          <div class="">
-                            <label class="form-label">
-                              {isMobile ? (
-                                <>
-                                  {i?.driverName
-                                    .substring(0, 30)
-                                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                                </>
-                              ) : (
-                                <>
-                                  {props.moduleName === "Package" ||
-                                  props.moduleName === "Quote" ? (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  ) : i?.driverName.length > 20 ? (
-                                    <Tooltip title={i?.driverName}>
-                                      {i?.driverName
-                                        .substring(0, 25)
-                                        .replace(/\b\w/g, (l) =>
-                                          l.toUpperCase(),
-                                        ) + "..."}
-                                    </Tooltip>
-                                  ) : (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  )}
-                                </>
-                              )}
-                              <span class="text-danger">*</span>
-                            </label>
-                          </div>
-                        </div>
-                        <div
-                          id={`${i?.driverName}`}
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-lg-7 col-md-9 col-sm-12"
-                              : "col-lg-9 col-md-9 col-sm-12"
-                          }
-                        >
-                          <div class="mb-1 ">
-                            <div class="input-group">
-                              <Select
-                                options={i.variation?.map((item) => ({
-                                  value: item.variationID,
-                                  label: item.variationName,
-                                  variationValue: item.variationValue,
-                                }))}
-                                value={i?.variation
-                                  .filter(
-                                    (variation) => variation.isDefault === true,
-                                  )
-                                  .map((i) => ({
-                                    value: i.variationID,
-                                    label: i.variationName,
-                                  }))}
-                                onChange={(value) =>
-                                  HandleAdditionalInformation(
-                                    value,
-                                    i.globalPricingDriverID,
-                                    value.value,
-                                    i,
-                                  )
-                                }
-                                menuPortalTarget={document.body}
-                                styles={SELECT_MENU_PORTAL_STYLES}
-                              />
-                              {props.requireMessage &&
-                              (i.driverValue === null ||
-                                i.driverValue === undefined ||
-                                i.driverValue === "") ? (
-                                <label className="validation">
-                                  {ERROR_MESSAGES}
-                                </label>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    {i.driverVisibility && i.driverTypeID === 6 && (
-                      <>
-                        <div
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-md-5 col-sm-12 text-start text-md-start"
-                              : "col-md-3 col-sm-12 text-start text-md-end"
-                          }
-                        >
-                          <div class="">
-                            <label class="form-label">
-                              {isMobile ? (
-                                <>
-                                  {i?.driverName
-                                    .substring(0, 30)
-                                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                                </>
-                              ) : (
-                                <>
-                                  {props.moduleName === "Package" ||
-                                  props.moduleName === "Quote" ? (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  ) : i?.driverName.length > 20 ? (
-                                    <Tooltip title={i?.driverName}>
-                                      {i?.driverName
-                                        .substring(0, 25)
-                                        .replace(/\b\w/g, (l) =>
-                                          l.toUpperCase(),
-                                        ) + "..."}
-                                    </Tooltip>
-                                  ) : (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  )}
-                                </>
-                              )}
-                              <span class="text-danger">*</span>
-                            </label>
-                          </div>
-                        </div>
-                        <div
-                          id={`${i?.driverName}`}
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-lg-7 col-md-9 col-sm-12"
-                              : "col-lg-9 col-md-9 col-sm-12"
-                          }
-                        >
-                          <div className="mb-1">
-                            <div class="input-group">
-                              <DatePicker
-                                className="input-text"
-                                selected={
-                                  i.enteredDate
-                                    ? getSelectedDateInfo(i)?.enteredDate
-                                    : null
-                                }
-                                dateFormat={
-                                  i.date?.[0]?.dateFormat || "dd-MM-yyyy"
-                                }
-                                onChange={(date) =>
-                                  HandleDateDriver(
-                                    date,
-                                    i.globalPricingDriverID,
-                                  )
-                                }
-                                minDate={getMinDate(
-                                  i.date,
-                                  i.date?.[0]?.dateFormat,
-                                )}
-                                maxDate={getMaxDate(
-                                  i.date,
-                                  i.date?.[0]?.dateFormat,
-                                )}
-                                placeholderText="Select any date"
-                              />
-                              {props.requireMessage &&
-                                (i.enteredDate === null ||
-                                  i.enteredDate === undefined ||
-                                  i.enteredDate === "") && (
-                                  <label className="validation">
-                                    {ERROR_MESSAGES}
-                                  </label>
-                                )}
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {i.driverVisibility && i.driverTypeID === 5 && (
-                      <>
-                        <div
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-md-5 col-sm-12 text-start text-md-start"
-                              : "col-md-3 col-sm-12 text-start text-md-end"
-                          }
-                        >
-                          <div class="">
-                            <label class="form-label">
-                              {isMobile ? (
-                                <>
-                                  {i?.driverName
-                                    .substring(0, 30)
-                                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                                </>
-                              ) : (
-                                <>
-                                  {props.moduleName === "Package" ||
-                                  props.moduleName === "Quote" ? (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  ) : i?.driverName.length > 20 ? (
-                                    <Tooltip title={i?.driverName}>
-                                      {i?.driverName
-                                        .substring(0, 25)
-                                        .replace(/\b\w/g, (l) =>
-                                          l.toUpperCase(),
-                                        ) + "..."}
-                                    </Tooltip>
-                                  ) : (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  )}
-                                </>
-                              )}
-                              <span class="text-danger">*</span>
-                            </label>
-                          </div>
-                        </div>
-                        <div
-                          id={`${i?.driverName}`}
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-lg-7 col-md-9 col-sm-12"
-                              : "col-lg-9 col-md-9 col-sm-12"
-                          }
-                        >
-                          <div className="mb-1">
-                            <div class="input-group">
-                              <input
-                                className="input-text"
-                                type="text"
-                                value={i?.enteredText || null}
-                                onChange={(e) =>
-                                  HandleTextDriver(e, i.globalPricingDriverID)
-                                }
-                                placeholder="Enter Text"
-                                maxLength={i?.text?.[0]?.textLength || 100}
-                              />
-                              {props.requireMessage &&
-                                (i.enteredText === null ||
-                                  i.enteredText === undefined ||
-                                  i.enteredText === "") && (
-                                  <label className="validation">
-                                    {ERROR_MESSAGES}
-                                  </label>
-                                )}
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {/* working here  */}
-                    {i.driverVisibility && i.driverTypeID === 4 && (
-                      <>
-                        <div
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-md-5 col-sm-12 text-start text-md-start"
-                              : "col-md-3 col-sm-12 text-start text-md-end"
-                          }
-                        >
-                          {/* <div class="col-md-5 col-sm-12 text-start text-md-start"> */}
-                          <div class="">
-                            <label class="form-label">
-                              {isMobile ? (
-                                <>
-                                  {i?.driverName
-                                    .substring(0, 30)
-                                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                                </>
-                              ) : (
-                                <>
-                                  {props.moduleName === "Package" ||
-                                  props.moduleName === "Quote" ? (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  ) : i?.driverName.length > 20 ? (
-                                    <Tooltip title={i?.driverName}>
-                                      {i?.driverName
-                                        .substring(0, 25)
-                                        .replace(/\b\w/g, (l) =>
-                                          l.toUpperCase(),
-                                        ) + "..."}
-                                    </Tooltip>
-                                  ) : (
-                                    i?.driverName.replace(/\b\w/g, (l) =>
-                                      l.toUpperCase(),
-                                    )
-                                  )}
-                                </>
-                              )}
-                              <span class="text-danger">*</span>
-                            </label>
-                          </div>
-                        </div>
-                        <div
-                          id={`${i?.driverName}`}
-                          className={
-                            props.moduleName === "Package" ||
-                            props.moduleName === "Quote"
-                              ? "col-lg-7 col-md-9 col-sm-12"
-                              : "col-lg-9 col-md-9 col-sm-12"
-                          }
-                        >
-                          <div class="mb-1 ">
-                            <div class="input-group">
-                              <Select
-                                options={i.slab?.map((item) => ({
-                                  value: item.slabID,
-                                  label:
-                                    item.slabTypeID === 2
-                                      ? "Other"
-                                      : `${item.slabFrom
-                                          .toString()
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ",",
-                                          )} - ${item.slabTo
-                                          .toString()
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ",",
-                                          )}`,
-                                  variationValue: item.slabValue,
-                                }))}
-                                value={i?.slab
-                                  ?.filter((slab) => slab.isDefault === true)
-                                  .map((i) => ({
-                                    value: i.slabID,
-                                    label:
-                                      i.slabTypeID === 2
-                                        ? "Other"
-                                        : `${i.slabFrom
-                                            .toString()
-                                            .replace(
-                                              /\B(?=(\d{3})+(?!\d))/g,
-                                              ",",
-                                            )} - ${i.slabTo
-                                            .toString()
-                                            .replace(
-                                              /\B(?=(\d{3})+(?!\d))/g,
-                                              ",",
-                                            )}`,
-                                  }))}
-                                onChange={(value) =>
-                                  HandleAdditionalInformation(
-                                    value,
-                                    i.globalPricingDriverID,
-                                  )
-                                }
-                                menuPortalTarget={document.body}
-                                styles={SELECT_MENU_PORTAL_STYLES}
-                              />
-                              {props.requireMessage &&
-                              i?.slab?.some(
-                                (slab) =>
-                                  slab.isDefault && slab.slabTypeID !== 2,
-                              ) &&
-                              (i.driverValue === null ||
-                                i.driverValue === undefined ||
-                                i.driverValue === "") ? (
-                                <label className="validation">
-                                  {ERROR_MESSAGES}
-                                </label>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        {i?.slab
-                          ?.filter((slab) => slab.isDefault === true)
-                          .map((item) => {
-                            if (item.slabTypeID === 2) {
-                              return (
-                                <React.Fragment key={i?.driverName}>
-                                  <div
-                                    className={
-                                      props.moduleName === "Package" ||
-                                      props.moduleName === "Quote"
-                                        ? "col-md-5 col-sm-12 text-start text-md-start"
-                                        : "col-md-3 col-sm-12 text-start text-md-end"
-                                    }
-                                  >
-                                    <div>
-                                      <label className="form-label"></label>
-                                    </div>
-                                  </div>
-                                  <div
-                                    id={`${i?.driverName}`}
-                                    className={
-                                      props.moduleName === "Package" ||
-                                      props.moduleName === "Quote"
-                                        ? "col-lg-7 col-md-9 col-sm-12"
-                                        : "col-lg-9 col-md-9 col-sm-12"
-                                    }
-                                  >
-                                    <div className="mb-1 d-flex flex-column justify-content-end h-100">
-                                      <div className="input-group">
-                                        <input
-                                          type="text"
-                                          value={i?.driverValue
-                                            ?.toString()
-                                            ?.replace(
-                                              /\B(?=(\d{3})+(?!\d))/g,
-                                              ",",
-                                            )}
-                                          onChange={(e) => {
-                                            OnIncrementalValueChange(
-                                              i,
-                                              e.target.value,
-                                            );
-                                          }}
-                                          className="input-text mt-2"
-                                          placeholder={i.driverName}
-                                        />
-                                      </div>
-                                      {props.requireMessage &&
-                                        (i.driverValue === null ||
-                                          i.driverValue === undefined ||
-                                          i.driverValue === "") && (
-                                          <label className="validation">
-                                            {ERROR_MESSAGES}
-                                          </label>
+                              >
+                                <div class="">
+                                  <label class="form-label">
+                                    {isMobile ? (
+                                      <>
+                                        {i?.driverName
+                                          .substring(0, 30)
+                                          .replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )}
+                                      </>
+                                    ) : (
+                                      <>
+                                        {props.moduleName === "Package" ||
+                                        props.moduleName === "Quote" ? (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
+                                        ) : i?.driverName.length > 20 ? (
+                                          <Tooltip title={i?.driverName}>
+                                            {i?.driverName
+                                              .substring(0, 25)
+                                              .replace(/\b\w/g, (l) =>
+                                                l.toUpperCase(),
+                                              ) + "..."}
+                                          </Tooltip>
+                                        ) : (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
                                         )}
-                                      {props.requireMessage &&
-                                        (i.driverValue === "." ||
-                                          i.driverValue === "-") && (
-                                          <label className="validation">
-                                            Invalid Value
-                                          </label>
-                                        )}
-                                    </div>
+                                      </>
+                                    )}
+                                    <span class="text-danger">*</span>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div
+                                id={`${i?.driverName}`}
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-lg-7 col-md-9 col-sm-12"
+                                    : "col-lg-9 col-md-9 col-sm-12"
+                                }
+                              >
+                                <div class="mb-1">
+                                  <div class="input-group">
+                                    <input
+                                      type="text"
+                                      class="input-text"
+                                      placeholder={i?.driverName}
+                                      value={
+                                        i.driverValue === null
+                                          ? ""
+                                          : i.driverValue
+                                      }
+                                      onChange={(e) =>
+                                        HandleAdditionalInformation(
+                                          e.target.value,
+                                          i.globalPricingDriverID,
+                                        )
+                                      }
+                                    />
+                                    {props.requireMessage &&
+                                    (i.driverValue === null ||
+                                      i.driverValue === undefined ||
+                                      i.driverValue === "") ? (
+                                      <label className="validation">
+                                        {ERROR_MESSAGES}
+                                      </label>
+                                    ) : (
+                                      ""
+                                    )}
                                   </div>
-                                </React.Fragment>
-                              );
-                            }
-                            return null;
-                          })}
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-
-            {props.moduleName == "Contract" && (
-              <div id="SignatoryBlockDiv">
-                <h3 className="modal-title">Signatories</h3>
-                <div className="separator"></div>
-
-                {/* Signature Position (moved to top) */}
-                <div className="row fieldset mt-3">
-                  <div className="col-lg-3 col-md-3 col-sm-12 text-start text-md-end">
-                    <label className="fieldset-label required">
-                      Signature Position
-                      <span style={{ color: "#ec4561" }}>*</span>
-                    </label>
-                  </div>
-                  <div className="col-lg-9 col-md-9 col-sm-12">
-                    <div className="input-group">
-                      <Select
-                        options={Utils.SignaturePosition}
-                        value={Utils.SignaturePosition.find(
-                          (item) => item.value == SignaturePositionValue,
-                        )}
-                        onChange={(e) => {
-                          // Apply the selected position to all signatories
-                          setSignaturePositionValue(e.value);
-                          const updatedList = props.contractSignatoriesList.map(
-                            (signatory) => ({
-                              ...signatory,
-                              signaturePositionID: e.value,
-                            }),
-                          );
-                          props.setContractSignatoriesList(updatedList);
-                        }}
-                        menuPortalTarget={document.body}
-                        styles={SELECT_MENU_PORTAL_STYLES}
-                      />
-                    </div>
-                    {props.requireMessage &&
-                      (!SignaturePositionValue ||
-                        SignaturePositionValue === "") && (
-                        <label className="validation">{ERROR_MESSAGES}</label>
-                      )}
-                  </div>
-                </div>
-
-                {/* Signatories List */}
-                {props?.contractSignatoriesList?.map((signatory, index) => {
-                  return (
-                    <div
-                      id={`contract-signatory-${index}`}
-                      className="fieldset-group mb-4"
-                      key={index}
-                    >
-                      <div>
-                        <label className="fieldset-group-label">
-                          {Utils.stringifyNumber(index + 1)} Signatory
-                        </label>
-                        <label className="fieldset-group-label-1 required">
-                          {props.contractSignatoriesList.length === 1 ? null : (
-                            <button
-                              onClick={() => props.deleteSignatory(index)}
-                              className="btn btn-sm btn-danger delete-fieldset-group"
-                            >
-                              <i className="bi bi-trash3 margin-right "></i>
-                              <span className="d-none d-sm-inline">
-                                Delete Signature
-                              </span>
-                            </button>
+                                </div>
+                              </div>
+                            </>
                           )}
-                        </label>
+                          {i.driverVisibility && i.driverTypeID === 3 && (
+                            <>
+                              <div
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-md-5 col-sm-12 text-start text-md-start"
+                                    : "col-md-3 col-sm-12 text-start text-md-end"
+                                }
+                              >
+                                <div class="">
+                                  <label class="form-label">
+                                    {isMobile ? (
+                                      <>
+                                        {i?.driverName
+                                          .substring(0, 30)
+                                          .replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )}
+                                      </>
+                                    ) : (
+                                      <>
+                                        {props.moduleName === "Package" ||
+                                        props.moduleName === "Quote" ? (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
+                                        ) : i?.driverName.length > 20 ? (
+                                          <Tooltip title={i?.driverName}>
+                                            {i?.driverName
+                                              .substring(0, 25)
+                                              .replace(/\b\w/g, (l) =>
+                                                l.toUpperCase(),
+                                              ) + "..."}
+                                          </Tooltip>
+                                        ) : (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
+                                        )}
+                                      </>
+                                    )}
+                                    <span class="text-danger">*</span>
+                                  </label>
+                                </div>
+                              </div>
+                              <div
+                                id={`${i?.driverName}`}
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-lg-7 col-md-9 col-sm-12"
+                                    : "col-lg-9 col-md-9 col-sm-12"
+                                }
+                              >
+                                <div class="mb-1 ">
+                                  <div class="input-group">
+                                    <Select
+                                      options={i.variation?.map((item) => ({
+                                        value: item.variationID,
+                                        label: item.variationName,
+                                        variationValue: item.variationValue,
+                                      }))}
+                                      value={i?.variation
+                                        .filter(
+                                          (variation) =>
+                                            variation.isDefault === true,
+                                        )
+                                        .map((i) => ({
+                                          value: i.variationID,
+                                          label: i.variationName,
+                                        }))}
+                                      onChange={(value) =>
+                                        HandleAdditionalInformation(
+                                          value,
+                                          i.globalPricingDriverID,
+                                          value.value,
+                                          i,
+                                        )
+                                      }
+                                      menuPortalTarget={document.body}
+                                      styles={SELECT_MENU_PORTAL_STYLES}
+                                    />
+                                    {props.requireMessage &&
+                                    (i.driverValue === null ||
+                                      i.driverValue === undefined ||
+                                      i.driverValue === "") ? (
+                                      <label className="validation">
+                                        {ERROR_MESSAGES}
+                                      </label>
+                                    ) : (
+                                      ""
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                          {i.driverVisibility && i.driverTypeID === 6 && (
+                            <>
+                              <div
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-md-5 col-sm-12 text-start text-md-start"
+                                    : "col-md-3 col-sm-12 text-start text-md-end"
+                                }
+                              >
+                                <div class="">
+                                  <label class="form-label">
+                                    {isMobile ? (
+                                      <>
+                                        {i?.driverName
+                                          .substring(0, 30)
+                                          .replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )}
+                                      </>
+                                    ) : (
+                                      <>
+                                        {props.moduleName === "Package" ||
+                                        props.moduleName === "Quote" ? (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
+                                        ) : i?.driverName.length > 20 ? (
+                                          <Tooltip title={i?.driverName}>
+                                            {i?.driverName
+                                              .substring(0, 25)
+                                              .replace(/\b\w/g, (l) =>
+                                                l.toUpperCase(),
+                                              ) + "..."}
+                                          </Tooltip>
+                                        ) : (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
+                                        )}
+                                      </>
+                                    )}
+                                    <span class="text-danger">*</span>
+                                  </label>
+                                </div>
+                              </div>
+                              <div
+                                id={`${i?.driverName}`}
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-lg-7 col-md-9 col-sm-12"
+                                    : "col-lg-9 col-md-9 col-sm-12"
+                                }
+                              >
+                                <div className="mb-1">
+                                  <div class="input-group">
+                                    <DatePicker
+                                      className="input-text"
+                                      selected={
+                                        i.enteredDate
+                                          ? getSelectedDateInfo(i)?.enteredDate
+                                          : null
+                                      }
+                                      dateFormat={
+                                        i.date?.[0]?.dateFormat || "dd-MM-yyyy"
+                                      }
+                                      onChange={(date) =>
+                                        HandleDateDriver(
+                                          date,
+                                          i.globalPricingDriverID,
+                                        )
+                                      }
+                                      minDate={getMinDate(
+                                        i.date,
+                                        i.date?.[0]?.dateFormat,
+                                      )}
+                                      maxDate={getMaxDate(
+                                        i.date,
+                                        i.date?.[0]?.dateFormat,
+                                      )}
+                                      placeholderText="Select any date"
+                                    />
+                                    {props.requireMessage &&
+                                      (i.enteredDate === null ||
+                                        i.enteredDate === undefined ||
+                                        i.enteredDate === "") && (
+                                        <label className="validation">
+                                          {ERROR_MESSAGES}
+                                        </label>
+                                      )}
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          )}
 
-                        {/* First Name */}
-                        <div className="row fieldset">
-                          <div className="col-lg-3 col-md-3 col-sm-12 text-start text-md-end">
-                            <label className="fieldset-label required">
-                              First Name{" "}
-                              <span style={{ color: "#ec4561" }}>*</span>
-                            </label>
-                          </div>
-                          <div className="col-lg-9 col-md-9 col-sm-12">
-                            <input
-                              type="text"
-                              className="input-text"
-                              placeholder="First Name"
-                              value={signatory?.firstName}
-                              onChange={(e) => {
-                                const inputValue = e.target.value.trim();
-                                const cleanedValue = inputValue.replace(
-                                  /[.\s]/g,
-                                  "",
-                                );
-                                if (/\d/.test(cleanedValue)) return;
-                                const capitalizedValue =
-                                  cleanedValue.charAt(0).toUpperCase() +
-                                  cleanedValue.slice(1);
-                                handleSignatoryBlock(
-                                  index,
-                                  "firstName",
-                                  capitalizedValue,
-                                );
-                              }}
-                              maxLength={30}
-                            />
-                            {props.requireMessage &&
-                              (!signatory?.firstName ||
-                                signatory?.firstName === "") && (
-                                <label className="validation">
-                                  {ERROR_MESSAGES}
-                                </label>
-                              )}
-                          </div>
+                          {i.driverVisibility && i.driverTypeID === 5 && (
+                            <>
+                              <div
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-md-5 col-sm-12 text-start text-md-start"
+                                    : "col-md-3 col-sm-12 text-start text-md-end"
+                                }
+                              >
+                                <div class="">
+                                  <label class="form-label">
+                                    {isMobile ? (
+                                      <>
+                                        {i?.driverName
+                                          .substring(0, 30)
+                                          .replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )}
+                                      </>
+                                    ) : (
+                                      <>
+                                        {props.moduleName === "Package" ||
+                                        props.moduleName === "Quote" ? (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
+                                        ) : i?.driverName.length > 20 ? (
+                                          <Tooltip title={i?.driverName}>
+                                            {i?.driverName
+                                              .substring(0, 25)
+                                              .replace(/\b\w/g, (l) =>
+                                                l.toUpperCase(),
+                                              ) + "..."}
+                                          </Tooltip>
+                                        ) : (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
+                                        )}
+                                      </>
+                                    )}
+                                    <span class="text-danger">*</span>
+                                  </label>
+                                </div>
+                              </div>
+                              <div
+                                id={`${i?.driverName}`}
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-lg-7 col-md-9 col-sm-12"
+                                    : "col-lg-9 col-md-9 col-sm-12"
+                                }
+                              >
+                                <div className="mb-1">
+                                  <div class="input-group">
+                                    <input
+                                      className="input-text"
+                                      type="text"
+                                      value={i?.enteredText || null}
+                                      onChange={(e) =>
+                                        HandleTextDriver(
+                                          e,
+                                          i.globalPricingDriverID,
+                                        )
+                                      }
+                                      placeholder="Enter Text"
+                                      maxLength={
+                                        i?.text?.[0]?.textLength || 100
+                                      }
+                                    />
+                                    {props.requireMessage &&
+                                      (i.enteredText === null ||
+                                        i.enteredText === undefined ||
+                                        i.enteredText === "") && (
+                                        <label className="validation">
+                                          {ERROR_MESSAGES}
+                                        </label>
+                                      )}
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          )}
 
-                          {/* Last Name */}
-                          <div className="mb-2"></div>
-                          <div className="col-lg-3 col-md-3 col-sm-12 text-start text-md-end">
-                            <label className="fieldset-label required">
-                              Last Name{" "}
-                              <span style={{ color: "#ec4561" }}>*</span>
-                            </label>
-                          </div>
-                          <div className="col-lg-9 col-md-9 col-sm-12">
-                            <input
-                              type="text"
-                              className="input-text"
-                              placeholder="Last Name"
-                              value={formatName(signatory?.lastName)}
-                              onChange={(e) => {
-                                const inputValue = e.target.value.trim();
-                                const cleanedValue = inputValue.replace(
-                                  /[.\s]/g,
-                                  "",
-                                );
-                                if (/\d/.test(cleanedValue)) return;
-                                const capitalizedValue =
-                                  cleanedValue.charAt(0).toUpperCase() +
-                                  cleanedValue.slice(1).toLowerCase();
-                                handleSignatoryBlock(
-                                  index,
-                                  "lastName",
-                                  capitalizedValue,
-                                );
-                              }}
-                              maxLength={30}
-                            />
-                            {props.requireMessage &&
-                              (!signatory?.lastName ||
-                                signatory?.lastName === "") && (
-                                <label className="validation">
-                                  {ERROR_MESSAGES}
-                                </label>
-                              )}
-                          </div>
+                          {/* working here  */}
+                          {i.driverVisibility && i.driverTypeID === 4 && (
+                            <>
+                              <div
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-md-5 col-sm-12 text-start text-md-start"
+                                    : "col-md-3 col-sm-12 text-start text-md-end"
+                                }
+                              >
+                                {/* <div class="col-md-5 col-sm-12 text-start text-md-start"> */}
+                                <div class="">
+                                  <label class="form-label">
+                                    {isMobile ? (
+                                      <>
+                                        {i?.driverName
+                                          .substring(0, 30)
+                                          .replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )}
+                                      </>
+                                    ) : (
+                                      <>
+                                        {props.moduleName === "Package" ||
+                                        props.moduleName === "Quote" ? (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
+                                        ) : i?.driverName.length > 20 ? (
+                                          <Tooltip title={i?.driverName}>
+                                            {i?.driverName
+                                              .substring(0, 25)
+                                              .replace(/\b\w/g, (l) =>
+                                                l.toUpperCase(),
+                                              ) + "..."}
+                                          </Tooltip>
+                                        ) : (
+                                          i?.driverName.replace(/\b\w/g, (l) =>
+                                            l.toUpperCase(),
+                                          )
+                                        )}
+                                      </>
+                                    )}
+                                    <span class="text-danger">*</span>
+                                  </label>
+                                </div>
+                              </div>
+                              <div
+                                id={`${i?.driverName}`}
+                                className={
+                                  props.moduleName === "Package" ||
+                                  props.moduleName === "Quote"
+                                    ? "col-lg-7 col-md-9 col-sm-12"
+                                    : "col-lg-9 col-md-9 col-sm-12"
+                                }
+                              >
+                                <div class="mb-1 ">
+                                  <div class="input-group">
+                                    <Select
+                                      options={i.slab?.map((item) => ({
+                                        value: item.slabID,
+                                        label:
+                                          item.slabTypeID === 2
+                                            ? "Other"
+                                            : `${item.slabFrom
+                                                .toString()
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ",",
+                                                )} - ${item.slabTo
+                                                .toString()
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ",",
+                                                )}`,
+                                        variationValue: item.slabValue,
+                                      }))}
+                                      value={i?.slab
+                                        ?.filter(
+                                          (slab) => slab.isDefault === true,
+                                        )
+                                        .map((i) => ({
+                                          value: i.slabID,
+                                          label:
+                                            i.slabTypeID === 2
+                                              ? "Other"
+                                              : `${i.slabFrom
+                                                  .toString()
+                                                  .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    ",",
+                                                  )} - ${i.slabTo
+                                                  .toString()
+                                                  .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    ",",
+                                                  )}`,
+                                        }))}
+                                      onChange={(value) =>
+                                        HandleAdditionalInformation(
+                                          value,
+                                          i.globalPricingDriverID,
+                                        )
+                                      }
+                                      menuPortalTarget={document.body}
+                                      styles={SELECT_MENU_PORTAL_STYLES}
+                                    />
+                                    {props.requireMessage &&
+                                    i?.slab?.some(
+                                      (slab) =>
+                                        slab.isDefault && slab.slabTypeID !== 2,
+                                    ) &&
+                                    (i.driverValue === null ||
+                                      i.driverValue === undefined ||
+                                      i.driverValue === "") ? (
+                                      <label className="validation">
+                                        {ERROR_MESSAGES}
+                                      </label>
+                                    ) : (
+                                      ""
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              {i?.slab
+                                ?.filter((slab) => slab.isDefault === true)
+                                .map((item) => {
+                                  if (item.slabTypeID === 2) {
+                                    return (
+                                      <React.Fragment key={i?.driverName}>
+                                        <div
+                                          className={
+                                            props.moduleName === "Package" ||
+                                            props.moduleName === "Quote"
+                                              ? "col-md-5 col-sm-12 text-start text-md-start"
+                                              : "col-md-3 col-sm-12 text-start text-md-end"
+                                          }
+                                        >
+                                          <div>
+                                            <label className="form-label"></label>
+                                          </div>
+                                        </div>
+                                        <div
+                                          id={`${i?.driverName}`}
+                                          className={
+                                            props.moduleName === "Package" ||
+                                            props.moduleName === "Quote"
+                                              ? "col-lg-7 col-md-9 col-sm-12"
+                                              : "col-lg-9 col-md-9 col-sm-12"
+                                          }
+                                        >
+                                          <div className="mb-1 d-flex flex-column justify-content-end h-100">
+                                            <div className="input-group">
+                                              <input
+                                                type="text"
+                                                value={i?.driverValue
+                                                  ?.toString()
+                                                  ?.replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    ",",
+                                                  )}
+                                                onChange={(e) => {
+                                                  OnIncrementalValueChange(
+                                                    i,
+                                                    e.target.value,
+                                                  );
+                                                }}
+                                                className="input-text mt-2"
+                                                placeholder={i.driverName}
+                                              />
+                                            </div>
+                                            {props.requireMessage &&
+                                              (i.driverValue === null ||
+                                                i.driverValue === undefined ||
+                                                i.driverValue === "") && (
+                                                <label className="validation">
+                                                  {ERROR_MESSAGES}
+                                                </label>
+                                              )}
+                                            {props.requireMessage &&
+                                              (i.driverValue === "." ||
+                                                i.driverValue === "-") && (
+                                                <label className="validation">
+                                                  Invalid Value
+                                                </label>
+                                              )}
+                                          </div>
+                                        </div>
+                                      </React.Fragment>
+                                    );
+                                  }
+                                  return null;
+                                })}
+                            </>
+                          )}
                         </div>
+                      );
+                    })}
 
-                        {/* Email */}
-                        <div className="row fieldset">
-                          <div className="col-md-3 col-sm-12 text-start text-md-end">
-                            <label className="fieldset-label required">
-                              Email <span style={{ color: "#ec4561" }}>*</span>
-                            </label>
-                          </div>
-                          <div className="col-md-9 col-sm-12">
-                            <input
-                              type="text"
-                              className="input-text"
-                              placeholder="Email"
-                              value={signatory?.emailID}
+                  {props.moduleName == "Contract" && (
+                    <div id="SignatoryBlockDiv">
+                      <h3 className="modal-title">Signatories</h3>
+                      <div className="separator"></div>
+
+                      {/* Signature Position (moved to top) */}
+                      <div className="row fieldset mt-3">
+                        <div className="col-lg-3 col-md-3 col-sm-12 text-start text-md-end">
+                          <label className="fieldset-label required">
+                            Signature Position
+                            <span style={{ color: "#ec4561" }}>*</span>
+                          </label>
+                        </div>
+                        <div className="col-lg-9 col-md-9 col-sm-12">
+                          <div className="input-group">
+                            <Select
+                              options={Utils.SignaturePosition}
+                              value={Utils.SignaturePosition.find(
+                                (item) => item.value == SignaturePositionValue,
+                              )}
                               onChange={(e) => {
-                                handleSignatoryBlock(
-                                  index,
-                                  "emailID",
-                                  e.target.value,
-                                );
+                                // Apply the selected position to all signatories
+                                setSignaturePositionValue(e.value);
+                                const updatedList =
+                                  props.contractSignatoriesList.map(
+                                    (signatory) => ({
+                                      ...signatory,
+                                      signaturePositionID: e.value,
+                                    }),
+                                  );
+                                props.setContractSignatoriesList(updatedList);
                               }}
+                              menuPortalTarget={document.body}
+                              styles={SELECT_MENU_PORTAL_STYLES}
                             />
-                            {props.requireMessage &&
-                            (!signatory?.emailID ||
-                              signatory?.emailID === "") ? (
+                          </div>
+                          {props.requireMessage &&
+                            (!SignaturePositionValue ||
+                              SignaturePositionValue === "") && (
                               <label className="validation">
                                 {ERROR_MESSAGES}
                               </label>
-                            ) : (
-                              props.requireMessage &&
-                              !isValidEmail(signatory?.emailID) && (
-                                <label className="validation">
-                                  Invalid email pattern
-                                </label>
-                              )
                             )}
-                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
 
-                {/* Validation for no signatories */}
-                {props.requireMessage &&
-                  props?.contractSignatoriesList?.length === 0 && (
-                    <label className="validation">
-                      At least 1 Signatory is required.
-                    </label>
-                  )}
-              </div>
-            )}
-            {props.moduleName === "Contract" && (
-              <>
-                <h3 className="modal-title">Terms & Conditions</h3>
-                <div className="separator"></div>
-                <div id="TnC-Div" className="row fieldset mt-3">
-                  <div className="col-lg-3 col-md-3 col-sm-12 text-start text-md-end">
-                    <label className="fieldset-label required">
-                      TnC Template<span style={{ color: "#ec4561" }}>*</span>
-                    </label>
-                  </div>
-                  <div className="col-lg-9 col-md-9 col-sm-12">
-                    <div className="input-group">
-                      <Select
-                        options={props.TnCLookupList}
-                        value={props?.SelectTnCTemplateValue} // Assuming 'index' is defined somewhere
-                        onChange={(e) => {
-                          props.handleSelectTncTemplate(e);
-                        }}
-                        menuPortalTarget={document.body}
-                        styles={SELECT_MENU_PORTAL_STYLES}
-                      />
+                      {/* Signatories List */}
+                      {props?.contractSignatoriesList?.map(
+                        (signatory, index) => {
+                          return (
+                            <div
+                              id={`contract-signatory-${index}`}
+                              className="fieldset-group mb-4"
+                              key={index}
+                            >
+                              <div>
+                                <label className="fieldset-group-label">
+                                  {Utils.stringifyNumber(index + 1)} Signatory
+                                </label>
+                                <label className="fieldset-group-label-1 required">
+                                  {props.contractSignatoriesList.length ===
+                                  1 ? null : (
+                                    <button
+                                      onClick={() =>
+                                        props.deleteSignatory(index)
+                                      }
+                                      className="btn btn-sm btn-danger delete-fieldset-group"
+                                    >
+                                      <i className="bi bi-trash3 margin-right "></i>
+                                      <span className="d-none d-sm-inline">
+                                        Delete Signature
+                                      </span>
+                                    </button>
+                                  )}
+                                </label>
+
+                                {/* First Name */}
+                                <div className="row fieldset">
+                                  <div className="col-lg-3 col-md-3 col-sm-12 text-start text-md-end">
+                                    <label className="fieldset-label required">
+                                      First Name{" "}
+                                      <span style={{ color: "#ec4561" }}>
+                                        *
+                                      </span>
+                                    </label>
+                                  </div>
+                                  <div className="col-lg-9 col-md-9 col-sm-12">
+                                    <input
+                                      type="text"
+                                      className="input-text"
+                                      placeholder="First Name"
+                                      value={signatory?.firstName}
+                                      onChange={(e) => {
+                                        const inputValue =
+                                          e.target.value.trim();
+                                        const cleanedValue = inputValue.replace(
+                                          /[.\s]/g,
+                                          "",
+                                        );
+                                        if (/\d/.test(cleanedValue)) return;
+                                        const capitalizedValue =
+                                          cleanedValue.charAt(0).toUpperCase() +
+                                          cleanedValue.slice(1);
+                                        handleSignatoryBlock(
+                                          index,
+                                          "firstName",
+                                          capitalizedValue,
+                                        );
+                                      }}
+                                      maxLength={30}
+                                    />
+                                    {props.requireMessage &&
+                                      (!signatory?.firstName ||
+                                        signatory?.firstName === "") && (
+                                        <label className="validation">
+                                          {ERROR_MESSAGES}
+                                        </label>
+                                      )}
+                                  </div>
+
+                                  {/* Last Name */}
+                                  <div className="mb-2"></div>
+                                  <div className="col-lg-3 col-md-3 col-sm-12 text-start text-md-end">
+                                    <label className="fieldset-label required">
+                                      Last Name{" "}
+                                      <span style={{ color: "#ec4561" }}>
+                                        *
+                                      </span>
+                                    </label>
+                                  </div>
+                                  <div className="col-lg-9 col-md-9 col-sm-12">
+                                    <input
+                                      type="text"
+                                      className="input-text"
+                                      placeholder="Last Name"
+                                      value={formatName(signatory?.lastName)}
+                                      onChange={(e) => {
+                                        const inputValue =
+                                          e.target.value.trim();
+                                        const cleanedValue = inputValue.replace(
+                                          /[.\s]/g,
+                                          "",
+                                        );
+                                        if (/\d/.test(cleanedValue)) return;
+                                        const capitalizedValue =
+                                          cleanedValue.charAt(0).toUpperCase() +
+                                          cleanedValue.slice(1).toLowerCase();
+                                        handleSignatoryBlock(
+                                          index,
+                                          "lastName",
+                                          capitalizedValue,
+                                        );
+                                      }}
+                                      maxLength={30}
+                                    />
+                                    {props.requireMessage &&
+                                      (!signatory?.lastName ||
+                                        signatory?.lastName === "") && (
+                                        <label className="validation">
+                                          {ERROR_MESSAGES}
+                                        </label>
+                                      )}
+                                  </div>
+                                </div>
+
+                                {/* Email */}
+                                <div className="row fieldset">
+                                  <div className="col-md-3 col-sm-12 text-start text-md-end">
+                                    <label className="fieldset-label required">
+                                      Email{" "}
+                                      <span style={{ color: "#ec4561" }}>
+                                        *
+                                      </span>
+                                    </label>
+                                  </div>
+                                  <div className="col-md-9 col-sm-12">
+                                    <input
+                                      type="text"
+                                      className="input-text"
+                                      placeholder="Email"
+                                      value={signatory?.emailID}
+                                      onChange={(e) => {
+                                        handleSignatoryBlock(
+                                          index,
+                                          "emailID",
+                                          e.target.value,
+                                        );
+                                      }}
+                                    />
+                                    {props.requireMessage &&
+                                    (!signatory?.emailID ||
+                                      signatory?.emailID === "") ? (
+                                      <label className="validation">
+                                        {ERROR_MESSAGES}
+                                      </label>
+                                    ) : (
+                                      props.requireMessage &&
+                                      !isValidEmail(signatory?.emailID) && (
+                                        <label className="validation">
+                                          Invalid email pattern
+                                        </label>
+                                      )
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        },
+                      )}
+
+                      {/* Validation for no signatories */}
+                      {props.requireMessage &&
+                        props?.contractSignatoriesList?.length === 0 && (
+                          <label className="validation">
+                            At least 1 Signatory is required.
+                          </label>
+                        )}
                     </div>
-                    {props.requireMessage &&
-                    (props?.engagementObj.tnCTemplateID === null ||
-                      props?.engagementObj.tnCTemplateID === undefined ||
-                      props?.engagementObj.tnCTemplateID === "") ? (
-                      <label className="validation">{ERROR_MESSAGES}</label>
-                    ) : (
-                      ""
-                    )}
-                  </div>
-                </div>
-                {props?.engagementObj?.pdf !== null ? (
-                  <div id="TnC-PdfDiv" className="mt-2">
-                    <iframe
-                      title="PDF Viewer"
-                      src={props?.engagementObj?.pdf}
-                      width="100%"
-                      height="600px"
-                    ></iframe>
-                  </div>
-                ) : props?.engagementObj?.tnCTemplateContent !== null ? (
-                  <div id="TnC-EditorDiv">
-                    <Text_Editor
-                      className="mt-2"
-                      handleContentChange={props?.handleContentChange}
-                      editorState={props?.engagementObj?.tnCTemplateContent}
-                    />
-                  </div>
-                ) : null}
-              </>
-            )}
+                  )}
+                  {props.moduleName === "Contract" && (
+                    <>
+                      <h3 className="modal-title">Terms & Conditions</h3>
+                      <div className="separator"></div>
+                      <div id="TnC-Div" className="row fieldset mt-3">
+                        <div className="col-lg-3 col-md-3 col-sm-12 text-start text-md-end">
+                          <label className="fieldset-label required">
+                            TnC Template
+                            <span style={{ color: "#ec4561" }}>*</span>
+                          </label>
+                        </div>
+                        <div className="col-lg-9 col-md-9 col-sm-12">
+                          <div className="input-group">
+                            <Select
+                              options={props.TnCLookupList}
+                              value={props?.SelectTnCTemplateValue} // Assuming 'index' is defined somewhere
+                              onChange={(e) => {
+                                props.handleSelectTncTemplate(e);
+                              }}
+                              menuPortalTarget={document.body}
+                              styles={SELECT_MENU_PORTAL_STYLES}
+                            />
+                          </div>
+                          {props.requireMessage &&
+                          (props?.engagementObj.tnCTemplateID === null ||
+                            props?.engagementObj.tnCTemplateID === undefined ||
+                            props?.engagementObj.tnCTemplateID === "") ? (
+                            <label className="validation">
+                              {ERROR_MESSAGES}
+                            </label>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </div>
+                      {props?.engagementObj?.pdf !== null ? (
+                        <div id="TnC-PdfDiv" className="mt-2">
+                          <iframe
+                            title="PDF Viewer"
+                            src={props?.engagementObj?.pdf}
+                            width="100%"
+                            height="600px"
+                          ></iframe>
+                        </div>
+                      ) : props?.engagementObj?.tnCTemplateContent !== null ? (
+                        <div id="TnC-EditorDiv">
+                          <Text_Editor
+                            className="mt-2"
+                            handleContentChange={props?.handleContentChange}
+                            editorState={
+                              props?.engagementObj?.tnCTemplateContent
+                            }
+                          />
+                        </div>
+                      ) : null}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-      {showSelectedServicesSummary && (
-        <aside
-          className="additional-info-summary"
-          aria-label="Selected services"
-        >
-          <div className="additional-info-summary__head">
-            <h3>Selected Services</h3>
-            <span className="additional-info-summary__badge">
-              {totalSelectedForSummary}
-            </span>
-          </div>
+        {showSelectedServicesSummary && (
+          <aside
+            className="additional-info-summary"
+            aria-label="Selected services"
+          >
+            <div className="additional-info-summary__head">
+              <h3>Selected Services</h3>
+              <span className="additional-info-summary__badge">
+                {totalSelectedForSummary}
+              </span>
+            </div>
 
-          <div className="additional-info-summary__body">
-            {totalSelectedForSummary === 0 ? (
-              <p className="additional-info-summary__empty">
-                No services selected yet.
-              </p>
-            ) : (
-              <>
-                {selectedRecurringForSummary.length > 0 && (
-                  <section>
-                    <h4>Recurring Services</h4>
-                    <ul>
-                      {visibleRecurringForSummary.map((item) => (
-                        <li key={item.key}>
-                          <span>{item.serviceName}</span>
-                          <small>{item.categoryName}</small>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-                {selectedOneOffForSummary.length > 0 && (
-                  <section>
-                    <h4>One-Off Services</h4>
-                    <ul>
-                      {visibleOneOffForSummary.map((item) => (
-                        <li key={item.key}>
-                          <span>{item.serviceName}</span>
-                          <small>{item.categoryName}</small>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-                {hiddenSelectedForSummaryCount > 0 && (
-                  <button
-                    type="button"
-                    className="additional-info-summary__toggle"
-                    onClick={() =>
-                      setShowAllSelectedForSummary((prev) => !prev)
-                    }
-                  >
-                    {showAllSelectedForSummary
-                      ? "Show fewer"
-                      : `View all ${totalSelectedForSummary} items`}
-                  </button>
-                )}
-              </>
-            )}
-          </div>
+            <div className="additional-info-summary__body">
+              {totalSelectedForSummary === 0 ? (
+                <p className="additional-info-summary__empty">
+                  No services selected yet.
+                </p>
+              ) : (
+                <>
+                  {selectedRecurringForSummary.length > 0 && (
+                    <section>
+                      <h4>Recurring Services</h4>
+                      <ul>
+                        {visibleRecurringForSummary.map((item) => (
+                          <li key={item.key}>
+                            <span>{item.serviceName}</span>
+                            <small>{item.categoryName}</small>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                  {selectedOneOffForSummary.length > 0 && (
+                    <section>
+                      <h4>One-Off Services</h4>
+                      <ul>
+                        {visibleOneOffForSummary.map((item) => (
+                          <li key={item.key}>
+                            <span>{item.serviceName}</span>
+                            <small>{item.categoryName}</small>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                  {hiddenSelectedForSummaryCount > 0 && (
+                    <button
+                      type="button"
+                      className="additional-info-summary__toggle"
+                      onClick={() =>
+                        setShowAllSelectedForSummary((prev) => !prev)
+                      }
+                    >
+                      {showAllSelectedForSummary
+                        ? "Show fewer"
+                        : `View all ${totalSelectedForSummary} items`}
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
 
-          <div className="hstack additional-info-summary__actions">
-            {footerActions}
-          </div>
-        </aside>
-      )}
+            <div className="hstack additional-info-summary__actions">
+              {footerActions}
+            </div>
+          </aside>
+        )}
       </div>
 
       {!showSelectedServicesSummary && (

@@ -14639,7 +14639,41 @@ const Add_Update_Engagement_Letter = () => {
               BasicForm: true,
             });
             setActiveTab(NextTab);
+          } else if (engagementObj.selectSourceId === 4) {
+            // Same as selectSourceId 1/3 above: this is the "skip Proposal
+            // to EL" source. Without loadServiceLists() here,
+            // recurringServiceList/oneOffServiceList stay at their initial
+            // [] state for as long as the user is on Additional
+            // Information, so its "Selected Services" summary sidebar has
+            // nothing to filter on and always shows "No services selected
+            // yet" - even though services ARE selected and do show
+            // correctly once Review Services re-fetches them separately.
+            setRequireMessage(false);
+            GetPricingSettingModelData();
+            if (
+              location.state?.contractKeyID === null ||
+              engagementObj.paymentGatewayID === null
+            ) {
+              GetPaymentGatewayModelData(common.organisationKeyID);
+            }
+            loadServiceLists();
+            setIsValidForm({
+              ...isValidForm,
+              BasicForm: true,
+              SelectService: true,
+            });
+            setLoader(false);
+            setActiveTab(3);
           } else {
+            // selectSourceId 2 - "from an existing Proposal", including the
+            // "Skip to EL" flow (skipToEngagementLatter() sets
+            // selectSourceId to 2). Same missing piece as the 4 branch
+            // above: without loadServiceLists() here, recurringServiceList/
+            // oneOffServiceList never get populated, so Additional
+            // Information's "Selected Services" summary sidebar has
+            // nothing to show even though the services carried over from
+            // the Proposal are genuinely selected (Review Services re-
+            // fetches them separately, which is why that page is correct).
             setIsValidForm({
               ...isValidForm,
               BasicForm: true,
@@ -14652,6 +14686,7 @@ const Add_Update_Engagement_Letter = () => {
             ) {
               GetPaymentGatewayModelData(common.organisationKeyID);
             }
+            loadServiceLists();
             setLoader(false);
             setRequireMessage(false);
             setActiveTab(3);
@@ -15233,6 +15268,16 @@ const Add_Update_Engagement_Letter = () => {
             const recurringServiceListData =
               await GetRecurringServiceListData();
             const oneOffServiceListData = await GetOneOffServiceListData();
+            // Feed the "Selected Services" summary sidebar on Additional
+            // Information (AdditionalInformation.jsx reads these via its
+            // recurringServiceList/oneOffServiceList props, same as the
+            // normal create flow's own GetRecurringServiceListData/
+            // GetOneOffServiceListData already do at line ~10738/10900).
+            // Without this, that sidebar has nothing to filter on and
+            // always shows "No services selected yet" for this skip-from-
+            // Proposal flow, even though the services below are selected.
+            setRecurringServiceList(recurringServiceListData);
+            setOneOffServiceList(oneOffServiceListData);
             const SelectedRecurringService = recurringServiceListData.map(
               (item) => {
                 return {
@@ -18897,6 +18942,16 @@ const Add_Update_Engagement_Letter = () => {
                     serviceThemeID={serviceThemeID}
                     recurringServiceList={recurringServiceList}
                     oneOffServiceList={oneOffServiceList}
+                    // Only true for the "Skip to EL" entry path (the
+                    // Proposal screen's Skip button navigates here with
+                    // { state: { QuoteKeyID } }). A manual "from an
+                    // existing Proposal" dropdown pick during Basic
+                    // Information sets engagementObj.QuoteKeyID instead,
+                    // never this router-level location.state value, so it
+                    // isn't affected.
+                    hideSelectedServicesSummary={Boolean(
+                      location.state?.QuoteKeyID,
+                    )}
                   />
                 </Suspense>
               )}

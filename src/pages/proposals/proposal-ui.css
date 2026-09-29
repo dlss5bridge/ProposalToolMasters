@@ -177,8 +177,8 @@
 
 .proposal-ui .tab-content > .tab-pane {
   margin-bottom: 20px;
-  padding: 24px !important;
-  border: 1px solid var(--pu-line);
+  padding: 10px !important;
+  /* border: 1px solid var(--pu-line); */
   border-radius: 14px;
   background: #fff;
 }
@@ -365,6 +365,7 @@
   padding: 20px;
   border: 1px solid var(--pu-line);
   border-radius: 14px;
+  margin-top: 15px;
 }
 
 .proposal-ui .SOF-SD-Customization .separator {
