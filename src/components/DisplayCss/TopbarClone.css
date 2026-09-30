@@ -121,29 +121,98 @@
   background: #8fa0b7;
 }
 
+/* =========================================================
+   SIDEBAR NAVIGATION
+   Single consolidated section (replaces the earlier stacked
+   override layers). Every surface is a translucent tint over
+   --sb-bg, the user's Appearance colour set inline on
+   .app-menu, so the sidebar stays coherent with any theme.
+   ========================================================= */
+
+.topbar-clone {
+  --sb-bg: #333547;
+  --sb-text: rgba(255, 255, 255, 0.72);
+  --sb-text-muted: rgba(255, 255, 255, 0.48);
+  --sb-child-text: rgba(255, 255, 255, 0.64);
+  --sb-hover: rgba(255, 255, 255, 0.08);
+  --sb-line: rgba(255, 255, 255, 0.09);
+  --sb-field: rgba(255, 255, 255, 0.06);
+  --sb-accent: #22b8da;
+  --sb-accent-soft: rgba(34, 184, 218, 0.16);
+  --sb-accent-text: #7ddcf0;
+}
+
+/* ---------------------------------------------------------
+   Scroll chain: logo row and practice selector stay put,
+   only the menu list scrolls.
+   --------------------------------------------------------- */
+
+.topbar-clone .app-menu > #scrollbar {
+  display: flex !important;
+  flex-direction: column;
+  overflow: hidden !important;
+}
+
+.topbar-clone .app-menu > #scrollbar > div {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar-clone #two-column-menu {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto !important;
+}
+
+.topbar-clone #two-column-menu > div:first-child > .pt-4.me-2 {
+  border-bottom: 0 !important;
+}
+
 .topbar-clone .sidebar-menu-scroll {
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 0 105px;
+  overflow-y: auto;
+  padding: 0 0 16px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.22) transparent;
+  scrollbar-color: transparent transparent;
+}
+
+.topbar-clone .sidebar-menu-scroll:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
 }
 
 .topbar-clone .sidebar-menu-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-.topbar-clone .sidebar-menu-scroll::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.22);
-  border-radius: 8px;
+  width: 6px;
 }
 
-/* Practice selector */
+.topbar-clone .sidebar-menu-scroll::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background: transparent;
+}
+
+.topbar-clone .sidebar-menu-scroll:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ---------------------------------------------------------
+   Practice selector (pinned)
+   --------------------------------------------------------- */
+
+.topbar-clone .sidebar-fixed-practice-selector {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--sb-bg) !important;
+  border-bottom: 1px solid var(--sb-line);
+}
+
 .topbar-clone .sidebar-menu-scroll > .navbar-nav.d-none.d-md-block {
   display: block !important;
-  padding: 0 16px !important;
-  margin: 10px 0 10px !important;
+  margin: 0 !important;
+  padding: 4px 16px 14px !important;
 }
 
 .topbar-clone
@@ -164,70 +233,57 @@
   position: relative !important;
   display: block !important;
   width: 100% !important;
-  margin: 0 0 32px !important;
+  margin: 0 !important;
 }
 
 .topbar-clone .nav-select.form-select {
-  width: 100% !important;
-  height: 36px !important;
-
-  padding: 0 36px 0 28px !important;
-
-  border: 1px solid #334155 !important;
+  height: 38px !important;
+  padding: 0 34px 0 28px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 8px !important;
-
-  background-color: #111c2f !important;
-  color: #e5edf7 !important;
-
+  background-color: var(--sb-field) !important;
+  background-image: none !important;
+  color: #ffffff !important;
   font-size: 13px !important;
   font-weight: 500 !important;
   line-height: 36px !important;
-
   box-shadow: none !important;
-
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-
   cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .topbar-clone .nav-select.form-select:hover {
-  border-color: #475569 !important;
-  background-color: #152238 !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  background-color: rgba(255, 255, 255, 0.09) !important;
 }
 
 .topbar-clone .nav-select.form-select:focus {
-  border-color: #20b7da !important;
-  background-color: #111c2f !important;
-
-  box-shadow: 0 0 0 2px rgba(32, 183, 218, 0.12) !important;
-
+  border-color: var(--sb-accent) !important;
+  box-shadow: 0 0 0 3px rgba(34, 184, 218, 0.18) !important;
   outline: none !important;
 }
 
-/* Dropdown items */
 .topbar-clone .nav-select.form-select option {
-  background-color: #111827 !important;
-  color: #dce6f3 !important;
-
+  background-color: #1f2430 !important;
+  color: #e8edf5 !important;
   font-size: 13px;
-  font-weight: 400;
-
-  padding: 10px 14px;
 }
 
-/* Selected organisation */
 .topbar-clone .nav-select.form-select option:checked {
-  background-color: #263448 !important;
+  background-color: #2c3444 !important;
   color: #ffffff !important;
 }
 
-/* Optional create practice option */
 .topbar-clone .nav-select.form-select option[value="1"] {
-  color: #38c7e8 !important;
+  color: #5fd0ea !important;
 }
 
+/* Active-practice status dot */
 .topbar-clone
   .sidebar-menu-scroll
   > .navbar-nav.d-none.d-md-block
@@ -235,14 +291,15 @@
   > div:first-child::before {
   content: "";
   position: absolute;
-  left: 12px;
   top: 50%;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #1ed39f;
-  transform: translateY(-50%);
+  left: 12px;
   z-index: 2;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #31d7a3;
+  box-shadow: 0 0 0 3px rgba(49, 215, 163, 0.16);
+  transform: translateY(-50%);
   pointer-events: none;
 }
 
@@ -252,20 +309,20 @@
   .edit-dropdown-cls
   > div:first-child
   > i {
-  right: 9px !important;
+  right: 10px !important;
   background: transparent !important;
-  color: #91a1b8 !important;
-  font-size: 16px;
+  color: rgba(255, 255, 255, 0.55) !important;
+  font-size: 16px !important;
 }
 
-/* Convert the existing icon actions into Figma buttons without changing handlers */
+/* Update / New practice: two compact buttons side by side */
 .topbar-clone
   .sidebar-menu-scroll
   > .navbar-nav.d-none.d-md-block
   .edit-dropdown-cls
   > .d-flex {
   display: flex !important;
-  flex-direction: column !important;
+  flex-direction: row !important;
   gap: 8px !important;
   width: 100%;
   margin: 0 !important;
@@ -279,20 +336,24 @@
   .sidebar-menu-scroll
   > .navbar-nav.d-none.d-md-block
   .edit-topbar {
-  width: 100% !important;
-  height: 40px;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 32px;
   margin: 0 !important;
-  border-radius: 8px;
+  padding: 0 10px;
   display: flex !important;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  cursor: pointer;
-  font-size: 16px;
+  gap: 6px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
   transition:
-    background 0.18s ease,
-    border-color 0.18s ease;
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .topbar-clone
@@ -300,9 +361,17 @@
   > .navbar-nav.d-none.d-md-block
   .update-practice-details {
   order: 1;
-  background: linear-gradient(90deg, #20b9d9 0%, #17a5d1 100%);
-  color: #fff;
-  border: 1px solid transparent;
+  border: 1px solid rgba(34, 184, 218, 0.38);
+  background: var(--sb-accent-soft);
+  color: var(--sb-accent-text);
+}
+
+.topbar-clone
+  .sidebar-menu-scroll
+  > .navbar-nav.d-none.d-md-block
+  .update-practice-details:hover {
+  background: rgba(34, 184, 218, 0.26);
+  color: #ffffff;
 }
 
 .topbar-clone
@@ -310,25 +379,18 @@
   > .navbar-nav.d-none.d-md-block
   .edit-topbar {
   order: 2;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   background: transparent;
-  color: #9aa8bd;
-  border: 1px solid #718096;
-}
-
-.topbar-clone
-  .sidebar-menu-scroll
-  > .navbar-nav.d-none.d-md-block
-  .update-practice-details:hover {
-  background: linear-gradient(90deg, #27c0df 0%, #1aadd9 100%);
+  color: var(--sb-text);
 }
 
 .topbar-clone
   .sidebar-menu-scroll
   > .navbar-nav.d-none.d-md-block
   .edit-topbar:hover {
-  border-color: #8ea1ba;
-  color: #c7d2e2;
-  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.24);
+  background: var(--sb-hover);
+  color: #ffffff;
 }
 
 .topbar-clone
@@ -342,25 +404,23 @@
   .sidebar-menu-scroll
   > .navbar-nav.d-none.d-md-block
   .edit-topbar::after {
-  content: "Create New Practice";
+  content: "New Practice";
 }
 
 .topbar-clone
   .sidebar-menu-scroll
   > .navbar-nav.d-none.d-md-block
   .update-practice-details
-  i {
-  font-size: 14px;
-  color: #fff !important;
-}
-
+  i,
 .topbar-clone
   .sidebar-menu-scroll
   > .navbar-nav.d-none.d-md-block
   .edit-topbar
   i {
-  color: #94a3b8 !important;
-  font-size: 14px;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: currentColor !important;
+  font-size: 11px;
 }
 
 .topbar-clone
@@ -373,17 +433,38 @@
   font-weight: 900;
 }
 
-/* Main navigation */
+/* ---------------------------------------------------------
+   Main menu
+   --------------------------------------------------------- */
+
 .topbar-clone .changed-nav.navbar-nav {
   display: flex !important;
   flex-direction: column !important;
-  gap: 4px;
-  padding: 0 16px !important;
+  gap: 2px;
   margin: 0 !important;
+  padding: 4px 12px 0 !important;
 }
 
 .topbar-clone .changed-nav .menu-title {
-  display: none !important;
+  display: block !important;
+  order: 0 !important;
+  margin: 0 !important;
+  padding: 14px 12px 8px !important;
+  text-align: left !important;
+  line-height: 1 !important;
+}
+
+.topbar-clone .changed-nav .menu-title span {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--sb-text-muted) !important;
+  font-family: inherit !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em;
+  line-height: 1 !important;
+  text-transform: uppercase;
 }
 
 .topbar-clone .org-sidebar-nav > li {
@@ -415,101 +496,235 @@
 }
 
 .topbar-clone .changed-nav > .nav-item {
+  position: relative;
   width: 100%;
   margin: 0 !important;
   padding: 0 !important;
-  position: relative;
 }
 
 .topbar-clone .changed-nav > .nav-item > .nav-link.menu-link {
-  min-height: 36px;
+  position: relative;
   width: 100%;
-  padding: 0 14px !important;
+  min-height: 38px;
   margin: 0 !important;
-  border-radius: 7px !important;
+  padding: 0 12px !important;
   display: flex !important;
   align-items: center !important;
-  gap: 10px;
-  color: var(--figma-muted) !important;
-  font-size: 13px !important;
+  gap: 12px;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--sb-text) !important;
+  font-family: inherit !important;
+  font-size: 13.5px !important;
   font-weight: 500 !important;
   line-height: 1.2;
-  background: transparent !important;
-  transition:
-    color 0.16s ease,
-    background 0.16s ease;
   text-decoration: none !important;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link > span {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit !important;
+  font-weight: inherit !important;
+}
+
+.topbar-clone .changed-nav .menu-link .fw-bold {
+  font-weight: inherit !important;
+}
+
+/* The base theme paints its own markers on expanded links */
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link::before,
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link::after {
+  content: none !important;
+}
+
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link > i {
+  display: inline-block !important;
+  width: 20px !important;
+  min-width: 0 !important;
+  flex: 0 0 20px;
+  margin: 0 !important;
+  color: inherit;
+  font-size: 18px !important;
+  /* rows go semi-bold when current; a synthetic-bold icon glyph smears */
+  font-weight: 400 !important;
+  line-height: 1;
+  text-align: center;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link:hover,
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link[aria-expanded="true"] {
+  color: #ffffff !important;
 }
 
 .topbar-clone .changed-nav > .nav-item > .nav-link.menu-link:hover {
-  color: #dbe6f5 !important;
-  background: var(--figma-row-hover) !important;
+  background: var(--sb-hover) !important;
+}
+
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link:hover > i,
+.topbar-clone
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link[aria-expanded="true"]
+  > i {
+  opacity: 0.95;
+}
+
+/* Current page (top level) */
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link[aria-current="page"],
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link.sidebar-current {
+  background: var(--sb-accent-soft) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
 }
 
 .topbar-clone
   .changed-nav
   > .nav-item
-  > .nav-link.menu-link[aria-current="page"] {
-  color: #fff !important;
-  background: linear-gradient(90deg, #197b9d 0%, #18779b 100%) !important;
-  box-shadow: inset 4px 0 0 #1fd0e8;
-}
-
-.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link img {
-  width: 18px !important;
-  height: 18px !important;
-  margin: 0 !important;
-  opacity: 0.92;
-  filter: grayscale(1) brightness(1.55);
-  flex: 0 0 18px;
+  > .nav-link.menu-link[aria-current="page"]::before,
+.topbar-clone
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link.sidebar-current::before {
+  content: "" !important;
+  position: absolute;
+  top: 9px;
+  bottom: 9px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--sb-accent);
 }
 
 .topbar-clone
   .changed-nav
   > .nav-item
   > .nav-link.menu-link[aria-current="page"]
-  img {
-  filter: brightness(0) invert(1);
+  > i,
+.topbar-clone
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link.sidebar-current
+  > i {
+  color: var(--sb-accent-text);
   opacity: 1;
 }
 
-.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link > span {
-  color: inherit !important;
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
+.topbar-clone
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link.sidebar-current-parent
+  > i {
+  opacity: 1;
 }
 
+/* Group that contains the current page */
+.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link.sidebar-current-parent {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* public/assets/css/layout.css styles the old sidebar through #scrollbar
+   ID selectors (grey item hover, forced black/white text, black icon
+   filter). These carry the same ID so they take precedence. */
+.topbar-clone #scrollbar .changed-nav .nav-item,
+.topbar-clone #scrollbar .changed-nav .nav-item:hover {
+  background-color: transparent !important;
+}
+
+.topbar-clone #scrollbar .changed-nav > .nav-item > .nav-link.menu-link:hover,
+.topbar-clone
+  #scrollbar
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link[aria-expanded="true"],
+.topbar-clone
+  #scrollbar
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link[aria-current="page"],
+.topbar-clone #scrollbar .changed-nav > .nav-item > .nav-link.menu-link.sidebar-current,
+.topbar-clone
+  #scrollbar
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link.sidebar-current-parent {
+  color: #ffffff !important;
+}
+
+.topbar-clone #scrollbar .changed-nav > .nav-item > .nav-link.menu-link span {
+  color: inherit !important;
+}
+
+.topbar-clone #scrollbar .changed-nav .nav-link.menu-link i,
+.topbar-clone #scrollbar .changed-nav .nav-link.menu-link img {
+  filter: none !important;
+}
+
+/* layout.css darkens an open sub-toggle's label to #1f2937 whenever the
+   pointer is anywhere inside its list, e.g. on a child such as "Xero". */
+.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a {
+  color: var(--sb-child-text) !important;
+}
+
+.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a:hover,
+.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a[aria-expanded="true"],
+.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a.sidebar-current-parent,
+.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a.sidebar-current,
+.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a[aria-current="page"] {
+  color: #ffffff !important;
+}
+
+/* Chevrons */
 .topbar-clone .changed-nav .menu-arrow,
 .topbar-clone .changed-nav .sub-arrow {
-  margin-left: auto;
-  width: 7px;
-  height: 7px;
-  border-right: 1.5px solid #8fa0b7;
-  border-bottom: 1.5px solid #8fa0b7;
-  transform: rotate(45deg);
-  transition: transform 0.16s ease;
-  flex: 0 0 7px;
+  position: relative !important;
+  top: 0 !important;
+  width: 6px !important;
+  height: 6px !important;
+  flex: 0 0 6px !important;
+  margin: 0 2px 0 auto !important;
+  border: 0 !important;
+  border-right: 1.5px solid currentColor !important;
+  border-bottom: 1.5px solid currentColor !important;
+  opacity: 0.6;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.18s ease;
 }
 
 .topbar-clone .changed-nav a[aria-expanded="true"] .menu-arrow,
 .topbar-clone .changed-nav a[aria-expanded="true"] .sub-arrow {
-  transform: rotate(225deg);
+  transform: translateY(1px) rotate(225deg);
 }
 
-/* Dropdowns stay in normal flow, so opening them never overlays sibling items */
+/* ---------------------------------------------------------
+   Child menus: in-flow tree with a guide line per level
+   --------------------------------------------------------- */
+
 .topbar-clone .changed-nav .menu-dropdown,
 .topbar-clone .changed-nav .subList {
-  position: static !important;
+  position: relative !important;
   inset: auto !important;
   width: 100% !important;
   min-width: 0 !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  padding: 4px 0 3px 30px !important;
   margin: 0 !important;
+  padding: 0 !important;
   display: none;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .topbar-clone .changed-nav .menu-dropdown.show,
@@ -517,172 +732,350 @@
   display: block !important;
 }
 
+.topbar-clone .changed-nav .menu-dropdown.show {
+  padding: 2px 0 6px !important;
+}
+
+.topbar-clone .changed-nav .subList.show {
+  padding: 1px 0 3px !important;
+}
+
+.topbar-clone .changed-nav .menu-dropdown::before,
+.topbar-clone .changed-nav .subList::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  bottom: 8px;
+  left: 21px;
+  width: 1px;
+  background: var(--sb-line);
+}
+
+.topbar-clone .changed-nav .menu-dropdown .subList::before {
+  top: 2px;
+  bottom: 5px;
+  left: 45px;
+}
+
+.topbar-clone .changed-nav .menu-dropdown .subList .subList::before {
+  left: 61px;
+}
+
+.topbar-clone .changed-nav .menu-dropdown::after,
+.topbar-clone .changed-nav .subList::after {
+  content: none !important;
+}
+
 .topbar-clone .changed-nav .menu-dropdown .nav,
 .topbar-clone .changed-nav .subList .nav {
-  display: flex;
+  display: flex !important;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 !important;
+  gap: 1px;
   margin: 0 !important;
-}
-
-.topbar-clone .changed-nav .menu-dropdown .nav-link,
-.topbar-clone .changed-nav .subList .nav-link {
-  min-height: 31px;
-  padding: 7px 9px !important;
-  border-radius: 6px;
-  color: #090909 !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  line-height: 1.35;
+  padding: 0 !important;
   background: transparent !important;
-  text-decoration: none !important;
-  display: flex;
-  align-items: center;
 }
 
-.topbar-clone .changed-nav .menu-dropdown .nav-link:hover,
-.topbar-clone .changed-nav .subList .nav-link:hover {
-  color: #080808 !important;
-  background: rgba(255, 255, 255, 0.045) !important;
+.topbar-clone .changed-nav .menu-dropdown .nav-item,
+.topbar-clone .changed-nav .subList .nav-item {
+  position: relative;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-/* Footer profile */
-.topbar-clone .sidebar-bottom {
-  position: absolute !important;
-  left: 0;
-  bottom: 0;
-  width: var(--figma-sidebar-width);
-  min-height: 84px;
-  padding: 12px 16px !important;
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
-  background: rgba(8, 16, 32, 0.9);
-  backdrop-filter: blur(10px);
+/* Every child row is the anchor directly inside .nav-item: a
+   <Link>/<NavLink> wrapper, a plain nav-link, or a sub-toggle. */
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a {
+  position: relative;
+  width: 100% !important;
+  min-height: 34px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 7px 12px 7px 42px !important;
   display: flex !important;
   align-items: center !important;
   gap: 8px;
-  z-index: 5;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--sb-child-text) !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+  text-align: left !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
 }
 
-.topbar-clone .sidebar-bottom > .dropdown:first-child {
-  order: 2;
-  margin-left: auto !important;
-  margin-right: 0 !important;
+.topbar-clone .changed-nav .menu-dropdown .subList .nav-item > a {
+  padding-left: 58px !important;
+  font-size: 12.5px !important;
 }
 
-.topbar-clone .sidebar-bottom > .dropdown:nth-child(2) {
-  order: 1;
-  padding-left: 0 !important;
+.topbar-clone .changed-nav .menu-dropdown .subList .subList .nav-item > a {
+  min-height: 32px !important;
+  padding-left: 74px !important;
+}
+
+/* Inner <a class="nav-link"> of wrapped links is plain content */
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a > .nav-link {
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a::before,
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a > .nav-link::before,
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a::after,
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a > .nav-link::after {
+  content: none !important;
+}
+
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a:hover,
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a[aria-expanded="true"],
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a.sidebar-current-parent {
+  color: #ffffff !important;
+}
+
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a:hover {
+  background: var(--sb-hover) !important;
+}
+
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a.sidebar-current-parent {
+  font-weight: 500 !important;
+}
+
+/* Current page (child level): tinted row + accent tick on the guide line */
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a.sidebar-current,
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a[aria-current="page"] {
+  background: var(--sb-accent-soft) !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a.sidebar-current::before,
+.topbar-clone .changed-nav .menu-dropdown .nav-item > a[aria-current="page"]::before {
+  content: "" !important;
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 20px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--sb-accent);
+}
+
+.topbar-clone
+  .changed-nav
+  .menu-dropdown
+  .subList
+  .nav-item
+  > a.sidebar-current::before,
+.topbar-clone
+  .changed-nav
+  .menu-dropdown
+  .subList
+  .nav-item
+  > a[aria-current="page"]::before {
+  left: 44px;
+}
+
+.topbar-clone
+  .changed-nav
+  .menu-dropdown
+  .subList
+  .subList
+  .nav-item
+  > a.sidebar-current::before,
+.topbar-clone
+  .changed-nav
+  .menu-dropdown
+  .subList
+  .subList
+  .nav-item
+  > a[aria-current="page"]::before {
+  left: 60px;
+}
+
+.topbar-clone .changed-nav .subList .nav.ms-3 {
+  margin-left: 0 !important;
+}
+
+/* ---------------------------------------------------------
+   Footer: profile + notifications
+   --------------------------------------------------------- */
+
+.topbar-clone .figma-sidebar-footer {
+  min-height: 0 !important;
+  padding: 10px 12px !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--sb-line);
+  background: transparent;
+}
+
+.topbar-clone.collapsed .figma-sidebar-footer {
+  display: none;
+}
+
+.topbar-clone .figma-footer-profile {
+  position: relative !important;
   min-width: 0;
   flex: 1 1 auto;
 }
 
-.topbar-clone #page-header-user-dropdown {
+.topbar-clone #page-header-user-dropdown.figma-profile-button {
   width: 100%;
-  padding: 0 !important;
+  min-height: 0;
   margin: 0 !important;
-  min-height: 46px;
+  padding: 8px !important;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  gap: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #ffffff;
   text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
-.topbar-clone #page-header-user-dropdown > span {
-  justify-content: flex-start !important;
-  width: 100%;
+.topbar-clone #page-header-user-dropdown.figma-profile-button:hover,
+.topbar-clone #page-header-user-dropdown.figma-profile-button[aria-expanded="true"] {
+  background: var(--sb-hover);
+}
+
+.topbar-clone .figma-profile-avatar-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.topbar-clone .figma-profile-image {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: block;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.topbar-clone .figma-profile-online-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--sb-bg);
+  border-radius: 50%;
+  background: #31d7a3;
+}
+
+.topbar-clone .figma-profile-copy {
   min-width: 0;
-}
-
-.topbar-clone #page-header-user-dropdown .header-profile-user {
-  width: 38px !important;
-  height: 38px !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  flex: 0 0 38px;
-}
-
-.figma-profile-copy {
+  flex: 1 1 auto;
+  margin: 0;
   display: flex;
-  min-width: 0;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
+  gap: 2px;
   line-height: 1.25;
 }
 
-.figma-profile-name {
-  max-width: 145px;
-  color: #f7f9fc;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
+.topbar-clone .figma-profile-name {
+  max-width: 100%;
   overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.figma-profile-role {
-  max-width: 145px;
-  margin-top: 2px;
-  color: #8f9db1;
-  font-size: 11px;
-  font-weight: 400;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.topbar-clone #page-header-notifications-dropdown {
-  width: 34px !important;
-  height: 34px !important;
-  min-width: 34px !important;
-  padding: 0 !important;
-  border-radius: 8px !important;
-  background: transparent !important;
-  border: 0 !important;
-  position: relative;
-}
-
-.topbar-clone #page-header-notifications-dropdown:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
-}
-
-.topbar-clone #page-header-notifications-dropdown i {
-  color: #f2f5f9 !important;
-  font-size: 19px;
-}
-
-.topbar-clone #page-header-notifications-dropdown .topbar-badge {
-  width: 7px;
-  height: 7px;
-  min-width: 7px;
-  padding: 0 !important;
-  top: 8px !important;
-  left: auto !important;
-  right: 5px !important;
-  transform: none !important;
-  background: #ff5b67 !important;
-  border: 1px solid rgba(8, 16, 32, 0.95);
-  border-radius: 50% !important;
-}
-
-.topbar-clone #page-header-notifications-dropdown .notification-badge {
-  font-size: 0;
-}
-
-/* Preserve the existing Bootstrap profile dropdown, only refresh its surface */
-.topbar-clone .sidebar-bottom .dropdown-menu {
-  min-width: 230px;
-  padding: 8px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.18);
-}
-
-.topbar-clone .sidebar-bottom .dropdown-menu .dropdown-item {
-  border-radius: 7px;
+  color: #ffffff;
   font-size: 13px;
-  padding: 8px 10px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+.topbar-clone .figma-profile-role {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sb-text-muted);
+  font-size: 11.5px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-clone .figma-profile-chevron {
+  flex: 0 0 auto;
+  color: var(--sb-text-muted);
+  font-size: 16px;
+  transition: transform 0.15s ease;
+}
+
+.topbar-clone .figma-profile-button[aria-expanded="true"] .figma-profile-chevron {
+  transform: rotate(180deg);
+}
+
+.topbar-clone #page-header-notifications-dropdown.figma-footer-notification {
+  position: relative;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  flex: 0 0 38px;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: var(--sb-text);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.topbar-clone #page-header-notifications-dropdown.figma-footer-notification:hover {
+  background: var(--sb-hover) !important;
+  color: #ffffff;
+}
+
+.topbar-clone #page-header-notifications-dropdown.figma-footer-notification i {
+  color: inherit !important;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.topbar-clone .figma-notification-dot {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--sb-bg);
+  border-radius: 50%;
+  background: #ff5b67;
+}
+
 
 /* Existing collapse functionality retained */
 .topbar-clone.collapsed .app-menu {
@@ -830,1279 +1223,6 @@
   }
 }
 
-/* =========================================================
-   SIDEBAR FOOTER
-   ========================================================= */
-
-.figma-sidebar-footer {
-  width: 100%;
-  min-height: 112px;
-
-  display: flex;
-  align-items: center;
-
-  padding: 20px 22px;
-
-  border-top: 1px solid #1e293b;
-
-  background: #0f172a;
-
-  flex-shrink: 0;
-}
-
-/* =========================================================
-   NOTIFICATION
-   ========================================================= */
-
-.figma-footer-notification {
-  position: relative;
-
-  width: 40px;
-  height: 40px;
-
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-  margin: 0 18px 0 0;
-
-  border: 0;
-  outline: 0;
-
-  background: transparent;
-
-  color: #ffffff;
-
-  cursor: pointer;
-}
-
-.figma-footer-notification i {
-  font-size: 23px;
-  line-height: 1;
-  color: #ffffff;
-}
-
-.figma-footer-notification:hover {
-  color: #ffffff;
-}
-
-.figma-footer-notification:focus,
-.figma-footer-notification:active {
-  border: 0;
-  outline: none;
-  box-shadow: none;
-}
-
-/* red notification dot */
-.figma-notification-dot {
-  position: absolute;
-
-  top: 5px;
-  right: 5px;
-
-  width: 8px;
-  height: 8px;
-
-  border-radius: 50%;
-
-  background: #ff4d5e;
-
-  border: 1.5px solid #0f172a;
-}
-
-/* =========================================================
-   PROFILE
-   ========================================================= */
-
-.figma-footer-profile {
-  flex: 1;
-
-  min-width: 0;
-}
-
-.figma-profile-button {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-
-  padding: 0;
-  margin: 0;
-
-  border: 0;
-  outline: none;
-
-  background: transparent;
-
-  text-align: left;
-
-  cursor: pointer;
-}
-
-.figma-profile-button:hover,
-.figma-profile-button:focus,
-.figma-profile-button:active {
-  background: transparent;
-  border: 0;
-  outline: none;
-  box-shadow: none;
-}
-
-/* Avatar */
-
-.figma-profile-image {
-  width: 48px;
-  height: 48px;
-
-  min-width: 48px;
-
-  border-radius: 50%;
-
-  object-fit: cover;
-
-  border: 1px solid rgba(255, 255, 255, 0.25);
-}
-
-/* Name + role */
-
-.figma-profile-copy {
-  display: flex;
-  flex-direction: column;
-
-  justify-content: center;
-
-  min-width: 0;
-
-  margin-left: 12px;
-
-  line-height: 1.25;
-}
-
-.figma-profile-name {
-  max-width: 145px;
-
-  color: #f8fafc;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.figma-profile-role {
-  margin-top: 4px;
-
-  color: #94a3b8;
-
-  font-size: 13px;
-  font-weight: 400;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* =========================================================
-   PROFILE DROPDOWN
-   ========================================================= */
-
-.figma-profile-dropdown {
-  min-width: 220px;
-
-  margin-bottom: 12px !important;
-
-  border-radius: 10px;
-
-  border: 1px solid #e2e8f0;
-
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.12),
-    0 4px 10px rgba(0, 0, 0, 0.08);
-}
-
-/* =========================================================
-   COLLAPSED SIDEBAR
-   ========================================================= */
-
-.topbar-clone.collapsed .figma-sidebar-footer {
-  display: none;
-}
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 1040px) {
-  .figma-sidebar-footer {
-    padding: 18px 20px;
-  }
-}
-
-/* Hide sidebar scrollbar but keep scrolling enabled */
-.sidebar-menu-scroll,
-#scrollbar {
-  overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* old Edge / IE */
-}
-
-.sidebar-menu-scroll::-webkit-scrollbar,
-#scrollbar::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-  display: none;
-}
-
-/* =========================================================
-   CHILD DROPDOWN / NESTED MENU UPGRADE
-   ---------------------------------------------------------
-   Visual-only overrides.
-   No route, click handler, permission, dropdown toggle,
-   hover-open or submenu logic is changed.
-   ========================================================= */
-
-/* ---------------------------------------------------------
-   1) Expanded main dropdown surface
-   --------------------------------------------------------- */
-
-.topbar-clone .changed-nav .menu-dropdown.show {
-  margin-top: 3px !important;
-  padding: 5px 5px 7px 5px !important;
-
-  border: 1px solid rgba(73, 196, 224, 0.1) !important;
-  border-radius: 9px !important;
-
-  background: linear-gradient(
-    180deg,
-    rgba(19, 76, 99, 0.82) 0%,
-    rgba(14, 65, 86, 0.82) 100%
-  ) !important;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.025),
-    0 4px 14px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* Keep the expanded parent visibly connected with its children */
-.topbar-clone
-  .changed-nav
-  > .nav-item:has(> .menu-dropdown.show)
-  > .nav-link.menu-link {
-  color: #ffffff !important;
-
-  background: linear-gradient(90deg, #1683a4 0%, #197e9f 100%) !important;
-
-  box-shadow: inset 4px 0 0 #27d2ea !important;
-}
-
-/* ---------------------------------------------------------
-   2) FIRST LEVEL CHILDREN
-   Example:
-   Settings
-      Users
-      Practice Config
-      Activity Logs
-      Personalize Setting
-      My Subscription
-   --------------------------------------------------------- */
-
-.topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item {
-  width: 100%;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Handles direct <a class="nav-link"> children */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link,
-
-/* Handles existing <Link><a class="nav-link">...</a></Link> markup */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a
-  > .nav-link,
-
-/* Handles the outer Link itself where React Router adds active state */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a {
-  min-height: 34px !important;
-
-  padding: 7px 10px 7px 38px !important;
-
-  position: relative;
-
-  display: flex !important;
-  align-items: center !important;
-
-  border: 0 !important;
-  border-radius: 6px !important;
-
-  background: transparent !important;
-  color: #b9c8d9 !important;
-
-  font-size: 12.5px !important;
-  font-weight: 500 !important;
-  line-height: 1.25 !important;
-
-  text-decoration: none !important;
-
-  transition:
-    background-color 0.16s ease,
-    color 0.16s ease,
-    padding-left 0.16s ease !important;
-}
-
-/* subtle hierarchy indicator */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link::before,
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a
-  > .nav-link::before {
-  content: "";
-
-  position: absolute;
-  left: 19px;
-  top: 50%;
-
-  width: 4px;
-  height: 4px;
-
-  transform: translateY(-50%);
-
-  border-radius: 50%;
-
-  background: #6f879d;
-
-  transition:
-    background-color 0.16s ease,
-    transform 0.16s ease;
-}
-
-/* Hover */
-.topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item > .nav-link:hover,
-.topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item > a:hover,
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a
-  > .nav-link:hover {
-  background: rgba(32, 183, 218, 0.1) !important;
-  color: #f4fbff !important;
-}
-
-/* Active route — works with NavLink */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link[aria-current="page"],
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a[aria-current="page"],
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a[aria-current="page"]
-  > .nav-link {
-  background: linear-gradient(
-    90deg,
-    rgba(27, 169, 202, 0.42) 0%,
-    rgba(22, 135, 163, 0.34) 100%
-  ) !important;
-
-  color: #ffffff !important;
-
-  box-shadow: inset 3px 0 0 #28d2e9 !important;
-}
-
-/* Active bullet */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link[aria-current="page"]::before,
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a[aria-current="page"]
-  > .nav-link::before {
-  background: #35dbef !important;
-  transform: translateY(-50%) scale(1.2);
-}
-
-/* ---------------------------------------------------------
-   3) FIRST-LEVEL CHILD ITEMS THAT OPEN ANOTHER SUBMENU
-   --------------------------------------------------------- */
-
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link[aria-expanded] {
-  padding-right: 13px !important;
-}
-
-/* submenu arrow */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link
-  .sub-arrow {
-  width: 6px !important;
-  height: 6px !important;
-
-  margin-left: auto !important;
-
-  border-right-color: #8fa9bd !important;
-  border-bottom-color: #8fa9bd !important;
-}
-
-/* slightly brighter while expanded */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link[aria-expanded="true"] {
-  color: #eefaff !important;
-  background: rgba(255, 255, 255, 0.035) !important;
-}
-
-/* ---------------------------------------------------------
-   4) SECOND LEVEL CHILDREN
-   Example:
-   Practice Config
-      Payment Gateways
-      Pricing Settings
-      Email Config
-   --------------------------------------------------------- */
-
-.topbar-clone .changed-nav .subList.show {
-  position: relative !important;
-
-  margin: 1px 4px 4px 14px !important;
-  padding: 3px 0 3px 15px !important;
-
-  border-left: 1px solid rgba(117, 165, 184, 0.24) !important;
-  border-radius: 0 !important;
-
-  background: transparent !important;
-}
-
-/* Second level item */
-.topbar-clone .changed-nav .subList > .nav > .nav-item > .nav-link,
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a,
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a > .nav-link {
-  min-height: 31px !important;
-
-  padding: 6px 10px !important;
-
-  position: relative;
-
-  border: 0 !important;
-  border-radius: 5px !important;
-
-  background: transparent !important;
-  color: #9eb1c4 !important;
-
-  font-size: 12px !important;
-  font-weight: 400 !important;
-  line-height: 1.25 !important;
-
-  text-decoration: none !important;
-
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease !important;
-}
-
-.topbar-clone .changed-nav .subList > .nav > .nav-item > .nav-link:hover,
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a:hover,
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a > .nav-link:hover {
-  color: #f0f8fc !important;
-  background: rgba(32, 183, 218, 0.075) !important;
-}
-
-/* Active second-level route */
-.topbar-clone
-  .changed-nav
-  .subList
-  > .nav
-  > .nav-item
-  > .nav-link[aria-current="page"],
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a[aria-current="page"],
-.topbar-clone
-  .changed-nav
-  .subList
-  > .nav
-  > .nav-item
-  > a[aria-current="page"]
-  > .nav-link {
-  color: #ffffff !important;
-  background: rgba(31, 177, 211, 0.15) !important;
-}
-
-/* ---------------------------------------------------------
-   5) THIRD LEVEL CHILDREN
-   Example:
-   Practice Config
-      Bookkeeping Gateway
-         Xero
-         QuickBooks
-         Deviation
-   --------------------------------------------------------- */
-
-.topbar-clone .changed-nav .subList .subList.show {
-  margin: 2px 2px 4px 9px !important;
-  padding: 2px 0 2px 13px !important;
-
-  border-left-color: rgba(117, 165, 184, 0.18) !important;
-}
-
-.topbar-clone .changed-nav .subList .subList .nav-link {
-  min-height: 29px !important;
-
-  padding: 5px 9px !important;
-
-  color: #8fa5b9 !important;
-
-  font-size: 11.5px !important;
-}
-
-.topbar-clone .changed-nav .subList .subList .nav-link:hover {
-  color: #edfaff !important;
-}
-
-/* ---------------------------------------------------------
-   6) SETTINGS-SPECIFIC POLISH
-   Keeps the screenshot's Settings block visually cohesive.
-   --------------------------------------------------------- */
-
-.topbar-clone #Setting.menu-dropdown.show {
-  padding-top: 4px !important;
-  padding-bottom: 7px !important;
-}
-
-/* The first selected child, such as "Users", feels like a tab */
-.topbar-clone #Setting > .nav > .nav-item > a[aria-current="page"] {
-  min-height: 34px !important;
-
-  background: linear-gradient(
-    90deg,
-    rgba(22, 172, 205, 0.42) 0%,
-    rgba(18, 132, 160, 0.38) 100%
-  ) !important;
-
-  color: #ffffff !important;
-
-  box-shadow: inset 3px 0 0 #23d3e9 !important;
-}
-
-/* Practice Config child block should not look like a grey box */
-.topbar-clone #PracticeConfig.subList.show,
-.topbar-clone #WebIntegration.subList.show,
-.topbar-clone #BookKeepingConfig.subList.show {
-  background: transparent !important;
-}
-
-/* ---------------------------------------------------------
-   7) CONFIGURE / WORKFLOW / SUPERADMIN consistency
-   --------------------------------------------------------- */
-
-.topbar-clone #config.menu-dropdown.show,
-.topbar-clone #workflow.menu-dropdown.show,
-.topbar-clone #Subscription.menu-dropdown.show,
-.topbar-clone #UserRole.menu-dropdown.show,
-.topbar-clone #superAdminWorkflows.menu-dropdown.show {
-  background: linear-gradient(
-    180deg,
-    rgba(19, 76, 99, 0.82) 0%,
-    rgba(14, 65, 86, 0.82) 100%
-  ) !important;
-}
-
-/* ---------------------------------------------------------
-   8) REMOVE OLD BLACK CHILD TEXT
-   This specifically overrides the earlier generic rule:
-   color: #090909
-   --------------------------------------------------------- */
-
-.topbar-clone .changed-nav .menu-dropdown .nav-link,
-.topbar-clone .changed-nav .subList .nav-link {
-  color: #aebed0 !important;
-}
-
-.topbar-clone .changed-nav .menu-dropdown .nav-link:hover,
-.topbar-clone .changed-nav .subList .nav-link:hover {
-  color: #ffffff !important;
-}
-
-/* ---------------------------------------------------------
-   9) MOBILE / SMALL WIDTH
-   --------------------------------------------------------- */
-
-@media (max-width: 1040px) {
-  .topbar-clone .changed-nav .menu-dropdown.show {
-    border-radius: 8px !important;
-  }
-
-  .topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item > .nav-link,
-  .topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item > a > .nav-link {
-    padding-left: 34px !important;
-  }
-}
-
-/* =========================================================
-   NESTED SIDEBAR MENU - FINAL CLEANUP
-   Fixes light/white legacy backgrounds and oversized
-   child-of-child rows without changing dropdown logic.
-   ========================================================= */
-
-/* 1. Neutralise legacy light background classes used by old sidebar */
-.topbar-clone .changed-nav .Responsive-Config-service-package,
-.topbar-clone .changed-nav .Responsive-Config-Variables,
-.topbar-clone .changed-nav .Service-package-bgColor,
-.topbar-clone .changed-nav .menu_dropdown,
-.topbar-clone .changed-nav .menu-dropdown,
-.topbar-clone .changed-nav .subList {
-  background-color: transparent !important;
-  background-image: none !important;
-}
-
-/* 2. Main expanded dropdown: one consistent dark-teal surface */
-.topbar-clone .changed-nav .menu-dropdown.show {
-  width: calc(100% - 10px) !important;
-
-  margin: 4px 5px 5px !important;
-  padding: 4px !important;
-
-  border: 1px solid rgba(93, 184, 205, 0.12) !important;
-  border-radius: 8px !important;
-
-  background: #123f52 !important;
-
-  box-shadow: none !important;
-  overflow: hidden !important;
-}
-
-/* 3. Reset old list item sizing/backgrounds */
-.topbar-clone .changed-nav .menu-dropdown .nav-item,
-.topbar-clone .changed-nav .subList .nav-item {
-  width: 100% !important;
-
-  min-height: 0 !important;
-  height: auto !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  border: 0 !important;
-
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-/* 4. Remove bullets added by previous child styling */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link::before,
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a
-  > .nav-link::before {
-  display: none !important;
-  content: none !important;
-}
-
-/* 5. First-level dropdown rows:
-      Configure > Services/Packages / Variables / Templates
-      Settings > Users / Practice Config / Activity Logs ... */
-.topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item > .nav-link,
-.topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item > a,
-.topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item > a > .nav-link {
-  width: 100% !important;
-
-  min-height: 34px !important;
-  height: auto !important;
-
-  margin: 0 !important;
-  padding: 8px 11px 8px 34px !important;
-
-  display: flex !important;
-  align-items: center !important;
-
-  border: 0 !important;
-  border-radius: 6px !important;
-
-  background: transparent !important;
-  color: #b9c7d7 !important;
-
-  font-family: inherit !important;
-  font-size: 12.5px !important;
-  font-weight: 500 !important;
-  line-height: 1.25 !important;
-
-  text-decoration: none !important;
-
-  box-shadow: none !important;
-}
-
-/* First-level hover */
-.topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item > .nav-link:hover,
-.topbar-clone .changed-nav .menu-dropdown > .nav > .nav-item > a:hover,
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a
-  > .nav-link:hover {
-  background: rgba(32, 183, 218, 0.1) !important;
-  color: #ffffff !important;
-}
-
-/* Open expandable child */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link[aria-expanded="true"] {
-  background: rgba(255, 255, 255, 0.055) !important;
-  color: #ffffff !important;
-}
-
-/* Active route */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link[aria-current="page"],
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a[aria-current="page"],
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a[aria-current="page"]
-  > .nav-link {
-  background: #176985 !important;
-  color: #ffffff !important;
-
-  box-shadow: inset 3px 0 0 #25d0e8 !important;
-}
-
-/* 6. Second-level submenu container:
-      Services/Packages > Service Categories / Services / Packages */
-.topbar-clone .changed-nav .subList.show {
-  width: auto !important;
-
-  margin: 1px 6px 5px 25px !important;
-  padding: 3px 0 3px 10px !important;
-
-  border: 0 !important;
-  border-left: 1px solid rgba(141, 180, 198, 0.2) !important;
-  border-radius: 0 !important;
-
-  background: transparent !important;
-
-  box-shadow: none !important;
-  overflow: visible !important;
-}
-
-/* 7. Second-level rows - compact text rows, no grey cards */
-.topbar-clone .changed-nav .subList > .nav > .nav-item > .nav-link,
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a,
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a > .nav-link {
-  width: 100% !important;
-
-  min-height: 30px !important;
-  height: auto !important;
-
-  margin: 0 !important;
-  padding: 6px 9px !important;
-
-  display: flex !important;
-  align-items: center !important;
-
-  border: 0 !important;
-  border-radius: 5px !important;
-
-  background: transparent !important;
-  color: #93a9bc !important;
-
-  font-family: inherit !important;
-  font-size: 11.75px !important;
-  font-weight: 400 !important;
-  line-height: 1.25 !important;
-
-  text-decoration: none !important;
-
-  box-shadow: none !important;
-}
-
-/* Second-level hover */
-.topbar-clone .changed-nav .subList > .nav > .nav-item > .nav-link:hover,
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a:hover,
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a > .nav-link:hover {
-  background: rgba(32, 183, 218, 0.075) !important;
-  color: #edfaff !important;
-}
-
-/* Second-level active route */
-.topbar-clone
-  .changed-nav
-  .subList
-  > .nav
-  > .nav-item
-  > .nav-link[aria-current="page"],
-.topbar-clone .changed-nav .subList > .nav > .nav-item > a[aria-current="page"],
-.topbar-clone
-  .changed-nav
-  .subList
-  > .nav
-  > .nav-item
-  > a[aria-current="page"]
-  > .nav-link {
-  background: rgba(32, 183, 218, 0.13) !important;
-  color: #ffffff !important;
-}
-
-/* 8. Third level: Bookkeeping Gateway > Xero / QuickBooks / Deviation */
-.topbar-clone .changed-nav .subList .subList.show {
-  margin: 2px 4px 4px 10px !important;
-  padding: 2px 0 2px 9px !important;
-
-  border-left: 1px solid rgba(141, 180, 198, 0.14) !important;
-}
-
-.topbar-clone .changed-nav .subList .subList .nav-link {
-  min-height: 28px !important;
-  padding: 5px 8px !important;
-
-  background: transparent !important;
-  color: #849caf !important;
-
-  font-size: 11.25px !important;
-}
-
-/* 9. Keep arrows compact and aligned */
-.topbar-clone .changed-nav .menu-dropdown .sub-arrow {
-  width: 6px !important;
-  height: 6px !important;
-
-  margin-left: auto !important;
-  margin-right: 2px !important;
-
-  flex: 0 0 6px !important;
-
-  border-right: 1.5px solid #8ea6ba !important;
-  border-bottom: 1.5px solid #8ea6ba !important;
-}
-
-/* 10. Avoid old inline/listColor variables visually bleeding through */
-.topbar-clone #config,
-.topbar-clone #Setting,
-.topbar-clone #workflow,
-.topbar-clone #Subscription,
-.topbar-clone #UserRole,
-.topbar-clone #superAdminWorkflows,
-.topbar-clone #servicesAndPackage,
-.topbar-clone #variable,
-.topbar-clone #Template,
-.topbar-clone #PracticeConfig,
-.topbar-clone #WebIntegration,
-.topbar-clone #BookKeepingConfig {
-  background-color: transparent !important;
-}
-
-/* Re-apply the intended surface only when a main dropdown is open */
-.topbar-clone #config.show,
-.topbar-clone #Setting.show,
-.topbar-clone #workflow.show,
-.topbar-clone #Subscription.show,
-.topbar-clone #UserRole.show,
-.topbar-clone #superAdminWorkflows.show {
-  background: #123f52 !important;
-}
-
-/* Mobile */
-@media (max-width: 1040px) {
-  .topbar-clone .changed-nav .menu-dropdown.show {
-    width: calc(100% - 8px) !important;
-    margin-left: 4px !important;
-    margin-right: 4px !important;
-  }
-
-  .topbar-clone .changed-nav .subList.show {
-    margin-left: 20px !important;
-  }
-}
-
-/* =========================================================
-   REMOVE LIGHT / GREY OUTER BACKGROUND FROM EXPANDED MENUS
-   Keeps only the dark teal menu surface.
-   ========================================================= */
-
-/* Remove the pale outer frame around Configure / Settings / Workflows */
-.topbar-clone .changed-nav .menu-dropdown.show,
-.topbar-clone #config.menu-dropdown.show,
-.topbar-clone #Setting.menu-dropdown.show,
-.topbar-clone #workflow.menu-dropdown.show,
-.topbar-clone #Subscription.menu-dropdown.show,
-.topbar-clone #UserRole.menu-dropdown.show,
-.topbar-clone #superAdminWorkflows.menu-dropdown.show {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-
-  background: #123f52 !important;
-}
-
-/* Remove any old background coming from wrapper/list helper classes */
-.topbar-clone .Responsive-Config-service-package,
-.topbar-clone .Responsive-Config-Variables,
-.topbar-clone .Service-package-bgColor,
-.topbar-clone .menu_dropdown,
-.topbar-clone .menu-dropdown .nav,
-.topbar-clone .menu-dropdown .nav-item,
-.topbar-clone .subList,
-.topbar-clone .subList .nav,
-.topbar-clone .subList .nav-item {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  box-shadow: none !important;
-}
-
-/* Main open dropdown keeps the dark teal only */
-.topbar-clone .changed-nav .menu-dropdown.show {
-  padding: 5px !important;
-  background: #123f52 !important;
-}
-
-/* Open first-level submenu row */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link[aria-expanded="true"] {
-  background: rgba(255, 255, 255, 0.045) !important;
-}
-
-/* Nested submenu should blend into the same dark teal parent */
-.topbar-clone .changed-nav .subList.show {
-  background: transparent !important;
-  border-top: 0 !important;
-  border-right: 0 !important;
-  border-bottom: 0 !important;
-  box-shadow: none !important;
-}
-
-/* Remove any white/grey pseudo backgrounds */
-.topbar-clone .changed-nav .menu-dropdown::before,
-.topbar-clone .changed-nav .menu-dropdown::after,
-.topbar-clone .changed-nav .subList::before,
-.topbar-clone .changed-nav .subList::after {
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-/* =========================================================
-   SINGLE CHILD MENU ALIGNMENT
-   ---------------------------------------------------------
-   Fixes leaf items such as:
-   Users, Activity Logs, Personalize Setting, My Subscription.
-   They now align with expandable children instead of appearing
-   centered / overly indented.
-   ========================================================= */
-
-/* First-level leaf links */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link:not([aria-expanded]),
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a:not([aria-expanded]) {
-  width: 100% !important;
-
-  min-height: 34px !important;
-
-  padding: 8px 34px !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-
-  text-align: left !important;
-
-  border-radius: 6px !important;
-
-  background: transparent !important;
-  color: #b9c7d7 !important;
-
-  font-size: 12.5px !important;
-  font-weight: 500 !important;
-
-  box-shadow: none !important;
-}
-
-/* If the project has Link > .nav-link nesting */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a:not([aria-expanded])
-  > .nav-link {
-  width: 100% !important;
-
-  padding: 0 !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-
-  text-align: left !important;
-
-  background: transparent !important;
-  color: inherit !important;
-}
-
-/* Hover state */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link:not([aria-expanded]):hover,
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a:not([aria-expanded]):hover {
-  background: rgba(32, 183, 218, 0.08) !important;
-  color: #ffffff !important;
-}
-
-/* Active single child - subtle, left aligned */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link:not([aria-expanded])[aria-current="page"],
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a:not([aria-expanded])[aria-current="page"] {
-  background: rgba(24, 129, 158, 0.46) !important;
-  color: #ffffff !important;
-
-  box-shadow: inset 3px 0 0 #29d2e9 !important;
-}
-
-/* Remove accidental centering from nested text/span wrappers */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link:not([aria-expanded])
-  span,
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > a:not([aria-expanded])
-  span {
-  text-align: left !important;
-}
-
-/* Keep expandable and non-expandable first-level children on same x-axis */
-.topbar-clone
-  .changed-nav
-  .menu-dropdown
-  > .nav
-  > .nav-item
-  > .nav-link[aria-expanded] {
-  padding-left: 34px !important;
-}
-
-/* =========================================================
-   PROFILE AREA
-   ========================================================= */
-
-.figma-footer-profile {
-  width: 100%;
-}
-
-.figma-profile-button {
-  width: 100%;
-  min-height: 72px;
-
-  padding: 10px 14px;
-
-  display: flex;
-  align-items: center;
-  gap: 11px;
-
-  border: 0;
-  border-radius: 10px;
-
-  background: transparent;
-  color: #ffffff;
-
-  text-align: left;
-
-  transition: background-color 0.15s ease;
-}
-
-.figma-profile-button:hover,
-.figma-profile-button[aria-expanded="true"] {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.figma-profile-avatar-wrap {
-  position: relative;
-
-  flex: 0 0 auto;
-}
-
-.figma-profile-image {
-  width: 46px;
-  height: 46px;
-
-  display: block;
-
-  border: 2px solid rgba(255, 255, 255, 0.75);
-  border-radius: 50%;
-
-  object-fit: cover;
-}
-
-.figma-profile-online-dot {
-  position: absolute;
-  right: 1px;
-  bottom: 2px;
-
-  width: 10px;
-  height: 10px;
-
-  border: 2px solid #0f1b33;
-  border-radius: 50%;
-
-  background: #31d7a3;
-}
-
-.figma-profile-copy {
-  min-width: 0;
-
-  flex: 1;
-
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.figma-profile-name {
-  overflow: hidden;
-
-  color: #ffffff;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.figma-profile-role {
-  overflow: hidden;
-
-  color: #8fb0d5;
-
-  font-size: 10.5px;
-  font-weight: 400;
-
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.figma-profile-chevron {
-  flex: 0 0 auto;
-
-  color: #8fa1b9;
-
-  font-size: 18px;
-
-  transition: transform 0.15s ease;
-}
-
-.figma-profile-button[aria-expanded="true"] .figma-profile-chevron {
-  transform: rotate(180deg);
-}
 
 /* =========================================================
    PROFILE DROPDOWN
@@ -2541,7 +1661,7 @@
 }
 
 .figma-profile-dropdown[data-popper-placement] {
-  left: 64% !important;
+  left: 60% !important;
   right: auto !important;
   top: auto !important;
   bottom: calc(100% + 12px) !important;
@@ -3225,10 +2345,8 @@
   text-overflow: ellipsis !important;
 }
 
-/* 4. Update / Create practice buttons follow the same width */
-.topbar-clone .sidebar-menu-scroll .edit-dropdown-cls > .d-flex,
-.topbar-clone .sidebar-menu-scroll .update-practice-details,
-.topbar-clone .sidebar-menu-scroll .edit-topbar {
+/* 4. Update / Create practice button row follows the same width */
+.topbar-clone .sidebar-menu-scroll .edit-dropdown-cls > .d-flex {
   box-sizing: border-box !important;
   width: 100% !important;
   min-width: 0 !important;

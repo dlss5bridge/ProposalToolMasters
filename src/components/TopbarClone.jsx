@@ -4,12 +4,6 @@ import { useLocation, Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthContextProvider } from "../AuthContext/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
 import { resetState, updateState } from "../redux/Persist";
-import DashboardSvg from "../../src/assets/images/Navbar Icons/Dashboard Icon.svg";
-import ProspectSvg from "../../src/assets/images/Navbar Icons/Prospect Icon.svg";
-import ProposalSvg from "../../src/assets/images/Navbar Icons/Proposal Icon.svg";
-import EngagementSvg from "../../src/assets/images/Navbar Icons/Engagement Letter Icon.svg";
-import ConfigSvg from "../../src/assets/images/Navbar Icons/Configure Icon.svg";
-import SettingSvg from "../../src/assets/images/Navbar Icons/Settings Icon.svg";
 import logoImg from "../../src/assets/images/company-logos/logo-outbooks-proposal.webp";
 import {
   NotificationCount,
@@ -546,6 +540,7 @@ const TopbarClone = () => {
       const link = el.parentElement.querySelector(".nav-link");
       if (link) link.setAttribute("aria-expanded", "false");
     });
+    syncActiveSidebarMenu();
   };
 
   const hideSettingSubList = (id) => {
@@ -580,6 +575,7 @@ const TopbarClone = () => {
     if (workflowRef.current) {
       workflowRef.current.setAttribute("aria-expanded", "false");
     }
+    syncActiveSidebarMenu();
   };
 
   const hideSubscriptionList = () => {
@@ -591,6 +587,7 @@ const TopbarClone = () => {
     if (subscriptionRef.current) {
       subscriptionRef.current.setAttribute("aria-expanded", "false");
     }
+    syncActiveSidebarMenu();
   };
   //   const hideConfigList = () => {
   //   const configs = document.getElementById("config");
@@ -613,6 +610,7 @@ const TopbarClone = () => {
       const link = el.parentElement.querySelector(".nav-link");
       if (link) link.setAttribute("aria-expanded", "false");
     });
+    syncActiveSidebarMenu();
   };
   // const hideConfigSubList = (id) => {
   //   const list = document.getElementById(id);
@@ -814,6 +812,7 @@ const TopbarClone = () => {
         const link = sub.parentElement.querySelector(".nav-link");
         if (link) link.setAttribute("aria-expanded", "false");
       });
+    syncActiveSidebarMenu();
   };
 
   // Same accordion pattern as toggleConfigSubList, scoped to this dropdown
@@ -882,7 +881,90 @@ const TopbarClone = () => {
       const link = el.parentElement.querySelector(".nav-link");
       if (link) link.setAttribute("aria-expanded", "false");
     });
+    syncActiveSidebarMenu();
   };
+
+  const normaliseSidebarPath = (path) =>
+    (path.length > 1 ? path.replace(/\/+$/, "") : path).toLowerCase();
+
+  const revealSidebarItem = (item) => {
+    const scroller = item.closest(".sidebar-menu-scroll");
+    if (!scroller) return;
+
+    // The pinned practice selector overlays the top of the scroll area.
+    const pinned = Array.from(
+      scroller.querySelectorAll(":scope > .sidebar-fixed-practice-selector"),
+    ).find((el) => el.offsetParent !== null);
+    const pinnedHeight = pinned ? pinned.offsetHeight : 0;
+
+    const itemTop =
+      item.getBoundingClientRect().top -
+      scroller.getBoundingClientRect().top +
+      scroller.scrollTop;
+    const itemBottom = itemTop + item.offsetHeight;
+
+    if (itemTop < scroller.scrollTop + pinnedHeight) {
+      scroller.scrollTop = itemTop - pinnedHeight - 8;
+    } else if (itemBottom > scroller.scrollTop + scroller.clientHeight) {
+      scroller.scrollTop = itemBottom - scroller.clientHeight + 8;
+    }
+  };
+
+  // Collapses every menu group except the chain leading to the current page,
+  // which stays expanded with the current link highlighted. Link markup varies
+  // (<Link>, <NavLink>, nested anchors), so the current link is found by href.
+  const syncActiveSidebarMenu = (reveal = false) => {
+    const currentPath = normaliseSidebarPath(location.pathname);
+
+    document.querySelectorAll(".topbar-clone .changed-nav").forEach((nav) => {
+      nav
+        .querySelectorAll(".sidebar-current, .sidebar-current-parent")
+        .forEach((el) =>
+          el.classList.remove("sidebar-current", "sidebar-current-parent"),
+        );
+
+      nav.querySelectorAll(".menu-dropdown, .subList").forEach((list) => {
+        list.classList.remove("show");
+        // closeDropdown() hides lists with an inline style; clear it.
+        list.style.display = "";
+        const toggle = list.parentElement?.querySelector(":scope > a");
+        if (toggle) toggle.setAttribute("aria-expanded", "false");
+      });
+
+      const current = Array.from(nav.querySelectorAll("a[href]")).find(
+        (a) => normaliseSidebarPath(a.getAttribute("href")) === currentPath,
+      );
+      if (!current) return;
+
+      current.classList.add("sidebar-current");
+
+      for (let el = current.parentElement; el && el !== nav; el = el.parentElement) {
+        if (
+          el.classList.contains("menu-dropdown") ||
+          el.classList.contains("subList")
+        ) {
+          el.classList.add("show");
+          const toggle = el.parentElement?.querySelector(":scope > a");
+          if (toggle) {
+            toggle.setAttribute("aria-expanded", "true");
+            toggle.classList.add("sidebar-current-parent");
+          }
+        }
+      }
+
+      if (reveal) revealSidebarItem(current);
+    });
+  };
+
+  useEffect(() => {
+    syncActiveSidebarMenu(true);
+  }, [
+    location.key,
+    location.pathname,
+    userAccessData,
+    activeOrganizationSubscriptionPlan,
+    common.organisationKeyID,
+  ]);
   // logout function
   const Logout = () => {
     localStorage.removeItem("userAccess");
@@ -1290,6 +1372,7 @@ const TopbarClone = () => {
             // width: isMobile || window.innerWidth <= 1040 ? "100%" : "300px",
             // maxWidth: "300px",
             background: currentTopbarColor,
+            "--sb-bg": currentTopbarColor,
             // overflowY: "auto",
             position:
               isMobile || window.innerWidth <= 1040 ? "absolute" : "relative",
@@ -1361,7 +1444,7 @@ const TopbarClone = () => {
                 </div>
                 <div className="sidebar-menu-scroll ">
                   <ul
-                    class="navbar-nav d-none d-md-block pt-4"
+                    class="navbar-nav d-none d-md-block pt-4 sidebar-fixed-practice-selector"
                     style={{ paddingLeft: "0.5rem" }}
                     id="navbar-nav"
                   >
@@ -1495,7 +1578,10 @@ const TopbarClone = () => {
                 </span>
               </button> */}
                   {/* <ul class="navbar-nav" id="navbar-nav"></ul> */}
-                  <ul class="d-md-none d-block navbar-nav" id="navbar-nav">
+                  <ul
+                    class="d-md-none d-block navbar-nav sidebar-fixed-practice-selector"
+                    id="navbar-nav"
+                  >
                     <li class="edit-dropdown-cls">
                       {accessCount !== 0 && (
                         <>
@@ -1638,11 +1724,7 @@ const TopbarClone = () => {
                                 fontWeight: "bold",
                               }}
                             >
-                              <img
-                                src={DashboardSvg}
-                                alt="Dashboard"
-                                style={{ width: "16px", marginRight: "5px" }}
-                              />
+                              <i className="ri-dashboard-3-line" aria-hidden="true"></i>
                               {/* <i class="bi bi-graph-up mr-2"></i> */}
                               <span
                                 className="menu-link"
@@ -1680,11 +1762,7 @@ const TopbarClone = () => {
                               fontWeight: "bold",
                             }}
                           >
-                            <img
-                              src={ProspectSvg}
-                              alt="ProspectSvg"
-                              style={{ width: "16px", marginRight: "5px" }}
-                            />
+                            <i className="ri-team-line" aria-hidden="true"></i>
                             <span
                               data-key="t-dashboard"
                               style={{
@@ -1718,11 +1796,7 @@ const TopbarClone = () => {
                             }}
                           >
                             {" "}
-                            <img
-                              src={ProposalSvg}
-                              alt="ProposalSvg"
-                              style={{ width: "16px", marginRight: "5px" }}
-                            />
+                            <i className="ri-file-list-3-line" aria-hidden="true"></i>
                             {/* <i class="bi bi-card-list mr-2"  ></i>{" "} */}
                             <span
                               data-key="t-dashboard"
@@ -1758,14 +1832,7 @@ const TopbarClone = () => {
                               }}
                             >
                               {" "}
-                              <img
-                                src={EngagementSvg}
-                                alt="EngagementSvg"
-                                style={{
-                                  width: "16px",
-                                  marginRight: "5px",
-                                }}
-                              />
+                              <i className="ri-draft-line" aria-hidden="true"></i>
                               {/* <i class="bi bi-envelope-paper mr-2"  ></i>{" "} */}
                               <span
                                 data-key="t-dashboard"
@@ -1807,11 +1874,7 @@ const TopbarClone = () => {
                               cursor: "pointer",
                             }}
                           >
-                            <img
-                              src={ConfigSvg}
-                              alt="ConfigSvg"
-                              style={{ width: "16px", marginRight: "5px" }}
-                            />
+                            <i className="ri-tools-line" aria-hidden="true"></i>
                             <span
                               data-key="t-pages"
                               // style={{
@@ -2086,11 +2149,7 @@ const TopbarClone = () => {
                             //   fontWeight: "bold",
                             // }}
                           >
-                            <img
-                              src={SettingSvg}
-                              alt="SettingSvg"
-                              style={{ width: "16px", marginRight: "5px" }}
-                            />
+                            <i className="ri-settings-3-line" aria-hidden="true"></i>
                             <span
                               data-key="t-dashboard"
                               // style={{
@@ -2449,11 +2508,7 @@ const TopbarClone = () => {
                             ref={workflowRef}
                             style={{ fontWeight: "bold", cursor: "pointer" }}
                           >
-                            <img
-                              src={SettingSvg}
-                              alt="WorkflowSvg"
-                              style={{ width: "16px", marginRight: "5px" }}
-                            />
+                            <i className="ri-flow-chart" aria-hidden="true"></i>
                             <span data-key="t-pages">
                               Workflows
                               <span className="menu-arrow" />
@@ -2520,14 +2575,7 @@ const TopbarClone = () => {
                               }}
                             >
                               {" "}
-                              <img
-                                src={EngagementSvg}
-                                alt="PdfToCsvSvg"
-                                style={{
-                                  width: "16px",
-                                  marginRight: "5px",
-                                }}
-                              />
+                              <i className="ri-file-transfer-line" aria-hidden="true"></i>
                               <span
                                 data-key="t-dashboard"
                                 // style={{
@@ -2581,14 +2629,7 @@ const TopbarClone = () => {
                                   fontWeight: "bold",
                                 }}
                               >
-                                <img
-                                  src={DashboardSvg}
-                                  alt="DashboardSvg"
-                                  style={{
-                                    width: "16px",
-                                    marginRight: "5px",
-                                  }}
-                                />
+                                <i className="ri-dashboard-3-line" aria-hidden="true"></i>
                                 {/* <i class="bi bi-graph-up mr-2"></i> */}
                                 <span
                                   data-key="t-dashboard"
@@ -2630,7 +2671,7 @@ const TopbarClone = () => {
                               >
                                 {" "}
                                 <i
-                                  class="bi bi-buildings-fill"
+                                  class="ri-building-2-line"
                                   style={{ marginRight: "5px" }}
                                 ></i>
                                 <span
@@ -2670,7 +2711,7 @@ const TopbarClone = () => {
                               >
                                 {" "}
                                 <i
-                                  class="bi bi-people-fill"
+                                  class="ri-group-line"
                                   style={{
                                     width: "16px",
                                     marginRight: "5px",
@@ -2714,14 +2755,7 @@ const TopbarClone = () => {
                                 //   fontWeight: "bold",
                                 // }}
                               >
-                                <img
-                                  src={ConfigSvg}
-                                  alt="ConfigSvg"
-                                  style={{
-                                    width: "16px",
-                                    marginRight: "5px",
-                                  }}
-                                />
+                                <i className="ri-tools-line" aria-hidden="true"></i>
                                 {/* <i class="bi bi-tools mr-2"></i>{" "} */}
                                 <span
                                   data-key="t-pages"
@@ -3066,7 +3100,7 @@ const TopbarClone = () => {
                                 // }
                               >
                                 <i
-                                  class="bi bi-credit-card"
+                                  class="ri-bank-card-line"
                                   style={{ marginRight: "5px" }}
                                 ></i>
                                 <span
@@ -3191,14 +3225,7 @@ const TopbarClone = () => {
                                 // }}
                                 style={{ cursor: "pointer" }}
                               >
-                                <img
-                                  src={SettingSvg}
-                                  alt="SettingSvg"
-                                  style={{
-                                    width: "16px",
-                                    marginRight: "5px",
-                                  }}
-                                />
+                                <i className="ri-settings-3-line" aria-hidden="true"></i>
                                 <span
                                   data-key="t-dashboard"
                                   // style={{
@@ -3402,11 +3429,7 @@ const TopbarClone = () => {
                                   cursor: "pointer",
                                 }}
                               >
-                                <img
-                                  src={SettingSvg}
-                                  alt="WorkflowSvg"
-                                  style={{ width: "16px", marginRight: "5px" }}
-                                />
+                                <i className="ri-flow-chart" aria-hidden="true"></i>
                                 <span data-key="t-pages">
                                   Workflows
                                   <span className="menu-arrow" />
