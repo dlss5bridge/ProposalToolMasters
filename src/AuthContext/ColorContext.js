@@ -7,9 +7,34 @@ import {
 import { useSelector } from "react-redux";
 import { AuthContextProvider } from "./AuthContext";
 import SuccessModal from "../components/SuccessModal";
+import { USER_ROLE_TYPE } from "../Middleware/enums";
 
 const initialState = {
   loading: false,
+};
+
+const MASTER_THEME_STORAGE_KEY = "masterThemeSettingLocalStorage";
+
+// The API returns colours as hex or "rgb(r, g, b)"; <input type="color"> only
+// accepts #rrggbb, so normalise before the values reach the customizer.
+const toHexColor = (value) => {
+  const match = /^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i.exec(value || "");
+  if (!match) return value;
+  return (
+    "#" +
+    match
+      .slice(1, 4)
+      .map((channel) => Number(channel).toString(16).padStart(2, "0"))
+      .join("")
+  );
+};
+
+const readStoredSettings = (key) => {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "null");
+  } catch {
+    return null;
+  }
 };
 
 export const ColorContext = createContext(initialState);
@@ -46,64 +71,50 @@ export const ColorProvider = ({ children }) => {
   } = useContext(AuthContextProvider);
   const common = useSelector((state) => state.Storage); //Getting Logged Users Details From Persist Storage of redux hooks
 
+  // A Super Admin with no organisation selected saves Appearance without an
+  // OrganisationKeyID, and the API returns that under masterThemeSetting.
+  const isPlatformLevelSuperAdmin =
+    common.roleTypeId == USER_ROLE_TYPE.SuperAdmin &&
+    common.organisationKeyID == null;
+
+  const applyThemeSettings = (userSettings, masterSettings) => {
+    const settings =
+      isPlatformLevelSuperAdmin && masterSettings?.length
+        ? masterSettings
+        : userSettings;
+    if (!settings) return;
+
+    const valueOf = (settingName) =>
+      toHexColor(
+        settings.find((item) => item.settingName === settingName)
+          ?.settingValue
+      );
+    const headerBgColor = valueOf("AppearanceHeaderBgColor");
+    const menuTextColor = valueOf("AppearanceNavbarMenuListColor");
+    const cardBgColor = valueOf("AppearanceDashboardCardBgColor");
+
+    setCurrentCardColor(cardBgColor);
+    setCurrentTopbarTextColor(menuTextColor);
+    setCurrentTopbarColor(headerBgColor);
+
+    setCardColor(cardBgColor);
+    setTopbarTextColor(menuTextColor);
+    setTopbarColor(headerBgColor);
+  };
+
   useEffect(() => {
     if (common.token) {
-      let userThemeSettingLocalStorage = localStorage.getItem(
-        "userThemeSettingLocalStorage"
-      );
-      if (
-        userThemeSettingLocalStorage === undefined ||
-        userThemeSettingLocalStorage === null
-      ) {
-        GetUserPersonalizeSettingData(
-          common.userKeyID,
-          common.organisationKeyID
-        );
+      const userSettings = readStoredSettings("userThemeSettingLocalStorage");
+      const masterSettings = readStoredSettings(MASTER_THEME_STORAGE_KEY);
+      // Caches written before the master set was stored lack it; refetch.
+      if (userSettings === null || masterSettings === null) {
+        GetUserPersonalizeSettingData(common.userKeyID);
       } else {
-        GetUserPersonalizeSettingDataFromLocalStorage();
+        applyThemeSettings(userSettings, masterSettings);
       }
     }
-  }, []);
-
-  const GetUserPersonalizeSettingDataFromLocalStorage = () => {
-    // Get the JSON-formatted string from localStorage
-    let userThemeSettingLocalStorage = localStorage.getItem(
-      "userThemeSettingLocalStorage"
-    );
-
-    if (userThemeSettingLocalStorage) {
-      // Parse the JSON string to a JavaScript object
-      let userThemeSettings = JSON.parse(userThemeSettingLocalStorage);
-
-      // Check if userThemeSettings is not null or undefined
-      if (userThemeSettings) {
-        // Now, userThemeSettings is a JavaScript object containing the parsed JSON data     
-
-        // Assuming the properties in ModelData match the setting names
-        const AppearanceHeaderBgColorSetting = userThemeSettings.find(
-          (item) => item.settingName === "AppearanceHeaderBgColor"
-        );
-        const AppearanceNavbarMenuListColorSetting = userThemeSettings.find(
-          (item) => item.settingName === "AppearanceNavbarMenuListColor"
-        );
-        const AppearanceDashboardCardBgColorSetting = userThemeSettings.find(
-          (item) => item.settingName === "AppearanceDashboardCardBgColor"
-        );
-        // Set values based on the found settings
-        setCurrentCardColor(
-          AppearanceDashboardCardBgColorSetting?.settingValue
-        );
-        setCurrentTopbarTextColor(
-          AppearanceNavbarMenuListColorSetting?.settingValue
-        );
-        setCurrentTopbarColor(AppearanceHeaderBgColorSetting?.settingValue);
-
-        setCardColor(AppearanceDashboardCardBgColorSetting?.settingValue);
-        setTopbarTextColor(AppearanceNavbarMenuListColorSetting?.settingValue);
-        setTopbarColor(AppearanceHeaderBgColorSetting?.settingValue);
-      }
-    }
-  };
+    // Re-evaluated when switching between platform level and an organisation.
+  }, [common.organisationKeyID]);
 
   const GetUserPersonalizeSettingData = async (id) => {
     if (!id) {
@@ -114,39 +125,19 @@ export const ColorProvider = ({ children }) => {
       if (response) {
         if (response?.data?.statusCode === 200) {
           getUserPersonalizeSettingApiCallCount = 0;
-          const modelData =
-            response?.data?.responseData.userPersonalSetting.userThemeSetting;
+          const { userThemeSetting, masterThemeSetting } =
+            response?.data?.responseData.userPersonalSetting;
 
-          localStorage.removeItem("userThemeSettingLocalStorage");
           localStorage.setItem(
             "userThemeSettingLocalStorage",
-            JSON.stringify(modelData)
+            JSON.stringify(userThemeSetting)
+          );
+          localStorage.setItem(
+            MASTER_THEME_STORAGE_KEY,
+            JSON.stringify(masterThemeSetting || [])
           );
 
-          // Assuming the properties in ModelData match the setting names
-          const AppearanceHeaderBgColorSetting = modelData.find(
-            (item) => item.settingName === "AppearanceHeaderBgColor"
-          );
-          const AppearanceNavbarMenuListColorSetting = modelData.find(
-            (item) => item.settingName === "AppearanceNavbarMenuListColor"
-          );
-          const AppearanceDashboardCardBgColorSetting = modelData.find(
-            (item) => item.settingName === "AppearanceDashboardCardBgColor"
-          );
-          // Set values based on the found settings
-          setCurrentCardColor(
-            AppearanceDashboardCardBgColorSetting?.settingValue
-          );
-          setCurrentTopbarTextColor(
-            AppearanceNavbarMenuListColorSetting?.settingValue
-          );
-          setCurrentTopbarColor(AppearanceHeaderBgColorSetting?.settingValue);
-
-          setCardColor(AppearanceDashboardCardBgColorSetting?.settingValue);
-          setTopbarTextColor(
-            AppearanceNavbarMenuListColorSetting?.settingValue
-          );
-          setTopbarColor(AppearanceHeaderBgColorSetting?.settingValue);
+          applyThemeSettings(userThemeSetting, masterThemeSetting);
         } else {
           RecallGetUserPersonalizeSettingData(id);
         }
