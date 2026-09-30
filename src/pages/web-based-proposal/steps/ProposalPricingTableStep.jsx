@@ -1570,8 +1570,32 @@ export default function ProposalPricingTableStep({
   const currencySymbol = CURRENCY_SYMBOLS[currencyID] || "£";
   const formatAmount = (value) => `${currencySymbol}${value.toFixed(2)}`;
 
-  const hasRecurring = recurringSelectedList.length > 0;
-  const hasOneOff = oneOffSelectedList.length > 0;
+  // Standard Package quotes hydrate every service the package-scoped catalog
+  // call returns, recurring and one-off alike — so a package with only
+  // recurring services still leaves oneOffSelectedList non-empty, and vice
+  // versa. Section visibility for those quotes checks actual package
+  // membership (does any selected item resolve a price for one of this
+  // proposal's packages) instead of raw selection count. Service/Custom
+  // Package quotes keep the plain count check — their selections are real,
+  // not an artifact of package-scoped hydration.
+  const hasPackageService = (chargeTypeID, items) =>
+    items.some((item) =>
+      packageColumns.some(
+        (pkg) =>
+          priceByServiceAndPackage(
+            chargeTypeID,
+            item.serviceID,
+            pkg.servicePackageID,
+          ) !== null,
+      ),
+    );
+
+  const hasRecurring = isStandardPackage
+    ? hasPackageService(SERVICE_CHARGE_TYPE_ID.RECURRING, recurringSelectedList)
+    : recurringSelectedList.length > 0;
+  const hasOneOff = isStandardPackage
+    ? hasPackageService(SERVICE_CHARGE_TYPE_ID.ONE_OFF, oneOffSelectedList)
+    : oneOffSelectedList.length > 0;
 
   const clientName = quoteModel?.clientName || "Client";
   const organisationName = themeSettings?.tradingBusinessName || "Outbooks";
