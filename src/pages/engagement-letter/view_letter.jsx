@@ -564,9 +564,21 @@ const View_Engagement_Latter = () => {
     });
   };
 
-  // Renders a boolean status field as "-" (null/undefined), "true" or "false"
-  const formatBooleanStatus = (value) =>
-    value === null || value === undefined ? "-" : String(value);
+  const formatPaymentStatus = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "-";
+    }
+
+    if (value === true || String(value).toLowerCase() === "true") {
+      return "Completed";
+    }
+
+    if (value === false || String(value).toLowerCase() === "false") {
+      return "Pending";
+    }
+
+    return String(value);
+  };
 
   const GetOnlyDate = (value) => {
     if (!value) return "";
@@ -1714,7 +1726,7 @@ const View_Engagement_Latter = () => {
                                 <tr>
                                   <td>One-off Payment Status</td>
                                   <td class="text-end">
-                                    {formatBooleanStatus(
+                                    {formatPaymentStatus(
                                       EngagementObj.oneOffPaymentStatus,
                                     )}
                                   </td>
@@ -1722,7 +1734,7 @@ const View_Engagement_Latter = () => {
                                 <tr>
                                   <td>Recurring Payment Status</td>
                                   <td class="text-end">
-                                    {formatBooleanStatus(
+                                    {formatPaymentStatus(
                                       EngagementObj.recurringPaymentStatus,
                                     )}
                                   </td>
@@ -1730,7 +1742,7 @@ const View_Engagement_Latter = () => {
                                 <tr>
                                   <td>Payment Status</td>
                                   <td class="text-end">
-                                    {formatBooleanStatus(
+                                    {formatPaymentStatus(
                                       EngagementObj.paymentStatus,
                                     )}
                                   </td>
