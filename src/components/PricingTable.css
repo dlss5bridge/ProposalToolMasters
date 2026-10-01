@@ -203,3 +203,203 @@ table.table.pricing-table.pricing-table--oneoff
 table.table.pricing-table .input-text {
   font-weight: 500;
 }
+
+/* =========================================================
+   SELECT TEMPLATE MODAL (PricingTableTemplatesModal)
+   ========================================================= */
+
+.ptt-modal {
+  overflow: hidden;
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.ptt-modal__header {
+  padding: 18px 22px !important;
+  border-bottom: 1px solid #e8edf3;
+  background: #fff;
+}
+
+.ptt-modal__heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ptt-modal__icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #e6f8fb;
+  color: #14b5d1;
+  font-size: 19px;
+}
+
+.ptt-modal__header .modal-title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ptt-modal__subtitle {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 12.5px;
+}
+
+.ptt-modal__body {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  padding: 20px 22px !important;
+  background: #f6f8fb;
+}
+
+.ptt-options {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Each template: radio + title above, the table itself is the card.
+   The radio stays the real control. */
+.ptt-modal .form-check.ptt-option {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ptt-modal .ptt-option > .ptt-option__radio {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  border: 1.5px solid #cbd5e1;
+  cursor: pointer;
+}
+
+.ptt-modal .ptt-option > .ptt-option__radio:checked {
+  border-color: #14b5d1;
+  background-color: #14b5d1;
+}
+
+.ptt-modal .ptt-option > .form-check-label {
+  width: 100%;
+  cursor: pointer;
+}
+
+.ptt-modal .ptt-option__title {
+  display: flex;
+  align-items: center;
+  min-height: 22px;
+  margin: 0 0 10px 28px;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ptt-modal .ptt-option:has(> .ptt-option__radio:checked) .ptt-option__title::after {
+  content: "Selected";
+  margin-left: 10px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #e6f8fb;
+  color: #0b8aa3;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ptt-modal .ptt-option__preview {
+  margin: 0;
+}
+
+.ptt-modal .ptt-option__preview .table-responsive {
+  margin: 0 !important;
+  padding: 2px;
+}
+
+.ptt-modal .ptt-option table.table.pricing-table {
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ptt-modal .ptt-option:hover table.table.pricing-table {
+  border-color: #b8e8f2;
+}
+
+.ptt-modal .ptt-option:has(> .ptt-option__radio:checked) table.table.pricing-table {
+  border-color: #14b5d1;
+  box-shadow: 0 0 0 3px rgba(20, 181, 209, 0.12);
+}
+
+/* Column toggles for the custom template */
+.ptt-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.ptt-columns__label {
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.ptt-columns__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ptt-columns__list > .form-check {
+  min-height: 0;
+  margin: 0;
+  padding: 6px 12px 6px 34px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f8fafc;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.ptt-columns__list > .form-check:has(> .form-check-input:checked) {
+  border-color: #b8e8f2;
+  background: #e6f8fb;
+}
+
+.ptt-columns__list > .form-check > .form-check-input {
+  width: 15px !important;
+  height: 15px !important;
+  margin: 2px 0 0 -22px !important;
+}
+
+.ptt-columns__list > .form-check > .form-check-input:checked {
+  border-color: #14b5d1;
+  background-color: #14b5d1;
+}
+
+.ptt-columns__list > .form-check > .form-check-input:disabled + .form-check-label {
+  opacity: 0.6;
+}
+
+.ptt-columns__list .form-check-label {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 500;
+}

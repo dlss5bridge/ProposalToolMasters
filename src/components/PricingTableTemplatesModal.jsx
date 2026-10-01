@@ -12499,12 +12499,22 @@ const PricingTableTemplatesModal = ({
         aria-labelledby="modalLabel"
         aria-hidden="true"
       >
-        <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header bg-light p-3">
-              <h5 className="modal-title" id="modalLabel">
-                Select Template
-              </h5>
+        <div className="modal-dialog modal-xl modal-dialog-centered">
+          <div className="modal-content ptt-modal">
+            <div className="modal-header ptt-modal__header">
+              <div className="ptt-modal__heading">
+                <span className="ptt-modal__icon">
+                  <i className="ri-table-line" aria-hidden="true"></i>
+                </span>
+                <div>
+                  <h5 className="modal-title" id="modalLabel">
+                    Select Template
+                  </h5>
+                  <p className="ptt-modal__subtitle">
+                    Choose how the pricing table appears in the document
+                  </p>
+                </div>
+              </div>
               <button
                 type="button"
                 className="btn-close"
@@ -12513,14 +12523,14 @@ const PricingTableTemplatesModal = ({
               ></button>
             </div>
 
-            <div className="modal-body">
-              <form>
+            <div className="modal-body ptt-modal__body">
+              <form className="ptt-options">
                 <div
                   key={templates[0].id}
-                  className="form-check d-flex align-items-start justify-content-center mb-3"
+                  className="form-check ptt-option"
                 >
                   <input
-                    className="form-check-input mt-2 me-2"
+                    className="form-check-input ptt-option__radio"
                     type="radio"
                     name="pricingTemplate"
                     id={templates[0].id}
@@ -12568,19 +12578,19 @@ const PricingTableTemplatesModal = ({
                     className="form-check-label w-100"
                     htmlFor={templates[0].id}
                   >
-                    <strong style={{ fontSize: "20px" }}>
+                    <strong className="ptt-option__title">
                       {templates[0].label}
                     </strong>
-                    <div className="mt-1">{templates[0].content}</div>
+                    <div className="ptt-option__preview">{templates[0].content}</div>
                   </label>
                 </div>
 
                 {/* <div
                   key={templates.id}
-                  className="form-check d-flex align-items-start justify-content-center mb-3"
+                  className="form-check ptt-option"
                 >
                   <input
-                    className="form-check-input mt-2 me-2"
+                    className="form-check-input ptt-option__radio"
                     type="radio"
                     name="pricingTemplate"
                     id={templates.id}
@@ -12628,14 +12638,18 @@ const PricingTableTemplatesModal = ({
                     className="form-check-label w-100"
                     htmlFor={templates.id}
                   >
-                    <strong style={{ fontSize: "20px" }}>
+                    <strong className="ptt-option__title">
                       {templates.label}
                     </strong>
-                    <div className="mt-1">{templates.content}</div>
+                    <div className="ptt-option__preview">{templates.content}</div>
                   </label>
                 </div> */}
 
-                <div className="mb-3 d-flex flex-wrap gap-3">
+                <div className="ptt-columns">
+                  <span className="ptt-columns__label">
+                    Columns shown in the custom template
+                  </span>
+                  <div className="ptt-columns__list">
                   {Object.keys(vatSafeVisibleFields).map((field) => (
                     <div key={field} className="form-check">
                       <input
@@ -12675,14 +12689,15 @@ const PricingTableTemplatesModal = ({
                       </label>
                     </div>
                   ))}
+                  </div>
                 </div>
 
                 {/* <div
                   key={templates[0].id}
-                  className="form-check d-flex align-items-start justify-content-center mb-3"
+                  className="form-check ptt-option"
                 >
                   <input
-                    className="form-check-input mt-2 me-2"
+                    className="form-check-input ptt-option__radio"
                     type="radio"
                     name="pricingTemplate"
                     id={templates[0].id}
@@ -12730,19 +12745,19 @@ const PricingTableTemplatesModal = ({
                     className="form-check-label w-100"
                     htmlFor={templates[6].id}
                   >
-                    <strong style={{ fontSize: "20px" }}>
+                    <strong className="ptt-option__title">
                       {templates[6].label}
                     </strong>
-                    <div className="mt-1">{templates[6].content}</div>
+                    <div className="ptt-option__preview">{templates[6].content}</div>
                   </label>
                 </div> */}
 
                 <div
                   key={templates[6].id}
-                  className="form-check d-flex align-items-start justify-content-center mb-3"
+                  className="form-check ptt-option"
                 >
                   <input
-                    className="form-check-input mt-2 me-2"
+                    className="form-check-input ptt-option__radio"
                     type="radio"
                     name="pricingTemplate"
                     id={templates[6].id}
@@ -12790,10 +12805,10 @@ const PricingTableTemplatesModal = ({
                     className="form-check-label w-100"
                     htmlFor={templates[6].id}
                   >
-                    <strong style={{ fontSize: "20px" }}>
+                    <strong className="ptt-option__title">
                       {templates[6].label}
                     </strong>
-                    <div className="mt-1">{templates[6].content}</div>
+                    <div className="ptt-option__preview">{templates[6].content}</div>
                   </label>
                 </div>
               </form>
