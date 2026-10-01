@@ -483,64 +483,96 @@
 }
 
 /* Editor shell */
-.SOF-SD-Customization .jodit-container:not(.jodit_inline) {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-container:not(.jodit_inline) {
   overflow: hidden;
   border: 1px solid #dfe5ec !important;
   border-radius: 10px !important;
   background: #fff !important;
 }
 
-.SOF-SD-Customization .jodit-toolbar__box:not(:empty) {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-toolbar__box:not(:empty) {
   border-bottom: 1px solid #e8edf3 !important;
   background: #f8fafc !important;
 }
 
-.SOF-SD-Customization .jodit-toolbar-editor-collection_mode_horizontal {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-toolbar-editor-collection_mode_horizontal {
   background-image: none !important;
 }
 
-.SOF-SD-Customization .jodit-toolbar__box .jodit-toolbar-button__button,
-.SOF-SD-Customization .jodit-toolbar__box .jodit-toolbar-button__trigger {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-toolbar__box .jodit-toolbar-button__button,
+:is(.SOF-SD-Customization, .tnc-card) .jodit-toolbar__box .jodit-toolbar-button__trigger {
   border-radius: 6px;
   color: #475569;
 }
 
-.SOF-SD-Customization .jodit-toolbar__box .jodit-toolbar-button:hover .jodit-toolbar-button__button,
-.SOF-SD-Customization .jodit-toolbar__box .jodit-toolbar-button__button:hover {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-toolbar__box .jodit-toolbar-button:hover .jodit-toolbar-button__button,
+:is(.SOF-SD-Customization, .tnc-card) .jodit-toolbar__box .jodit-toolbar-button__button:hover {
   background: #e9eef5 !important;
 }
 
-.SOF-SD-Customization .jodit-toolbar__box .jodit-toolbar-button_variant_initial[aria-pressed="true"] .jodit-toolbar-button__button,
-.SOF-SD-Customization .jodit-toolbar__box .jodit-toolbar-button__button[aria-pressed="true"] {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-toolbar__box .jodit-toolbar-button_variant_initial[aria-pressed="true"] .jodit-toolbar-button__button,
+:is(.SOF-SD-Customization, .tnc-card) .jodit-toolbar__box .jodit-toolbar-button__button[aria-pressed="true"] {
   background: var(--rv-accent-soft) !important;
   color: var(--rv-accent-text);
 }
 
-.SOF-SD-Customization .jodit-toolbar__box svg {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-toolbar__box svg {
   fill: currentColor;
 }
 
-.SOF-SD-Customization .jodit-workplace {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-workplace {
   background: #fff;
 }
 
-.SOF-SD-Customization .jodit-wysiwyg {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-wysiwyg {
   padding: 16px 18px !important;
   color: #334155;
   font-size: 13.5px;
   line-height: 1.6;
 }
 
-.SOF-SD-Customization .jodit-wysiwyg li::marker {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-wysiwyg li::marker {
   color: var(--rv-accent);
 }
 
 /* app.min.css gives the status bar 30px padding */
-.SOF-SD-Customization .jodit-status-bar {
+:is(.SOF-SD-Customization, .tnc-card) .jodit-status-bar {
   min-height: 0;
   padding: 4px 12px !important;
   border-top: 1px solid #eef2f6;
   background: #fbfcfd !important;
   color: #94a3b8;
   font-size: 11px;
+}
+
+/* Terms & Conditions (EL Additional Information) */
+/* The Additional Information pane is a 2-column grid; span both columns */
+.tnc-card {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  padding: 20px;
+  border: 1px solid var(--rv-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.tnc-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 520px;
+  margin-bottom: 16px;
+}
+
+.tnc-card__field .fieldset-label {
+  margin: 0 !important;
+  color: var(--rv-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tnc-card #TnC-PdfDiv iframe {
+  border: 1px solid #dfe5ec;
+  border-radius: 10px;
 }

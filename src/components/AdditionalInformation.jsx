@@ -1411,17 +1411,26 @@ const AdditionalInformation = (props) => {
                     </div>
                   )}
                   {props.moduleName === "Contract" && (
-                    <>
-                      <h3 className="modal-title">Terms & Conditions</h3>
-                      <div className="separator"></div>
-                      <div id="TnC-Div" className="row fieldset mt-3">
-                        <div className="col-lg-3 col-md-3 col-sm-12 text-start text-md-end">
+                    <div className="tnc-card">
+                      <div className="sofsd-head">
+                        <span className="sofsd-head__icon">
+                          <i className="ri-file-shield-2-line" aria-hidden="true"></i>
+                        </span>
+                        <div>
+                          <h6 className="sofsd-head__title">Terms &amp; Conditions</h6>
+                          <p className="sofsd-head__desc">
+                            Choose the terms template included with this letter
+                          </p>
+                        </div>
+                      </div>
+                      <div id="TnC-Div" className="tnc-card__field">
+                        <div>
                           <label className="fieldset-label required">
                             TnC Template
                             <span style={{ color: "#ec4561" }}>*</span>
                           </label>
                         </div>
-                        <div className="col-lg-9 col-md-9 col-sm-12">
+                        <div>
                           <div className="input-group">
                             <Select
                               options={props.TnCLookupList}
@@ -1465,7 +1474,7 @@ const AdditionalInformation = (props) => {
                           />
                         </div>
                       ) : null}
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
