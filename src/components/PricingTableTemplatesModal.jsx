@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useState } from "react";
+import "./PricingTable.css";
 import { servicePackageTypeID } from "../Middleware/enums";
 import { Tooltip } from "@mui/material";
 import { FormatOverlineSharp } from "@mui/icons-material";
@@ -526,7 +527,7 @@ const PricingTableTemplatesModal = ({
       content:
         serviceTypeID === servicePackageTypeID.RecurringServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
               <thead className="table-light table-header-font">
                 <tr className="head-row">
                   <th className="tr-table-class text-white">Services</th>
@@ -670,7 +671,7 @@ const PricingTableTemplatesModal = ({
                           __html: currentPricingTableDesignOneOff,
                         }}
                       /> */}
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
               <thead className="table-light table-header-font">
                 <tr className="head-row">
                   <th className="tr-table-class text-white">Services</th>
@@ -798,7 +799,7 @@ const PricingTableTemplatesModal = ({
                         }}
                       /> */}
             <table
-              class="table align-middle table-nowrap"
+              class="table align-middle table-nowrap pricing-table pricing-table--recurring"
               style={{ width: "100%" }}
             >
               <thead className="table-light table-header-font">
@@ -1403,7 +1404,7 @@ const PricingTableTemplatesModal = ({
                                     }}
                                   /> */}
             <table
-              class="table align-middle table-nowrap"
+              class="table align-middle table-nowrap pricing-table pricing-table--oneoff"
               style={{ width: "100%" }}
             >
               <thead className="table-light table-header-font">
@@ -1985,7 +1986,7 @@ const PricingTableTemplatesModal = ({
       content:
         serviceTypeID === servicePackageTypeID.RecurringServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   <th
@@ -2316,7 +2317,7 @@ const PricingTableTemplatesModal = ({
           </div>
         ) : serviceTypeID === servicePackageTypeID.OneOffServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   <th
@@ -2642,7 +2643,7 @@ const PricingTableTemplatesModal = ({
                                  }}
                                /> */}
             <table
-              class="table align-middle table-nowrap"
+              class="table align-middle table-nowrap pricing-table pricing-table--recurring"
               style={{ width: "100%" }}
             >
               <thead className="table-light table-header-font">
@@ -3556,7 +3557,7 @@ const PricingTableTemplatesModal = ({
                                }}
                              /> */}
             <table
-              class="table align-middle table-nowrap"
+              class="table align-middle table-nowrap pricing-table pricing-table--oneoff"
               style={{ width: "100%" }}
             >
               <thead className="table-light table-header-font">
@@ -4678,7 +4679,7 @@ const PricingTableTemplatesModal = ({
       content:
         serviceTypeID === servicePackageTypeID.RecurringServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   {/* <th
@@ -5009,7 +5010,7 @@ const PricingTableTemplatesModal = ({
           </div>
         ) : serviceTypeID === servicePackageTypeID.OneOffServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   {/* <th
@@ -5333,7 +5334,7 @@ const PricingTableTemplatesModal = ({
                               }}
                             /> */}
             <table
-              class="table align-middle table-nowrap"
+              class="table align-middle table-nowrap pricing-table pricing-table--recurring"
               style={{ width: "100%" }}
             >
               <thead className="table-light table-header-font">
@@ -6111,7 +6112,7 @@ const PricingTableTemplatesModal = ({
                                }}
                              /> */}
             <table
-              class="table align-middle table-nowrap"
+              class="table align-middle table-nowrap pricing-table pricing-table--oneoff"
               style={{ width: "100%" }}
             >
               <thead className="table-light table-header-font">
@@ -7287,7 +7288,7 @@ const PricingTableTemplatesModal = ({
       content:
         serviceTypeID === servicePackageTypeID.RecurringServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   <th
@@ -7651,7 +7652,7 @@ const PricingTableTemplatesModal = ({
           </div>
         ) : serviceTypeID === servicePackageTypeID.OneOffServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   <th
@@ -8013,7 +8014,7 @@ const PricingTableTemplatesModal = ({
       content:
         serviceTypeID === servicePackageTypeID.RecurringServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   {/* <th
@@ -8374,7 +8375,7 @@ const PricingTableTemplatesModal = ({
           </div>
         ) : serviceTypeID === servicePackageTypeID.OneOffServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   {/* <th
@@ -8738,7 +8739,7 @@ const PricingTableTemplatesModal = ({
       content:
         serviceTypeID === servicePackageTypeID.RecurringServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   {/* <th
@@ -9100,7 +9101,7 @@ const PricingTableTemplatesModal = ({
           </div>
         ) : serviceTypeID === servicePackageTypeID.OneOffServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   {/* <th
@@ -9466,7 +9467,7 @@ const PricingTableTemplatesModal = ({
       content:
         serviceTypeID === servicePackageTypeID.RecurringServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   {visibleFieldsCustomTemp?.serviceCategory && (
@@ -9816,7 +9817,7 @@ const PricingTableTemplatesModal = ({
           </div>
         ) : serviceTypeID === servicePackageTypeID.OneOffServiceTypeID ? (
           <div style={{ marginTop: "0px" }} className="table-responsive">
-            <table className="table align-middle table-nowrap">
+            <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
               <thead className="table-dark text-white">
                 <tr className="head-row">
                   {visibleFieldsCustomTemp?.serviceCategory && (
@@ -10175,7 +10176,7 @@ const PricingTableTemplatesModal = ({
                                  }}
                                /> */}
             <table
-              class="table align-middle table-nowrap"
+              class="table align-middle table-nowrap pricing-table pricing-table--recurring"
               style={{ width: "100%" }}
             >
               <thead className="table-light table-header-font">
@@ -11166,7 +11167,7 @@ const PricingTableTemplatesModal = ({
                                  }}
                                /> */}
             <table
-              class="table align-middle table-nowrap"
+              class="table align-middle table-nowrap pricing-table pricing-table--oneoff"
               style={{ width: "100%" }}
             >
               <thead className="table-light table-header-font">

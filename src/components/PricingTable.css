@@ -1,0 +1,205 @@
+/* =========================================================
+   PRICING TABLE
+   Shared look for every on-screen pricing table (template
+   selection modal, Proposal and Engagement Letter review
+   screens). Applies only to <table class="table ... pricing-table">
+   and only restyles the existing row classes:
+     thead tr                               column headings
+     tr.a-la-carte-services-review-head-row  service category
+     tr.head-row / tr.head-grey-row          totals (Net, Discount, VAT...)
+     last tr.head-row                        grand total
+   Bootstrap paints cell backgrounds, and global rules
+   (.head-row, .table thead tr, .text-white) use !important, so
+   the overrides below target cells and use !important too.
+   ========================================================= */
+
+/* app.min.css gives .table-responsive a 60px top margin; some wrappers
+   cancel it inline and some don't, so neutralise it for every pricing table */
+.table-responsive:has(> table.pricing-table) {
+  margin-top: 0 !important;
+}
+
+table.table.pricing-table {
+  --pt-ink: #0f172a;
+  --pt-text: #1e293b;
+  --pt-muted: #64748b;
+  --pt-line: #e8edf3;
+  --pt-head: #f8fafc;
+  --pt-category: #f1f5f9;
+  --pt-total: #ecfeff;
+  --pt-total-line: #cff7fb;
+  --pt-grand: #0c2545;
+  --pt-check: #10b981;
+  --pt-grand-note: #67d4ea;
+
+  width: 100%;
+  margin: 0 !important;
+  border-collapse: separate !important;
+  border-spacing: 0;
+  border: 1px solid #dfe5ec;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+table.table.pricing-table > :is(thead, tbody, tfoot) > tr,
+table.table.pricing-table > :is(thead, tbody, tfoot) > tr > :is(th, td) {
+  padding: 13px 20px !important;
+  border-bottom: 1px solid var(--pt-line) !important;
+  background-color: #fff !important;
+  color: var(--pt-text) !important;
+  font-size: 13.5px !important;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+/* ---------- Column headings ---------- */
+
+table.table.pricing-table > thead > tr > :is(th, td) {
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+  background-color: var(--pt-head) !important;
+  color: var(--pt-muted) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+table.table.pricing-table > thead > tr > :is(th, td):not(:first-child) {
+  color: var(--pt-ink) !important;
+  font-weight: 700 !important;
+}
+
+/* ---------- Service category ---------- */
+
+table.table.pricing-table
+  > tbody
+  > tr.a-la-carte-services-review-head-row
+  > :is(th, td) {
+  padding-top: 11px !important;
+  padding-bottom: 11px !important;
+  background-color: var(--pt-category) !important;
+  color: var(--pt-ink) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+/* ---------- Service rows ---------- */
+
+table.table.pricing-table
+  > tbody
+  > tr:not(.head-row):not(.head-grey-row):not(.a-la-carte-services-review-head-row)
+  > :is(th, td) {
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+  color: #334155 !important;
+  font-size: 14px !important;
+  font-weight: 500;
+}
+
+table.table.pricing-table
+  > tbody
+  > tr:not(.head-row):not(.head-grey-row):not(.a-la-carte-services-review-head-row)
+  > :is(th, td):not(:first-child) {
+  color: var(--pt-text) !important;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+table.table.pricing-table .package-variables:empty {
+  display: none;
+}
+
+/* Included / not included marks in package comparison columns */
+table.table.pricing-table .fa-check {
+  color: var(--pt-check) !important;
+}
+
+table.table.pricing-table .fa-times {
+  color: #cbd5e1 !important;
+}
+
+/* ---------- Totals: Net Total, Discount, Discounted Total, VAT ---------- */
+
+table.table.pricing-table > tbody > tr:is(.head-row, .head-grey-row) > :is(th, td) {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  border-bottom: 1px solid var(--pt-total-line) !important;
+  background-color: var(--pt-total) !important;
+  color: #334155 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Label cells (value cells are right/centre aligned) */
+table.table.pricing-table
+  > tbody
+  > tr:is(.head-row, .head-grey-row)
+  > :is(th, td):first-child:not(.text-right):not(.text-center) {
+  font-weight: 500 !important;
+}
+
+table.table.pricing-table
+  > tbody
+  > tr:is(.head-row, .head-grey-row):not(:last-child)
+  > :is(th, td):first-child:not(.text-right):not(.text-center):not(:empty)::after {
+  content: ":";
+}
+
+/* ---------- Grand total: the final totals row ---------- */
+
+table.table.pricing-table > tbody > tr.head-row:last-child > :is(th, td) {
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+  border-bottom: 0 !important;
+  background-color: var(--pt-grand) !important;
+  color: #fff !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+table.table.pricing-table
+  > tbody
+  > tr.head-row:last-child
+  > :is(th, td):first-child:not(.text-right):not(.text-center) {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.35;
+}
+
+table.table.pricing-table.pricing-table--recurring
+  > tbody
+  > tr.head-row:last-child
+  > :is(th, td):first-child:not(.text-right):not(.text-center)::after,
+table.table.pricing-table.pricing-table--oneoff
+  > tbody
+  > tr.head-row:last-child
+  > :is(th, td):first-child:not(.text-right):not(.text-center)::after {
+  display: block;
+  margin-top: 2px;
+  color: var(--pt-grand-note);
+  font-size: 11.5px;
+  font-weight: 400;
+}
+
+table.table.pricing-table.pricing-table--recurring
+  > tbody
+  > tr.head-row:last-child
+  > :is(th, td):first-child:not(.text-right):not(.text-center)::after {
+  content: "Recurring Investment";
+}
+
+table.table.pricing-table.pricing-table--oneoff
+  > tbody
+  > tr.head-row:last-child
+  > :is(th, td):first-child:not(.text-right):not(.text-center)::after {
+  content: "One-Off Investment";
+}
+
+/* Inputs used for editable prices inside some templates */
+table.table.pricing-table .input-text {
+  font-weight: 500;
+}

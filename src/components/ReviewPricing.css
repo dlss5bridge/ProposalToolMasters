@@ -1,0 +1,431 @@
+/* =========================================================
+   REVIEW SERVICES / REVIEW PACKAGES (Proposal + Engagement Letter)
+   Visual layer only: every Select, input, checkbox and handler in
+   the JSX is unchanged. Hooks used:
+     .review-toolbar            the "Fees in the ..." / Show Discount pane
+     .review-section__head      section header (icon, title, badge)
+     .review-pricing-panel      wrapper round the price fields
+   ========================================================= */
+
+:root {
+  --rv-ink: #0f172a;
+  --rv-text: #334155;
+  --rv-muted: #64748b;
+  --rv-line: #e5eaf0;
+  --rv-soft: #f5f7fb;
+  --rv-accent: #14b5d1;
+  --rv-accent-soft: #e6f8fb;
+  --rv-accent-text: #0b8aa3;
+}
+
+/* ---------------------------------------------------------
+   Toolbar card
+   --------------------------------------------------------- */
+
+.tab-pane.review-toolbar {
+  margin: 0 0 16px;
+  padding: 14px 20px !important;
+  border: 1px solid var(--rv-line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.review-toolbar > .row {
+  margin: 0;
+}
+
+.review-toolbar > .row > .col-12 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 14px;
+  padding: 0;
+}
+
+.review-toolbar .row.fieldset {
+  display: contents;
+}
+
+.review-toolbar .row.fieldset > [class*="col-"] {
+  width: auto !important;
+  max-width: none !important;
+  flex: 0 0 auto;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.review-toolbar .fieldset-label {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--rv-ink);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* label + its field sit together; a gap separates field groups */
+.review-toolbar .row.fieldset > [class*="col-"]:has(.fieldset-label) + [class*="col-"] {
+  margin-right: 18px !important;
+}
+
+.review-toolbar .input-group {
+  min-width: 220px;
+  flex-wrap: nowrap;
+}
+
+.review-toolbar .selectDropDown {
+  width: 100% !important;
+  min-width: 220px;
+}
+
+.review-toolbar .selectDropDown > div[class*="control"] {
+  min-height: 38px;
+  border-color: #d7dee8;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+/* Show Discount group sits at the far right */
+.review-toolbar .row.fieldset > [class*="col-"]:has(+ [class*="col-"] input[type="checkbox"]) {
+  margin-left: auto !important;
+}
+
+.review-toolbar .row.fieldset > [class*="col-"]:has(input[type="checkbox"]) .input-group {
+  min-width: 0;
+}
+
+/* Checkbox drawn as a toggle; still the same native input */
+/* proposal-ui.css sizes every checkbox at 16x16 and loads later,
+   so the switch dimensions need !important */
+.review-toolbar input[type="checkbox"] {
+  position: relative;
+  width: 40px !important;
+  min-width: 40px;
+  height: 22px !important;
+  margin: 0 !important;
+  padding: 0;
+  flex: 0 0 40px;
+  border: 0;
+  vertical-align: middle;
+  border-radius: 999px;
+  background: #cbd5e1;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: background-color 0.18s ease;
+}
+
+.review-toolbar input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+  transition: transform 0.18s ease;
+}
+
+.review-toolbar input[type="checkbox"]:checked {
+  background: var(--rv-accent);
+}
+
+.review-toolbar input[type="checkbox"]:checked::before {
+  transform: translateX(18px);
+}
+
+.review-toolbar input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.review-toolbar input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--rv-accent);
+  outline-offset: 2px;
+}
+
+/* EL: "+ Payment Gateway" link sits beside its select */
+.review-toolbar .d-flex.flex-column.align-items-end {
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------
+   Pricing table template bar
+   --------------------------------------------------------- */
+
+.review-template-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 14px 12px 16px;
+  border: 1px solid var(--rv-line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.review-template-bar__icon {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: var(--rv-accent-soft);
+  color: var(--rv-accent);
+  font-size: 18px;
+}
+
+.review-template-bar__text {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.review-template-bar__title {
+  color: var(--rv-ink);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.review-template-bar__desc {
+  color: var(--rv-muted);
+  font-size: 12px;
+}
+
+.review-template-bar__btn {
+  min-height: 36px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  border: 1px solid #c6eff6;
+  border-radius: 8px;
+  background: var(--rv-accent-soft);
+  color: var(--rv-accent-text);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.review-template-bar__btn:hover {
+  border-color: var(--rv-accent);
+  background: #d4f2f8;
+}
+
+.review-template-bar__btn:focus-visible {
+  outline: 2px solid var(--rv-accent);
+  outline-offset: 2px;
+}
+
+.review-template-bar__btn i {
+  font-size: 16px;
+}
+
+/* EL renders the bar inside the toolbar card: divider instead of a card */
+.review-toolbar .review-template-bar {
+  flex: 1 0 100%;
+  margin: 2px 0 0 !important;
+  padding: 12px 0 0;
+  border: 0;
+  border-top: 1px solid var(--rv-line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------
+   Section card
+   --------------------------------------------------------- */
+
+/* The wizard already renders each .tab-pane as a white card; outline it */
+/* .tab-content > .tab-pane.active out-ranks proposal-ui.css's padding rule */
+.tab-content > .tab-pane.active:has(.review-section__head) {
+  padding: 20px !important;
+  border: 1px solid var(--rv-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.tab-content > .tab-pane.active:has(.review-section__head) > .row > [class*="col-"] {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.review-section__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.review-section__icon {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--rv-line);
+  border-radius: 10px;
+  background: var(--rv-soft);
+  color: var(--rv-accent);
+  font-size: 20px;
+}
+
+.review-section__heading {
+  min-width: 0;
+}
+
+.review-section__title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.review-section__head .review-section__title {
+  margin: 0 !important;
+  color: var(--rv-ink);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.review-section__badge {
+  padding: 3px 10px;
+  border: 1px solid #c6eff6;
+  border-radius: 999px;
+  background: var(--rv-accent-soft);
+  color: var(--rv-accent-text);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.review-section__desc {
+  margin: 3px 0 0;
+  color: var(--rv-muted);
+  font-size: 12.5px;
+}
+
+/* ---------------------------------------------------------
+   Price fields: label above input, one column per field
+   (the markup alternates label column / input column)
+   --------------------------------------------------------- */
+
+.review-pricing-panel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 6px 18px;
+  margin-bottom: 0;
+  padding: 14px 16px 16px;
+  border-radius: 10px;
+  background: var(--rv-soft);
+}
+
+.review-pricing-panel > .row {
+  display: contents;
+}
+
+.review-pricing-panel > .row > [class*="col-"] {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.review-pricing-panel > .row > [class*="col-"]:empty {
+  display: none;
+}
+
+.review-pricing-panel .text-md-end,
+.review-pricing-panel .text-lg-right {
+  text-align: left !important;
+}
+
+.review-pricing-panel .mt-2 {
+  margin-top: 0 !important;
+}
+
+.review-pricing-panel .fieldset-label {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--rv-text);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.review-pricing-panel .input-text {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d7dee8 !important;
+  border-radius: 8px !important;
+  background: #fff;
+  color: var(--rv-ink);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  box-shadow: none !important;
+}
+
+.review-pricing-panel .input-text:focus {
+  border-color: var(--rv-accent) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(20, 181, 209, 0.14) !important;
+}
+
+.review-pricing-panel .input-text[readonly] {
+  background: #f8fafc;
+  color: var(--rv-muted);
+}
+
+.review-pricing-panel .selectDropDown {
+  width: 100% !important;
+}
+
+.review-pricing-panel .selectDropDown > div[class*="control"] {
+  min-height: 40px;
+  border-color: #d7dee8;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.review-pricing-panel .validation {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  white-space: normal;
+}
+
+@media (max-width: 991px) {
+  .review-pricing-panel {
+    grid-auto-flow: row;
+    grid-template-rows: none;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .review-toolbar .row.fieldset > [class*="col-"]:has(+ [class*="col-"] input[type="checkbox"]) {
+    margin-left: 0 !important;
+  }
+}

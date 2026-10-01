@@ -1,5 +1,7 @@
 /* global $ */
 import React, { useContext, useEffect, useRef, useState } from "react";
+import "../../components/PricingTable.css";
+import "../../components/ReviewPricing.css";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.entry";
 import { lazy, Suspense } from "react";
@@ -45,7 +47,6 @@ import {
 } from "../../redux/Services/client/clientAPI";
 import { ERROR_MESSAGES } from "../../components/GlobalMessage";
 // import { SelectServices } from "../../components/SelectServices";
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
 
 import {
   GetTemplateListLookupList,
@@ -3837,7 +3838,7 @@ const ReviewServicesComponent = (props) => {
       <div className="create-practice-height scrollbar">
         <div className="container">
           <div className="tab-content">
-            <div className="tab-pane p-3 active">
+            <div className="tab-pane p-3 active review-toolbar">
               <div className="row">
                 <div className="col-12">
                   <div className="row fieldset">
@@ -3902,30 +3903,28 @@ const ReviewServicesComponent = (props) => {
             </div>
           </div>
           {(hasRecurringServiceRows || hasOneOffServiceRows) && (
-            <div
-              className="Custom-template"
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                gap: "10px",
-                width: "100%",
-                marginBottom: "12px",
-              }}
-            >
-              <small className="text-muted">
-                Applies to recurring and one-off tables
-              </small>
-              <div className="viewTemp">
-                <Tooltip title="Select Template">
-                  <div
-                    onClick={openGlobalServiceTemplatePicker}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <ViewModuleIcon />
-                  </div>
-                </Tooltip>
+            <div className="Custom-template review-template-bar">
+              <span className="review-template-bar__icon">
+                <i className="ri-table-line" aria-hidden="true"></i>
+              </span>
+              <div className="review-template-bar__text">
+                <span className="review-template-bar__title">
+                  Pricing Table Template
+                </span>
+                <span className="review-template-bar__desc">
+                  Applies to recurring and one-off tables
+                </span>
               </div>
+              <Tooltip title="Select Template">
+                <button
+                  type="button"
+                  className="review-template-bar__btn"
+                  onClick={openGlobalServiceTemplatePicker}
+                >
+                  <i className="ri-layout-masonry-line" aria-hidden="true"></i>
+                  <span>Change Template</span>
+                </button>
+              </Tooltip>
             </div>
           )}
           {props.selectedRecurringServiceList?.length !== 0 && (
@@ -3933,9 +3932,26 @@ const ReviewServicesComponent = (props) => {
               <div className="tab-pane p-3 active">
                 <div className="row">
                   <div className="col-lg-12">
-                    <div className="separator mb-2"></div>
-                    <h6>Recurring Services</h6>
-                    <div className="separator mb-3"></div>
+                    <div className="review-section__head">
+                      <span className="review-section__icon">
+                        <i className="ri-repeat-line" aria-hidden="true"></i>
+                      </span>
+                      <div className="review-section__heading">
+                        <div className="review-section__title-row">
+                          <h6 className="review-section__title">Recurring Services</h6>
+                          <span className="review-section__badge">
+                            {(props.selectedRecurringServiceList || []).reduce(
+                              (count, category) =>
+                                count + (category?.servicesList?.length || 0),
+                              0,
+                            )}{" "}
+                            Active Services
+                          </span>
+                        </div>
+                        <p className="review-section__desc">Ongoing services billed on a regular schedule</p>
+                      </div>
+                    </div>
+                    <div className="review-pricing-panel">
 
                     <div className="row fieldset">
                       <div className="col-md-2 col-sm-12  text-md-end">
@@ -4210,13 +4226,14 @@ const ReviewServicesComponent = (props) => {
                           )}
                       </div>
                     </div>
+                    </div>
                     <div className="mb-3"></div>
                     {props.selectedTemplateID === 0 ? (
                       <div
                         style={{ marginTop: "0px" }}
                         className="table-responsive"
                       >
-                        <table className="table align-middle table-nowrap">
+                        <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
                           <thead className="table-light table-header-font">
                             <tr className="head-row">
                               <th className="tr-table-class text-white">
@@ -4445,7 +4462,7 @@ const ReviewServicesComponent = (props) => {
                         style={{ marginTop: "0px" }}
                         className="table-responsive"
                       >
-                        <table className="table align-middle table-nowrap">
+                        <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
                           <thead className="table-dark text-white">
                             <tr className="head-row">
                               {props.visibleFieldsCustomTemp
@@ -4860,9 +4877,26 @@ const ReviewServicesComponent = (props) => {
               <div className="tab-pane p-3 active">
                 <div className="row">
                   <div className="col-lg-12">
-                    <div className="separator mb-2"></div>
-                    <h6>One-Off Services</h6>
-                    <div className="separator mb-3"></div>
+                    <div className="review-section__head">
+                      <span className="review-section__icon">
+                        <i className="ri-flashlight-line" aria-hidden="true"></i>
+                      </span>
+                      <div className="review-section__heading">
+                        <div className="review-section__title-row">
+                          <h6 className="review-section__title">One-Off Services</h6>
+                          <span className="review-section__badge">
+                            {(props.selectedOneOffServiceList || []).reduce(
+                              (count, category) =>
+                                count + (category?.servicesList?.length || 0),
+                              0,
+                            )}{" "}
+                            Active Services
+                          </span>
+                        </div>
+                        <p className="review-section__desc">Single-delivery services billed once</p>
+                      </div>
+                    </div>
+                    <div className="review-pricing-panel">
 
                     <div className="row fieldset">
                       <div className="col-md-2 col-sm-12  text-md-end">
@@ -5100,13 +5134,14 @@ const ReviewServicesComponent = (props) => {
                           )}
                       </div>
                     </div>
+                    </div>
                     <div className="mb-3"></div>
                     {props.selectedTemplateID === 0 ? (
                       <div
                         style={{ marginTop: "0px" }}
                         className="table-responsive"
                       >
-                        <table className="table align-middle table-nowrap">
+                        <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
                           <thead className="table-light table-header-font">
                             <tr className="head-row">
                               <th className="tr-table-class text-white">
@@ -5324,7 +5359,7 @@ const ReviewServicesComponent = (props) => {
                         style={{ marginTop: "0px" }}
                         className="table-responsive"
                       >
-                        <table className="table align-middle table-nowrap">
+                        <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
                           <thead className="table-dark text-white">
                             <tr className="head-row">
                               {props.visibleFieldsCustomTemp
@@ -11571,7 +11606,7 @@ const ReviewPackagesComponent = (props) => {
       <div className="create-practice-height scrollbar">
         <div className="container">
           <div className="tab-content">
-            <div className="tab-pane p-3 active">
+            <div className="tab-pane p-3 active review-toolbar">
               <div className="row">
                 <div className="col-12">
                   <div className="row fieldset mb-2">
@@ -11637,30 +11672,28 @@ const ReviewPackagesComponent = (props) => {
             </div>
           </div>
           {(hasRecurringPackageRows || hasOneOffPackageRows) && (
-            <div
-              className="Custom-template"
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                gap: "10px",
-                width: "100%",
-                marginBottom: "12px",
-              }}
-            >
-              <small className="text-muted">
-                Applies to recurring and one-off tables
-              </small>
-              <div className="viewTemp">
-                <Tooltip title="Select Template">
-                  <div
-                    onClick={openGlobalPackageTemplatePicker}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <ViewModuleIcon />
-                  </div>
-                </Tooltip>
+            <div className="Custom-template review-template-bar">
+              <span className="review-template-bar__icon">
+                <i className="ri-table-line" aria-hidden="true"></i>
+              </span>
+              <div className="review-template-bar__text">
+                <span className="review-template-bar__title">
+                  Pricing Table Template
+                </span>
+                <span className="review-template-bar__desc">
+                  Applies to recurring and one-off tables
+                </span>
               </div>
+              <Tooltip title="Select Template">
+                <button
+                  type="button"
+                  className="review-template-bar__btn"
+                  onClick={openGlobalPackageTemplatePicker}
+                >
+                  <i className="ri-layout-masonry-line" aria-hidden="true"></i>
+                  <span>Change Template</span>
+                </button>
+              </Tooltip>
             </div>
           )}
           {props.selectedRecurringServiceList?.length !== 0 && (
@@ -11668,9 +11701,26 @@ const ReviewPackagesComponent = (props) => {
               <div className="tab-pane p-3 active">
                 <div className="row">
                   <div className="col-lg-12">
-                    <div className="separator mb-2"></div>
-                    <h6>Recurring Services</h6>
-                    <div className="separator mb-3"></div>
+                    <div className="review-section__head">
+                      <span className="review-section__icon">
+                        <i className="ri-repeat-line" aria-hidden="true"></i>
+                      </span>
+                      <div className="review-section__heading">
+                        <div className="review-section__title-row">
+                          <h6 className="review-section__title">Recurring Services</h6>
+                          <span className="review-section__badge">
+                            {(props.selectedRecurringServiceList || []).reduce(
+                              (count, category) =>
+                                count + (category?.servicesList?.length || 0),
+                              0,
+                            )}{" "}
+                            Active Services
+                          </span>
+                        </div>
+                        <p className="review-section__desc">Ongoing services billed on a regular schedule</p>
+                      </div>
+                    </div>
+                    <div className="review-pricing-panel">
 
                     <div className="row" id="recurring_Default">
                       <div class="col-lg-2 mb-1 col-md-2 col-sm-12 mt-2 text-md-end">
@@ -11722,6 +11772,7 @@ const ReviewPackagesComponent = (props) => {
                       </div>
                     </div>
                     <div className="row fieldset"></div>
+                    </div>
                     <div className="mb-3"></div>
 
                     {props.selectedTemplateID === 0 ? (
@@ -11730,7 +11781,7 @@ const ReviewPackagesComponent = (props) => {
                         className="table-responsive"
                       >
                         <table
-                          class="table align-middle table-nowrap"
+                          class="table align-middle table-nowrap pricing-table pricing-table--recurring"
                           style={{ width: "100%" }}
                         >
                           <thead className="table-light table-header-font">
@@ -12615,7 +12666,7 @@ const ReviewPackagesComponent = (props) => {
                                                     }}
                                                   /> */}
                         <table
-                          class="table align-middle table-nowrap"
+                          class="table align-middle table-nowrap pricing-table pricing-table--recurring"
                           style={{ width: "100%" }}
                         >
                           <thead className="table-light table-header-font">
@@ -13845,9 +13896,26 @@ const ReviewPackagesComponent = (props) => {
               <div className="tab-pane p-3 active">
                 <div className="row">
                   <div className="col-lg-12">
-                    <div className="separator mb-2"></div>
-                    <h6>One-Off Services</h6>
-                    <div className="separator mb-3"></div>
+                    <div className="review-section__head">
+                      <span className="review-section__icon">
+                        <i className="ri-flashlight-line" aria-hidden="true"></i>
+                      </span>
+                      <div className="review-section__heading">
+                        <div className="review-section__title-row">
+                          <h6 className="review-section__title">One-Off Services</h6>
+                          <span className="review-section__badge">
+                            {(props.selectedOneOffServiceList || []).reduce(
+                              (count, category) =>
+                                count + (category?.servicesList?.length || 0),
+                              0,
+                            )}{" "}
+                            Active Services
+                          </span>
+                        </div>
+                        <p className="review-section__desc">Single-delivery services billed once</p>
+                      </div>
+                    </div>
+                    <div className="review-pricing-panel">
 
                     {/* <div className="row fieldset">
                     <div className="col-lg-2 text-lg-right">
@@ -13900,6 +13968,7 @@ const ReviewPackagesComponent = (props) => {
                         )}{" "}
                       </div>
                     </div>
+                    </div>
                     <div className="mb-3"></div>
 
                     {props.selectedTemplateID === 0 ? (
@@ -13908,7 +13977,7 @@ const ReviewPackagesComponent = (props) => {
                         className="table-responsive"
                       >
                         <table
-                          class="table align-middle table-nowrap"
+                          class="table align-middle table-nowrap pricing-table pricing-table--oneoff"
                           style={{ width: "100%" }}
                         >
                           <thead className="table-light table-header-font">
@@ -14732,7 +14801,7 @@ const ReviewPackagesComponent = (props) => {
                                  }}
                                /> */}
                         <table
-                          class="table align-middle table-nowrap"
+                          class="table align-middle table-nowrap pricing-table pricing-table--oneoff"
                           style={{ width: "100%" }}
                         >
                           <thead className="table-light table-header-font">
