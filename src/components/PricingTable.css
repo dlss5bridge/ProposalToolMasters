@@ -42,8 +42,18 @@ table.table.pricing-table {
   background: #fff;
 }
 
+/* Package tables close </tbody> early and render their total rows directly
+   inside <table>, so every row rule also targets "table > tr". */
 table.table.pricing-table > :is(thead, tbody, tfoot) > tr,
-table.table.pricing-table > :is(thead, tbody, tfoot) > tr > :is(th, td) {
+table.table.pricing-table > tr,
+table.table.pricing-table > :is(thead, tbody, tfoot) > tr > :is(th, td),
+table.table.pricing-table > tr > :is(th, td) {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+table.table.pricing-table > :is(thead, tbody, tfoot) > tr > :is(th, td),
+table.table.pricing-table > tr > :is(th, td) {
   padding: 13px 20px !important;
   border-bottom: 1px solid var(--pt-line) !important;
   background-color: #fff !important;
@@ -73,10 +83,8 @@ table.table.pricing-table > thead > tr > :is(th, td):not(:first-child) {
 
 /* ---------- Service category ---------- */
 
-table.table.pricing-table
-  > tbody
-  > tr.a-la-carte-services-review-head-row
-  > :is(th, td) {
+table.table.pricing-table > tbody > tr.a-la-carte-services-review-head-row > :is(th, td),
+table.table.pricing-table > tr.a-la-carte-services-review-head-row > :is(th, td) {
   padding-top: 11px !important;
   padding-bottom: 11px !important;
   background-color: var(--pt-category) !important;
@@ -87,10 +95,8 @@ table.table.pricing-table
 
 /* ---------- Service rows ---------- */
 
-table.table.pricing-table
-  > tbody
-  > tr:not(.head-row):not(.head-grey-row):not(.a-la-carte-services-review-head-row)
-  > :is(th, td) {
+table.table.pricing-table > tbody > tr:not(.head-row):not(.head-grey-row):not(.a-la-carte-services-review-head-row) > :is(th, td),
+table.table.pricing-table > tr:not(.head-row):not(.head-grey-row):not(.a-la-carte-services-review-head-row) > :is(th, td) {
   padding-top: 14px !important;
   padding-bottom: 14px !important;
   color: #334155 !important;
@@ -98,10 +104,8 @@ table.table.pricing-table
   font-weight: 500;
 }
 
-table.table.pricing-table
-  > tbody
-  > tr:not(.head-row):not(.head-grey-row):not(.a-la-carte-services-review-head-row)
-  > :is(th, td):not(:first-child) {
+table.table.pricing-table > tbody > tr:not(.head-row):not(.head-grey-row):not(.a-la-carte-services-review-head-row) > :is(th, td):not(:first-child),
+table.table.pricing-table > tr:not(.head-row):not(.head-grey-row):not(.a-la-carte-services-review-head-row) > :is(th, td):not(:first-child) {
   color: var(--pt-text) !important;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -122,7 +126,8 @@ table.table.pricing-table .fa-times {
 
 /* ---------- Totals: Net Total, Discount, Discounted Total, VAT ---------- */
 
-table.table.pricing-table > tbody > tr:is(.head-row, .head-grey-row) > :is(th, td) {
+table.table.pricing-table > tbody > tr:is(.head-row, .head-grey-row) > :is(th, td),
+table.table.pricing-table > tr:is(.head-row, .head-grey-row) > :is(th, td) {
   padding-top: 10px !important;
   padding-bottom: 10px !important;
   border-bottom: 1px solid var(--pt-total-line) !important;
@@ -134,23 +139,20 @@ table.table.pricing-table > tbody > tr:is(.head-row, .head-grey-row) > :is(th, t
 }
 
 /* Label cells (value cells are right/centre aligned) */
-table.table.pricing-table
-  > tbody
-  > tr:is(.head-row, .head-grey-row)
-  > :is(th, td):first-child:not(.text-right):not(.text-center) {
+table.table.pricing-table > tbody > tr:is(.head-row, .head-grey-row) > :is(th, td):first-child:not(.text-right):not(.text-center),
+table.table.pricing-table > tr:is(.head-row, .head-grey-row) > :is(th, td):first-child:not(.text-right):not(.text-center) {
   font-weight: 500 !important;
 }
 
-table.table.pricing-table
-  > tbody
-  > tr:is(.head-row, .head-grey-row):not(:last-child)
-  > :is(th, td):first-child:not(.text-right):not(.text-center):not(:empty)::after {
+table.table.pricing-table > tbody > tr:is(.head-row, .head-grey-row):not(:last-child) > :is(th, td):first-child:not(.text-right):not(.text-center):not(:empty)::after,
+table.table.pricing-table > tr:is(.head-row, .head-grey-row):not(:last-child) > :is(th, td):first-child:not(.text-right):not(.text-center):not(:empty)::after {
   content: ":";
 }
 
 /* ---------- Grand total: the final totals row ---------- */
 
-table.table.pricing-table > tbody > tr.head-row:last-child > :is(th, td) {
+table.table.pricing-table > tbody:last-child > tr.head-row:last-child > :is(th, td),
+table.table.pricing-table > tr.head-row:last-child > :is(th, td) {
   padding-top: 15px !important;
   padding-bottom: 15px !important;
   border-bottom: 0 !important;
@@ -161,23 +163,17 @@ table.table.pricing-table > tbody > tr.head-row:last-child > :is(th, td) {
   font-variant-numeric: tabular-nums;
 }
 
-table.table.pricing-table
-  > tbody
-  > tr.head-row:last-child
-  > :is(th, td):first-child:not(.text-right):not(.text-center) {
+table.table.pricing-table > tbody:last-child > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center),
+table.table.pricing-table > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center) {
   font-size: 14px !important;
   font-weight: 600 !important;
   line-height: 1.35;
 }
 
-table.table.pricing-table.pricing-table--recurring
-  > tbody
-  > tr.head-row:last-child
-  > :is(th, td):first-child:not(.text-right):not(.text-center)::after,
-table.table.pricing-table.pricing-table--oneoff
-  > tbody
-  > tr.head-row:last-child
-  > :is(th, td):first-child:not(.text-right):not(.text-center)::after {
+table.table.pricing-table.pricing-table--recurring > tbody:last-child > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center)::after,
+table.table.pricing-table.pricing-table--recurring > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center)::after,
+table.table.pricing-table.pricing-table--oneoff > tbody:last-child > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center)::after,
+table.table.pricing-table.pricing-table--oneoff > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center)::after {
   display: block;
   margin-top: 2px;
   color: var(--pt-grand-note);
@@ -185,23 +181,21 @@ table.table.pricing-table.pricing-table--oneoff
   font-weight: 400;
 }
 
-table.table.pricing-table.pricing-table--recurring
-  > tbody
-  > tr.head-row:last-child
-  > :is(th, td):first-child:not(.text-right):not(.text-center)::after {
+table.table.pricing-table.pricing-table--recurring > tbody:last-child > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center)::after,
+table.table.pricing-table.pricing-table--recurring > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center)::after {
   content: "Recurring Investment";
 }
 
-table.table.pricing-table.pricing-table--oneoff
-  > tbody
-  > tr.head-row:last-child
-  > :is(th, td):first-child:not(.text-right):not(.text-center)::after {
+table.table.pricing-table.pricing-table--oneoff > tbody:last-child > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center)::after,
+table.table.pricing-table.pricing-table--oneoff > tr.head-row:last-child > :is(th, td):first-child:not(.text-right):not(.text-center)::after {
   content: "One-Off Investment";
 }
 
 /* Inputs used for editable prices inside some templates */
 table.table.pricing-table .input-text {
+  min-width: 96px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 /* =========================================================
