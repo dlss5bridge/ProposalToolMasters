@@ -42,6 +42,41 @@ import InvalidFormIcon from "../../components/InvalidFormIcon";
 import ErrorModel from "../../components/ErrorModel";
 import { Tooltip } from "@mui/material";
 import dayjs from "dayjs";
+import "./AddUpdateProspect-redesign.css";
+
+const PROSPECT_TYPE_ICONS = {
+  [CLIENT_TYPES.Individual]: "ri-user-line",
+  [CLIENT_TYPES.Sole_Trader]: "ri-store-2-line",
+  [CLIENT_TYPES.Partnership]: "ri-group-line",
+  [CLIENT_TYPES.LLP]: "ri-building-line",
+  [CLIENT_TYPES.Company]: "ri-building-2-line",
+};
+
+// Presentation-only props shared by every react-select on this page: a class
+// prefix for styling, and a body portal so menus are never clipped.
+const PF_SELECT_PROPS = {
+  classNamePrefix: "pf-select",
+  menuPortalTarget: document.body,
+  styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) },
+};
+
+const PfField = ({ id, label, required, full, children }) => (
+  <div className={`pf-field${full ? " pf-field--full" : ""}`} id={id}>
+    <label className="pf-label">
+      {label}
+      {required && <span className="pf-req">*</span>}
+    </label>
+    {children}
+  </div>
+);
+
+const PfIconInput = ({ icon, children }) => (
+  <div className="pf-input-icon">
+    <i className={icon} aria-hidden="true"></i>
+    {children}
+  </div>
+);
+
 // Basic Information component
 const Basic_information = (props) => {
   const [openAddressPopUp, setOpenAddressPopUp] = useState(false);
@@ -348,924 +383,268 @@ const Basic_information = (props) => {
   //   setMenuIsOpen(true);
   //   prospectBasicInfoScrollToBottom();
   // };
-  const SelectBusinessTypeValue = props.BusinessTypeLookupList.find((item) => {
-    return item.value == props.basicInfo.businessTypeID;
-  });
+  const isCompanyOrLLP =
+    props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Company ||
+    props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.LLP;
+  const companyStatus = props.companyForm?.companyStatus;
 
   return (
-    <>
+    <div className="pf-card">
       <div
-        className={
-          props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Sole_Trader ||
-          props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Other ||
-          props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Partnership
-            ? `scrollbar`
-            : "create-practice-height scrollbar"
-        }
+        className="pf-step-body"
         ref={prospectDivContainerRef}
         onClick={(e) => scrollUptoCurrentPosition(e, prospectDivContainerRef)}
       >
-        <div className="tab-content">
-          <div className="tab-pane p-3 active">
-            <div class="row fieldset" id="ProspectType_Div">
-              <div class="col-md-3 col-sm-12 text-start text-md-end">
-                <label class="fieldset-label required">
-                  {prospectName} Type
-                </label>
-                <span class="text-danger">*</span>
-              </div>
-              <div class="col-lg-9 col-md-8 col-sm-12">
-                <div className="mb businessType input-group">
-                  <Select
-                    className="user-role-select"
-                    style={{ padding: "5px", width: "20%" }}
-                    options={props.BusinessTypeLookupList}
-                    value={SelectBusinessTypeValue}
-                    // value={{
-                    //   value: props.basicInfo.businessTypeID,
-                    //   label: props.basicInfo.businessTypeName,
-                    // }}
-                    onChange={(e) => {
-                      handleBusinessTypeChange(e);
-                    }}
-                  />
-                  {props.requireErrorMessage &&
-                  (props.basicInfo.businessTypeID === "" ||
-                    props.basicInfo.businessTypeID === null) ? (
-                    <span className="validation">{ERROR_MESSAGES}</span>
-                  ) : (
-                    ""
-                  )}
-                </div>
-              </div>
+        <PfField
+          id="ProspectType_Div"
+          label={`${prospectName} Type`}
+          required
+          full
+        >
+          <p className="pf-help">
+            Select the statutory legal structure to adapt intake fields and
+            automated compliance checklists.
+          </p>
+          <div className="pf-type-tabs" role="tablist">
+            {props.BusinessTypeLookupList.map((option) => {
+              const isActive = option.value == props.basicInfo.businessTypeID;
+              return (
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  key={option.value}
+                  className={`pf-type-tab${isActive ? " is-active" : ""}`}
+                  onClick={() => handleBusinessTypeChange(option)}
+                >
+                  <i
+                    className={
+                      PROSPECT_TYPE_ICONS[option.originalBusinessTypeID] ||
+                      "ri-more-line"
+                    }
+                    aria-hidden="true"
+                  ></i>
+                  <span>{option.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          {props.requireErrorMessage &&
+          (props.basicInfo.businessTypeID === "" ||
+            props.basicInfo.businessTypeID === null) ? (
+            <span className="validation">{ERROR_MESSAGES}</span>
+          ) : (
+            ""
+          )}
+        </PfField>
+
+        {/* ...........Individual Row........... */}
+        {props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Individual && (
+          <section>
+            <div className="pf-section-head">
+              <h3 className="pf-section-title">
+                Client Identification &amp; Contact
+              </h3>
+              <span className="pf-section-note">
+                Required fields indicated by <span className="pf-req">*</span>
+              </span>
             </div>
-            {/* ...........Individual Row........... */}
-            {props.basicInfo.originalBusinessTypeID ===
-              CLIENT_TYPES.Individual && (
-              <>
-                {props.officersForm?.map((item, index) => {
-                  return (
-                    <>
-                      <div
-                        className="row fieldset"
-                        id={`FirstName_Div_${index}`}
-                      >
-                        <div className="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">
-                            First Name
-                            <span style={{ color: "#ec4561" }}>*</span>
-                          </label>
-                        </div>
-                        <div class="col-lg-9 col-md-8 col-sm-12">
-                          <input
-                            type="text"
-                            className="input-text"
-                            placeholder="First Name"
-                            value={props.officersForm[index].firstName}
-                            onChange={(e) => {
-                              const inputValue = e.target.value.trim();
-                              // Reject input if it contains numeric characters
-                              // Remove all spaces and dots
-                              const cleanedValue = inputValue.replace(
-                                /[.\s]/g,
-                                "",
-                              );
-                              // Reject input if it starts with a digit
-                              if (/\d/.test(cleanedValue)) {
-                                return;
-                              }
-                              const capitalizedValue =
-                                cleanedValue.charAt(0).toUpperCase() +
-                                cleanedValue.slice(1);
-                              props.OnOfficerChange(
-                                index,
-                                "firstName",
-                                capitalizedValue,
-                              );
-                            }}
-                            maxLength={20}
-                          />
-                          {props.officerError &&
-                          (props.officersForm[index].firstName === null ||
-                            props.officersForm[index].firstName === "") ? (
-                            <span className="validation">{ERROR_MESSAGES}</span>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      </div>
-                      <div
-                        className="row fieldset"
-                        id={`LastName_Div_${index}`}
-                      >
-                        <div className="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">
-                            Last Name
-                            <span style={{ color: "#ec4561" }}>*</span>
-                          </label>
-                        </div>
-                        <div class="col-lg-9 col-md-8 col-sm-12">
-                          <input
-                            type="text"
-                            class="input-text"
-                            placeholder="Last Name"
-                            value={props.officersForm[index].lastName}
-                            onChange={(e) => {
-                              const inputValue = e.target.value;
-
-                              // Remove all spaces and dots
-                              const cleanedValue = inputValue.replace(
-                                /[.\s]/g,
-                                "",
-                              );
-
-                              // Reject input if it starts with a digit
-                              if (/\d/.test(cleanedValue)) {
-                                return;
-                              }
-
-                              const capitalizedValue =
-                                cleanedValue.charAt(0).toUpperCase() +
-                                cleanedValue.slice(1);
-                              props.OnOfficerChange(
-                                index,
-                                "lastName",
-                                capitalizedValue,
-                              );
-                            }}
-                            maxLength={20}
-                          />
-                          {props.officerError &&
-                          (props.officersForm[index].lastName === null ||
-                            props.officersForm[index].lastName === "") ? (
-                            <span className="validation">{ERROR_MESSAGES}</span>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      </div>
-                      <div class="row fieldset" id={`Phone_Div_${index}`}>
-                        <div class="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">Phone</label>
-                        </div>
-                        <div class="col-lg-9 col-md-8 col-sm-12 ">
-                          <div className="phone-input-div">
-                            <Select
-                              style={{ padding: "5px", width: "20%" }}
-                              className="createCompanyInfo"
-                              options={props.countryCodes}
-                              value={
-                                props.officersForm[index]?.phoneCountryCodeID
-                              }
-                              onChange={(e) => {
-                                setIndex(index);
-                                props.OnOfficerChange(
-                                  index,
-                                  "phoneCountryCodeID",
-                                  e,
-                                );
-                                props.OnOfficerChange(
-                                  index,
-                                  "countryCodeID",
-                                  e.value,
-                                );
-                              }}
-                            />
-                            <div className="phone-input-number-div">
-                              <input
-                                style={{ width: "100%" }}
-                                className="input-text"
-                                type="text"
-                                placeholder="Phone"
-                                value={props.officersForm[index].phoneNo}
-                                onChange={(e) => {
-                                  // Ensure that the input only contains numeric characters
-                                  const sanitizedInput = e.target.value
-                                    .replace(/[^0-9]/g, "")
-                                    .slice(0, 15);
-                                  props.OnOfficerChange(
-                                    index,
-                                    "phoneNo",
-                                    sanitizedInput,
-                                  );
-                                }}
-                              />
-                            </div>
-                          </div>
-                          {props.officerError &&
-                            props.officersForm[index].phoneNo !== null &&
-                            props.officersForm[index].phoneNo !== "" &&
-                            props.officersForm[index].phoneNo !== undefined &&
-                            !isValidPhoneNumber(
-                              props.officersForm[index].phoneNo,
-                            ) && (
-                              <span className="validation">
-                                {" "}
-                                Invalid phone number{" "}
-                              </span>
-                            )}
-                        </div>
-                      </div>
-                      <div class="row fieldset" id={`Email_Div_${index}`}>
-                        <div class="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">
-                            Email
-                            <span className="text-danger">*</span>
-                          </label>
-                        </div>
-                        <div class="col-lg-9 col-md-8 col-sm-12">
-                          <input
-                            type="text"
-                            class="input-text"
-                            placeholder="Email"
-                            value={props.officersForm[index]?.emailID?.replace(
-                              /\s/g,
-                              "",
-                            )}
-                            maxLength={50}
-                            onChange={(e) => {
-                              // Get the entered value
-                              const enteredValue = e.target.value
-                                .trim()
-                                .toLowerCase();
-
-                              // Remove whitespace from the entered value
-                              const trimmedValue = enteredValue.replace(
-                                /\s/g,
-                                "",
-                              );
-
-                              // Check for consecutive dots
-                              if (trimmedValue.includes("..")) {
-                                // If consecutive dots found, remove the last dot
-                                const correctedValue = trimmedValue.replace(
-                                  /\.+/g,
-                                  ".",
-                                );
-                                // Update the email address in the parent component
-                                props.OnOfficerChange(
-                                  index,
-                                  "emailID",
-                                  correctedValue,
-                                );
-                                return;
-                              }
-
-                              // Update the email address in the parent component
-                              props.OnOfficerChange(
-                                index,
-                                "emailID",
-                                trimmedValue,
-                              );
-                            }}
-                          />
-                          {props.officerError &&
-                            (props.officersForm[index].emailID === null ||
-                            props.officersForm[index].emailID === "" ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              !isValidEmail(
-                                props.officersForm[index].emailID,
-                              ) && (
-                                <span className="validation">
-                                  Invalid email pattern
-                                </span>
-                              )
-                            ))}
-                        </div>
-                      </div>
-                      <div className="row fieldset" id={`Web_Div_${index}`}>
-                        <div class="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">Website</label>
-                        </div>
-                        <div className="col-lg-9 col-md-8 col-sm-12">
-                          <input
-                            type="text"
-                            className="input-text"
-                            placeholder="www.example.com"
-                            value={props.basicInfo?.website?.replace(/\s/g, "")}
-                            onChange={(e) =>
-                              props.setBasicInfo({
-                                ...props.basicInfo,
-                                website: e.target.value,
-                              })
-                            }
-                            maxLength={70}
-                          />
-                          {props.requireErrorMessage &&
-                            props.basicInfo.website !== null &&
-                            props.basicInfo.website !== "" &&
-                            props.basicInfo.website !== undefined &&
-                            !isValidWebUrl(props.basicInfo.website) && (
-                              <span className="validation"> Invalid Url </span>
-                            )}
-                        </div>
-                      </div>
-                      <div class="row fieldset" id={`Address_Div_${index}`}>
-                        <div class="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">
-                            Residential Address
-                            <span style={{ color: "#ec4561" }}>*</span>
-                          </label>
-                        </div>
-                        <div class="col-lg-9 col-md-8 col-sm-12">
-                          <input
-                            className="input-text"
-                            style={{ cursor: "pointer" }}
-                            type="text"
-                            placeholder="Residential Address"
-                            value={
-                              props.concatenatedResidentialAddress[0]
-                                ?.officersFullAddress
-                            }
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              props.setAddressPopUpTitle("Residential Address");
-                              handleOpenRegisterOfficeAddressPopup(e, index);
-                            }}
-                            autoComplete="off"
-                          />
-                          {props.officerError &&
-                          (props.concatenatedResidentialAddress[0]
-                            .officersFullAddress === null ||
-                            props.concatenatedResidentialAddress[index]
-                              .officersFullAddress === "") ? (
-                            <span className="validation">{ERROR_MESSAGES}</span>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  );
-                })}
-              </>
-            )}
-            {/* ...........Sole Trader Detail And Partnership Detail Row........... */}
-            {(props.basicInfo.originalBusinessTypeID ===
-              CLIENT_TYPES.Sole_Trader ||
-              props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Other ||
-              props.basicInfo.originalBusinessTypeID ===
-                CLIENT_TYPES.Partnership) && (
-              <div>
-                <div className="row fieldset" id="TradingNameDiv">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      {" "}
-                      {props.basicInfo.originalBusinessTypeID ===
-                      CLIENT_TYPES.Other
-                        ? `${props.basicInfo.businessTypeName} Name`
-                        : `Trading Name`}
-                    </label>
-                    <span class="text-danger">*</span>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
-                    <div className="">
-                      <div className="input-group">
-                        <input
-                          maxLength={50}
-                          type="text"
-                          className="input-text"
-                          placeholder="Trading Name"
-                          value={props.basicInfo.tradingName}
-                          onChange={(e) => {
-                            const inputValue = e.target.value;
-                            const trimmedValue = inputValue.replace(
-                              /^\s+/g,
-                              "",
-                            );
-
-                            // Validation: Check if the trimmed value is either alphanumeric or only alphabet but not only numeric
-                            const isValidName =
-                              /^[a-zA-Z0-9\s,.!?"':;()-_`]+(?:[a-zA-Z0-9\s,.!?"':;()-_`]+)*$/.test(
-                                trimmedValue,
-                              ) && !/^\d+$/.test(trimmedValue);
-
-                            if (isValidName || trimmedValue === "") {
-                              const capitalizedValue =
-                                trimmedValue.charAt(0).toUpperCase() +
-                                trimmedValue.slice(1);
-                              props.setBasicInfo({
-                                ...props.basicInfo,
-                                tradingName: capitalizedValue,
-                              });
-                            }
-                          }}
-                        />
-                      </div>
-                      {props.requireErrorMessage &&
-                      (props.basicInfo.tradingName === "" ||
-                        props.basicInfo.tradingName === null) ? (
-                        <span className="validation">{ERROR_MESSAGES}</span>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="row fieldset" id="TradingAddressDiv">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      {props.basicInfo.originalBusinessTypeID ===
-                      CLIENT_TYPES.Other
-                        ? `${props.basicInfo.businessTypeName} Address`
-                        : `Trading Address`}
-                    </label>
-                    <span class="text-danger">*</span>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
-                    <div className="mb-2">
-                      <div className="input-group">
-                        <input
-                          type="text"
-                          style={{ cursor: "pointer" }}
-                          class="input-text"
-                          id="category-description"
-                          placeholder="Trading Address"
-                          value={props.concatenatedTradingAddress}
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            props.setAddressPopUpTitle("Trading Address");
-                            handleOpenTradingAddressPopup(e);
-                          }}
-                          autoComplete="off"
-                        />
-                      </div>
-                      {props.requireErrorMessage &&
-                      (props.basicInfo.tradingAddress === "" ||
-                        props.basicInfo.tradingAddress === null ||
-                        props.concatenatedTradingAddress === null ||
-                        props.concatenatedTradingAddress === "") ? (
-                        <span className="validation">{ERROR_MESSAGES}</span>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  </div>
-
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      Nature Of Business
-                    </label>
-                    {/* <span class="text-danger">*</span> */}
-                  </div>
-                  <div class="col-lg-9 col-md-8 mb-2 col-sm-12">
-                    <div className="mb businessType input-group">
-                      <Select
-                        // isMulti
-                        className="user-role-select"
-                        style={{ padding: "5px", width: "20%" }}
-                        options={props.NatureOfBusinessTypeLookupList}
-                        value={props.NOBTypeValue}
-                        onChange={(e) => {
-                          props.OnNOBChange(e);
-                        }}
-                      />
-                      {/* {props.requireErrorMessage &&
-                          (props.basicInfo.businessTypeID === "" ||
-                            props.basicInfo.businessTypeID === null) ? (
-                          <span className="validation">{ERROR_MESSAGES}</span>
-                        ) : (
-                          ""
-                        )} */}
-                    </div>
-                  </div>
-
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">Website</label>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
+            {props.officersForm?.map((item, index) => {
+              return (
+                <div className="pf-grid" key={index}>
+                  <PfField
+                    id={`FirstName_Div_${index}`}
+                    label="First Name"
+                    required
+                  >
                     <input
-                      maxLength={70}
                       type="text"
                       className="input-text"
-                      placeholder="www.example.com"
-                      value={props.basicInfo?.website?.replace(/\s/g, "")}
-                      onChange={(e) =>
-                        props.setBasicInfo({
-                          ...props.basicInfo,
-                          website: e.target.value,
-                        })
-                      }
-                    />
-                    {props.requireErrorMessage &&
-                      props.basicInfo.website !== null &&
-                      props.basicInfo.website !== "" &&
-                      props.basicInfo.website !== undefined &&
-                      !isValidWebUrl(props.basicInfo.website) && (
-                        <span className="validation"> Invalid Url </span>
-                      )}
-                  </div>
-                  <div className="mb-2"></div>
-                  {/* <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      VAT Registered
-                    </label>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
-                    <div className="input-group">
-                      <Select
-                        className="CurrencySelect"
-                        options={Utils.VAT_Registered}
-                        value={VATRegFilter}
-                        onChange={(e) =>
-                          props.setBasicInfo({
-                            ...props.basicInfo,
-                            VATReg: e.value,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="mb-2"></div>
-                  {props.basicInfo.VATReg === 0 && (
-                    <>
-                      <div class="col-md-3 col-sm-12 text-start text-md-end">
-                        <label class="fieldset-label required">
-                          VAT Number
-                        </label>
-                      </div>
-                      <div className="col-lg-9 col-md-8 col-sm-12">
-                        <div className="input-group">
-                          <input
-                            type="text"
-                            className="input-text"
-                            placeholder="VAT Number"
-                            value={props.basicInfo?.VATNumber?.replace(
-                              /\s/g,
-                              ""
-                            )}
-                            onChange={(e) => {
-                              // Remove non-numeric characters and limit to 12 numbers
-                              const sanitizedInput = e.target.value.slice(
-                                0,
-                                12
-                              );
-                              // Update state with sanitized input
-                              props.setBasicInfo({
-                                ...props.basicInfo,
-                                VATNumber: sanitizedInput.toUpperCase(),
-                              });
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )} */}
-                </div>
-              </div>
-            )}
-            {/* ...........Company Detail And Llp Detail Row........... */}
-            {(props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Company ||
-              props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.LLP) && (
-              <div>
-                <div className="row fieldset" id="CompSearchDiv">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      Search Company
-                    </label>
-                    {/* <span class="text-danger">*</span> */}
-                  </div>
-                  <div className="col-lg-7 col-md-8 col-sm-12">
-                    <div className="">
-                      <div className="input-group">
-                        <input
-                          type="text"
-                          class="input-text"
-                          id="category-description"
-                          placeholder="Search Company"
-                          value={props.SearchCompany}
-                          onChange={(e) => props.handleCompanyInputChange(e)}
-                          onKeyDown={(e) => {
-                            if (e.key === " " && e.target.value.trim() === "") {
-                              e.preventDefault();
-                            }
-                          }}
-                        />
-                      </div>
-                      {props.companies.length > 0 && (
-                        <div className="autocomplete-input-div show">
-                          <ul className="searchList">
-                            {props.companies.map((i, index) => (
-                              <li
-                                key={index}
-                                onClick={() => props.handleCompanySelect(i)}
-                              >
-                                {i.title}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="col-lg-2 col-md-2 col-sm-3">
-                    {(props.basicInfo.originalBusinessTypeID ===
-                      CLIENT_TYPES.LLP ||
-                      props.basicInfo.originalBusinessTypeID ===
-                        CLIENT_TYPES.Company) && (
-                      <button
-                        class="btn btn-sm btn-primary create-item-btn"
-                        onClick={() =>
-                          props.setEnterManually(!props.enterManually)
-                        }
-                      >
-                        <span>Enter manually</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div className="row fieldset" id="CompanyName">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">Company Name</label>
-                    <span class="text-danger">*</span>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
-                    <input
-                      disabled={!props.enterManually}
-                      maxLength={100}
-                      class="input-text"
-                      id="category-description"
-                      placeholder="Company Name"
-                      value={props.companyForm.companyName}
-                      onChange={(e) =>
-                        props.setCompanyForm({
-                          ...props.companyForm,
-                          companyName: e.target.value,
-                        })
-                      }
-                    />
-                    {props.requireErrorMessage &&
-                    (props.companyForm.companyName === "" ||
-                      props.companyForm.companyName === null) ? (
-                      <span className="validation">{ERROR_MESSAGES}</span>
-                    ) : (
-                      ""
-                    )}
-                  </div>
-                </div>
-                <div className="row fieldset">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">Entity Type</label>
-                    <span class="text-danger">*</span>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
-                    <input
-                      disabled={!props.enterManually}
-                      maxLength={50}
-                      class="input-text"
-                      id="category-description"
-                      placeholder="Entity Type"
-                      value={props.companyForm.companyType}
+                      placeholder="First Name"
+                      value={props.officersForm[index].firstName}
                       onChange={(e) => {
-                        let inputVal = e.target.value;
-
-                        // Trim leading spaces
-                        if (inputVal.startsWith(" ")) {
-                          inputVal = inputVal.trimStart();
+                        const inputValue = e.target.value.trim();
+                        // Reject input if it contains numeric characters
+                        // Remove all spaces and dots
+                        const cleanedValue = inputValue.replace(/[.\s]/g, "");
+                        // Reject input if it starts with a digit
+                        if (/\d/.test(cleanedValue)) {
+                          return;
                         }
-
-                        // Prevent digits
-                        inputVal = inputVal.replace(/[0-9]/g, "");
-
-                        props.setCompanyForm({
-                          ...props.companyForm,
-                          companyType: inputVal,
-                        });
+                        const capitalizedValue =
+                          cleanedValue.charAt(0).toUpperCase() +
+                          cleanedValue.slice(1);
+                        props.OnOfficerChange(
+                          index,
+                          "firstName",
+                          capitalizedValue,
+                        );
                       }}
+                      maxLength={20}
                     />
-                    {props.requireErrorMessage &&
-                    (props.companyForm.companyType === "" ||
-                      props.companyForm.companyType === null) ? (
+                    {props.officerError &&
+                    (props.officersForm[index].firstName === null ||
+                      props.officersForm[index].firstName === "") ? (
                       <span className="validation">{ERROR_MESSAGES}</span>
                     ) : (
                       ""
                     )}
-                  </div>
-                </div>
-                <div className="row fieldset" id="CompanyNumber">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      Company Number
-                    </label>
-                    <span class="text-danger">*</span>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
+                  </PfField>
+
+                  <PfField
+                    id={`LastName_Div_${index}`}
+                    label="Last Name"
+                    required
+                  >
                     <input
-                      disabled={!props.enterManually}
-                      maxLength={12}
+                      type="text"
                       class="input-text"
-                      id="category-description"
-                      placeholder="Company Number"
-                      value={props.companyForm.companyNumber}
+                      placeholder="Last Name"
+                      value={props.officersForm[index].lastName}
                       onChange={(e) => {
-                        let inputVal = e.target.value;
+                        const inputValue = e.target.value;
 
-                        // Prevent first character as space
-                        if (inputVal.startsWith(" ")) {
-                          inputVal = inputVal.trimStart();
+                        // Remove all spaces and dots
+                        const cleanedValue = inputValue.replace(/[.\s]/g, "");
+
+                        // Reject input if it starts with a digit
+                        if (/\d/.test(cleanedValue)) {
+                          return;
                         }
 
-                        // Allow digits only (remove any non-digit characters)
-                        inputVal = inputVal.replace(/\D/g, "");
-
-                        props.setCompanyForm({
-                          ...props.companyForm,
-                          companyNumber: inputVal,
-                        });
+                        const capitalizedValue =
+                          cleanedValue.charAt(0).toUpperCase() +
+                          cleanedValue.slice(1);
+                        props.OnOfficerChange(
+                          index,
+                          "lastName",
+                          capitalizedValue,
+                        );
                       }}
+                      maxLength={20}
                     />
-                    {props.requireErrorMessage &&
-                    (props.companyForm.companyNumber === "" ||
-                      props.companyForm.companyNumber === null) ? (
+                    {props.officerError &&
+                    (props.officersForm[index].lastName === null ||
+                      props.officersForm[index].lastName === "") ? (
                       <span className="validation">{ERROR_MESSAGES}</span>
                     ) : (
                       ""
                     )}
-                  </div>
-                </div>
-                <div className="row fieldset">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      Registered Office Address
-                    </label>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
-                    <div className="">
-                      <div className="input-group">
-                        <input
-                          disabled={!props.enterManually}
-                          class="input-text"
-                          id="category-description"
-                          placeholder="Registered Office Address"
-                          value={props.concatenatedRegisterAddress}
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            props.setAddressPopUpTitle(
-                              "Registered Office Address",
-                            );
-                            handleOpenRegisterAddressPopupCompany(e);
-                          }}
-                          // onChange={(e) => {
-                          //   let inputVal = e.target.value;
-                          //   if (inputVal.startsWith(" ")) {
-                          //     inputVal = inputVal.trimStart();
-                          //   }
-                          //   props.setCompanyForm({
-                          //     ...props.companyForm,
-                          //     companyAddress: inputVal,
-                          //   });
-                          // }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="row fieldset">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      Incorporation Date
-                    </label>
-                    <span class="text-danger">*</span>
-                  </div>
+                  </PfField>
 
-                  <div class="col-lg-9 col-md-8 col-sm-12 ">
-                    <DatePicker
-                      minDate={minDate}
-                      maxDate={maxDate}
-                      disabled={!props.enterManually}
-                      style={{
-                        width: "100%",
-                        opacity: !props.enterManually ? 0.6 : 1,
-                        pointerEvents: !props.enterManually ? "none" : "auto",
-                        cursor: !props.enterManually ? "not-allowed" : "auto",
-                      }}
-                      format="dd/MM/yyyy"
-                      dayPlaceholder="dd"
-                      monthPlaceholder="mm"
-                      yearPlaceholder="yyyy"
-                      value={
-                        props.companyForm.incorporationDate
-                          ? new Date(props.companyForm.incorporationDate)
-                          : null
-                      }
-                      onChange={handleDateChange}
-                    />
-
-                    {/* {props.InvalidAppointedOnDate &&
-                    !isValidDate(props.officersForm[index]?.appointedOn) ? (
-                      <span className="validation">Invalid Date</span>
-                    ) : null} */}
-                    {props.requireErrorMessage &&
-                    (props.companyForm.incorporationDate === "" ||
-                      props.companyForm.incorporationDate === null) ? (
-                      <span className="validation">{ERROR_MESSAGES}</span>
-                    ) : (
-                      ""
-                    )}
-                  </div>
-
-                  {/* <div className="col-lg-9 col-md-8 col-sm-12">
-                    <div className="">
-                      <div className="input-group">
-                        <input
-                          disabled={!props.enterManually}
-                          class="input-text"
-                          id="category-description"
-                          placeholder="Incorporation Date"
-                          value={
-                            props.companyForm.incorporationDate
-                              ? formatDate(props.companyForm.incorporationDate)
-                              : ""
-                          }
-                          onChange={(e) =>
-                            props.setCompanyForm({
-                              ...props.companyForm,
-                              incorporationDate: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                      {props.requireErrorMessage &&
-                      (props.companyForm.incorporationDate === "" ||
-                        props.companyForm.incorporationDate === null) ? (
-                        <span className="validation">{ERROR_MESSAGES}</span>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  </div> */}
-                </div>
-                <div className="row fieldset" id="InCorporateIDDiv">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      Incorporated In
-                    </label>
-                    <span class="text-danger">*</span>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
-                    <div className="">
-                      <div className="input-group">
-                        <Select
-                          className="CurrencySelect"
-                          options={props.incorporatedInList}
-                          value={IncorporatedValue}
-                          onChange={props.handleIncorporatedInChange}
-                        />
-                      </div>
-                      {props.requireErrorMessage &&
-                      (props.companyForm.incInID === "" ||
-                        props.companyForm.incInID === null) ? (
-                        <span className="validation">{ERROR_MESSAGES}</span>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="row fieldset" id="NOBTypeDiv">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      Nature Of Business
-                    </label>
-                    {/* <span class="text-danger">*</span> */}
-                  </div>
-                  <div class="col-lg-9 col-md-8 col-sm-12">
-                    <div className="input-group">
+                  <PfField id={`Phone_Div_${index}`} label="Phone Number">
+                    <div className="phone-input-div">
                       <Select
-                        //onClick={prospectBasicInfoScrollToTop}
-                        // menuIsOpen={menuIsOpen}
-                        // onMenuOpen={handleMenuOpen}
-                        // isMulti
-                        className="user-role-select"
+                        {...PF_SELECT_PROPS}
                         style={{ padding: "5px", width: "20%" }}
-                        options={props.NatureOfBusinessTypeLookupList}
-                        value={props.NOBTypeValue}
+                        className="createCompanyInfo"
+                        options={props.countryCodes}
+                        value={props.officersForm[index]?.phoneCountryCodeID}
                         onChange={(e) => {
-                          props.OnNOBChange(e);
+                          setIndex(index);
+                          props.OnOfficerChange(
+                            index,
+                            "phoneCountryCodeID",
+                            e,
+                          );
+                          props.OnOfficerChange(index, "countryCodeID", e.value);
                         }}
                       />
-                      {/* {props.requireErrorMessage &&
-                          (props.basicInfo.businessTypeID === "" ||
-                            props.basicInfo.businessTypeID === null) ? (
-                          <span className="validation">{ERROR_MESSAGES}</span>
-                        ) : (
-                          ""
-                        )} */}
+                      <div className="phone-input-number-div">
+                        <input
+                          style={{ width: "100%" }}
+                          className="input-text"
+                          type="text"
+                          placeholder="Phone"
+                          value={props.officersForm[index].phoneNo}
+                          onChange={(e) => {
+                            // Ensure that the input only contains numeric characters
+                            const sanitizedInput = e.target.value
+                              .replace(/[^0-9]/g, "")
+                              .slice(0, 15);
+                            props.OnOfficerChange(
+                              index,
+                              "phoneNo",
+                              sanitizedInput,
+                            );
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="row fieldset" id="Web_Div">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">Website</label>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
-                    <div className="input-group">
+                    {props.officerError &&
+                      props.officersForm[index].phoneNo !== null &&
+                      props.officersForm[index].phoneNo !== "" &&
+                      props.officersForm[index].phoneNo !== undefined &&
+                      !isValidPhoneNumber(props.officersForm[index].phoneNo) && (
+                        <span className="validation">
+                          {" "}
+                          Invalid phone number{" "}
+                        </span>
+                      )}
+                  </PfField>
+
+                  <PfField
+                    id={`Email_Div_${index}`}
+                    label="Email Address"
+                    required
+                  >
+                    <PfIconInput icon="ri-mail-line">
                       <input
                         type="text"
-                        maxLength={70}
+                        class="input-text"
+                        placeholder="Email"
+                        value={props.officersForm[index]?.emailID?.replace(
+                          /\s/g,
+                          "",
+                        )}
+                        maxLength={50}
+                        onChange={(e) => {
+                          // Get the entered value
+                          const enteredValue = e.target.value
+                            .trim()
+                            .toLowerCase();
+
+                          // Remove whitespace from the entered value
+                          const trimmedValue = enteredValue.replace(/\s/g, "");
+
+                          // Check for consecutive dots
+                          if (trimmedValue.includes("..")) {
+                            // If consecutive dots found, remove the last dot
+                            const correctedValue = trimmedValue.replace(
+                              /\.+/g,
+                              ".",
+                            );
+                            // Update the email address in the parent component
+                            props.OnOfficerChange(
+                              index,
+                              "emailID",
+                              correctedValue,
+                            );
+                            return;
+                          }
+
+                          // Update the email address in the parent component
+                          props.OnOfficerChange(index, "emailID", trimmedValue);
+                        }}
+                      />
+                    </PfIconInput>
+                    {props.officerError &&
+                      (props.officersForm[index].emailID === null ||
+                      props.officersForm[index].emailID === "" ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        !isValidEmail(props.officersForm[index].emailID) && (
+                          <span className="validation">
+                            Invalid email pattern
+                          </span>
+                        )
+                      ))}
+                  </PfField>
+
+                  <PfField id={`Web_Div_${index}`} label="Website">
+                    <PfIconInput icon="ri-global-line">
+                      <input
+                        type="text"
                         className="input-text"
                         placeholder="www.example.com"
                         value={props.basicInfo?.website?.replace(/\s/g, "")}
@@ -1275,218 +654,584 @@ const Basic_information = (props) => {
                             website: e.target.value,
                           })
                         }
+                        maxLength={70}
                       />
-                      {props.requireErrorMessage &&
-                        props.basicInfo.website !== null &&
-                        props.basicInfo.website !== "" &&
-                        props.basicInfo.website !== undefined &&
-                        !isValidWebUrl(props.basicInfo.website) && (
-                          <span className="validation"> Invalid Url </span>
-                        )}
-                    </div>
-                  </div>
-                </div>
-                {/* <div className="row fieldset" id="VATRegDiv">
-                  <div class="col-md-3 col-sm-12 text-start text-md-end">
-                    <label class="fieldset-label required">
-                      VAT Registered
-                    </label>
-                  </div>
-                  <div className="col-lg-9 col-md-8 col-sm-12">
-                    <div className="input-group">
-                      <Select
-                        className="CurrencySelect"
-                        options={Utils.VAT_Registered}
-                        value={VATRegFilter}
-                        onChange={(e) =>
-                          props.setBasicInfo({
-                            ...props.basicInfo,
-                            VATReg: e.value,
-                          })
+                    </PfIconInput>
+                    {props.requireErrorMessage &&
+                      props.basicInfo.website !== null &&
+                      props.basicInfo.website !== "" &&
+                      props.basicInfo.website !== undefined &&
+                      !isValidWebUrl(props.basicInfo.website) && (
+                        <span className="validation"> Invalid Url </span>
+                      )}
+                  </PfField>
+
+                  <PfField
+                    id={`Address_Div_${index}`}
+                    label="Residential Address"
+                    required
+                    full
+                  >
+                    <PfIconInput icon="ri-map-pin-line">
+                      <input
+                        className="input-text"
+                        style={{ cursor: "pointer" }}
+                        type="text"
+                        placeholder="Residential Address"
+                        value={
+                          props.concatenatedResidentialAddress[0]
+                            ?.officersFullAddress
                         }
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          props.setAddressPopUpTitle("Residential Address");
+                          handleOpenRegisterOfficeAddressPopup(e, index);
+                        }}
+                        autoComplete="off"
                       />
-                    </div>
-                  </div>
-                </div> */}
-                <div className="row fieldset" id="InCorporateIDDiv">
-                  {/* {props.basicInfo.VATReg === 0 && (
-                    <>
-                      <div class="col-md-3 col-sm-12 text-start text-md-end">
-                        <label class="fieldset-label required">
-                          VAT Number
-                        </label>
-                      </div>
-                      <div className="col-lg-9 col-md-8 col-sm-12">
-                        <div className="input-group">
-                          <input
-                            type="text"
-                            className="input-text"
-                            placeholder="VAT Number"
-                            value={props.basicInfo.VATNumber?.replace(
-                              /\s/g,
-                              ""
-                            )}
-                            onChange={(e) => {
-                              // Remove non-numeric characters and limit to 12 numbers
-                              const sanitizedInput = e.target.value.slice(
-                                0,
-                                12
-                              );
-                              // Update state with sanitized input
-                              props.setBasicInfo({
-                                ...props.basicInfo,
-                                VATNumber: sanitizedInput.toUpperCase(),
-                              });
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )} */}
-                  {/* .............Trading Detail------------- */}
+                    </PfIconInput>
+                    {props.officerError &&
+                    (props.concatenatedResidentialAddress[0]
+                      .officersFullAddress === null ||
+                      props.concatenatedResidentialAddress[index]
+                        .officersFullAddress === "") ? (
+                      <span className="validation">{ERROR_MESSAGES}</span>
+                    ) : (
+                      ""
+                    )}
+                  </PfField>
                 </div>
-                {/* <div className="row fieldset" id="InCorporateIDDiv"> */}
-                <div className="fieldset-group">
-                  <label htmlFor="" className="fieldset-group-label required">
-                    Trading Details
-                  </label>
-                  <div className="row fieldset" id="LTDTradingName">
-                    <div class="col-md-3 col-sm-12 text-start text-md-end">
-                      <label class="fieldset-label required">
-                        Trading Name
-                      </label>
-                      <span class="text-danger">*</span>
-                    </div>
-                    <div className="col-lg-9 col-md-8 col-sm-12">
-                      <div className="">
-                        <div className="input-group">
-                          <input
-                            type="text"
-                            maxLength={50}
-                            className="input-text"
-                            placeholder="Trading Name"
-                            value={props.basicInfo.tradingName}
-                            onChange={(e) => {
-                              const inputValue = e.target.value;
-                              const trimmedValue = inputValue.replace(
-                                /^\s+/g,
-                                "",
-                              );
+              );
+            })}
+          </section>
+        )}
 
-                              // Validation: Check if the trimmed value is either alphanumeric or only alphabet but not only numeric
-                              const isValidName =
-                                /^[a-zA-Z0-9\s,.!?"':;()-_`]+(?:[a-zA-Z0-9\s,.!?"':;()-_`]+)*$/.test(
-                                  trimmedValue,
-                                ) && !/^\d+$/.test(trimmedValue);
+        {/* ...........Sole Trader Detail And Partnership Detail Row........... */}
+        {(props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Sole_Trader ||
+          props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Other ||
+          props.basicInfo.originalBusinessTypeID ===
+            CLIENT_TYPES.Partnership) && (
+          <div className="pf-grid">
+            <PfField
+              id="TradingNameDiv"
+              label={
+                props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Other
+                  ? `${props.basicInfo.businessTypeName} Name`
+                  : `Trading Name`
+              }
+              required
+            >
+              <input
+                maxLength={50}
+                type="text"
+                className="input-text"
+                placeholder="Trading Name"
+                value={props.basicInfo.tradingName}
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const trimmedValue = inputValue.replace(/^\s+/g, "");
 
-                              if (isValidName || trimmedValue === "") {
-                                const capitalizedValue =
-                                  trimmedValue.charAt(0).toUpperCase() +
-                                  trimmedValue.slice(1);
-                                props.setBasicInfo({
-                                  ...props.basicInfo,
-                                  tradingName: capitalizedValue,
-                                });
-                              }
-                            }}
-                          />
-                        </div>
-                        {props.requireErrorMessage &&
-                        (props.basicInfo.tradingName === "" ||
-                          props.basicInfo.tradingName === null) ? (
-                          <span className="validation">{ERROR_MESSAGES}</span>
-                        ) : (
-                          ""
-                        )}
-                      </div>
+                  // Validation: Check if the trimmed value is either alphanumeric or only alphabet but not only numeric
+                  const isValidName =
+                    /^[a-zA-Z0-9\s,.!?"':;()-_`]+(?:[a-zA-Z0-9\s,.!?"':;()-_`]+)*$/.test(
+                      trimmedValue,
+                    ) && !/^\d+$/.test(trimmedValue);
+
+                  if (isValidName || trimmedValue === "") {
+                    const capitalizedValue =
+                      trimmedValue.charAt(0).toUpperCase() +
+                      trimmedValue.slice(1);
+                    props.setBasicInfo({
+                      ...props.basicInfo,
+                      tradingName: capitalizedValue,
+                    });
+                  }
+                }}
+              />
+              {props.requireErrorMessage &&
+              (props.basicInfo.tradingName === "" ||
+                props.basicInfo.tradingName === null) ? (
+                <span className="validation">{ERROR_MESSAGES}</span>
+              ) : (
+                ""
+              )}
+            </PfField>
+
+            <PfField
+              id="TradingAddressDiv"
+              label={
+                props.basicInfo.originalBusinessTypeID === CLIENT_TYPES.Other
+                  ? `${props.basicInfo.businessTypeName} Address`
+                  : `Trading Address`
+              }
+              required
+            >
+              <PfIconInput icon="ri-map-pin-line">
+                <input
+                  type="text"
+                  style={{ cursor: "pointer" }}
+                  class="input-text"
+                  id="category-description"
+                  placeholder="Trading Address"
+                  value={props.concatenatedTradingAddress}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    props.setAddressPopUpTitle("Trading Address");
+                    handleOpenTradingAddressPopup(e);
+                  }}
+                  autoComplete="off"
+                />
+              </PfIconInput>
+              {props.requireErrorMessage &&
+              (props.basicInfo.tradingAddress === "" ||
+                props.basicInfo.tradingAddress === null ||
+                props.concatenatedTradingAddress === null ||
+                props.concatenatedTradingAddress === "") ? (
+                <span className="validation">{ERROR_MESSAGES}</span>
+              ) : (
+                ""
+              )}
+            </PfField>
+
+            <PfField label="Website">
+              <PfIconInput icon="ri-global-line">
+                <input
+                  maxLength={70}
+                  type="text"
+                  className="input-text"
+                  placeholder="www.example.com"
+                  value={props.basicInfo?.website?.replace(/\s/g, "")}
+                  onChange={(e) =>
+                    props.setBasicInfo({
+                      ...props.basicInfo,
+                      website: e.target.value,
+                    })
+                  }
+                />
+              </PfIconInput>
+              {props.requireErrorMessage &&
+                props.basicInfo.website !== null &&
+                props.basicInfo.website !== "" &&
+                props.basicInfo.website !== undefined &&
+                !isValidWebUrl(props.basicInfo.website) && (
+                  <span className="validation"> Invalid Url </span>
+                )}
+            </PfField>
+
+            <PfField label="Nature Of Business">
+              <Select
+                {...PF_SELECT_PROPS}
+                className="user-role-select"
+                style={{ padding: "5px", width: "20%" }}
+                options={props.NatureOfBusinessTypeLookupList}
+                value={props.NOBTypeValue}
+                onChange={(e) => {
+                  props.OnNOBChange(e);
+                }}
+              />
+            </PfField>
+          </div>
+        )}
+
+        {/* ...........Company Detail And Llp Detail Row........... */}
+        {isCompanyOrLLP && (
+          <>
+            <PfField
+              id="CompSearchDiv"
+              label="Search Companies House Database"
+              full
+            >
+              <div className="pf-search-row">
+                <div className="pf-search-box">
+                  <PfIconInput icon="ri-search-line">
+                    <input
+                      type="text"
+                      class="input-text"
+                      id="category-description"
+                      placeholder="Search Company"
+                      value={props.SearchCompany}
+                      onChange={(e) => props.handleCompanyInputChange(e)}
+                      onKeyDown={(e) => {
+                        if (e.key === " " && e.target.value.trim() === "") {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                  </PfIconInput>
+                  {props.companies.length > 0 && (
+                    <div className="autocomplete-input-div show">
+                      <ul className="searchList">
+                        {props.companies.map((i, index) => (
+                          <li
+                            key={index}
+                            onClick={() => props.handleCompanySelect(i)}
+                          >
+                            {i.title}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                  </div>
-                  <div className="row fieldset" id="LTDTradingAddressName">
-                    <div class="col-md-3 col-sm-12 text-start text-md-end">
-                      <label class="fieldset-label required">
-                        Trading Address
-                      </label>
-                      <span class="text-danger">*</span>
-                    </div>
-                    <div className="col-lg-9 col-md-8 col-sm-12">
-                      <div className="">
-                        <div className="input-group">
-                          <input
-                            type="text"
-                            style={{ cursor: "pointer" }}
-                            class="input-text"
-                            id="category-description"
-                            placeholder="Trading Address"
-                            value={props.concatenatedTradingAddress}
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              props.setAddressPopUpTitle("Trading Address");
-                              handleOpenTradingAddressPopup(e);
-                            }}
-                          />
-                        </div>
-                        {props.requireErrorMessage &&
-                        (props.basicInfo.tradingAddress === "" ||
-                          props.basicInfo.tradingAddress === null ||
-                          props.concatenatedTradingAddress === null ||
-                          props.concatenatedTradingAddress === "") ? (
-                          <span className="validation">{ERROR_MESSAGES}</span>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  )}
+                </div>
+                <button
+                  className={`pf-btn pf-btn--primary${
+                    props.enterManually ? " is-active" : ""
+                  }`}
+                  onClick={() => props.setEnterManually(!props.enterManually)}
+                >
+                  <i className="ri-edit-2-line" aria-hidden="true"></i>
+                  <span>Enter manually</span>
+                </button>
+              </div>
+            </PfField>
+
+            {props.companyForm.companyName && (
+              <div className="pf-company-summary">
+                <span className="pf-company-summary__name">
+                  {props.companyForm.companyName}
+                </span>
+                {companyStatus && (
+                  <span
+                    className={`pf-status-badge${
+                      String(companyStatus).toLowerCase() === "active"
+                        ? " is-active"
+                        : ""
+                    }`}
+                  >
+                    {companyStatus}
+                  </span>
+                )}
+                {props.companyForm.companyNumber && (
+                  <span className="pf-company-summary__meta">
+                    No. {props.companyForm.companyNumber}
+                  </span>
+                )}
+              </div>
+            )}
+
+            <div className="pf-grid">
+              <PfField id="CompanyName" label="Company Name" required>
+                <input
+                  disabled={!props.enterManually}
+                  maxLength={100}
+                  class="input-text"
+                  id="category-description"
+                  placeholder="Company Name"
+                  value={props.companyForm.companyName}
+                  onChange={(e) =>
+                    props.setCompanyForm({
+                      ...props.companyForm,
+                      companyName: e.target.value,
+                    })
+                  }
+                />
+                {props.requireErrorMessage &&
+                (props.companyForm.companyName === "" ||
+                  props.companyForm.companyName === null) ? (
+                  <span className="validation">{ERROR_MESSAGES}</span>
+                ) : (
+                  ""
+                )}
+              </PfField>
+
+              <PfField label="Entity Type" required>
+                <input
+                  disabled={!props.enterManually}
+                  maxLength={50}
+                  class="input-text"
+                  id="category-description"
+                  placeholder="Entity Type"
+                  value={props.companyForm.companyType}
+                  onChange={(e) => {
+                    let inputVal = e.target.value;
+
+                    // Trim leading spaces
+                    if (inputVal.startsWith(" ")) {
+                      inputVal = inputVal.trimStart();
+                    }
+
+                    // Prevent digits
+                    inputVal = inputVal.replace(/[0-9]/g, "");
+
+                    props.setCompanyForm({
+                      ...props.companyForm,
+                      companyType: inputVal,
+                    });
+                  }}
+                />
+                {props.requireErrorMessage &&
+                (props.companyForm.companyType === "" ||
+                  props.companyForm.companyType === null) ? (
+                  <span className="validation">{ERROR_MESSAGES}</span>
+                ) : (
+                  ""
+                )}
+              </PfField>
+
+              <PfField id="CompanyNumber" label="Company Number" required>
+                <PfIconInput icon="ri-hashtag">
+                  <input
+                    disabled={!props.enterManually}
+                    maxLength={12}
+                    class="input-text"
+                    id="category-description"
+                    placeholder="Company Number"
+                    value={props.companyForm.companyNumber}
+                    onChange={(e) => {
+                      let inputVal = e.target.value;
+
+                      // Prevent first character as space
+                      if (inputVal.startsWith(" ")) {
+                        inputVal = inputVal.trimStart();
+                      }
+
+                      // Allow digits only (remove any non-digit characters)
+                      inputVal = inputVal.replace(/\D/g, "");
+
+                      props.setCompanyForm({
+                        ...props.companyForm,
+                        companyNumber: inputVal,
+                      });
+                    }}
+                  />
+                </PfIconInput>
+                {props.requireErrorMessage &&
+                (props.companyForm.companyNumber === "" ||
+                  props.companyForm.companyNumber === null) ? (
+                  <span className="validation">{ERROR_MESSAGES}</span>
+                ) : (
+                  ""
+                )}
+              </PfField>
+
+              <PfField label="Incorporation Date" required>
+                <DatePicker
+                  minDate={minDate}
+                  maxDate={maxDate}
+                  disabled={!props.enterManually}
+                  style={{
+                    width: "100%",
+                    opacity: !props.enterManually ? 0.6 : 1,
+                    pointerEvents: !props.enterManually ? "none" : "auto",
+                    cursor: !props.enterManually ? "not-allowed" : "auto",
+                  }}
+                  format="dd/MM/yyyy"
+                  dayPlaceholder="dd"
+                  monthPlaceholder="mm"
+                  yearPlaceholder="yyyy"
+                  value={
+                    props.companyForm.incorporationDate
+                      ? new Date(props.companyForm.incorporationDate)
+                      : null
+                  }
+                  onChange={handleDateChange}
+                />
+                {props.requireErrorMessage &&
+                (props.companyForm.incorporationDate === "" ||
+                  props.companyForm.incorporationDate === null) ? (
+                  <span className="validation">{ERROR_MESSAGES}</span>
+                ) : (
+                  ""
+                )}
+              </PfField>
+
+              <PfField id="InCorporateIDDiv" label="Incorporated In" required>
+                <Select
+                  {...PF_SELECT_PROPS}
+                  className="CurrencySelect"
+                  options={props.incorporatedInList}
+                  value={IncorporatedValue}
+                  onChange={props.handleIncorporatedInChange}
+                />
+                {props.requireErrorMessage &&
+                (props.companyForm.incInID === "" ||
+                  props.companyForm.incInID === null) ? (
+                  <span className="validation">{ERROR_MESSAGES}</span>
+                ) : (
+                  ""
+                )}
+              </PfField>
+
+              <PfField id="NOBTypeDiv" label="Nature Of Business">
+                <Select
+                  {...PF_SELECT_PROPS}
+                  className="user-role-select"
+                  style={{ padding: "5px", width: "20%" }}
+                  options={props.NatureOfBusinessTypeLookupList}
+                  value={props.NOBTypeValue}
+                  onChange={(e) => {
+                    props.OnNOBChange(e);
+                  }}
+                />
+              </PfField>
+
+              <PfField label="Registered Office Address" full>
+                <PfIconInput icon="ri-map-pin-line">
+                  <input
+                    disabled={!props.enterManually}
+                    class="input-text"
+                    id="category-description"
+                    placeholder="Registered Office Address"
+                    value={props.concatenatedRegisterAddress}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      props.setAddressPopUpTitle("Registered Office Address");
+                      handleOpenRegisterAddressPopupCompany(e);
+                    }}
+                  />
+                </PfIconInput>
+              </PfField>
+
+              <PfField id="Web_Div" label="Company Website" full>
+                <PfIconInput icon="ri-global-line">
+                  <input
+                    type="text"
+                    maxLength={70}
+                    className="input-text"
+                    placeholder="www.example.com"
+                    value={props.basicInfo?.website?.replace(/\s/g, "")}
+                    onChange={(e) =>
+                      props.setBasicInfo({
+                        ...props.basicInfo,
+                        website: e.target.value,
+                      })
+                    }
+                  />
+                </PfIconInput>
+                {props.requireErrorMessage &&
+                  props.basicInfo.website !== null &&
+                  props.basicInfo.website !== "" &&
+                  props.basicInfo.website !== undefined &&
+                  !isValidWebUrl(props.basicInfo.website) && (
+                    <span className="validation"> Invalid Url </span>
+                  )}
+              </PfField>
+            </div>
+
+            {/* .............Trading Detail------------- */}
+            <div className="pf-subpanel">
+              <div className="pf-subpanel__head">
+                <i className="ri-store-2-line" aria-hidden="true"></i>
+                <div>
+                  <h4 className="pf-subpanel__title">Trading Details</h4>
+                  <p className="pf-subpanel__desc">
+                    Configure operational presence if distinct from legal
+                    register
+                  </p>
                 </div>
               </div>
-              // </div>
-            )}
-          </div>
-          <AddressModal
-            // handleOk={handleOk}
-            setAddressUpdatedDatetime={props.setAddressUpdatedDatetime}
-            fullAddress={props.fullAddress}
-            setFullAddress={props.setFullAddress}
-            title={props.addressPopUpTitle}
-            openAddressPopUp={openAddressPopUp}
-            address={props.address}
-            setAddress={props.setAddress}
-            setCompanyAddress={props.setCompanyAddress}
-            companyAddress={props.companyAddress}
-            // setModelRequestData={setModelRequestData}
-            modelRequestData={modelRequestData}
-            handleAddressPopUpClose={handleAddressPopUpClose}
-            setOpenAddressPopUp={setOpenAddressPopUp}
-          />
-          {/* Declare Modal here */}
-          {/* Upload signature modal */}
-          <Upload_image_modal
-            class="modal fade"
-            id="SignatureUploadModel"
-            tabIndex="-1"
-            aria_hidden="true"
-            handleImageUpload={handleImageUpload}
-            setBasicInfo={props.setBasicInfo}
-            basicInfo={props.basicInfo}
-          />
-        </div>
-        <span
-          style={{ display: "flex", justifyContent: "center" }}
-          className="validation"
-        >
-          {props.errorMessage}
-        </span>
+              <div className="pf-grid">
+                <PfField id="LTDTradingName" label="Trading Name" required>
+                  <input
+                    type="text"
+                    maxLength={50}
+                    className="input-text"
+                    placeholder="Trading Name"
+                    value={props.basicInfo.tradingName}
+                    onChange={(e) => {
+                      const inputValue = e.target.value;
+                      const trimmedValue = inputValue.replace(/^\s+/g, "");
+
+                      // Validation: Check if the trimmed value is either alphanumeric or only alphabet but not only numeric
+                      const isValidName =
+                        /^[a-zA-Z0-9\s,.!?"':;()-_`]+(?:[a-zA-Z0-9\s,.!?"':;()-_`]+)*$/.test(
+                          trimmedValue,
+                        ) && !/^\d+$/.test(trimmedValue);
+
+                      if (isValidName || trimmedValue === "") {
+                        const capitalizedValue =
+                          trimmedValue.charAt(0).toUpperCase() +
+                          trimmedValue.slice(1);
+                        props.setBasicInfo({
+                          ...props.basicInfo,
+                          tradingName: capitalizedValue,
+                        });
+                      }
+                    }}
+                  />
+                  {props.requireErrorMessage &&
+                  (props.basicInfo.tradingName === "" ||
+                    props.basicInfo.tradingName === null) ? (
+                    <span className="validation">{ERROR_MESSAGES}</span>
+                  ) : (
+                    ""
+                  )}
+                </PfField>
+
+                <PfField
+                  id="LTDTradingAddressName"
+                  label="Trading Address"
+                  required
+                >
+                  <PfIconInput icon="ri-map-pin-line">
+                    <input
+                      type="text"
+                      style={{ cursor: "pointer" }}
+                      class="input-text"
+                      id="category-description"
+                      placeholder="Trading Address"
+                      value={props.concatenatedTradingAddress}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        props.setAddressPopUpTitle("Trading Address");
+                        handleOpenTradingAddressPopup(e);
+                      }}
+                    />
+                  </PfIconInput>
+                  {props.requireErrorMessage &&
+                  (props.basicInfo.tradingAddress === "" ||
+                    props.basicInfo.tradingAddress === null ||
+                    props.concatenatedTradingAddress === null ||
+                    props.concatenatedTradingAddress === "") ? (
+                    <span className="validation">{ERROR_MESSAGES}</span>
+                  ) : (
+                    ""
+                  )}
+                </PfField>
+              </div>
+            </div>
+          </>
+        )}
+
+        <AddressModal
+          // handleOk={handleOk}
+          setAddressUpdatedDatetime={props.setAddressUpdatedDatetime}
+          fullAddress={props.fullAddress}
+          setFullAddress={props.setFullAddress}
+          title={props.addressPopUpTitle}
+          openAddressPopUp={openAddressPopUp}
+          address={props.address}
+          setAddress={props.setAddress}
+          setCompanyAddress={props.setCompanyAddress}
+          companyAddress={props.companyAddress}
+          // setModelRequestData={setModelRequestData}
+          modelRequestData={modelRequestData}
+          handleAddressPopUpClose={handleAddressPopUpClose}
+          setOpenAddressPopUp={setOpenAddressPopUp}
+        />
+        {/* Upload signature modal */}
+        <Upload_image_modal
+          class="modal fade"
+          id="SignatureUploadModel"
+          tabIndex="-1"
+          aria_hidden="true"
+          handleImageUpload={handleImageUpload}
+          setBasicInfo={props.setBasicInfo}
+          basicInfo={props.basicInfo}
+        />
       </div>
-      <div class="separator"></div>
-      <div class="row fieldset">
-        <div class="col-lg-12 hstack gap-2 justify-content-end text-right mt-3">
-          <button class="btn btn-md  btn-light" onClick={props.handleCancel}>
-            <span>{props.getCrudButtonTextName("Cancel")}</span>
-          </button>
+      <span className="validation pf-form-error">{props.errorMessage}</span>
+
+      <div className="pf-footer">
+        <button className="pf-btn pf-btn--ghost" onClick={props.handleCancel}>
+          <i className="ri-close-line" aria-hidden="true"></i>
+          <span>{props.getCrudButtonTextName("Cancel")}</span>
+        </button>
+        <div className="pf-footer__end">
           {props.basicInfo.originalBusinessTypeID ===
             CLIENT_TYPES.Individual && (
             <button
-              class="btn btn-md btn-primary create-item-btn"
+              className="pf-btn pf-btn--primary"
               onClick={() => props.handleTabChange(2)}
             >
               <span>
@@ -1500,15 +1245,16 @@ const Basic_information = (props) => {
           {props.basicInfo.originalBusinessTypeID !==
             CLIENT_TYPES.Individual && (
             <button
-              class="btn btn-md btn-primary create-item-btn"
+              className="pf-btn pf-btn--primary"
               onClick={() => props.handleTabChange(2)}
             >
               <span>Next</span>
+              <i className="ri-arrow-right-line" aria-hidden="true"></i>
             </button>
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -1605,1085 +1351,786 @@ const OfficerDetails = (props) => {
   // Set the maximum date to today
   const maxDate = today;
 
+  // Country code select + number input, shared by every person block below.
+  const renderPhoneField = (index, id) => (
+    <PfField id={id} label="Phone Number">
+      <div className="phone-input-div">
+        <Select
+          {...PF_SELECT_PROPS}
+          style={{ padding: "5px", width: "20%" }}
+          className="createCompanyInfo"
+          options={props.countryCodes}
+          value={props.officersForm[index]?.phoneCountryCodeID}
+          onChange={(e) => {
+            setIndex(index);
+            props.OnOfficerChange(index, "phoneCountryCodeID", e);
+            props.OnOfficerChange(index, "countryCodeID", e.value);
+          }}
+        />
+        <div className="phone-input-number-div">
+          <input
+            style={{ width: "100%" }}
+            className="input-text"
+            placeholder="Phone"
+            type="text"
+            value={props.officersForm[index].phoneNo}
+            onChange={(e) => {
+              // Ensure that the input only contains numeric characters
+              const sanitizedInput = e.target.value
+                .replace(/[^0-9]/g, "")
+                .slice(0, 15);
+              props.OnOfficerChange(index, "phoneNo", sanitizedInput);
+            }}
+          />
+        </div>
+      </div>
+      {props.officerError &&
+        props.officersForm[index].phoneNo !== null &&
+        props.officersForm[index].phoneNo !== "" &&
+        props.officersForm[index].phoneNo !== undefined &&
+        !isValidPhoneNumber(props.officersForm[index].phoneNo) && (
+          <span className="validation"> Invalid phone number </span>
+        )}
+    </PfField>
+  );
+
+  // Delete + Authorised Signatory controls shown in partner/officer headers.
+  const renderPersonActions = (index, deleteLabel) => (
+    <div className="pf-person__actions">
+      {props.officersForm?.length === 1 ? null : (
+        <button
+          className="pf-link-danger"
+          onClick={() => props.deleteOfficer(index)}
+        >
+          <i className="ri-delete-bin-line" aria-hidden="true"></i>
+          {deleteLabel}
+        </button>
+      )}
+      <div className="pf-signatory">
+        <span>Authorised Signatory</span>
+        <Switch
+          checked={props.officersForm[index]?.isAuthorisedSignatory}
+          onChange={(e) => handleSwitchToggle(e, index)}
+          color="primary"
+        />
+      </div>
+    </div>
+  );
+
   return (
-    <>
+    <div className="pf-card">
       <div
         ref={OfficerDetailsDivContainerRef}
         onClick={(e) =>
           scrollUptoCurrentPosition(e, OfficerDetailsDivContainerRef)
         }
-        className="create-practice-height scrollbar"
+        className="pf-step-body"
       >
-        <div className="tab-content">
-          <div className="row">
-            <div className="col-xl-12 col-lg-12">
-              {/* Sole Trader Form */}
-              {(props.originalBusinessTypeID === CLIENT_TYPES.Sole_Trader ||
-                props.originalBusinessTypeID === CLIENT_TYPES.Other) &&
-                props.officersForm?.map((item, index) => {
-                  return (
-                    <>
-                      <div
-                        className="row fieldset mt-4"
-                        id={`FirstName_Div_${index}`}
-                        key={index}
-                      >
-                        <div className="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">
-                            First Name
-                            <span style={{ color: "#ec4561" }}>*</span>
-                          </label>
-                        </div>
-                        <div class="col-lg-9 col-md-8 col-sm-12">
-                          <input
-                            type="text"
-                            class="input-text"
-                            placeholder="First Name"
-                            value={props.officersForm[index].firstName}
-                            onChange={(e) => {
-                              const inputValue = e.target.value.trim();
-                              // Reject input if it contains numeric characters
-                              // Remove all spaces and dots
-                              const cleanedValue = inputValue.replace(
-                                /[.\s]/g,
-                                "",
-                              );
-                              // Reject input if it starts with a digit
-                              if (/^\d/.test(cleanedValue)) {
-                                return;
-                              }
-                              const capitalizedValue =
-                                cleanedValue.charAt(0).toUpperCase() +
-                                cleanedValue.slice(1);
-                              props.OnOfficerChange(
-                                index,
-                                "firstName",
-                                capitalizedValue,
-                              );
-                            }}
-                            maxLength={20}
-                          />
-                          {props.officerError &&
-                          (props.officersForm[index].firstName === null ||
-                            props.officersForm[index].firstName === "") ? (
-                            <span className="validation">{ERROR_MESSAGES}</span>
-                          ) : (
-                            ""
+        <div>
+          {/* Sole Trader Form */}
+          {(props.originalBusinessTypeID === CLIENT_TYPES.Sole_Trader ||
+            props.originalBusinessTypeID === CLIENT_TYPES.Other) &&
+            props.officersForm?.map((item, index) => {
+              return (
+                <section className="pf-person" key={index}>
+                  <div className="pf-section-head">
+                    <h3 className="pf-section-title">
+                      {props.businessTypeName} Details
+                    </h3>
+                  </div>
+                  <div className="pf-grid">
+                    <PfField
+                      id={`FirstName_Div_${index}`}
+                      label="First Name"
+                      required
+                    >
+                      <input
+                        type="text"
+                        class="input-text"
+                        placeholder="First Name"
+                        value={props.officersForm[index].firstName}
+                        onChange={(e) => {
+                          const inputValue = e.target.value.trim();
+                          // Reject input if it contains numeric characters
+                          // Remove all spaces and dots
+                          const cleanedValue = inputValue.replace(
+                            /[.\s]/g,
+                            "",
+                          );
+                          // Reject input if it starts with a digit
+                          if (/^\d/.test(cleanedValue)) {
+                            return;
+                          }
+                          const capitalizedValue =
+                            cleanedValue.charAt(0).toUpperCase() +
+                            cleanedValue.slice(1);
+                          props.OnOfficerChange(
+                            index,
+                            "firstName",
+                            capitalizedValue,
+                          );
+                        }}
+                        maxLength={20}
+                      />
+                      {props.officerError &&
+                      (props.officersForm[index].firstName === null ||
+                        props.officersForm[index].firstName === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
+
+                    <PfField
+                      id={`LastName_Div_${index}`}
+                      label="Last Name"
+                      required
+                    >
+                      <input
+                        type="text"
+                        class="input-text"
+                        placeholder="Last Name"
+                        value={props.officersForm[index].lastName}
+                        onChange={(e) => {
+                          const inputValue = e.target.value;
+
+                          // Remove all spaces and dots
+                          const cleanedValue = inputValue.replace(
+                            /[.\s]/g,
+                            "",
+                          );
+
+                          // Reject input if it starts with a digit
+                          if (/\d/.test(cleanedValue)) {
+                            return;
+                          }
+
+                          const capitalizedValue =
+                            cleanedValue.charAt(0).toUpperCase() +
+                            cleanedValue.slice(1);
+                          props.OnOfficerChange(
+                            index,
+                            "lastName",
+                            capitalizedValue,
+                          );
+                        }}
+                        maxLength={20}
+                      />
+                      {props.officerError &&
+                      (props.officersForm[index].lastName === null ||
+                        props.officersForm[index].lastName === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
+
+                    {renderPhoneField(index, `Phone_Div_${index}`)}
+
+                    <PfField
+                      id={`Email_Div_${index}`}
+                      label="Email Address"
+                      required
+                    >
+                      <PfIconInput icon="ri-mail-line">
+                        <input
+                          type="text"
+                          class="input-text"
+                          maxLength={50}
+                          placeholder="Email"
+                          value={props.officersForm[index]?.emailID?.replace(
+                            /\s/g,
+                            "",
                           )}
-                        </div>
-                      </div>
+                          onChange={(e) =>
+                            props.OnOfficerChange(
+                              index,
+                              "emailID",
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </PfIconInput>
+                      {props.officerError &&
+                        (props.officersForm[index].emailID === null ||
+                        props.officersForm[index].emailID === "" ? (
+                          <span className="validation">{ERROR_MESSAGES}</span>
+                        ) : (
+                          !isValidEmail(props.officersForm[index].emailID) && (
+                            <span className="validation">
+                              Invalid email pattern
+                            </span>
+                          )
+                        ))}
+                    </PfField>
+
+                    <PfField
+                      id={`Address_Div_${index}`}
+                      label="Residential Address"
+                      required
+                      full
+                    >
+                      <PfIconInput icon="ri-map-pin-line">
+                        <input
+                          className="input-text"
+                          style={{ cursor: "pointer" }}
+                          type="text"
+                          placeholder="Residential Address"
+                          value={
+                            props.concatenatedResidentialAddress[0]
+                              ?.officersFullAddress
+                          }
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            props.setAddressPopUpTitle("Residential Address");
+                            handleOpenRegisterOfficeAddressPopup(e, index);
+                          }}
+                          autoComplete="off"
+                        />
+                      </PfIconInput>
+                      {props.officerError &&
+                      (props.concatenatedResidentialAddress[0]
+                        .officersFullAddress === null ||
+                        props.concatenatedResidentialAddress[index]
+                          .officersFullAddress === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
+                  </div>
+                </section>
+              );
+            })}
+
+          {/* lpp form */}
+          {props.originalBusinessTypeID === CLIENT_TYPES.Partnership &&
+            props.officersForm?.map((i, index) => {
+              return (
+                <section
+                  className="pf-person"
+                  id={`Partner_${index}`}
+                  key={index}
+                >
+                  <div className="pf-person__head">
+                    <h3 className="pf-section-title">Partner {index + 1}</h3>
+                    {renderPersonActions(index, "Delete Partner")}
+                  </div>
+                  {props.authoritySignatorySignatory &&
+                    props.officerError &&
+                    props.AuthorityCount === 0 && (
                       <div
-                        className="row fieldset"
-                        id={`LastName_Div_${index}`}
+                        className="pf-person__error"
+                        id={`AuthorizedPartner_${index}`}
                       >
-                        <div className="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">
-                            Last Name
-                            <span style={{ color: "#ec4561" }}>*</span>
-                          </label>
-                        </div>
-                        <div class="col-lg-9 col-md-8 col-sm-12">
-                          <input
-                            type="text"
-                            class="input-text"
-                            placeholder="Last Name"
-                            value={props.officersForm[index].lastName}
-                            onChange={(e) => {
-                              const inputValue = e.target.value;
-
-                              // Remove all spaces and dots
-                              const cleanedValue = inputValue.replace(
-                                /[.\s]/g,
-                                "",
-                              );
-
-                              // Reject input if it starts with a digit
-                              if (/\d/.test(cleanedValue)) {
-                                return;
-                              }
-
-                              const capitalizedValue =
-                                cleanedValue.charAt(0).toUpperCase() +
-                                cleanedValue.slice(1);
-                              props.OnOfficerChange(
-                                index,
-                                "lastName",
-                                capitalizedValue,
-                              );
-                            }}
-                            maxLength={20}
-                          />
-                          {props.officerError &&
-                          (props.officersForm[index].lastName === null ||
-                            props.officersForm[index].lastName === "") ? (
-                            <span className="validation">{ERROR_MESSAGES}</span>
-                          ) : (
-                            ""
-                          )}
-                        </div>
+                        <span className="validation">
+                          {" "}
+                          At least 1 authorised partner is required.
+                        </span>
                       </div>
-                      <div class="row fieldset" id={`Phone_Div_${index}`}>
-                        <div class="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">Phone</label>
-                        </div>
-                        <div class="col-lg-9 col-md-9 col-sm-10 ">
-                          <div className="phone-input-div">
-                            <Select
-                              style={{ padding: "5px", width: "20%" }}
-                              className="createCompanyInfo"
-                              options={props.countryCodes}
-                              value={
-                                props.officersForm[index]?.phoneCountryCodeID
-                              }
-                              onChange={(e) => {
-                                setIndex(index);
-                                props.OnOfficerChange(
-                                  index,
-                                  "phoneCountryCodeID",
-                                  e,
-                                );
-                                props.OnOfficerChange(
-                                  index,
-                                  "countryCodeID",
-                                  e.value,
-                                );
-                              }}
-                            />
-                            <div className="phone-input-number-div">
-                              <input
-                                style={{ width: "100%" }}
-                                className="input-text"
-                                placeholder="Phone"
-                                type="text"
-                                value={props.officersForm[index].phoneNo}
-                                onChange={(e) => {
-                                  // Ensure that the input only contains numeric characters
-                                  const sanitizedInput = e.target.value
-                                    .replace(/[^0-9]/g, "")
-                                    .slice(0, 15);
-                                  props.OnOfficerChange(
-                                    index,
-                                    "phoneNo",
-                                    sanitizedInput,
-                                  );
-                                }}
-                              />
-                            </div>
-                          </div>
-                          {props.officerError &&
-                            props.officersForm[index].phoneNo !== null &&
-                            props.officersForm[index].phoneNo !== "" &&
-                            props.officersForm[index].phoneNo !== undefined &&
-                            !isValidPhoneNumber(
-                              props.officersForm[index].phoneNo,
-                            ) && (
-                              <span className="validation">
-                                {" "}
-                                Invalid phone number{" "}
-                              </span>
-                            )}
-                        </div>
-                      </div>
-                      <div class="row fieldset" id={`Email_Div_${index}`}>
-                        <div class="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">
-                            Email
-                            <span className="text-danger">*</span>
-                          </label>
-                        </div>
-                        <div class="col-lg-9 col-md-8 col-sm-12">
-                          <input
-                            type="text"
-                            class="input-text"
-                            maxLength={50}
-                            placeholder="Email"
-                            value={props.officersForm[index]?.emailID?.replace(
-                              /\s/g,
-                              "",
-                            )}
-                            onChange={(e) =>
-                              props.OnOfficerChange(
-                                index,
-                                "emailID",
-                                e.target.value,
-                              )
-                            }
-                          />
-                          {props.officerError &&
-                            (props.officersForm[index].emailID === null ||
-                            props.officersForm[index].emailID === "" ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              !isValidEmail(
-                                props.officersForm[index].emailID,
-                              ) && (
-                                <span className="validation">
-                                  Invalid email pattern
-                                </span>
-                              )
-                            ))}
-                        </div>
-                      </div>
-                      <div class="row fieldset" id={`Address_Div_${index}`}>
-                        <div class="col-md-3 col-sm-12 text-start text-md-end">
-                          <label class="fieldset-label required">
-                            Residential Address
-                            <span style={{ color: "#ec4561" }}>*</span>
-                          </label>
-                        </div>
-                        <div class="col-lg-9 col-md-8 col-sm-12">
-                          <input
-                            className="input-text"
-                            style={{ cursor: "pointer" }}
-                            type="text"
-                            placeholder="Residential Address"
-                            value={
-                              props.concatenatedResidentialAddress[0]
-                                ?.officersFullAddress
-                            }
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              props.setAddressPopUpTitle("Residential Address");
-                              handleOpenRegisterOfficeAddressPopup(e, index);
-                            }}
-                            autoComplete="off"
-                          />
-                          {props.officerError &&
-                          (props.concatenatedResidentialAddress[0]
-                            .officersFullAddress === null ||
+                    )}
+                  <div className="pf-grid">
+                    <PfField
+                      id={`FirstName_Div_${index}`}
+                      label="First Name"
+                      required
+                    >
+                      <input
+                        type="text"
+                        class="input-text"
+                        placeholder="First Name"
+                        value={
+                          props.officersForm[index].firstName
+                            ? props.officersForm[index].firstName
+                                .charAt(0)
+                                .toUpperCase() +
+                              props.officersForm[index].firstName
+                                .slice(1)
+                                .toLowerCase()
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const inputValue = e.target.value.trim();
+                          // Reject input if it contains numeric characters
+                          // Remove all spaces and dots
+                          const cleanedValue = inputValue.replace(
+                            /[.\s]/g,
+                            "",
+                          );
+
+                          // Reject input if it starts with a digit
+                          if (/\d/.test(cleanedValue)) {
+                            return;
+                          }
+                          const capitalizedValue =
+                            cleanedValue.charAt(0).toUpperCase() +
+                            cleanedValue.slice(1);
+
+                          props.OnOfficerChange(
+                            index,
+                            "firstName",
+                            capitalizedValue,
+                          );
+                        }}
+                        maxLength={20}
+                      />
+                      {props.officerError &&
+                      (props.officersForm[index].firstName === null ||
+                        props.officersForm[index].firstName === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
+
+                    <PfField
+                      id={`LastName_Div_${index}`}
+                      label="Last Name"
+                      required
+                    >
+                      <input
+                        type="text"
+                        class="input-text"
+                        placeholder="Last Name"
+                        value={
+                          props.officersForm[index].lastName
+                            ? props.officersForm[index].lastName
+                                .charAt(0)
+                                .toUpperCase() +
+                              props.officersForm[index].lastName
+                                .slice(1)
+                                .toLowerCase()
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const inputValue = e.target.value;
+
+                          // Remove all spaces and dots
+                          const cleanedValue = inputValue.replace(
+                            /[.\s]/g,
+                            "",
+                          );
+
+                          // Reject input if it starts with a digit
+                          if (/\d/.test(cleanedValue)) {
+                            return;
+                          }
+
+                          const capitalizedValue =
+                            cleanedValue.charAt(0).toUpperCase() +
+                            cleanedValue.slice(1);
+
+                          props.OnOfficerChange(
+                            index,
+                            "lastName",
+                            capitalizedValue,
+                          );
+                        }}
+                        maxLength={20}
+                      />
+                      {props.officerError &&
+                      (props.officersForm[index].lastName === null ||
+                        props.officersForm[index].lastName === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
+
+                    {renderPhoneField(index, `Phone_Div_${index}`)}
+
+                    <PfField
+                      id={`Email_Div_${index}`}
+                      label="Email Address"
+                      required={props.officersForm[index].isAuthorisedSignatory}
+                    >
+                      <PfIconInput icon="ri-mail-line">
+                        <input
+                          maxLength={50}
+                          className="input-text"
+                          type="text"
+                          placeholder="Email"
+                          value={props.officersForm[index]?.emailID}
+                          onChange={(e) =>
+                            props.OnOfficerChange(
+                              index,
+                              "emailID",
+                              e.target.value.trim(), // Remove spaces using regex
+                            )
+                          }
+                        />
+                      </PfIconInput>
+                      {props.officerError &&
+                        props.officersForm[index].isAuthorisedSignatory &&
+                        (props.officersForm[index].emailID === null ||
+                        props.officersForm[index].emailID === "" ? (
+                          <span className="validation">{ERROR_MESSAGES}</span>
+                        ) : (
+                          !isValidEmail(props.officersForm[index].emailID) && (
+                            <span className="validation">
+                              Invalid email pattern
+                            </span>
+                          )
+                        ))}
+                    </PfField>
+
+                    <PfField
+                      id={`Address_Div_${index}`}
+                      label="Residential Address"
+                      required
+                      full
+                    >
+                      <PfIconInput icon="ri-map-pin-line">
+                        <input
+                          className="input-text"
+                          type="text"
+                          style={{ cursor: "pointer" }}
+                          placeholder="Residential Address"
+                          value={
                             props.concatenatedResidentialAddress[index]
-                              .officersFullAddress === "") ? (
-                            <span className="validation">{ERROR_MESSAGES}</span>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  );
-                })}
-              {/* lpp form */}
-              {props.originalBusinessTypeID === CLIENT_TYPES.Partnership && (
-                <div>
-                  {props.officersForm?.map((i, index) => {
-                    return (
-                      <div className="fieldset-group" id={`Partner_${index}`}>
-                        <label class="fieldset-group-label">
+                              ?.officersFullAddress
+                          }
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            props.setAddressPopUpTitle("Residential Address");
+                            handleOpenRegisterOfficeAddressPopup(e, index);
+                          }}
+                          autoComplete="off"
+                        />
+                      </PfIconInput>
+                      {props.officerError &&
+                      (props.concatenatedResidentialAddress[index]
+                        .officersFullAddress === null ||
+                        props.concatenatedResidentialAddress[index]
+                          .officersFullAddress === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
+                  </div>
+                </section>
+              );
+            })}
+
+          {(props.originalBusinessTypeID === CLIENT_TYPES.Company ||
+            props.originalBusinessTypeID === CLIENT_TYPES.LLP) &&
+            props.officersForm?.map((i, index) => {
+              return (
+                <section
+                  className="pf-person"
+                  id={`Officers${index}`}
+                  key={index}
+                >
+                  <div className="pf-person__head">
+                    <h3 className="pf-section-title">Officer {index + 1}</h3>
+                    {renderPersonActions(index, "Delete Officer")}
+                  </div>
+                  {props.authoritySignatorySignatory &&
+                    props.officerError &&
+                    props.AuthorityCount === 0 && (
+                      <div
+                        className="pf-person__error"
+                        id={`AuthorisedOfficer_${index}`}
+                      >
+                        <span className="validation">
                           {" "}
-                          Partner {index + 1}{" "}
-                        </label>
-                        <label
-                          htmlFor=""
-                          className="fieldset-group-label-1 required"
-                        >
-                          {props.officersForm?.length === 1 ? null : (
-                            <button
-                              className="btn btn-sm btn-danger gap-1  delete-fieldset-group"
-                              onClick={() => props.deleteOfficer(index)}
-                            >
-                              <i class="bi bi-trash3 "></i>
-                              Delete Partner
-                            </button>
-                          )}
-                        </label>
-                        <div
-                          className="align-right text-right mb-2"
-                          style={{ alignItems: "center" }}
-                        >
-                          <Switch
-                            checked={
-                              props.officersForm[index]?.isAuthorisedSignatory
-                            }
-                            onChange={(e) => handleSwitchToggle(e, index)}
-                            color="primary"
-                          />
-
-                          <div className="isAuthorized">
-                            Authorised Signatory
-                          </div>
-                        </div>
-                        {/* {props.officersForm.length === 0 && (
-                          <div className="row fieldset flex-center-div"  id="PartnerError">
-                            <div className="col-lg-12 text-end">
-                              <span className="validation">
-                                {" "}
-                                At least 1 authorised partner is required.
-                              </span>
-                            </div>
-                          </div>
-                        )} */}
-                        {props.authoritySignatorySignatory &&
-                          props.officerError &&
-                          props.AuthorityCount === 0 && (
-                            <div
-                              className="row fieldset flex-center-div"
-                              id={`AuthorizedPartner_${index}`}
-                            >
-                              <div className="col-lg-12 text-end">
-                                <span className="validation">
-                                  {" "}
-                                  At least 1 authorised partner is required.
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                        <div
-                          className="row fieldset"
-                          id={`FirstName_Div_${index}`}
-                        >
-                          <div className="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              First Name
-                              <span style={{ color: "#ec4561" }}>*</span>
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12">
-                            <input
-                              type="text"
-                              class="input-text"
-                              placeholder="First Name"
-                              value={
-                                props.officersForm[index].firstName
-                                  ? props.officersForm[index].firstName
-                                      .charAt(0)
-                                      .toUpperCase() +
-                                    props.officersForm[index].firstName
-                                      .slice(1)
-                                      .toLowerCase()
-                                  : ""
-                              }
-                              onChange={(e) => {
-                                const inputValue = e.target.value.trim();
-                                // Reject input if it contains numeric characters
-                                // Remove all spaces and dots
-                                const cleanedValue = inputValue.replace(
-                                  /[.\s]/g,
-                                  "",
-                                );
-
-                                // Reject input if it starts with a digit
-                                if (/\d/.test(cleanedValue)) {
-                                  return;
-                                }
-                                const capitalizedValue =
-                                  cleanedValue.charAt(0).toUpperCase() +
-                                  cleanedValue.slice(1);
-
-                                props.OnOfficerChange(
-                                  index,
-                                  "firstName",
-                                  capitalizedValue,
-                                );
-                              }}
-                              maxLength={20}
-                            />
-                            {props.officerError &&
-                            (props.officersForm[index].firstName === null ||
-                              props.officersForm[index].firstName === "") ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                        <div
-                          className="row fieldset"
-                          id={`LastName_Div_${index}`}
-                        >
-                          <div className="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              Last Name
-                              <span style={{ color: "#ec4561" }}>*</span>
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12">
-                            <input
-                              type="text"
-                              class="input-text"
-                              placeholder="Last Name"
-                              value={
-                                props.officersForm[index].lastName
-                                  ? props.officersForm[index].lastName
-                                      .charAt(0)
-                                      .toUpperCase() +
-                                    props.officersForm[index].lastName
-                                      .slice(1)
-                                      .toLowerCase()
-                                  : ""
-                              }
-                              onChange={(e) => {
-                                const inputValue = e.target.value;
-
-                                // Remove all spaces and dots
-                                const cleanedValue = inputValue.replace(
-                                  /[.\s]/g,
-                                  "",
-                                );
-
-                                // Reject input if it starts with a digit
-                                if (/\d/.test(cleanedValue)) {
-                                  return;
-                                }
-
-                                const capitalizedValue =
-                                  cleanedValue.charAt(0).toUpperCase() +
-                                  cleanedValue.slice(1);
-
-                                props.OnOfficerChange(
-                                  index,
-                                  "lastName",
-                                  capitalizedValue,
-                                );
-                              }}
-                              maxLength={20}
-                            />
-                            {props.officerError &&
-                            (props.officersForm[index].lastName === null ||
-                              props.officersForm[index].lastName === "") ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                        <div className="row fieldset" id={`Phone_Div_${index}`}>
-                          <div class="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">Phone</label>
-                          </div>
-                          <div className="col-lg-9 col-md-8 col-sm-12 ">
-                            <div className="phone-input-div">
-                              <Select
-                                style={{ padding: "5px", width: "20%" }}
-                                className="createCompanyInfo"
-                                options={props.countryCodes}
-                                value={
-                                  props.officersForm[index]?.phoneCountryCodeID
-                                }
-                                onChange={(e) => {
-                                  setIndex(index);
-                                  props.OnOfficerChange(
-                                    index,
-                                    "phoneCountryCodeID",
-                                    e,
-                                  );
-                                  props.OnOfficerChange(
-                                    index,
-                                    "countryCodeID",
-                                    e.value,
-                                  );
-                                }}
-                              />
-                              <div className="phone-input-number-div">
-                                <input
-                                  style={{ width: "100%" }}
-                                  className="input-text"
-                                  type="text"
-                                  placeholder="Phone"
-                                  value={props.officersForm[index].phoneNo}
-                                  onChange={(e) => {
-                                    const sanitizedInput = e.target.value
-                                      .replace(/[^0-9]/g, "")
-                                      .slice(0, 15);
-                                    props.OnOfficerChange(
-                                      index,
-                                      "phoneNo",
-                                      sanitizedInput,
-                                    );
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            {props.officerError &&
-                              props.officersForm[index].phoneNo !== null &&
-                              props.officersForm[index].phoneNo !== "" &&
-                              props.officersForm[index].phoneNo !== undefined &&
-                              !isValidPhoneNumber(
-                                props.officersForm[index].phoneNo,
-                              ) && (
-                                <span className="validation">
-                                  {" "}
-                                  Invalid phone number{" "}
-                                </span>
-                              )}
-                          </div>
-                        </div>
-                        <div className="row fieldset" id={`Email_Div_${index}`}>
-                          <div class="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              Email
-                              {props.officersForm[index]
-                                .isAuthorisedSignatory && (
-                                <span className="text-danger">*</span>
-                              )}
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12">
-                            <input
-                              maxLength={50}
-                              className="input-text"
-                              type="text"
-                              placeholder="Email"
-                              value={props.officersForm[index]?.emailID}
-                              onChange={(e) =>
-                                props.OnOfficerChange(
-                                  index,
-                                  "emailID",
-                                  e.target.value.trim(), // Remove spaces using regex
-                                )
-                              }
-                            />
-
-                            {props.officerError &&
-                              props.officersForm[index].isAuthorisedSignatory &&
-                              (props.officersForm[index].emailID === null ||
-                              props.officersForm[index].emailID === "" ? (
-                                <span className="validation">
-                                  {ERROR_MESSAGES}
-                                </span>
-                              ) : (
-                                !isValidEmail(
-                                  props.officersForm[index].emailID,
-                                ) && (
-                                  <span className="validation">
-                                    Invalid email pattern
-                                  </span>
-                                )
-                              ))}
-                          </div>
-                        </div>
-                        <div class="row fieldset" id={`Address_Div_${index}`}>
-                          <div class="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              Residential Address
-                              <span className="text-danger">*</span>
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12">
-                            <input
-                              className="input-text"
-                              type="text"
-                              style={{ cursor: "pointer" }}
-                              placeholder="Residential Address"
-                              value={
-                                props.concatenatedResidentialAddress[index]
-                                  ?.officersFullAddress
-                              }
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                props.setAddressPopUpTitle(
-                                  "Residential Address",
-                                );
-                                handleOpenRegisterOfficeAddressPopup(e, index);
-                              }}
-                              autoComplete="off"
-                            />
-                            {props.officerError &&
-                            (props.concatenatedResidentialAddress[index]
-                              .officersFullAddress === null ||
-                              props.concatenatedResidentialAddress[index]
-                                .officersFullAddress === "") ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
+                          At least 1 authorised officer is required.{" "}
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-              {(props.originalBusinessTypeID === CLIENT_TYPES.Company ||
-                props.originalBusinessTypeID === CLIENT_TYPES.LLP) && (
-                <div>
-                  {props.officersForm?.map((i, index) => {
-                    return (
-                      <div className="fieldset-group" id={`Officers${index}`}>
-                        <label class="fieldset-group-label">
-                          {" "}
-                          Officer {index + 1}{" "}
-                        </label>
-                        <label
-                          htmlFor=""
-                          className="fieldset-group-label-1 required"
-                        >
-                          {props.officersForm?.length === 1 ? null : (
-                            <button
-                              className="btn btn-sm btn-danger gap-1 delete-fieldset-group"
-                              onClick={() => props.deleteOfficer(index)}
-                            >
-                              <i class="bi bi-trash3  "></i>
-                              Delete Officer
-                            </button>
-                          )}
-                        </label>
-                        <div
-                          style={{ alignItems: "center" }}
-                          className="align-right text-right mb-2"
-                        >
-                          <Switch
-                            checked={
-                              props.officersForm[index]?.isAuthorisedSignatory
+                    )}
+                  <div className="pf-grid">
+                    <PfField label="First Name" required>
+                      <input
+                        type="text"
+                        class="input-text"
+                        placeholder="First Name"
+                        value={
+                          props.officersForm[index].firstName
+                            ? props.officersForm[index].firstName
+                                .charAt(0)
+                                .toUpperCase() +
+                              props.officersForm[index].firstName
+                                .slice(1)
+                                .toLowerCase()
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const inputValue = e.target.value.trim();
+                          // Reject input if it contains numeric characters
+                          // Remove all spaces and dots
+                          const cleanedValue = inputValue.replace(
+                            /[.\s]/g,
+                            "",
+                          );
+
+                          // Reject input if it starts with a digit
+                          if (/\d/.test(cleanedValue)) {
+                            return;
+                          }
+                          const capitalizedValue =
+                            cleanedValue.charAt(0).toUpperCase() +
+                            cleanedValue.slice(1);
+
+                          props.OnOfficerChange(
+                            index,
+                            "firstName",
+                            capitalizedValue,
+                          );
+                        }}
+                        maxLength={20}
+                      />
+                      {props.officerError &&
+                      (props.officersForm[index].firstName === null ||
+                        props.officersForm[index].firstName === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
+
+                    <PfField label="Last Name" required>
+                      <input
+                        type="text"
+                        class="input-text"
+                        placeholder="Last Name"
+                        value={
+                          props.officersForm[index].lastName
+                            ? props.officersForm[index].lastName
+                                .charAt(0)
+                                .toUpperCase() +
+                              props.officersForm[index].lastName
+                                .slice(1)
+                                .toLowerCase()
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const inputValue = e.target.value;
+
+                          // Remove all spaces and dots
+                          const cleanedValue = inputValue.replace(
+                            /[.\s]/g,
+                            "",
+                          );
+
+                          // Reject input if it starts with a digit
+                          if (/\d/.test(cleanedValue)) {
+                            return;
+                          }
+
+                          const capitalizedValue =
+                            cleanedValue.charAt(0).toUpperCase() +
+                            cleanedValue.slice(1);
+
+                          props.OnOfficerChange(
+                            index,
+                            "lastName",
+                            capitalizedValue,
+                          );
+                        }}
+                        maxLength={20}
+                      />
+                      {props.officerError &&
+                      (props.officersForm[index].lastName === null ||
+                        props.officersForm[index].lastName === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
+
+                    <PfField label="Role" required>
+                      <PfIconInput icon="ri-briefcase-line">
+                        <input
+                          maxLength={30}
+                          type="text"
+                          class="input-text"
+                          placeholder="Role"
+                          value={props.officersForm[index]?.officerRole}
+                          onChange={(e) => {
+                            const { value } = e.target;
+                            if (value === "" || value.charAt(0) !== " ") {
+                              props.OnOfficerChange(
+                                index,
+                                "officerRole",
+                                value.charAt(0).toUpperCase() +
+                                  value.slice(1).toLowerCase(),
+                              );
                             }
-                            onChange={(e) => handleSwitchToggle(e, index)}
-                            color="primary"
-                          />
+                          }}
+                        />
+                      </PfIconInput>
+                      {props.officerError &&
+                      (props.officersForm[index].officerRole === null ||
+                        props.officersForm[index].officerRole === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
 
-                          <div className="isAuthorized">
-                            Authorised Signatory
-                          </div>
-                        </div>
-                        {/* {props.officersForm.length === 0 && (
-                            <div className="row fieldset flex-center-div">
-                              <div className="col-lg-12 text-end">
-                                <span className="validation">
-                                  {" "}
-                                  At least 1 authorised officer is required.{" "}
-                                </span>
-                              </div>
-                            </div>
-                          )} */}
-                        {props.authoritySignatorySignatory &&
-                          props.officerError &&
-                          props.AuthorityCount === 0 && (
-                            <div
-                              className="row fieldset flex-center-div"
-                              id={`AuthorisedOfficer_${index}`}
-                            >
-                              <div className="col-lg-12 text-end">
-                                <span className="validation">
-                                  {" "}
-                                  At least 1 authorised officer is
-                                  required.{" "}
-                                </span>
-                              </div>
-                            </div>
+                    <PfField label="Appointed On" required>
+                      <DatePicker
+                        minDate={minDate}
+                        maxDate={maxDate}
+                        style={{ width: "100%" }}
+                        format="dd/MM/y"
+                        dayPlaceholder="dd"
+                        monthPlaceholder="mm"
+                        yearPlaceholder="yyyy"
+                        value={props.officersForm[index]?.appointedOn}
+                        onChange={(e) =>
+                          props.OnOfficerChange(index, "appointedOn", e)
+                        }
+                      />
+                      {props.InvalidAppointedOnDate &&
+                      !isValidDate(props.officersForm[index]?.appointedOn) ? (
+                        <span className="validation">Invalid Date</span>
+                      ) : null}
+                      {props.officerError &&
+                      (props.officersForm[index]?.appointedOn === null ||
+                        props.officersForm[index]?.appointedOn === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                      <span className="validation">
+                        {props.formErrors[index]?.appointedOn}
+                      </span>
+                    </PfField>
+
+                    {renderPhoneField(index)}
+
+                    <PfField
+                      label="Email Address"
+                      required={props.officersForm[index].isAuthorisedSignatory}
+                    >
+                      <PfIconInput icon="ri-mail-line">
+                        <input
+                          className="input-text"
+                          type="text"
+                          placeholder="Email"
+                          value={props.officersForm[index]?.emailID?.replace(
+                            /\s/g,
+                            "",
                           )}
-                        <div className="row fieldset">
-                          <div className="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              First Name
-                              <span style={{ color: "#ec4561" }}>*</span>
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12 ">
-                            <input
-                              type="text"
-                              class="input-text"
-                              placeholder="First Name"
-                              value={
-                                props.officersForm[index].firstName
-                                  ? props.officersForm[index].firstName
-                                      .charAt(0)
-                                      .toUpperCase() +
-                                    props.officersForm[index].firstName
-                                      .slice(1)
-                                      .toLowerCase()
-                                  : ""
-                              }
-                              onChange={(e) => {
-                                const inputValue = e.target.value.trim();
-                                // Reject input if it contains numeric characters
-                                // Remove all spaces and dots
-                                const cleanedValue = inputValue.replace(
-                                  /[.\s]/g,
-                                  "",
-                                );
+                          maxLength={50}
+                          onChange={(e) =>
+                            props.OnOfficerChange(
+                              index,
+                              "emailID",
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </PfIconInput>
+                      {props.officerError &&
+                        props.officersForm[index].isAuthorisedSignatory &&
+                        (props.officersForm[index].emailID === null ||
+                        props.officersForm[index].emailID === "" ? (
+                          <span className="validation">{ERROR_MESSAGES}</span>
+                        ) : (
+                          !isValidEmail(props.officersForm[index].emailID) && (
+                            <span className="validation">
+                              Invalid email pattern
+                            </span>
+                          )
+                        ))}
+                    </PfField>
 
-                                // Reject input if it starts with a digit
-                                if (/\d/.test(cleanedValue)) {
-                                  return;
-                                }
-                                const capitalizedValue =
-                                  cleanedValue.charAt(0).toUpperCase() +
-                                  cleanedValue.slice(1);
-
-                                props.OnOfficerChange(
-                                  index,
-                                  "firstName",
-                                  capitalizedValue,
-                                );
-                              }}
-                              maxLength={20}
-                            />
-                            {props.officerError &&
-                            (props.officersForm[index].firstName === null ||
-                              props.officersForm[index].firstName === "") ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                          <div className="mb-2"></div>
-                          <div className="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              Last Name
-                              <span style={{ color: "#ec4561" }}>*</span>
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12 ">
-                            <input
-                              type="text"
-                              class="input-text"
-                              placeholder="Last Name"
-                              value={
-                                props.officersForm[index].lastName
-                                  ? props.officersForm[index].lastName
-                                      .charAt(0)
-                                      .toUpperCase() +
-                                    props.officersForm[index].lastName
-                                      .slice(1)
-                                      .toLowerCase()
-                                  : ""
-                              }
-                              onChange={(e) => {
-                                const inputValue = e.target.value;
-
-                                // Remove all spaces and dots
-                                const cleanedValue = inputValue.replace(
-                                  /[.\s]/g,
-                                  "",
-                                );
-
-                                // Reject input if it starts with a digit
-                                if (/\d/.test(cleanedValue)) {
-                                  return;
-                                }
-
-                                const capitalizedValue =
-                                  cleanedValue.charAt(0).toUpperCase() +
-                                  cleanedValue.slice(1);
-
-                                props.OnOfficerChange(
-                                  index,
-                                  "lastName",
-                                  capitalizedValue,
-                                );
-                              }}
-                              maxLength={20}
-                            />
-                            {props.officerError &&
-                            (props.officersForm[index].lastName === null ||
-                              props.officersForm[index].lastName === "") ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                        <div className="row fieldset ">
-                          <div className="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              Role
-                              <span style={{ color: "#ec4561" }}>*</span>
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12 ">
-                            <input
-                              maxLength={30}
-                              type="text"
-                              class="input-text"
-                              placeholder="Role"
-                              value={props.officersForm[index]?.officerRole}
-                              onChange={(e) => {
-                                const { value } = e.target;
-                                if (value === "" || value.charAt(0) !== " ") {
-                                  props.OnOfficerChange(
-                                    index,
-                                    "officerRole",
-                                    value.charAt(0).toUpperCase() +
-                                      value.slice(1).toLowerCase(),
-                                  );
-                                }
-                              }}
-                            />
-                            {props.officerError &&
-                            (props.officersForm[index].officerRole === null ||
-                              props.officersForm[index].officerRole === "") ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                          <div className="mb-2"></div>
-                          <div className="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              Appointed On
-                              <span style={{ color: "#ec4561" }}>*</span>
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12 ">
-                            <DatePicker
-                              minDate={minDate}
-                              maxDate={maxDate}
-                              style={{ width: "100%" }}
-                              format="dd/MM/y"
-                              dayPlaceholder="dd"
-                              monthPlaceholder="mm"
-                              yearPlaceholder="yyyy"
-                              value={props.officersForm[index]?.appointedOn}
-                              onChange={(e) =>
-                                props.OnOfficerChange(index, "appointedOn", e)
-                              }
-                            />
-                            {props.InvalidAppointedOnDate &&
-                            !isValidDate(
-                              props.officersForm[index]?.appointedOn,
-                            ) ? (
-                              <span className="validation">Invalid Date</span>
-                            ) : null}
-                            {props.officerError &&
-                            (props.officersForm[index]?.appointedOn === null ||
-                              props.officersForm[index]?.appointedOn === "") ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                          <span className="validation">
-                            {props.formErrors[index]?.appointedOn}
-                          </span>
-                        </div>
-                        <div class="row fieldset">
-                          <div class="col-md-3 col-sm-12 text-start text-md-end ">
-                            <label class="fieldset-label required">Phone</label>
-                          </div>
-                          <div className="col-lg-9 col-md-8 col-sm-12 ">
-                            <div className="phone-input-div">
-                              <Select
-                                style={{ padding: "5px", width: "20%" }}
-                                class="createCompanyInfo"
-                                options={props.countryCodes}
-                                value={
-                                  props.officersForm[index]?.phoneCountryCodeID
-                                }
-                                onChange={(e) => {
-                                  setIndex(index);
-                                  props.OnOfficerChange(
-                                    index,
-                                    "phoneCountryCodeID",
-                                    e,
-                                  );
-                                  props.OnOfficerChange(
-                                    index,
-                                    "countryCodeID",
-                                    e.value,
-                                  );
-                                }}
-                              />
-                              <div className="mb-2"></div>
-                              <div className="phone-input-number-div">
-                                <input
-                                  style={{ width: "100%" }}
-                                  className="input-text"
-                                  type="text"
-                                  placeholder="Phone"
-                                  value={props.officersForm[index].phoneNo}
-                                  onChange={(e) => {
-                                    const sanitizedInput = e.target.value
-                                      .replace(/[^0-9]/g, "")
-                                      .slice(0, 15);
-                                    props.OnOfficerChange(
-                                      index,
-                                      "phoneNo",
-                                      sanitizedInput,
-                                    );
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            {props.officerError &&
-                              props.officersForm[index].phoneNo !== null &&
-                              props.officersForm[index].phoneNo !== "" &&
-                              props.officersForm[index].phoneNo !== undefined &&
-                              !isValidPhoneNumber(
-                                props.officersForm[index].phoneNo,
-                              ) && (
-                                <span className="validation">
-                                  {" "}
-                                  Invalid phone number{" "}
-                                </span>
-                              )}
-                          </div>
-                          <div className="mb-2"></div>
-                          <div class="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              Email
-                              {props.officersForm[index]
-                                .isAuthorisedSignatory && (
-                                <span className="text-danger">*</span>
-                              )}
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12">
-                            <input
-                              className="input-text"
-                              type="text"
-                              placeholder="Email"
-                              value={props.officersForm[
-                                index
-                              ]?.emailID?.replace(/\s/g, "")}
-                              maxLength={50}
-                              onChange={(e) =>
-                                props.OnOfficerChange(
-                                  index,
-                                  "emailID",
-                                  e.target.value,
-                                )
-                              }
-                            />
-                            {props.officerError &&
-                              props.officersForm[index].isAuthorisedSignatory &&
-                              (props.officersForm[index].emailID === null ||
-                              props.officersForm[index].emailID === "" ? (
-                                <span className="validation">
-                                  {ERROR_MESSAGES}
-                                </span>
-                              ) : (
-                                !isValidEmail(
-                                  props.officersForm[index].emailID,
-                                ) && (
-                                  <span className="validation">
-                                    Invalid email pattern
-                                  </span>
-                                )
-                              ))}
-                          </div>
-                        </div>
-                        <div class="row fieldset">
-                          <div class="col-md-3 col-sm-12 text-start text-md-end">
-                            <label class="fieldset-label required">
-                              Correspondence Address
-                              <span className="text-danger">*</span>
-                            </label>
-                          </div>
-                          <div class="col-lg-9 col-md-8 col-sm-12">
-                            <input
-                              placeholder="Correspondence Address"
-                              className="input-text"
-                              style={{ cursor: "pointer" }}
-                              type="text"
-                              value={
-                                props.concatenatedResidentialAddress[index]
-                                  ?.officersFullAddress
-                              }
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                props.setAddressPopUpTitle(
-                                  "Correspondence Address",
-                                );
-                                handleOpenRegisterOfficeAddressPopup(e, index);
-                              }}
-                              autoComplete="off"
-                            />
-                            {props.officerError &&
-                            (props.concatenatedResidentialAddress[index]
-                              .officersFullAddress === null ||
-                              props.concatenatedResidentialAddress[index]
-                                .officersFullAddress === "") ? (
-                              <span className="validation">
-                                {ERROR_MESSAGES}
-                              </span>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-            <AddressModal
-              title={props.addressPopUpTitle}
-              setAddressUpdatedDatetime={props.setAddressUpdatedDatetime}
-              fullAddress={props.fullAddress}
-              setFullAddress={props.setFullAddress}
-              openAddressPopUp={openAddressPopUp}
-              modelRequestData={modelRequestData}
-              address={props.address}
-              setAddress={props.setAddress}
-              handleAddressPopUpClose={handleAddressPopUpClose}
-              setOpenAddressPopUp={setOpenAddressPopUp}
-            />
-          </div>
+                    <PfField label="Correspondence Address" required full>
+                      <PfIconInput icon="ri-map-pin-line">
+                        <input
+                          placeholder="Correspondence Address"
+                          className="input-text"
+                          style={{ cursor: "pointer" }}
+                          type="text"
+                          value={
+                            props.concatenatedResidentialAddress[index]
+                              ?.officersFullAddress
+                          }
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            props.setAddressPopUpTitle(
+                              "Correspondence Address",
+                            );
+                            handleOpenRegisterOfficeAddressPopup(e, index);
+                          }}
+                          autoComplete="off"
+                        />
+                      </PfIconInput>
+                      {props.officerError &&
+                      (props.concatenatedResidentialAddress[index]
+                        .officersFullAddress === null ||
+                        props.concatenatedResidentialAddress[index]
+                          .officersFullAddress === "") ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </PfField>
+                  </div>
+                </section>
+              );
+            })}
         </div>
-        <span
-          style={{ display: "flex", justifyContent: "center" }}
-          className="validation"
-        >
-          {props.errorMessage}
-        </span>
-        <span
-          id="EmailError"
-          style={{ display: "flex", justifyContent: "center" }}
-          className="validation"
-        >
-          {props.emailError}
-        </span>
+        <AddressModal
+          title={props.addressPopUpTitle}
+          setAddressUpdatedDatetime={props.setAddressUpdatedDatetime}
+          fullAddress={props.fullAddress}
+          setFullAddress={props.setFullAddress}
+          openAddressPopUp={openAddressPopUp}
+          modelRequestData={modelRequestData}
+          address={props.address}
+          setAddress={props.setAddress}
+          handleAddressPopUpClose={handleAddressPopUpClose}
+          setOpenAddressPopUp={setOpenAddressPopUp}
+        />
       </div>
-      <div class="separator"></div>
-      <div class="row fieldset">
-        <div class="col-lg-12 hstack gap-2 justify-content-end text-right mt-3">
+      <span className="validation pf-form-error">{props.errorMessage}</span>
+      <span id="EmailError" className="validation pf-form-error">
+        {props.emailError}
+      </span>
+
+      <div className="pf-footer">
+        <button className="pf-btn pf-btn--ghost" onClick={props.handleCancel}>
+          <i className="ri-close-line" aria-hidden="true"></i>
+          <span>{props.getCrudButtonTextName("Cancel")}</span>
+        </button>
+        <div className="pf-footer__end">
           {props.originalBusinessTypeID === CLIENT_TYPES.Partnership && (
             <button
-              className="btn btn-md btn-primary create-item-btn"
+              className="pf-btn pf-btn--soft"
               onClick={() => {
                 props.setOfficersError(false);
                 props.addOfficer();
               }}
             >
-              <i class="bi bi-plus-circle "></i>
-              <span style={{ paddingLeft: "5px" }}>Add Partner</span>
+              <i className="ri-add-circle-line" aria-hidden="true"></i>
+              <span>Add Partner</span>
             </button>
           )}
           {props.originalBusinessTypeID === CLIENT_TYPES.LLP && (
-            <button
-              className="btn btn-md btn-primary create-item-btn"
-              onClick={props.addOfficer}
-            >
-              <i class="bi bi-plus-circle "></i>
-              <span style={{ paddingLeft: "5px" }}>Add Officer</span>
+            <button className="pf-btn pf-btn--soft" onClick={props.addOfficer}>
+              <i className="ri-add-circle-line" aria-hidden="true"></i>
+              <span>Add Officer</span>
             </button>
           )}
           {props.originalBusinessTypeID === CLIENT_TYPES.Company && (
-            <button
-              className="btn btn-md btn-primary create-item-btn"
-              onClick={props.addOfficer}
-            >
-              <i class="bi bi-plus-circle "></i>
-              <span style={{ paddingLeft: "5px" }}>Add Officer</span>
+            <button className="pf-btn pf-btn--soft" onClick={props.addOfficer}>
+              <i className="ri-add-circle-line" aria-hidden="true"></i>
+              <span>Add Officer</span>
             </button>
           )}
-          <button class="btn btn-md  btn-light" onClick={props.handleCancel}>
-            <span>{props.getCrudButtonTextName("Cancel")}</span>
-          </button>
           <button
             onClick={() => props.handleBackBtnChange(1)}
-            style={{ paddingTop: "5px", marginRight: "4px" }}
-            class="btn btn-md btn-primary create-item-btn"
+            className="pf-btn pf-btn--outline"
           >
+            <i className="ri-arrow-left-line" aria-hidden="true"></i>
             <span>Back</span>
           </button>
           <button
-            class="btn btn-md btn-primary create-item-btn"
+            className="pf-btn pf-btn--primary"
             onClick={() => props.handleTabChange(3)}
           >
             <span>
@@ -2694,7 +2141,7 @@ const OfficerDetails = (props) => {
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -4056,96 +3503,111 @@ const Add_Update_prospect = () => {
       }
     }
   };
+  // Same step states as the proposal wizard: current, completed, locked.
+  const getStepClass = (tabId, isValid) =>
+    `step tab-field-center w-90 ${
+      activeTab === tabId
+        ? "is-active"
+        : isValid
+          ? "is-complete"
+          : "disabled cursor-not-allowed"
+    }`;
+
   return (
-    <div className="container-fluid">
+    <div className="container-fluid prospect-form">
       <div class="new-item-page-nav"></div>
       <div className="new-item-page-content">
         <div className="row form-row">
           <div className="col-lg-12">
-            <h3 class="modal-title">
-              <BackButtonSvg onClick={handleCancel} />
-              {modelAction === "Add"
-                ? getCrudPopUpTitleName("Add", prospectName)
-                : getCrudPopUpTitleName("Update", prospectName)}
-              {modelAction !== "Add" ? `:` : ""}{" "}
-              {isMobile ? (
-                saveLocationState?.clientName?.length > 10 ? (
-                  `${saveLocationState?.clientName?.substring(0, 10)}...`
+            <div className="pf-header">
+              <h3 class="modal-title">
+                <BackButtonSvg onClick={handleCancel} />
+                {modelAction === "Add"
+                  ? getCrudPopUpTitleName("Add", prospectName)
+                  : getCrudPopUpTitleName("Update", prospectName)}
+                {modelAction !== "Add" ? `:` : ""}{" "}
+                {isMobile ? (
+                  saveLocationState?.clientName?.length > 10 ? (
+                    `${saveLocationState?.clientName?.substring(0, 10)}...`
+                  ) : (
+                    saveLocationState?.clientName
+                  )
+                ) : saveLocationState?.clientName?.length > 35 ? (
+                  <Tooltip title={saveLocationState?.clientName}>
+                    {" "}
+                    {saveLocationState?.clientName?.substring(0, 35)}...
+                  </Tooltip>
                 ) : (
                   saveLocationState?.clientName
-                )
-              ) : saveLocationState?.clientName?.length > 35 ? (
-                <Tooltip title={saveLocationState?.clientName}>
-                  {" "}
-                  {saveLocationState?.clientName?.substring(0, 35)}...
-                </Tooltip>
-              ) : (
-                saveLocationState?.clientName
-              )}
-            </h3>
-            <div
-              className="steps overflow-auto"
-              style={{ pointerEvents: "all" }}
-            >
-              <ul className="steps-list">
-                <li>
-                  <div
-                    onClick={() =>
-                      handleChangeTab(1, "Prospect_BasicInformation_Tab")
-                    }
-                    id="Prospect_BasicInformation_Tab"
-                    className={`${
-                      activeTab === CREATE_PRACTICE_DETAILS.BasicInformation
-                        ? "step tab-field-center"
-                        : isValidForm === true
-                          ? "step tab-field-center"
-                          : "step disabled cursor-not-allowed tab-field-center"
-                    } w-90`}
-                  >
-                    <span className="stepCount">1</span>
-                    <span className="stepTitle">Basic Information</span>
-                    {activeTab === CREATE_PRACTICE_DETAILS.BasicInformation &&
-                      (requireErrorMessage || officerError) && (
-                        <span className="validation">
-                          <InvalidFormIcon />
-                        </span>
+                )}
+              </h3>
+              <div
+                className="steps pf-header__steps"
+                style={{ pointerEvents: "all" }}
+              >
+                <ul className="steps-list">
+                  <li>
+                    <div
+                      onClick={() =>
+                        handleChangeTab(1, "Prospect_BasicInformation_Tab")
+                      }
+                      id="Prospect_BasicInformation_Tab"
+                      className={getStepClass(
+                        CREATE_PRACTICE_DETAILS.BasicInformation,
+                        isValidForm === true,
                       )}
-                  </div>
-                </li>
-                {basicInfo.originalBusinessTypeID !== "" &&
-                  basicInfo.originalBusinessTypeID !==
-                    CLIENT_TYPES.Individual && (
-                    <li>
-                      <div
-                        onClick={() =>
-                          handleChangeTab(2, "Prospect_OfficerDetails_Tab")
-                        }
-                        id="Prospect_OfficerDetails_Tab"
-                        class={`${
-                          activeTab === CREATE_PRACTICE_DETAILS.OfficerDetails
-                            ? "step tab-field-center"
-                            : isValidForm === true
-                              ? "step tab-field-center"
-                              : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
-                      >
-                        <span className="stepCount">2</span>
-                        <span className="stepTitle">
-                          {[4, 5]?.includes(basicInfo.originalBusinessTypeID)
-                            ? "Officer Details"
-                            : `${basicInfo.businessTypeName} Details`}
-                        </span>
-
-                        {activeTab === CREATE_PRACTICE_DETAILS.OfficerDetails &&
-                          officerError && (
-                            <span className="validation">
-                              <InvalidFormIcon />
-                            </span>
+                    >
+                      <span className="stepCount">1</span>
+                      <span className="stepTitle">Basic Information</span>
+                      {activeTab === CREATE_PRACTICE_DETAILS.BasicInformation &&
+                        (requireErrorMessage || officerError) && (
+                          <span className="validation">
+                            <InvalidFormIcon />
+                          </span>
+                        )}
+                    </div>
+                  </li>
+                  {basicInfo.originalBusinessTypeID !== "" &&
+                    basicInfo.originalBusinessTypeID !==
+                      CLIENT_TYPES.Individual && (
+                      <li>
+                        <div
+                          onClick={() =>
+                            handleChangeTab(2, "Prospect_OfficerDetails_Tab")
+                          }
+                          id="Prospect_OfficerDetails_Tab"
+                          className={getStepClass(
+                            CREATE_PRACTICE_DETAILS.OfficerDetails,
+                            isValidForm === true,
                           )}
-                      </div>
-                    </li>
-                  )}
-              </ul>
+                        >
+                          <span className="stepCount">2</span>
+                          <span className="stepTitle">
+                            {[4, 5]?.includes(basicInfo.originalBusinessTypeID)
+                              ? "Officer Details"
+                              : `${basicInfo.businessTypeName} Details`}
+                          </span>
+
+                          {activeTab ===
+                            CREATE_PRACTICE_DETAILS.OfficerDetails &&
+                            officerError && (
+                              <span className="validation">
+                                <InvalidFormIcon />
+                              </span>
+                            )}
+                        </div>
+                      </li>
+                    )}
+                </ul>
+              </div>
+              <button
+                type="button"
+                className="pf-close"
+                onClick={handleCancel}
+                aria-label="Close"
+              >
+                <i className="ri-close-line" aria-hidden="true"></i>
+              </button>
             </div>
             {activeTab === CREATE_PRACTICE_DETAILS.BasicInformation && (
               <Basic_information
@@ -4217,6 +3679,7 @@ const Add_Update_prospect = () => {
                 AuthorityCount={AuthorityCount}
                 emailError={emailError}
                 businessTypeID={basicInfo.businessTypeID}
+                businessTypeName={basicInfo.businessTypeName}
                 originalBusinessTypeID={basicInfo.originalBusinessTypeID}
                 addressPopUpTitle={addressPopUpTitle}
                 setOfficersError={setOfficersError}

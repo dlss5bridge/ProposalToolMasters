@@ -1,0 +1,905 @@
+/* =========================================================
+   ADD / UPDATE PROSPECT
+   Visual layer only. All handlers, validation and element IDs
+   used for scroll-to-error remain in the JSX unchanged.
+   ========================================================= */
+
+.prospect-form {
+  --pf-accent: #0fb5d4;
+  --pf-accent-hover: #0aa2bf;
+  --pf-accent-soft: #e6f7fb;
+  --pf-accent-text: #0b7f95;
+  --pf-text: #0f172a;
+  --pf-label: #1f2a3a;
+  --pf-muted: #64748b;
+  --pf-border: #d7dee8;
+  --pf-border-strong: #c3ccd9;
+  --pf-soft: #eef3fb;
+  --pf-divider: #9adbe8;
+  --pf-danger: #d93b4a;
+
+  min-height: 100%;
+  padding: 20px 28px 40px !important;
+  background: #f6f8fb;
+  color: var(--pf-text);
+}
+
+.prospect-form .new-item-page-nav {
+  display: none;
+}
+
+.prospect-form .form-row {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.prospect-form .form-row > .col-lg-12 {
+  padding: 0 !important;
+}
+
+/* ---------------------------------------------------------
+   Header: back, title | stepper | close (matches the proposal wizard)
+   --------------------------------------------------------- */
+
+.prospect-form .pf-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 24px;
+  row-gap: 14px;
+  margin-bottom: 20px;
+  padding: 4px 0 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.prospect-form .pf-header .modal-title {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+  color: var(--pf-text);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.prospect-form .pf-close {
+  grid-column: 3;
+  grid-row: 1;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.prospect-form .pf-close:hover {
+  background: #e7edf5;
+  color: var(--pf-text);
+}
+
+/* Package.css (legacy stepper) sets borders, li padding and ::after
+   dividers with !important; everything below resets those. */
+.prospect-form .pf-header .steps.pf-header__steps {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 4px 2px !important;
+  border: 0 !important;
+  overflow: visible;
+}
+
+.prospect-form .pf-header__steps .steps-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prospect-form .steps .steps-list > li {
+  display: flex;
+  align-items: center;
+  flex: none !important;
+  position: static !important;
+  padding: 0 !important;
+}
+
+.prospect-form .steps .steps-list > li:not(:last-child)::after {
+  content: none !important;
+  display: none !important;
+}
+
+.prospect-form .steps .steps-list > li + li::before {
+  content: "";
+  width: 32px;
+  height: 1px;
+  margin: 0 10px;
+  background: #e2e8f0;
+}
+
+.prospect-form .steps .steps-list > li .step {
+  width: auto !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #334155;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.prospect-form .steps .steps-list .stepCount {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  display: inline-grid !important;
+  place-items: center;
+  margin: 0 !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 50%;
+  background: #fff;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1 !important;
+}
+
+.prospect-form .steps .steps-list .stepTitle {
+  color: #334155;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.prospect-form .steps .steps-list > li .step.is-active .stepCount {
+  border-color: var(--pf-accent) !important;
+  background: var(--pf-accent);
+  color: #fff;
+}
+
+.prospect-form .steps .steps-list > li .step.is-active .stepTitle {
+  color: var(--pf-accent);
+  font-weight: 600;
+}
+
+.prospect-form .steps .steps-list > li .step.is-complete .stepCount {
+  border-color: #3fcf9f !important;
+  background: #3fcf9f;
+  color: #fff;
+}
+
+.prospect-form .steps .steps-list > li .step.disabled,
+.prospect-form .steps .steps-list > li .step.disabled:not(:hover) {
+  color: #334155;
+  font-weight: 400;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.prospect-form .steps .steps-list > li .step.disabled:not(:hover) .stepCount {
+  border-color: #cbd5e1 !important;
+}
+
+.prospect-form .steps .steps-list .validation {
+  display: inline-flex;
+  margin: 0;
+}
+
+/* Same breakpoint as the proposal wizard: below 1600px the stepper gets its
+   own centred row under the title. */
+@media (max-width: 1599px) {
+  .prospect-form .pf-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .prospect-form .pf-close {
+    grid-column: 2;
+  }
+
+  .prospect-form .pf-header .steps.pf-header__steps {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+/* ---------------------------------------------------------
+   Card + layout
+   --------------------------------------------------------- */
+
+.prospect-form .pf-card {
+  padding: 24px 24px 20px;
+  border: 1px solid #e3e8ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.prospect-form .pf-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.prospect-form .pf-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.prospect-form .pf-field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prospect-form .pf-field--full {
+  grid-column: 1 / -1;
+}
+
+.prospect-form .pf-label {
+  margin: 0;
+  color: var(--pf-label);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.prospect-form .pf-req {
+  margin-left: 3px;
+  color: #e5484d;
+}
+
+.prospect-form .pf-help {
+  margin: -2px 0 4px;
+  color: var(--pf-muted);
+  font-size: 13px;
+}
+
+.prospect-form .pf-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.prospect-form .pf-section-title {
+  margin: 0;
+  color: #1e293b;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.prospect-form .pf-section-note {
+  color: var(--pf-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.prospect-form .validation {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.prospect-form .pf-form-error {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.prospect-form .pf-form-error:empty {
+  display: none;
+}
+
+/* ---------------------------------------------------------
+   Prospect type segmented control
+   --------------------------------------------------------- */
+
+.prospect-form .pf-type-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--pf-soft);
+}
+
+.prospect-form .pf-type-tab {
+  min-height: 38px;
+  flex: 1 1 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.prospect-form .pf-type-tab i {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.prospect-form .pf-type-tab:hover {
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--pf-text);
+}
+
+.prospect-form .pf-type-tab.is-active {
+  background: var(--pf-accent);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(15, 181, 212, 0.3);
+}
+
+.prospect-form .pf-type-tab:focus-visible {
+  outline: 2px solid var(--pf-accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------
+   Inputs
+   --------------------------------------------------------- */
+
+.prospect-form .pf-field .input-text {
+  width: 100% !important;
+  height: 42px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 1px solid var(--pf-border) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  color: var(--pf-text) !important;
+  font-size: 14px !important;
+  outline: none !important;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.prospect-form .pf-field .input-text::placeholder {
+  color: #94a3b8;
+}
+
+.prospect-form .pf-field .input-text:hover:not(:disabled) {
+  border-color: var(--pf-border-strong) !important;
+}
+
+.prospect-form .pf-field .input-text:focus {
+  border-color: var(--pf-accent) !important;
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14) !important;
+}
+
+.prospect-form .pf-field .input-text:disabled {
+  background: #f5f7fa !important;
+  color: #475569 !important;
+  cursor: not-allowed;
+}
+
+.prospect-form .pf-input-icon {
+  position: relative;
+}
+
+.prospect-form .pf-input-icon > i {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  z-index: 1;
+  color: #64748b;
+  font-size: 17px;
+  line-height: 1;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.prospect-form .pf-input-icon > .input-text {
+  padding-left: 40px !important;
+}
+
+/* react-select (classNamePrefix="pf-select") */
+.prospect-form .pf-field .user-role-select,
+.prospect-form .pf-field .CurrencySelect {
+  width: 100%;
+}
+
+.prospect-form .pf-select__control {
+  min-height: 42px !important;
+  border: 1px solid var(--pf-border) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.prospect-form .pf-select__control:hover {
+  border-color: var(--pf-border-strong) !important;
+}
+
+.prospect-form .pf-select__control--is-focused {
+  border-color: var(--pf-accent) !important;
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14) !important;
+}
+
+.prospect-form .pf-select__value-container {
+  padding: 0 12px !important;
+}
+
+.prospect-form .pf-select__placeholder {
+  color: #94a3b8;
+}
+
+.prospect-form .pf-select__single-value {
+  color: var(--pf-text);
+  font-size: 14px;
+}
+
+.prospect-form .pf-select__indicator-separator {
+  display: none;
+}
+
+/* Phone: country code + number share one field */
+.prospect-form .pf-field .phone-input-div {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--pf-border);
+  border-radius: 8px;
+  background: #fff;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.prospect-form .pf-field .phone-input-div:focus-within {
+  border-color: var(--pf-accent);
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14);
+}
+
+.prospect-form .pf-field .phone-input-div > .createCompanyInfo {
+  flex: 0 0 104px;
+  width: 104px !important;
+}
+
+.prospect-form .pf-field .phone-input-div .pf-select__control {
+  height: 40px;
+  min-height: 40px !important;
+  border: 0 !important;
+  border-right: 1px solid var(--pf-border) !important;
+  border-radius: 8px 0 0 8px !important;
+  background: #f4f7fb !important;
+  box-shadow: none !important;
+}
+
+.prospect-form .pf-field .phone-input-div .pf-select__value-container {
+  padding: 0 4px 0 10px !important;
+}
+
+.prospect-form .pf-field .phone-input-div .pf-select__dropdown-indicator {
+  padding: 0 6px;
+}
+
+.prospect-form .pf-field .phone-input-div .phone-input-number-div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.prospect-form .pf-field .phone-input-div .phone-input-number-div .input-text {
+  height: 40px !important;
+  border: 0 !important;
+  border-radius: 0 8px 8px 0 !important;
+  box-shadow: none !important;
+}
+
+/* react-date-picker */
+.prospect-form .pf-field .react-date-picker {
+  width: 100%;
+}
+
+.prospect-form .pf-field .react-date-picker__wrapper {
+  height: 42px;
+  padding: 0 8px 0 14px;
+  border: 1px solid var(--pf-border) !important;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.prospect-form .pf-field .react-date-picker__inputGroup,
+.prospect-form .pf-field .react-date-picker__inputGroup__input,
+.prospect-form .pf-field .react-date-picker__inputGroup__divider {
+  color: var(--pf-text);
+  font-size: 14px;
+}
+
+.prospect-form .pf-field .react-date-picker--disabled .react-date-picker__wrapper {
+  background: #f5f7fa;
+}
+
+.prospect-form .pf-field .react-date-picker--open .react-date-picker__wrapper,
+.prospect-form .pf-field .react-date-picker__wrapper:focus-within {
+  border-color: var(--pf-accent) !important;
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14);
+}
+
+/* ---------------------------------------------------------
+   Companies House search + summary
+   --------------------------------------------------------- */
+
+.prospect-form .pf-search-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.prospect-form .pf-search-row > .pf-btn {
+  min-height: 42px;
+}
+
+.prospect-form .pf-search-box {
+  position: relative;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.prospect-form .pf-search-box .pf-input-icon > i {
+  color: var(--pf-accent);
+}
+
+.prospect-form .pf-search-box .autocomplete-input-div {
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 280px;
+  margin: 6px 0 0;
+  padding: 4px;
+  overflow-y: auto;
+  z-index: 20;
+  border: 1px solid var(--pf-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.prospect-form .pf-search-box .searchList li {
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: #334155;
+  font-size: 13px;
+}
+
+.prospect-form .pf-search-box .searchList li::before {
+  content: none;
+}
+
+.prospect-form .pf-search-box .searchList li:hover {
+  background: var(--pf-accent-soft) !important;
+  color: var(--pf-text);
+}
+
+.prospect-form .pf-company-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--pf-border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.prospect-form .pf-company-summary__name {
+  color: var(--pf-text);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.prospect-form .pf-company-summary__meta {
+  margin-left: auto;
+  color: var(--pf-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.prospect-form .pf-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #475569;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.prospect-form .pf-status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.prospect-form .pf-status-badge.is-active {
+  background: #e3f5fb;
+  color: #0b87a3;
+}
+
+/* Trading details panel */
+.prospect-form .pf-subpanel {
+  padding: 16px;
+  border: 1px solid #e3ebf6;
+  border-radius: 12px;
+  background: #f3f7fd;
+}
+
+.prospect-form .pf-subpanel__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.prospect-form .pf-subpanel__head > i {
+  margin-top: 1px;
+  color: var(--pf-accent);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.prospect-form .pf-subpanel__title {
+  margin: 0;
+  color: var(--pf-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.prospect-form .pf-subpanel__desc {
+  margin: 2px 0 0;
+  color: var(--pf-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ---------------------------------------------------------
+   Officers / partners
+   --------------------------------------------------------- */
+
+.prospect-form .pf-person + .pf-person {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--pf-divider);
+}
+
+.prospect-form .pf-person__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.prospect-form .pf-person__head .pf-section-title {
+  margin: 0;
+}
+
+.prospect-form .pf-person__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.prospect-form .pf-link-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--pf-danger);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.prospect-form .pf-link-danger:hover {
+  background: #fdecee;
+}
+
+.prospect-form .pf-signatory {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.prospect-form .pf-signatory .MuiSwitch-switchBase.Mui-checked {
+  color: #fff;
+}
+
+.prospect-form .pf-signatory .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+  background-color: var(--pf-accent) !important;
+  opacity: 1;
+}
+
+.prospect-form .pf-person__error {
+  margin: -6px 0 12px;
+  text-align: right;
+}
+
+/* ---------------------------------------------------------
+   Footer buttons
+   --------------------------------------------------------- */
+
+/* Pinned to the bottom of the viewport like the proposal wizard's footer; the
+   negative margins stretch it across the card's padding. */
+.prospect-form .pf-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px -24px -20px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--pf-divider);
+  border-radius: 0 0 14px 14px;
+  background: #fff;
+}
+
+.prospect-form .pf-footer__end {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.prospect-form .pf-btn {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.prospect-form .pf-btn i {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.prospect-form .pf-btn--primary {
+  background: var(--pf-accent);
+  box-shadow: 0 4px 12px rgba(15, 181, 212, 0.25);
+  color: #fff;
+}
+
+.prospect-form .pf-btn--primary:hover {
+  background: var(--pf-accent-hover);
+  color: #fff;
+}
+
+.prospect-form .pf-btn--primary.is-active {
+  background: var(--pf-accent-hover);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.prospect-form .pf-btn--soft {
+  border-color: rgba(15, 181, 212, 0.4);
+  background: var(--pf-accent-soft);
+  color: var(--pf-accent-text);
+}
+
+.prospect-form .pf-btn--soft:hover {
+  background: #d4f1f8;
+}
+
+.prospect-form .pf-btn--ghost {
+  background: #eaf1fb;
+  color: #334155;
+}
+
+.prospect-form .pf-btn--ghost:hover {
+  background: #dde7f5;
+  color: var(--pf-text);
+}
+
+.prospect-form .pf-btn--outline {
+  border-color: var(--pf-border);
+  background: #fff;
+  color: #334155;
+}
+
+.prospect-form .pf-btn--outline:hover {
+  border-color: var(--pf-border-strong);
+  background: #f8fafc;
+}
+
+/* ---------------------------------------------------------
+   Responsive
+   --------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  .prospect-form {
+    padding: 16px 12px 32px !important;
+  }
+
+  .prospect-form .pf-card {
+    padding: 18px 14px;
+  }
+
+  .prospect-form .pf-footer {
+    margin: 24px -14px -18px;
+    padding: 14px;
+  }
+
+  .prospect-form .pf-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prospect-form .pf-search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .prospect-form .pf-footer__end {
+    width: 100%;
+  }
+
+  .prospect-form .pf-footer__end .pf-btn {
+    flex: 1 1 auto;
+  }
+}
