@@ -5794,23 +5794,15 @@ const ReviewServicesComponent = (props) => {
                   props?.serviceDescriptionObj?.mainHeading !== undefined &&
                   props?.serviceDescriptionObj?.mainHeading !== "" && (
                     <>
-                      <div className="separator mb-2"></div>
-                      <h6
-                        style={{
-                          fontSize: `${props?.serviceDescriptionObj?.mainHeadingFontSize}px`,
-                          fontWeight: props?.serviceDescriptionObj
-                            ?.mainHeadingIsBold
-                            ? "bold"
-                            : "normal",
-                          fontStyle: props?.serviceDescriptionObj
-                            ?.mainHeadingIsItalic
-                            ? "italic"
-                            : undefined,
-                        }}
-                      >
-                        {props?.serviceDescriptionObj?.mainHeading}
-                      </h6>
-                      <div className="separator mb-3"></div>
+                      <div className="sofsd-head">
+                        <span className="sofsd-head__icon">
+                          <i className="ri-file-list-3-line" aria-hidden="true"></i>
+                        </span>
+                        <div>
+                          <h6 className="sofsd-head__title">{props?.serviceDescriptionObj?.mainHeading}</h6>
+                          <p className="sofsd-head__desc">Overview of deliverables and scope of services included</p>
+                        </div>
+                      </div>
                     </>
                   )}
                 <Text_Editor
@@ -5827,23 +5819,15 @@ const ReviewServicesComponent = (props) => {
                   props?.statementOfFactsObj?.mainHeading !== undefined &&
                   props?.statementOfFactsObj?.mainHeading !== "" && (
                     <>
-                      <div className="separator mb-2"></div>
-                      <h6
-                        style={{
-                          fontSize: `${props?.statementOfFactsObj?.mainHeadingFontSize}px`,
-                          fontWeight: props?.statementOfFactsObj
-                            ?.mainHeadingIsBold
-                            ? "bold"
-                            : "normal",
-                          fontStyle: props?.statementOfFactsObj
-                            ?.mainHeadingIsItalic
-                            ? "italic"
-                            : undefined,
-                        }}
-                      >
-                        {props?.statementOfFactsObj?.mainHeading}
-                      </h6>
-                      <div className="separator mb-3"></div>
+                      <div className="sofsd-head">
+                        <span className="sofsd-head__icon">
+                          <i className="ri-list-check-2" aria-hidden="true"></i>
+                        </span>
+                        <div>
+                          <h6 className="sofsd-head__title">{props?.statementOfFactsObj?.mainHeading}</h6>
+                          <p className="sofsd-head__desc">Key assumptions, scope boundaries and agreed operational parameters</p>
+                        </div>
+                      </div>
                     </>
                   )}
                 <Text_Editor
@@ -16088,23 +16072,15 @@ const ReviewPackagesComponent = (props) => {
                   props?.serviceDescriptionObj?.mainHeading !== undefined &&
                   props?.serviceDescriptionObj?.mainHeading !== "" && (
                     <>
-                      <div className="separator mb-2"></div>
-                      <h6
-                        style={{
-                          fontSize: `${props?.serviceDescriptionObj?.mainHeadingFontSize}px`,
-                          fontWeight: props?.serviceDescriptionObj
-                            ?.mainHeadingIsBold
-                            ? "bold"
-                            : "normal",
-                          fontStyle: props?.serviceDescriptionObj
-                            ?.mainHeadingIsItalic
-                            ? "italic"
-                            : undefined,
-                        }}
-                      >
-                        {props?.serviceDescriptionObj?.mainHeading}
-                      </h6>
-                      <div className="separator mb-3"></div>
+                      <div className="sofsd-head">
+                        <span className="sofsd-head__icon">
+                          <i className="ri-file-list-3-line" aria-hidden="true"></i>
+                        </span>
+                        <div>
+                          <h6 className="sofsd-head__title">{props?.serviceDescriptionObj?.mainHeading}</h6>
+                          <p className="sofsd-head__desc">Overview of deliverables and scope of services included</p>
+                        </div>
+                      </div>
                     </>
                   )}
                 <Text_Editor
@@ -16121,23 +16097,15 @@ const ReviewPackagesComponent = (props) => {
                   props?.statementOfFactsObj?.mainHeading !== undefined &&
                   props?.statementOfFactsObj?.mainHeading !== "" && (
                     <>
-                      <div className="separator mb-2"></div>
-                      <h6
-                        style={{
-                          fontSize: `${props?.statementOfFactsObj?.mainHeadingFontSize}px`,
-                          fontWeight: props?.statementOfFactsObj
-                            ?.mainHeadingIsBold
-                            ? "bold"
-                            : "normal",
-                          fontStyle: props?.statementOfFactsObj
-                            ?.mainHeadingIsItalic
-                            ? "italic"
-                            : undefined,
-                        }}
-                      >
-                        {props?.statementOfFactsObj?.mainHeading}
-                      </h6>
-                      <div className="separator mb-3"></div>
+                      <div className="sofsd-head">
+                        <span className="sofsd-head__icon">
+                          <i className="ri-list-check-2" aria-hidden="true"></i>
+                        </span>
+                        <div>
+                          <h6 className="sofsd-head__title">{props?.statementOfFactsObj?.mainHeading}</h6>
+                          <p className="sofsd-head__desc">Key assumptions, scope boundaries and agreed operational parameters</p>
+                        </div>
+                      </div>
                     </>
                   )}
                 <Text_Editor
