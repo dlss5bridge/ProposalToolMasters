@@ -620,3 +620,83 @@
     align-items: flex-start;
   }
 }
+
+/* =========================================================
+   PAYMENT GATEWAY MODAL (+ Payment Gateway on Proposal / EL)
+   Reuses the gateway-* cards above inside a Bootstrap modal.
+   ========================================================= */
+
+.pg-modal {
+  overflow: hidden;
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.pg-modal__header {
+  padding: 18px 22px !important;
+  border-bottom: 1px solid #e8edf3;
+  background: #fff;
+}
+
+.pg-modal__heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pg-modal__heading-icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #e6f8fb;
+  color: #14b5d1;
+  font-size: 19px;
+}
+
+.pg-modal__header .modal-title {
+  margin: 0;
+  color: #122138;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.pg-modal__subtitle {
+  margin: 2px 0 0;
+  color: #798393;
+  font-size: 12.5px;
+}
+
+.pg-modal__body.payment-gateway-redesign {
+  min-height: 0;
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+  padding: 20px 22px 22px;
+  background: #f7f9fc;
+}
+
+.pg-modal__body .payment-gateway-top-grid {
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+.pg-modal__body .gateway-card {
+  margin: 0;
+}
+
+/* proposal-ui.css sizes every checkbox at 16x16; MUI switches rely on
+   their hidden input covering the whole switch to receive clicks */
+.pg-modal .MuiSwitch-input {
+  width: 300% !important;
+  height: 100% !important;
+}
+
+@media (max-width: 991px) {
+  .pg-modal__body .payment-gateway-top-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
