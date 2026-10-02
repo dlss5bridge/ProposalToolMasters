@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Utils from "../../../../Middleware/Utils";
 import "../../email_template/EmailTemplate.css";
+import "./AddReminderTemplate-redesign.css";
 import { Row, Col } from "reactstrap";
 import Select from "react-select";
 import { AuthContextProvider } from "../../../../AuthContext/AuthContext";
@@ -522,7 +523,7 @@ function AddUpdateReminderTemplate(props) {
     }
   };
   return (
-    <div className="container-fluid new-item-page-container">
+    <div className="container-fluid new-item-page-container rt-form">
       <div class="new-item-page-nav"></div>
       <div class="new-item-page-content">
         <div class="row form-row">
@@ -586,6 +587,19 @@ function AddUpdateReminderTemplate(props) {
                       )}
                   </div> */}
                 </>
+                <div className="rt-card">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-mail-settings-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Template Details</h4>
+                    <p className="rt-card__desc">
+                      Name, type and subject line of this workflow email.
+                    </p>
+                  </div>
+                </div>
+                <div className="rt-fields">
                 <div className="row" id="TemplateNameDiv">
                   <div className="col-lg-2 mb-1 template-label text-left">
                     <label className="form-label">
@@ -748,9 +762,21 @@ function AddUpdateReminderTemplate(props) {
                     )}
                   </div>
                 </div>
-                <div>
-                  <h6 className="mt-2">Template Content</h6>
-                  <div className="separator mb-3" />
+                </div>
+                </div>
+                <div className="rt-card rt-content">
+                  <div className="rt-card__head">
+                    <span className="rt-card__icon">
+                      <i className="ri-file-text-line"></i>
+                    </span>
+                    <div>
+                      <h4 className="rt-card__title">Template Content</h4>
+                      <p className="rt-card__desc">
+                        Click a variable to copy it, then paste it into the
+                        email body below.
+                      </p>
+                    </div>
+                  </div>
                   <div className="fieldset-group helper-variables-div">
                     <label className="fieldset-group-label">Variables</label>
                     <ReminderVariables
@@ -797,8 +823,7 @@ function AddUpdateReminderTemplate(props) {
               </label>
             </div>
 
-            <hr />
-            <Row className="modal-footer">
+            <Row className="modal-footer rt-footer">
               <Col
                 style={{ paddingTop: "14px" }}
                 className="hstack gap-2 justify-content-end"
