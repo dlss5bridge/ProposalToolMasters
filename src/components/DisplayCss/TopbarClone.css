@@ -79,7 +79,7 @@
   > .pt-4.me-2
   > div:nth-child(2) {
   width: auto !important;
-  margin-left: auto;
+  margin-left: 60px;
 }
 
 .topbar-clone
@@ -563,7 +563,10 @@
 }
 
 .topbar-clone .changed-nav > .nav-item > .nav-link.menu-link:hover,
-.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link[aria-expanded="true"] {
+.topbar-clone
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link[aria-expanded="true"] {
   color: #ffffff !important;
 }
 
@@ -581,7 +584,10 @@
 }
 
 /* Current page (top level) */
-.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link[aria-current="page"],
+.topbar-clone
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link[aria-current="page"],
 .topbar-clone .changed-nav > .nav-item > .nav-link.menu-link.sidebar-current {
   background: var(--sb-accent-soft) !important;
   color: #ffffff !important;
@@ -629,7 +635,10 @@
 }
 
 /* Group that contains the current page */
-.topbar-clone .changed-nav > .nav-item > .nav-link.menu-link.sidebar-current-parent {
+.topbar-clone
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link.sidebar-current-parent {
   color: #ffffff !important;
   font-weight: 600 !important;
 }
@@ -653,7 +662,11 @@
   .changed-nav
   > .nav-item
   > .nav-link.menu-link[aria-current="page"],
-.topbar-clone #scrollbar .changed-nav > .nav-item > .nav-link.menu-link.sidebar-current,
+.topbar-clone
+  #scrollbar
+  .changed-nav
+  > .nav-item
+  > .nav-link.menu-link.sidebar-current,
 .topbar-clone
   #scrollbar
   .changed-nav
@@ -678,10 +691,30 @@
 }
 
 .topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a:hover,
-.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a[aria-expanded="true"],
-.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a.sidebar-current-parent,
-.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a.sidebar-current,
-.topbar-clone #scrollbar .changed-nav .menu-dropdown .nav-item > a[aria-current="page"] {
+.topbar-clone
+  #scrollbar
+  .changed-nav
+  .menu-dropdown
+  .nav-item
+  > a[aria-expanded="true"],
+.topbar-clone
+  #scrollbar
+  .changed-nav
+  .menu-dropdown
+  .nav-item
+  > a.sidebar-current-parent,
+.topbar-clone
+  #scrollbar
+  .changed-nav
+  .menu-dropdown
+  .nav-item
+  > a.sidebar-current,
+.topbar-clone
+  #scrollbar
+  .changed-nav
+  .menu-dropdown
+  .nav-item
+  > a[aria-current="page"] {
   color: #ffffff !important;
 }
 
@@ -871,7 +904,11 @@
 }
 
 .topbar-clone .changed-nav .menu-dropdown .nav-item > a.sidebar-current::before,
-.topbar-clone .changed-nav .menu-dropdown .nav-item > a[aria-current="page"]::before {
+.topbar-clone
+  .changed-nav
+  .menu-dropdown
+  .nav-item
+  > a[aria-current="page"]::before {
   content: "" !important;
   position: absolute;
   top: 8px;
@@ -961,7 +998,8 @@
 }
 
 .topbar-clone #page-header-user-dropdown.figma-profile-button:hover,
-.topbar-clone #page-header-user-dropdown.figma-profile-button[aria-expanded="true"] {
+.topbar-clone
+  #page-header-user-dropdown.figma-profile-button[aria-expanded="true"] {
   background: var(--sb-hover);
 }
 
@@ -1029,7 +1067,9 @@
   transition: transform 0.15s ease;
 }
 
-.topbar-clone .figma-profile-button[aria-expanded="true"] .figma-profile-chevron {
+.topbar-clone
+  .figma-profile-button[aria-expanded="true"]
+  .figma-profile-chevron {
   transform: rotate(180deg);
 }
 
@@ -1054,7 +1094,8 @@
     color 0.15s ease;
 }
 
-.topbar-clone #page-header-notifications-dropdown.figma-footer-notification:hover {
+.topbar-clone
+  #page-header-notifications-dropdown.figma-footer-notification:hover {
   background: var(--sb-hover) !important;
   color: #ffffff;
 }
@@ -1075,7 +1116,6 @@
   border-radius: 50%;
   background: #ff5b67;
 }
-
 
 /* Existing collapse functionality retained */
 .topbar-clone.collapsed .app-menu {
@@ -1222,7 +1262,6 @@
     display: none !important;
   }
 }
-
 
 /* =========================================================
    PROFILE DROPDOWN
@@ -2266,7 +2305,6 @@
   }
 }
 
-
 /* =========================================================
    SIDEBAR UNIFORM WIDTH FIX
    Paste at the VERY END of TopbarClone.css.
@@ -2326,10 +2364,7 @@
 
 /* 3. The organisation dropdown must never set the width.
       Long names are truncated with "..." instead. */
-.topbar-clone
-  .sidebar-menu-scroll
-  .edit-dropdown-cls
-  > div:first-child {
+.topbar-clone .sidebar-menu-scroll .edit-dropdown-cls > div:first-child {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
@@ -2361,4 +2396,38 @@
 
 .topbar-clone .changed-nav > .nav-item > .nav-link.menu-link > span {
   min-width: 0;
+}
+/* =========================================================
+   SIDEBAR TOGGLE ICON
+   A single panel icon replaces the three-line hamburger.
+   ========================================================= */
+.figma-sidebar-toggle-button,
+.figma-sidebar-reopen-button,
+.topbar-clone
+  #two-column-menu
+  > div:first-child
+  > .pt-4.me-2
+  button[aria-label="Toggle sidebar"] {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+.figma-sidebar-toggle-icon {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.figma-sidebar-toggle-button:hover .figma-sidebar-toggle-icon,
+.figma-sidebar-reopen-button:hover .figma-sidebar-toggle-icon {
+  color: #ffffff;
+}
+
+.figma-sidebar-reopen-button {
+  width: 36px !important;
+  height: 36px !important;
 }

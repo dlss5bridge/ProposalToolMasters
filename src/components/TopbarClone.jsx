@@ -1342,9 +1342,7 @@ const TopbarClone = () => {
             onClick={() => setIsSidebarOpen(true)}
             aria-label="Open sidebar"
           >
-            <span className="figma-sidebar-toggle-line"></span>
-            <span className="figma-sidebar-toggle-line"></span>
-            <span className="figma-sidebar-toggle-line"></span>
+            <i className="ri-side-bar-line figma-sidebar-toggle-icon"></i>
           </button>
         </Tooltip>
       )}
@@ -1431,11 +1429,7 @@ const TopbarClone = () => {
                           className="figma-sidebar-toggle-button"
                           aria-label="Toggle sidebar"
                         >
-                          <>
-                            <span className="figma-sidebar-toggle-line"></span>
-                            <span className="figma-sidebar-toggle-line"></span>
-                            <span className="figma-sidebar-toggle-line"></span>
-                          </>
+                          <i className="ri-side-bar-line figma-sidebar-toggle-icon"></i>
                         </button>
                       </div>
                     </Tooltip>
