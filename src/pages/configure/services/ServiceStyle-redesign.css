@@ -779,3 +779,52 @@
     display: none;
   }
 }
+
+/* =========================================================
+   CATEGORY COLLAPSE
+   ========================================================= */
+
+.services-category-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+.services-category-toggle {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--services-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--services-text);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.services-category-toggle:hover {
+  border-color: var(--services-cyan);
+  background: #eefafc;
+  color: var(--services-cyan-hover);
+}
+
+.services-category-toggle i {
+  transition: transform 0.2s ease;
+}
+
+.services-category-group.is-collapsed .services-category-toggle i {
+  transform: rotate(-90deg);
+}
+
+.services-category-group.is-collapsed .services-category-header {
+  border-bottom: 0;
+}

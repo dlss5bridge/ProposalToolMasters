@@ -53,6 +53,17 @@ const Services = () => {
   const [openSuccessModal, setOpenSuccessModal] = useState(false);
   const [openErrorModal, setOpenErrorModal] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
+  // Category groups the user has collapsed (UI only)
+  const [collapsedCategories, setCollapsedCategories] = useState([]);
+  const getCategoryKey = (service) =>
+    service.serviceCatKeyID || service.serviceCatName;
+  const toggleCategoryCollapse = (categoryKey) => {
+    setCollapsedCategories((prev) =>
+      prev.includes(categoryKey)
+        ? prev.filter((key) => key !== categoryKey)
+        : [...prev, categoryKey],
+    );
+  };
   const [modelRequestData, setModelRequestData] = useState({
     serviceKeyID: null,
     ProfessionTypeId: null,
@@ -451,6 +462,36 @@ const Services = () => {
                   </button>
                 </Tooltip>
 
+                {serviceList?.length > 0 && (
+                  <button
+                    type="button"
+                    className="services-filter-button services-collapse-all-button"
+                    onClick={() =>
+                      setCollapsedCategories(
+                        serviceList.every((service) =>
+                          collapsedCategories.includes(getCategoryKey(service)),
+                        )
+                          ? []
+                          : serviceList.map(getCategoryKey),
+                      )
+                    }
+                  >
+                    {serviceList.every((service) =>
+                      collapsedCategories.includes(getCategoryKey(service)),
+                    ) ? (
+                      <>
+                        <i className="ri-arrow-down-s-line"></i>
+                        <span>Expand All</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="ri-arrow-up-s-line"></i>
+                        <span>Collapse All</span>
+                      </>
+                    )}
+                  </button>
+                )}
+
                 {isFilterApply && (
                   <Tooltip title="Clear Filter">
                     <button
@@ -475,10 +516,12 @@ const Services = () => {
                   service?.serviceCatName?.replace(/\b\w/g, (l) =>
                     l.toUpperCase(),
                   ) || "-";
+                const categoryKey = getCategoryKey(service);
+                const isCollapsed = collapsedCategories.includes(categoryKey);
 
                 return (
                   <section
-                    className="services-category-group"
+                    className={`services-category-group${isCollapsed ? " is-collapsed" : ""}`}
                     key={service.serviceCatKeyID || service.serviceCatName}
                   >
                     {/* Category heading */}
@@ -514,15 +557,27 @@ const Services = () => {
                         </div>
                       </div>
 
-                      {service.needToUpdate && (
-                        <span className="services-category-attention">
-                          <i className="ri-error-warning-line"></i>
-                          Update required
-                        </span>
-                      )}
+                      <div className="services-category-actions">
+                        {service.needToUpdate && (
+                          <span className="services-category-attention">
+                            <i className="ri-error-warning-line"></i>
+                            Update required
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          className="services-category-toggle"
+                          onClick={() => toggleCategoryCollapse(categoryKey)}
+                          aria-expanded={!isCollapsed}
+                          title={isCollapsed ? "Expand services" : "Collapse services"}
+                        >
+                          <i className="ri-arrow-down-s-line"></i>
+                        </button>
+                      </div>
                     </div>
 
                     {/* Category table */}
+                    {!isCollapsed && (
                     <div className="services-table-wrap">
                       <table className="services-table">
                         <thead>
@@ -765,6 +820,7 @@ const Services = () => {
                         </tbody>
                       </table>
                     </div>
+                    )}
                   </section>
                 );
               })}
