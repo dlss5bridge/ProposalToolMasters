@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./ServiceStyle.css";
+import "./AddDeleteGlobalPricingDriver-redesign.css";
 import {
   GetGlobalPricingDriverListForServices,
   GetGlobalPricingDriverModel,
@@ -155,164 +156,120 @@ function AddDeleteGlobalPricingDriverModal(props) {
         aria-labelledby={props.aria_labelledby}
         aria-hidden={props.aria_hidden}
       >
-        <div class="modal-dialog modal-md">
-          <div class="modal-content">
-            <div class="modal-header bg-light p-3">
-              <h5
-                class="modal-title"
-                style={{ marginLeft: "14px" }}
-                id="addDeleteGlobalPricingDriver"
-              >
-                {props.title}
-              </h5>
+        <div class="modal-dialog modal-dialog-centered gpd-pick-dialog">
+          <div class="modal-content gpd-pick">
+            <div class="gpd-pick__header">
+              <span class="gpd-pick__icon">
+                <i class="ri-global-line"></i>
+              </span>
+              <div class="gpd-pick__heading">
+                <h5 class="gpd-pick__title" id="addDeleteGlobalPricingDriver">
+                  {props.title}
+                </h5>
+                <p class="gpd-pick__subtitle">
+                  Add a shared driver to this service, or remove one already
+                  added.
+                </p>
+              </div>
               <button
-                style={{
-                  position: "absolute",
-                  right: "2.3rem",
-                }}
                 type="button"
-                class="btn-close"
+                class="gpd-pick__close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
                 id="close-modal"
-              ></button>
+              >
+                <i class="ri-close-line"></i>
+              </button>
             </div>
 
-            <div class="container-fluid margin-lr ">
-              <div class="row">
-                <div class="col-lg-12">
-                  <div class="card ">
-                    <div class="card-body">
-                      <div id="customerList">
-                        <div class="row g-4 mb-3"></div>
-
-                        <div class="table-responsive table-card  mb-1 table-padding Scroll_GlobalP_Driver">
-                          <table
-                            class="table align-middle table-nowrap"
-                            id="customerTable"
-                          >
-                            <thead class="table-light">
-                              <tr className="head-row">
-                                <td
-                                  colSpan={2}
-                                  style={{
-                                    color: "#ffffff",
-                                    background: "#343a40",
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  Driver Name
-                                </td>
-
-                                <td
-                                  colSpan={2}
-                                  style={{
-                                    color: "#ffffff",
-                                    background: "#343a40",
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  Type
-                                </td>
-                              </tr>
-                            </thead>
-                            <tbody class="list form-check-all">
-                              {globalPricingDriverList.map((i, index) => {
-                                return (
-                                  <tr class="table_new" key={index}>
-                                    <td>
-                                      {isMobile ? (
-                                        <>
-                                          {i.driverName.length > 20
-                                            ? i.driverName.substring(0, 20) +
-                                              "..."
-                                            : i.driverName}
-                                        </>
-                                      ) : (
-                                        <>
-                                          {i.driverName.length > 30 ? (
-                                            <Tooltip title={i.driverName}>
-                                              {i.driverName.substring(0, 30) +
-                                                "..."}
-                                            </Tooltip>
-                                          ) : (
-                                            <>{i.driverName}</>
-                                          )}
-                                        </>
-                                      )}
-                                    </td>
-
-                                    <td>&nbsp;&nbsp;</td>
-                                    <td>{i.driverType}</td>
-                                    <td class="table_left">
-                                      <div class="d-flex gap-2">
-                                        {props.pricingDriver?.some(
-                                          (item) =>
-                                            item.parentGlobalPricingDriverKeyID ===
-                                            i.globalPricingDriverKeyID
-                                        ) ? (
-                                          <div class="remove">
-                                            <button
-                                              onClick={() =>
-                                                HandleDeleteClick(i)
-                                              }
-                                              class="btn btn-sm btn-danger"
-                                            >
-                                                <i class="bi bi-trash3-fill"></i>
-                                            </button>
-                                          </div>
-                                        ) : (
-                                          <div class="remove">
-                                            <button
-                                              class="btn btn-sm btn-dark"
-                                              onClick={() => HandleAdd(i)}
-                                            >
-                                              {id ===
-                                                i.globalPricingDriverKeyID &&
-                                              loader ? (
-                                                <RotatingLines
-                                                  strokeColor="grey"
-                                                  strokeWidth="3"
-                                                  animationDuration="0.75"
-                                                  width="13"
-                                                  visible={true}
-                                                />
-                                              ) : (
-                                                <i class="bi bi-plus"></i>
-                                                )}
-                                            </button>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                          <div class="noResult" style={{ display: "none" }}>
-                            <div class="text-center">
-                              <lord-icon
-                                src="https://cdn.lordicon.com/msoeawqm.json"
-                                trigger="loop"
-                                colors="primary:#121331,secondary:#08a88a"
-                                style={{ width: "75px", height: "75px" }}
-                              ></lord-icon>
-                              <h5 class="mt-2">Sorry! No Result Found</h5>
-                            </div>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div class="gpd-pick__body">
+              <div class="gpd-pick__list-head">
+                <span>Driver Name</span>
+                <span>Type</span>
+                <span class="gpd-pick__list-head-action">Action</span>
               </div>
 
-              {/* Modal  */}
-            </div>
+              <div class="gpd-pick__list" id="customerTable">
+                {globalPricingDriverList.map((i, index) => {
+                  const isAdded = props.pricingDriver?.some(
+                    (item) =>
+                      item.parentGlobalPricingDriverKeyID ===
+                      i.globalPricingDriverKeyID
+                  );
+                  return (
+                    <div
+                      class={`gpd-pick__row${isAdded ? " is-added" : ""}`}
+                      key={index}
+                    >
+                      <div class="gpd-pick__name">
+                        {isMobile ? (
+                          <>
+                            {i.driverName.length > 20
+                              ? i.driverName.substring(0, 20) + "..."
+                              : i.driverName}
+                          </>
+                        ) : (
+                          <>
+                            {i.driverName.length > 30 ? (
+                              <Tooltip title={i.driverName}>
+                                <span>
+                                  {i.driverName.substring(0, 30) + "..."}
+                                </span>
+                              </Tooltip>
+                            ) : (
+                              <>{i.driverName}</>
+                            )}
+                          </>
+                        )}
+                      </div>
 
-            {/* </form> */}
+                      <div>
+                        <span class="gpd-pick__type">{i.driverType}</span>
+                      </div>
+
+                      <div class="gpd-pick__action">
+                        {isAdded ? (
+                          <button
+                            type="button"
+                            onClick={() => HandleDeleteClick(i)}
+                            class="gpd-pick__btn gpd-pick__btn--remove"
+                          >
+                            <i class="ri-delete-bin-6-line"></i>
+                            <span>Remove</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            class="gpd-pick__btn gpd-pick__btn--add"
+                            onClick={() => HandleAdd(i)}
+                          >
+                            {id === i.globalPricingDriverKeyID && loader ? (
+                              <RotatingLines
+                                strokeColor="#0b7f95"
+                                strokeWidth="3"
+                                animationDuration="0.75"
+                                width="14"
+                                visible={true}
+                              />
+                            ) : (
+                              <i class="ri-add-line"></i>
+                            )}
+                            <span>Add</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {globalPricingDriverList.length === 0 && (
+                  <div class="gpd-pick__empty">
+                    <i class="ri-global-line"></i>
+                    <span>No global pricing drivers found</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
