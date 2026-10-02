@@ -95,6 +95,9 @@ export const SuperAdminMarketingReminderAddUpdate = Loadable(
 );
 const Logout = Loadable(lazy(() => import("../components/Logout")));
 const SuccessPage = Loadable(lazy(() => import("../components/SuccessPage")));
+const WebProposalPaymentSuccess = Loadable(
+  lazy(() => import("../pages/web-based-proposal/PaymentSuccess")),
+);
 const Setting = Loadable(
   lazy(
     () =>
@@ -1083,6 +1086,10 @@ function Index() {
                         path="/mySubscription"
                         element={<MySubscription />}
                       />
+                      <Route
+                        path="/web-based-proposal/payment-success"
+                        element={<WebProposalPaymentSuccess />}
+                      />
                       {/* <Route path="/accept-invite" element={<AcceptInvitation />} /> */}
                       <Route
                         path="/ChoosePlan"
@@ -1142,6 +1149,10 @@ function Index() {
                           <Route
                             path="/StripePaymentCanceled"
                             element={<StripePaymentCanceledPage />}
+                          />
+                          <Route
+                            path="/web-based-proposal/payment-success"
+                            element={<WebProposalPaymentSuccess />}
                           />
                           <Route
                             path="/service-category"
@@ -1463,6 +1474,10 @@ function Index() {
                     <Route
                       path="/web-based-proposal"
                       element={<WebBasedProposal />}
+                    />
+                    <Route
+                      path="/web-based-proposal/payment-success"
+                      element={<WebProposalPaymentSuccess />}
                     />
                   </Routes>
                 </ColorProvider>
