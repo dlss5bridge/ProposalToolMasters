@@ -12,8 +12,7 @@ const Description = ({ setTemplate, template, servicesObj, placeholder }) => {
     <>
       <div className="row fieldset">
         <div className="col-12">
-          <h6>Service Description</h6>
-          <div>
+          <div className="sf-editor">
             <Text_Editor
               editorState={serviceDescription}
               handleContentChange={handleContentChange}

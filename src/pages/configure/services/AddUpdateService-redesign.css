@@ -1,0 +1,986 @@
+/* =========================================================
+   ADD / UPDATE SERVICE
+   Visual layer only. Handlers, validation and the element IDs used
+   for scroll-to-error are unchanged in the JSX.
+   ========================================================= */
+
+.service-form {
+  --sf-accent: #0fb5d4;
+  --sf-accent-hover: #0aa2bf;
+  --sf-accent-soft: #e6f7fb;
+  --sf-accent-text: #0b7f95;
+  --sf-text: #0f172a;
+  --sf-label: #1f2a3a;
+  --sf-muted: #64748b;
+  --sf-border: #d7dee8;
+  --sf-border-strong: #c3ccd9;
+  --sf-line: #e3e8ef;
+  --sf-panel: #eef4fd;
+  --sf-danger: #d93b4a;
+
+  min-height: 100%;
+  padding: 20px 28px 28px !important;
+  background: #f6f8fb;
+  color: var(--sf-text);
+}
+
+.service-form .form-row {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.service-form .form-row > .col-lg-12 {
+  padding: 0 !important;
+}
+
+/* ---------------------------------------------------------
+   Header: back + title | stepper (matches the proposal wizard)
+   --------------------------------------------------------- */
+
+.service-form .sf-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 24px;
+  row-gap: 14px;
+  margin-bottom: 20px;
+  padding: 4px 0 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.service-form .sf-header > .container {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.service-form .sf-header .modal-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+  color: var(--sf-text);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+/* Package.css / ServiceStyle.css (legacy stepper) set borders, li padding
+   and ::after dividers; everything below resets those. */
+.service-form .sf-header .steps.sf-header__steps {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 4px 2px !important;
+  border: 0 !important;
+  overflow: visible;
+}
+
+.service-form .sf-header__steps .steps-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service-form .steps .steps-list > li {
+  display: flex;
+  align-items: center;
+  flex: none !important;
+  position: static !important;
+  padding: 0 !important;
+}
+
+.service-form .steps .steps-list > li:not(:last-child)::after {
+  content: none !important;
+  display: none !important;
+}
+
+.service-form .steps .steps-list > li + li::before {
+  content: "";
+  width: 32px;
+  height: 1px;
+  margin: 0 10px;
+  background: #e2e8f0;
+}
+
+.service-form .steps .steps-list > li .step {
+  width: auto !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #334155;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.service-form .steps .steps-list .stepCount {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  display: inline-grid !important;
+  place-items: center;
+  margin: 0 !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 50%;
+  background: #fff;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1 !important;
+}
+
+.service-form .steps .steps-list .stepTitle {
+  color: #334155;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.service-form .steps .steps-list > li .step.is-active .stepCount {
+  border-color: var(--sf-accent) !important;
+  background: var(--sf-accent);
+  color: #fff;
+}
+
+.service-form .steps .steps-list > li .step.is-active .stepTitle {
+  color: var(--sf-accent);
+  font-weight: 600;
+}
+
+.service-form .steps .steps-list > li .step.is-complete .stepCount {
+  border-color: #3fcf9f !important;
+  background: #3fcf9f;
+  color: #fff;
+}
+
+.service-form .steps .steps-list > li .step.disabled,
+.service-form .steps .steps-list > li .step.disabled:not(:hover) {
+  color: #334155;
+  font-weight: 400;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.service-form .steps .steps-list > li .step.disabled:not(:hover) .stepCount {
+  border-color: #cbd5e1 !important;
+}
+
+.service-form .steps .steps-list .validation {
+  display: inline-flex;
+  margin: 0;
+}
+
+/* Same breakpoint as the proposal wizard: below 1600px the stepper gets its
+   own centred row under the title. */
+@media (max-width: 1599px) {
+  .service-form .sf-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------------------------------------------------------
+   Scroll area + step cards
+   --------------------------------------------------------- */
+
+.service-form .create-practice-height {
+  max-height: calc(100vh - 210px);
+  min-height: 320px;
+  padding: 2px 4px 8px !important;
+}
+
+.service-form .create-practice-height > .tab-content.mt-2,
+.service-form .sf-card {
+  margin-top: 0 !important;
+}
+
+.service-form .sf-card {
+  padding: 28px 32px 30px !important;
+  border: 1px solid var(--sf-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.service-form .sf-card > .row,
+.service-form .sf-card > .tab-pane > .row {
+  row-gap: 4px;
+  margin-right: -14px;
+  margin-left: -14px;
+}
+
+.service-form .sf-card > .row > [class*="col-"],
+.service-form .sf-card > .tab-pane > .row > [class*="col-"] {
+  padding-right: 14px;
+  padding-left: 14px;
+}
+
+.service-form .sf-card .tab-pane.p-3 {
+  padding: 0 !important;
+}
+
+.service-form .sf-step-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.service-form .tab-pane.sf-card > .sf-step-head,
+.service-form .tab-content.sf-card > .sf-step-head:has(+ .tab-pane) {
+  padding-bottom: 18px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+/* Pricing drivers: the heading sits above the driver cards, not in a card */
+.service-form .create-practice-height > .sf-step-head {
+  margin: 4px 2px 18px;
+}
+
+.service-form .sf-step-head__icon {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--sf-line);
+  border-radius: 10px;
+  background: #f4f7fb;
+  color: var(--sf-accent);
+  font-size: 21px;
+}
+
+.service-form .sf-step-head__text {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.service-form .sf-step-head__title {
+  margin: 0;
+  color: var(--sf-text);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.service-form .sf-step-head__desc {
+  margin: 4px 0 0;
+  color: var(--sf-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.service-form .sf-step-head__count {
+  flex: none;
+  margin-top: 6px;
+  color: var(--sf-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------
+   Labels, inputs, selects
+   --------------------------------------------------------- */
+
+.service-form .form-label,
+.service-form .row > .col-12 > label:not(.validation) {
+  margin: 0 0 8px;
+  color: var(--sf-label);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.service-form .form-label .text-danger {
+  margin-left: 3px;
+  color: #e5484d !important;
+}
+
+.service-form .form-label > span[style] {
+  margin-left: 4px;
+  color: var(--sf-muted);
+  font-size: 12px !important;
+  font-weight: 500;
+}
+
+.service-form .sf-card .mb-3 {
+  margin-bottom: 22px !important;
+}
+
+.service-form .input-group {
+  flex-wrap: nowrap;
+}
+
+.service-form .input-text {
+  width: 100% !important;
+  height: 42px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 1px solid var(--sf-border-strong) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  color: var(--sf-text) !important;
+  font-size: 14.5px !important;
+  outline: none !important;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.service-form .input-text::placeholder {
+  color: #94a3b8;
+}
+
+.service-form .input-text:hover:not(:disabled) {
+  border-color: #aab6c6 !important;
+}
+
+.service-form .input-text:focus {
+  border-color: var(--sf-accent) !important;
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14) !important;
+}
+
+.service-form .input-text:disabled {
+  background: #f5f7fa !important;
+  color: #475569 !important;
+  cursor: not-allowed;
+}
+
+/* react-select (no classNamePrefix on most of these, so match emotion names) */
+.service-form .input-group > div,
+.service-form .basic-multi-select {
+  width: 100%;
+}
+
+.service-form [class*="-control"]:not([class*="-control-"]) {
+  min-height: 42px !important;
+  border: 1px solid var(--sf-border-strong) !important;
+  border-radius: 8px !important;
+  background-color: #fff;
+  box-shadow: none !important;
+  font-size: 14.5px;
+}
+
+.service-form [class*="-control"]:not([class*="-control-"]):hover {
+  border-color: #aab6c6 !important;
+}
+
+.service-form [class*="-control"][class*="--is-focused"],
+.service-form [class*="-control"]:focus-within {
+  border-color: var(--sf-accent) !important;
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14) !important;
+}
+
+.service-form [class*="-control"][class*="--is-disabled"] {
+  background-color: #f5f7fa;
+}
+
+.service-form [class*="-control"]:not([class*="-control-"]) > div:first-child {
+  padding: 2px 12px !important;
+}
+
+.service-form [class*="-singleValue"] {
+  color: var(--sf-text);
+}
+
+.service-form [class*="-control"] [class*="-placeholder"] {
+  color: #94a3b8;
+}
+
+.service-form [class*="-multiValue"] {
+  border-radius: 5px !important;
+  background-color: #dbeafe !important;
+}
+
+.service-form [class*="-multiValue"] > div:first-child {
+  padding: 3px 4px 3px 8px !important;
+  color: #1e293b !important;
+  font-size: 13px !important;
+  font-weight: 500;
+}
+
+.service-form [class*="-multiValue"] > div:last-child:hover {
+  background: transparent !important;
+  color: var(--sf-danger) !important;
+}
+
+.service-form [class*="-indicatorContainer"] {
+  color: #64748b;
+}
+
+.service-form [class*="-indicatorSeparator"] {
+  margin: 10px 0;
+  background-color: #dbe2ea;
+}
+
+/* single-value selects: no separator, like the reference */
+.service-form [class*="-control"]:not(:has([class*="-multiValue"])) [class*="-indicatorSeparator"] {
+  display: none;
+}
+
+.service-form .validation {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+/* Service Category label + "Create New Category" */
+.service-form .sf-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.service-form .sf-label-row .form-label {
+  margin: 0;
+}
+
+.service-form .sf-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sf-accent-text);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.service-form .sf-link-btn i {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.service-form .sf-link-btn:hover {
+  color: var(--sf-accent-hover);
+  text-decoration: underline;
+}
+
+/* "Depends on Services" checkbox shown as a switch */
+.service-form #ServiceDependency_Div > .mb-3 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 10px;
+}
+
+.service-form #ServiceDependency_Div > .mb-3 > .form-label {
+  margin: 0;
+  padding: 0 !important;
+  color: #334155;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+}
+
+.service-form #ServiceDependency_Div > .mb-3 > :not(.form-label):not(.sf-switch) {
+  flex: 1 0 100%;
+}
+
+.service-form #ServiceDependency_Div > .mb-3 > .input-group {
+  margin-top: 12px;
+}
+
+.service-form input[type="checkbox"].sf-switch {
+  position: relative;
+  width: 42px !important;
+  height: 24px !important;
+  flex: none;
+  margin: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #cbd5e1;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.service-form input[type="checkbox"].sf-switch::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+  transition: transform 0.18s ease;
+}
+
+.service-form input[type="checkbox"].sf-switch:checked {
+  background: var(--sf-accent);
+}
+
+.service-form input[type="checkbox"].sf-switch:checked::before {
+  transform: translateX(18px);
+}
+
+.service-form input[type="checkbox"].sf-switch:focus-visible {
+  outline: 2px solid var(--sf-accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------
+   Description (Jodit)
+   --------------------------------------------------------- */
+
+.service-form .sf-card .row.fieldset {
+  margin: 0;
+}
+
+.service-form .sf-card .row.fieldset > .col-12 {
+  padding: 0;
+}
+
+.service-form .sf-editor .jodit-container:not(.jodit_inline) {
+  overflow: hidden;
+  border: 1px solid #dfe5ec !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+}
+
+.service-form .sf-editor .jodit-toolbar__box:not(:empty) {
+  border-bottom: 1px solid #e8edf3 !important;
+  background: #f8fafc !important;
+}
+
+.service-form .sf-editor .jodit-toolbar-editor-collection_mode_horizontal {
+  background-image: none !important;
+}
+
+.service-form .sf-editor .jodit-toolbar__box .jodit-toolbar-button__button,
+.service-form .sf-editor .jodit-toolbar__box .jodit-toolbar-button__trigger {
+  border-radius: 6px;
+  color: #475569;
+}
+
+.service-form .sf-editor .jodit-toolbar__box .jodit-toolbar-button:hover .jodit-toolbar-button__button,
+.service-form .sf-editor .jodit-toolbar__box .jodit-toolbar-button__button:hover {
+  background: #e9eef5 !important;
+}
+
+.service-form .sf-editor .jodit-toolbar__box .jodit-toolbar-button__button[aria-pressed="true"] {
+  background: var(--sf-accent-soft) !important;
+  color: var(--sf-accent-text);
+}
+
+.service-form .sf-editor .jodit-toolbar__box svg {
+  fill: currentColor;
+}
+
+.service-form .sf-editor .jodit-wysiwyg {
+  min-height: 220px;
+  padding: 16px 18px !important;
+  color: #334155;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.service-form .sf-editor .jodit-wysiwyg li::marker {
+  color: var(--sf-accent);
+}
+
+.service-form .sf-editor .jodit-status-bar {
+  min-height: 0;
+  padding: 4px 12px !important;
+  border-top: 1px solid #eef2f6;
+  background: #fbfcfd !important;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------
+   Pricing driver / fee inflation cards
+   Card children: title | delete button, then the body.
+   --------------------------------------------------------- */
+
+.service-form .card-1.pricing-box {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  margin: 0 0 18px !important;
+  padding: 24px 26px 26px !important;
+  border: 1px solid var(--sf-line) !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+.service-form .card-1.pricing-box > * {
+  grid-column: 1 / -1;
+}
+
+.service-form .card-1.pricing-box > .gpd-title,
+.service-form .card-1.pricing-box > .col-lg-6:first-child {
+  grid-column: 1;
+}
+
+.service-form .card-1.pricing-box > .gpd-title-1 {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.service-form .card-1.pricing-box .gpd-title {
+  position: static !important;
+  width: auto !important;
+  margin: 0 !important;
+  background: transparent !important;
+  color: var(--sf-text);
+  font-size: 20px;
+  font-weight: 700 !important;
+}
+
+/* chevron first, then the driver name */
+.service-form .card-1.pricing-box .gpd-title > div {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 12px;
+}
+
+.service-form .card-1.pricing-box .gpd-title > div > span {
+  width: 32px;
+  height: 32px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 8px;
+  background-color: #eef3fb !important;
+  color: #1e293b !important;
+  transition: background-color 0.15s ease;
+}
+
+.service-form .card-1.pricing-box .gpd-title > div:hover > span {
+  background-color: #dfe8f6 !important;
+}
+
+.service-form .card-1.pricing-box .gpd-title > div > span svg {
+  font-size: 20px;
+}
+
+/* delete buttons ("Delete Pricing Driver", "Delete Slab", ...) */
+.service-form .card-1.pricing-box .gpd-title-1 {
+  width: auto !important;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  gap: 6px;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: #fdecee !important;
+  box-shadow: none !important;
+  color: var(--sf-danger) !important;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.service-form .card-1.pricing-box .gpd-title-1 i {
+  margin: 0 !important;
+}
+
+.service-form .card-1.pricing-box .gpd-title-1:hover:not(:disabled) {
+  background: #fbdade !important;
+}
+
+.service-form .card-1.pricing-box .gpd-title-1:disabled {
+  opacity: 0.5;
+}
+
+.service-form .card-1.pricing-box > .modal-body {
+  margin-top: 20px;
+  padding: 0 !important;
+}
+
+.service-form .card-1.pricing-box .modal-body .row {
+  row-gap: 4px;
+}
+
+/* rows nested directly in rows (slabs, variations, quantity range) would
+   otherwise pull in by an extra gutter on the right */
+.service-form .card-1.pricing-box .row > .row {
+  margin-right: 0;
+  margin-left: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.service-form .card-1.pricing-box .mb-1 {
+  margin-bottom: 18px !important;
+}
+
+/* Field labels inside driver cards: small caps like the reference */
+.service-form .card-1.pricing-box .form-label {
+  margin-bottom: 7px;
+  color: #334155;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Inner panels: slabs, variations, period blocks */
+.service-form .card-1.pricing-box .card-1.pricing-box {
+  margin: 4px 0 16px !important;
+  padding: 20px 22px 18px !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: var(--sf-panel) !important;
+  box-shadow: none !important;
+}
+
+.service-form .card-1.pricing-box .card-1.pricing-box > .col-lg-6:first-child {
+  width: auto;
+  max-width: none;
+  padding: 0;
+}
+
+.service-form .card-1.pricing-box .office-name {
+  position: static !important;
+  width: auto !important;
+  margin: 0 !important;
+  background: transparent !important;
+  color: var(--sf-text);
+  font-size: 17px;
+  font-weight: 700 !important;
+}
+
+.service-form .card-1.pricing-box .card-1.pricing-box > .row {
+  margin-top: 14px !important;
+}
+
+.service-form .card-1.pricing-box .card-1.pricing-box .gpd-title-1 {
+  min-height: 30px;
+  padding: 0 11px !important;
+  background: #fff !important;
+  font-size: 13px;
+}
+
+.service-form .card-1.pricing-box .card-1.pricing-box .input-text,
+.service-form .card-1.pricing-box .card-1.pricing-box [class*="-control"]:not([class*="-control-"]) {
+  border-color: transparent !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+.service-form .card-1.pricing-box .card-1.pricing-box .input-text:focus,
+.service-form .card-1.pricing-box .card-1.pricing-box [class*="-control"][class*="--is-focused"] {
+  border-color: var(--sf-accent) !important;
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14) !important;
+}
+
+/* radios / checkboxes ("Set to Default", "Depends on Previous Driver") */
+.service-form .card-1.pricing-box input[type="radio"],
+.service-form .card-1.pricing-box input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: #0b6f86;
+  cursor: pointer;
+}
+
+.service-form .card-1.pricing-box label.toggle {
+  color: var(--sf-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* "Add Slab" / "Add Variation" / "Add Period Block" */
+.service-form .card-1.pricing-box .delete-right {
+  justify-content: flex-start;
+  margin-top: 4px !important;
+}
+
+.service-form .card-1.pricing-box .delete-right .btn {
+  min-height: 38px;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 7px !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: #e8f1fb !important;
+  box-shadow: none !important;
+  color: #0b5f73 !important;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.service-form .card-1.pricing-box .delete-right .btn:hover:not(:disabled) {
+  background: #d9e8f8 !important;
+}
+
+.service-form .card-1.pricing-box .delete-right .btn p {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------
+   Pricing formula (tagify)
+   --------------------------------------------------------- */
+
+.service-form .sf-card .tagify {
+  width: 100%;
+  min-height: 92px;
+  padding: 8px 10px;
+  border: 1px solid var(--sf-border-strong);
+  border-radius: 10px;
+  background: #f8fafc;
+  --tag-pad: 4px 10px;
+}
+
+.service-form .sf-card .tagify:focus-within {
+  border-color: var(--sf-accent);
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14);
+}
+
+.service-form .sf-card .tagify__tag.global-tag,
+.service-form .sf-card .tagify__tag.private-tag,
+.service-form .sf-card .tagify__tag.local-tag,
+.service-form .sf-card .tagify__tag.inflation-tag {
+  --tag-bg: #e3f7fb;
+  --tag-hover: #d3f1f8;
+  --tag-text-color: #0f3d48;
+  --tag-remove-btn-color: #0b7f95;
+  box-shadow: inset 0 0 0 1px #9fe0ec;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+}
+
+.service-form .sf-card .tagify__tag > div::before {
+  border-radius: 6px;
+}
+
+/* ---------------------------------------------------------
+   Footer buttons
+   --------------------------------------------------------- */
+
+.service-form .separator {
+  display: none;
+}
+
+.service-form .modal-footer {
+  margin: 16px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.service-form .modal-footer > .col-lg-12 {
+  flex-wrap: wrap;
+  margin-top: 0 !important;
+  padding: 0 4px;
+}
+
+.service-form .modal-footer .btn,
+.service-form .create-practice-height + div .btn.create-item-btn {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0 !important;
+  padding: 0 20px !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.service-form .modal-footer .btn i {
+  margin: 0 !important;
+  font-size: 16px;
+}
+
+.service-form .modal-footer .btn.create-item-btn {
+  background: var(--sf-accent) !important;
+  box-shadow: 0 4px 12px rgba(15, 181, 212, 0.22);
+  color: #fff !important;
+}
+
+.service-form .modal-footer .btn.create-item-btn:hover {
+  background: var(--sf-accent-hover) !important;
+}
+
+.service-form .modal-footer .btn.btn-light {
+  background: #eaf1fb !important;
+  color: #334155 !important;
+}
+
+.service-form .modal-footer .btn.btn-light:hover {
+  background: #dde7f5 !important;
+}
+
+.service-form .modal-footer .btn.sf-btn-back {
+  border-color: var(--sf-border) !important;
+  background: #fff !important;
+  box-shadow: none;
+  color: #334155 !important;
+}
+
+.service-form .modal-footer .btn.sf-btn-back:hover {
+  border-color: var(--sf-border-strong) !important;
+  background: #f8fafc !important;
+}
+
+/* "Add Local / Global Pricing Driver" sit apart from the step buttons */
+.service-form .modal-footer .add-global-driver-price {
+  margin-right: auto !important;
+}
+
+@media (max-width: 767px) {
+  .service-form {
+    padding: 16px 12px 24px !important;
+  }
+
+  .service-form .sf-card {
+    padding: 20px 16px !important;
+  }
+
+  .service-form .card-1.pricing-box {
+    padding: 18px 14px !important;
+  }
+
+  .service-form .sf-step-head {
+    flex-wrap: wrap;
+  }
+
+  .service-form .sf-step-head__count {
+    order: -1;
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  .service-form .modal-footer .add-global-driver-price {
+    margin-right: 0 !important;
+  }
+}

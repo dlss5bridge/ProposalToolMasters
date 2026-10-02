@@ -2,6 +2,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "../packages/Package.css";
 import "./ServiceStyle.css";
+import "./AddUpdateService-redesign.css";
 import AddDeleteGlobalPricingDriver from "./AddDeleteGlobalPricingDriver";
 import Select from "react-select";
 import SuccessModal from "../../../components/SuccessModal";
@@ -56,6 +57,26 @@ import { parse, format, isValid,differenceInCalendarDays, addDays, getTime } fro
 import Utils from "../../../Middleware/Utils";
 import FeeInflationTab from "./FeeInflationTab";
 //Tab Custom Component Created
+// Card heading shown at the top of each step (presentational only).
+const ServiceStepHead = ({ icon, title, description, stepMeta }) => (
+  <div className="sf-step-head">
+    {icon && (
+      <span className="sf-step-head__icon">
+        <i className={icon}></i>
+      </span>
+    )}
+    <div className="sf-step-head__text">
+      <h4 className="sf-step-head__title">{title}</h4>
+      {description && <p className="sf-step-head__desc">{description}</p>}
+    </div>
+    {stepMeta?.current && stepMeta?.total ? (
+      <span className="sf-step-head__count">
+        Step {stepMeta.current} of {stepMeta.total}
+      </span>
+    ) : null}
+  </div>
+);
+
 const BasicInformationComponent = (props) => {
   const ServiceDivContainerRef = useRef(null);
   console.log("dropDown: ", props.ServiceDependencyValue);
@@ -314,7 +335,12 @@ const handleChangePricingType = async (selectedOption) => {
         ref={ServiceDivContainerRef}
         onClick={(e) => scrollUptoCurrentPosition(e, ServiceDivContainerRef)}
       >
-        <div class="tab-content mt-2">
+        <div class="tab-content mt-2 sf-card">
+          <ServiceStepHead
+            title="Service Details"
+            description="Specify the billing category, charge type and pricing for this service."
+            stepMeta={props.stepMeta}
+          />
           <div className="row">
             <SAPredefinedChangesNotifyMessageModel Params={{ moduleName: props.moduleName, SAChanges: props.modelRequestData.Type }} />
             {(props.common.professionTypeLists?.length > 1 ||
@@ -405,29 +431,20 @@ const handleChangePricingType = async (selectedOption) => {
             </div>
             <div className="col-lg-6" id="ServiceCat_Div">
               <div className="mb-3 ">
-                <div className="row">
-                  <div className="col-lg-6 col-md-6 col-sm-6 col-xsm-12">
-                    <label className="form-label">
-                      Service Category <span className="text-danger">*</span>
-                    </label>
-                  </div>
-                  <div className="col-lg-6 col-md-6 col-sm-6 col-xsm-12">
-                    <button
-                      style={{
-                        fontSize: "12px",
-                        float: "right",
-                        border: "none",
-                        background: "transparent",
-                        color: "#626ed4",
-                      }}
-                      className="float-sm-end"
-                      data-bs-toggle="modal"
-                      data-bs-target="#serviceCategoryModel"
-                      onClick={() => props.ServiceCategoryAddBtnClicked()}
-                    >
-                      + Create New Category
-                    </button>
-                  </div>
+                <div className="sf-label-row">
+                  <label className="form-label">
+                    Service Category <span className="text-danger">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    className="sf-link-btn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#serviceCategoryModel"
+                    onClick={() => props.ServiceCategoryAddBtnClicked()}
+                  >
+                    <i className="ri-add-line"></i>
+                    Create New Category
+                  </button>
                 </div>
                 <div className="input-group">
                   <Select
@@ -590,6 +607,7 @@ const handleChangePricingType = async (selectedOption) => {
                     <input
                       type="checkbox"
                       id="enableDropdown"
+                      className="sf-switch"
                       checked={props.isDropdownEnabled}
                       onChange={(e) => {
                         const isChecked = e.target.checked;
@@ -777,7 +795,13 @@ const DescriptionComponent = (props) => {
   return (
     <>
       <div className="create-practice-height scrollbar">
-        <div className="tab-content">
+        <div className="tab-content sf-card">
+          <ServiceStepHead
+            icon="ri-align-left"
+            title="Service Description"
+            description="Overview of the deliverables and scope included in this service."
+            stepMeta={props.stepMeta}
+          />
           <div className="tab-pane active">
             {/* <div class="row"> */}
             {/* <div className="separator mb-3"> */}{" "}
@@ -823,7 +847,7 @@ const DescriptionComponent = (props) => {
               <button
                 onClick={() => props.handleBackButton(1)}
                 style={{ paddingTop: "5px", marginRight: "4px" }}
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn sf-btn-back"
               >
                 <span>Back</span>
               </button>
@@ -1216,6 +1240,12 @@ const PricingDriversComponent = (props) => {
         }
         className="create-practice-height scrollbar"
       >
+        <ServiceStepHead
+          icon="ri-equalizer-line"
+          title="Pricing Drivers"
+          description="Define the local and global drivers used to calculate this service's price."
+          stepMeta={props.stepMeta}
+        />
         <div className="tab-content mt-2">
           <div class="row">
             <div style={{ padding: isMobile && "0px" }} class="col-xl-12 col-lg-12">
@@ -1225,7 +1255,7 @@ const PricingDriversComponent = (props) => {
                 return (
                   <div
                     id={`Driver_${mainIndex}`}
-                    class="card-1 pricing-box p-4 mt-3"
+                    class="card-1 pricing-box p-4 mt-3 sf-driver"
                     draggable="true"
                     onDragStart={(e) => {
                       e.dataTransfer.setData("Drivers", "DriverDatatype"); // Set a data type for the drag
@@ -2883,7 +2913,7 @@ const PricingDriversComponent = (props) => {
                                     return (
                                       <div
                                         id={`SlabDiv_${mainIndex}${index}`}
-                                        class="card-1 pricing-box p-4 mt-3"
+                                        class="card-1 pricing-box p-4 mt-3 sf-slab"
                                         key={index}
                                       >
                                         {/* Decimal Places Dropdown - Add at the top */}
@@ -2895,7 +2925,7 @@ const PricingDriversComponent = (props) => {
                                               zIndex: "0",
                                             }}
                                           >
-                                            Slab{index + 1}
+                                            Slab {index + 1}
                                           </p>
                                         </div>
                                         <button
@@ -3701,7 +3731,7 @@ const PricingDriversComponent = (props) => {
             <button
               onClick={() => props.handleBackButton(2)}
               style={{ paddingTop: "5px", marginRight: "4px" }}
-              className="btn btn-md btn-success create-item-btn"
+              className="btn btn-md btn-success create-item-btn sf-btn-back"
             >
               <span>Back</span>
             </button>
@@ -3728,7 +3758,12 @@ const PricingFormulaComponent = (props) => {
     <>
       <div className="scrollbar">
         <div className="tab-content">
-          <div class="tab-pane p-3 active">
+          <div class="tab-pane p-3 active sf-card">
+            <ServiceStepHead
+              title="Formula Configuration"
+              description="Build the pricing logic from your pricing drivers and operators."
+              stepMeta={props.stepMeta}
+            />
             <div class="row">
               <div className="col-12">
                 <div className="mb-3 ">
@@ -3839,7 +3874,7 @@ const PricingFormulaComponent = (props) => {
                   // props.setActiveTab(prev)
                 }}
                 style={{ paddingTop: "5px", marginRight: "4px" }}
-                className="btn btn-md btn-success create-item-btn"
+                className="btn btn-md btn-success create-item-btn sf-btn-back"
               >
                 <span>Back</span>
               </button>
@@ -7789,6 +7824,19 @@ else {
     return tabValue;
   };
 
+  // "Step X of Y" in each step's card heading.
+  const serviceStepMeta = {
+    current: getStepNumber(activeTab),
+    total: servicesObj.pricingTypeID === 2 ? (showFeeInflationTab ? 5 : 4) : 2,
+  };
+
+  // Stepper colours only: ServiceHeader values are in step order.
+  const getServiceStepState = (tabValue) => {
+    if (activeTab === tabValue) return " is-active";
+    if (tabValue < activeTab) return " is-complete";
+    return "";
+  };
+
   // Handle Tab Change 
   const handleChangeTab = (newTab, clickedTabID) => {
     setserviceError({
@@ -7875,10 +7923,11 @@ else {
   }
   return (
     <div>
-      <div className="container-fluid">
+      <div className="container-fluid service-form">
         <div className="new-item-page-content">
           <div className="row form-row">
             <div className="col-lg-12">
+              <div className="sf-header">
               <div className="container ">
                 <h3 className="modal-title">
                   <BackButtonSvg onClick={handleCancelButton} />
@@ -7897,7 +7946,7 @@ else {
                 </h3>
               </div>
               <div
-                className="steps overflow-auto"
+                className="steps sf-header__steps"
                 style={{ pointerEvents: "all" }}
               >
                 <ul className="steps-list">
@@ -7912,7 +7961,7 @@ else {
                         : activeTabForm.activeBasicInformationForm === true
                           ? "step tab-field-center"
                           : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
+                        } w-90${getServiceStepState(ServiceHeader.BasicInformation)}`}
                     >
                       <span className="stepCount">1</span>
                       <span className="stepTitle">Basic Information</span>
@@ -7935,7 +7984,7 @@ else {
                         : activeTabForm.activeBasicInformationForm === true
                           ? "step tab-field-center"
                           : "step disabled cursor-not-allowed tab-field-center"
-                        } w-90`}
+                        } w-90${getServiceStepState(ServiceHeader.Description)}`}
                     >
                       <span className="stepCount">2</span>
                       <span className="stepTitle">Description</span>
@@ -7954,7 +8003,7 @@ else {
                             : activeTabForm.activeDescriptionForm === true
                               ? "step tab-field-center"
                               : "step disabled cursor-not-allowed tab-field-center"
-                            } w-90`}
+                            } w-90${getServiceStepState(ServiceHeader.PricingDrivers)}`}
                         >
                           <span className="stepCount">3</span>
                           <span className="stepTitle">Pricing Drivers</span>
@@ -7996,7 +8045,7 @@ else {
                               : activeTabForm.activePricingDrivers === true
                                 ? "step tab-field-center"
                                 : "step disabled cursor-not-allowed tab-field-center"
-                              } w-90`}
+                              } w-90${getServiceStepState(ServiceHeader.FeeInflation)}`}
                           >
                             <span className="stepCount">{getStepNumber(ServiceHeader.FeeInflation)}</span>
                             <span className="stepTitle">Fee Inflation</span>
@@ -8014,7 +8063,7 @@ else {
                             : activeTabForm.activePricingDrivers === true
                               ? "step tab-field-center"
                               : "step disabled cursor-not-allowed tab-field-center"
-                            } w-90`}
+                            } w-90${getServiceStepState(ServiceHeader.PricingFormula)}`}
                         >
                           <span className="stepCount">{getStepNumber(ServiceHeader.PricingFormula)}</span>
                           <span className="stepTitle">Pricing Formula</span>
@@ -8030,8 +8079,10 @@ else {
                   )}
                 </ul>
               </div>
+              </div>
               {activeTab === ServiceHeader.BasicInformation && (
                 <BasicInformationComponent
+                  stepMeta={serviceStepMeta}
                   servicesObj={servicesObj}
                   isDropdownEnabled={isDropdownEnabled}
                   setIsDropdownEnabled={setIsDropdownEnabled}
@@ -8093,6 +8144,7 @@ else {
               )}
               {activeTab === ServiceHeader.Description && (
                 <DescriptionComponent
+                  stepMeta={serviceStepMeta}
                   modelAction={modelAction}
                   setActiveTab={setActiveTab}
                   servicesObj={servicesObj}
@@ -8127,6 +8179,7 @@ else {
               )}
               {activeTab === ServiceHeader.PricingDrivers && (
                 <PricingDriversComponent
+                  stepMeta={serviceStepMeta}
                   servicesObj={servicesObj}
                   setModelRequestData={setModelRequestData}
                   modelRequestData={modelRequestData}
@@ -8199,6 +8252,7 @@ else {
               )}
               {activeTab === ServiceHeader.PricingFormula && (
                 <PricingFormulaComponent
+                  stepMeta={serviceStepMeta}
                   modelAction={modelAction}
                   setActiveTab={setActiveTab}
                   servicesObj={servicesObj}
