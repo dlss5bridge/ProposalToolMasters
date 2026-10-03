@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import AcceptSuperAdminChangesConfirmation from "../../../components/AcceptSuperAdminChangesConfirmation";
 import "../email_template/EmailTemplate.css";
+import "../Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "./AddNewTemplatePdf-redesign.css";
 import { Row, Col } from "reactstrap";
 import { AuthContextProvider } from "../../../AuthContext/AuthContext";
 import { useNavigate } from "react-router";
@@ -419,7 +421,7 @@ function Add_New_Templates_Pdf(props) {
   };
 
   return (
-    <div className="container-fluid new-item-page-container">
+    <div className="container-fluid new-item-page-container rt-form tpd-form">
       <div class="new-item-page-nav"></div>
       <div class="new-item-page-content">
         <div class="row form-row">
@@ -433,6 +435,19 @@ function Add_New_Templates_Pdf(props) {
             <div class="separator mb-3"></div>
             <div className="template-height scrollbar" id="style-1">
               <div class="tab-content">
+                <div className="rt-card">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-file-list-3-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Template Details</h4>
+                    <p className="rt-card__desc">
+                      Give this file-based template a clear title.
+                    </p>
+                  </div>
+                </div>
+                <div className="rt-fields">
                 <>
                   <div className="row fieldset" id="TemplatePdfTitleDiv">
                     <SAPredefinedChangesNotifyMessageModel
@@ -487,6 +502,20 @@ function Add_New_Templates_Pdf(props) {
                     </div>
                   </div>
                 </>
+                </div>
+                </div>
+                <div className="rt-card tpd-file">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-upload-cloud-2-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Template File</h4>
+                    <p className="rt-card__desc">
+                      Upload a PDF, CSV or Excel file and check the preview.
+                    </p>
+                  </div>
+                </div>
                 <div className="row">
                   <div className="col-lg-3 template-label text-left">
                     <div className="mb-1">
@@ -653,6 +682,7 @@ function Add_New_Templates_Pdf(props) {
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
               <label
                 style={{ display: "flex", justifyContent: "center" }}
@@ -669,8 +699,7 @@ function Add_New_Templates_Pdf(props) {
               </label>
             </div>
 
-            <hr />
-            <Row className="modal-footer">
+            <Row className="modal-footer rt-footer">
               <Col
                 style={{ paddingTop: "14px" }}
                 className="hstack gap-2 justify-content-end"
