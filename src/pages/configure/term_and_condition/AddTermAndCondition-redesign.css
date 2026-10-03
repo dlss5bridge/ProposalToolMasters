@@ -1,0 +1,154 @@
+/* =========================================================
+   ADD / UPDATE TERMS & CONDITIONS TEMPLATE
+   Builds on the shared .rt-form layer from
+   Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css.
+   Only the pieces unique to this form live here.
+   ========================================================= */
+
+/* termAndCondition.css sets .container-fluid padding globally */
+.container-fluid.tc-form {
+  padding: 20px 28px 24px !important;
+}
+
+/* Profession type (and the SA notice inside it) spans both columns */
+.tc-form .rt-fields > #ProfessionTypeDiv {
+  grid-column: 1 / -1;
+  margin-bottom: 0 !important;
+}
+
+.tc-form .rt-fields > #ProfessionTypeDiv > .col-lg-9 {
+  margin-bottom: 14px;
+}
+
+.tc-form .rt-fields > #OrganisationBusinessDiv {
+  grid-column: 1 / -1;
+}
+
+.tc-form .rt-fields > #OrganisationBusinessDiv .input-group {
+  flex-wrap: wrap;
+}
+
+/* Is Default label carried an inline padding for the old layout */
+.tc-form #IsDefaultDiv > .template-label {
+  padding: 0 !important;
+}
+
+/* react-select multi-value chips (Profession Type) */
+.tc-form [class*="-multiValue"] {
+  border-radius: 6px !important;
+  background: var(--rt-accent-soft) !important;
+}
+
+.tc-form [class*="-multiValue"] > div:first-child {
+  color: var(--rt-accent-text) !important;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* PDF Template card */
+.tc-form .tc-pdf > .row {
+  margin: 0 !important;
+}
+
+.tc-form .tc-pdf > .row > .template-label {
+  display: none;
+}
+
+.tc-form .tc-pdf > .row > .col-lg-9 {
+  width: 100%;
+  max-width: 100%;
+  flex: 0 0 100%;
+  padding: 0 !important;
+}
+
+.tc-form .tc-pdf .col-lg-9 .col-lg-9 {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+.tc-form .tc-pdf .remove-item-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 10px !important;
+  padding: 6px 12px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: #fdecee !important;
+  color: #d93b4a !important;
+  font-size: 12.5px !important;
+  font-weight: 600;
+}
+
+.tc-form .tc-pdf .remove-item-btn:hover {
+  background: #fbdade !important;
+}
+
+.tc-form .tc-pdf .remove-item-btn .margin-right {
+  margin-right: 0;
+}
+
+.tc-form .tc-pdf input[type="file"] {
+  width: 100%;
+  padding: 26px 18px;
+  border: 1.5px dashed #b9c6d6;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: var(--rt-muted);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.tc-form .tc-pdf input[type="file"]:hover {
+  border-color: var(--rt-accent);
+  background: #f2fbfd;
+}
+
+.tc-form .tc-pdf input[type="file"]::file-selector-button {
+  margin-right: 14px;
+  padding: 8px 16px;
+  border: 1px solid rgba(15, 181, 212, 0.4);
+  border-radius: 8px;
+  background: var(--rt-accent-soft);
+  color: var(--rt-accent-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tc-form .tc-pdf .helpMessage {
+  margin-top: 8px;
+  color: var(--rt-muted) !important;
+  font-size: 12.5px;
+}
+
+.tc-form .tc-pdf object {
+  overflow: hidden;
+  border: 1px solid var(--rt-line);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+/* Variables panel group heading ("Common Variables :") */
+.tc-form .rt-content .variableHeading {
+  display: block;
+  margin: 0 0 10px;
+  color: var(--rt-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Error message under the cards */
+.tc-form .template-height > .validation {
+  justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .container-fluid.tc-form {
+    padding: 16px 12px 20px !important;
+  }
+}

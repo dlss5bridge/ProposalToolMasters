@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import "../email_template/EmailTemplate.css";
+import "../Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "./AddTermAndCondition-redesign.css";
 import { Row, Col } from "reactstrap";
 import Select from "react-select";
 
@@ -708,7 +710,7 @@ function Add_New_Term_And_Condition(props) {
   }
 
   return (
-    <div className="container-fluid new-item-page-container">
+    <div className="container-fluid new-item-page-container rt-form tc-form">
       <div class="new-item-page-nav"></div>
       <div class="new-item-page-content">
         <div class="row form-row">
@@ -722,6 +724,19 @@ function Add_New_Term_And_Condition(props) {
             <div class="separator mb-3"></div>
             <div className="template-height scrollbar" id="style-1">
               <div class="tab-content">
+                <div className="rt-card">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-file-shield-2-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Template Details</h4>
+                    <p className="rt-card__desc">
+                      Name, type and default setting of this terms &amp; conditions template.
+                    </p>
+                  </div>
+                </div>
+                <div className="rt-fields">
                 <>
                   <div className="row fieldset" id="ProfessionTypeDiv">
                     <SAPredefinedChangesNotifyMessageModel Params={{ moduleName: moduleName, SAChanges: location.state?.Type }} />
@@ -944,9 +959,22 @@ function Add_New_Term_And_Condition(props) {
                     }
                   </div>
                 </div>
+                </div>
+                </div>
                 {(TemplateObj.templateTypeID === 3 ||
                   TemplateObj.templateTypeID === "3") && (
-                    <>
+                    <div className="rt-card tc-pdf">
+                      <div className="rt-card__head">
+                        <span className="rt-card__icon">
+                          <i className="ri-file-pdf-line"></i>
+                        </span>
+                        <div>
+                          <h4 className="rt-card__title">PDF Template</h4>
+                          <p className="rt-card__desc">
+                            Upload the PDF used as this terms &amp; conditions template.
+                          </p>
+                        </div>
+                      </div>
                       <div className="row">
                         <div className="col-lg-3 template-label text-left">
                           <div className="mb-1">
@@ -1062,7 +1090,7 @@ function Add_New_Term_And_Condition(props) {
                           </div>
                         </div>
                       </div>
-                    </>
+                    </div>
                   )}
                 {(TemplateObj.templateTypeID === 3 ||
                   TemplateObj.templateTypeID === "3") && (
@@ -1098,9 +1126,19 @@ function Add_New_Term_And_Condition(props) {
 
                 {(TemplateObj.templateTypeID === 4 ||
                   TemplateObj.templateTypeID === "4") && (
-                    <div>
-                      <h6 className="mt-2">Template Content</h6>
-                      <div className="separator mb-3" />
+                    <div className="rt-card rt-content">
+                      <div className="rt-card__head">
+                        <span className="rt-card__icon">
+                          <i className="ri-file-text-line"></i>
+                        </span>
+                        <div>
+                          <h4 className="rt-card__title">Template Content</h4>
+                          <p className="rt-card__desc">
+                            Click a variable to copy it, then paste it into the content below.
+                          </p>
+                        </div>
+                      </div>
+
                       <div className="fieldset-group helper-variables-div">
                         <label className="fieldset-group-label">Variables</label>
                         <AccountantVariables
@@ -1154,8 +1192,7 @@ function Add_New_Term_And_Condition(props) {
               </label>
             </div>
 
-            <hr />
-            <Row className="modal-footer">
+            <Row className="modal-footer rt-footer">
               <Col
                 style={{ paddingTop: "14px" }}
                 className="hstack gap-2 justify-content-end"
