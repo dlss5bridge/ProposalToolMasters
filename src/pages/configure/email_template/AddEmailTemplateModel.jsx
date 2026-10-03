@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Utils from "../../../Middleware/Utils";
 import "../email_template/EmailTemplate.css";
+import "../Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "./AddEmailTemplate-redesign.css";
 import { Row, Col } from "reactstrap";
 import Select from "react-select";
 import { AuthContextProvider } from "../../../AuthContext/AuthContext";
@@ -554,7 +556,7 @@ function AddUpdateEmailTemplate(props) {
     }
   };
   return (
-    <div className="container-fluid new-item-page-container">
+    <div className="container-fluid new-item-page-container rt-form et-form">
       <div class="new-item-page-nav"></div>
       <div class="new-item-page-content">
         <div class="row form-row">
@@ -568,6 +570,19 @@ function AddUpdateEmailTemplate(props) {
             <div class="separator mb-3"></div>
             <div className="template-height scrollbar" id="style-1">
               <div class="tab-content">
+                <div className="rt-card">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-mail-settings-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Template Details</h4>
+                    <p className="rt-card__desc">
+                      Name, type and subject line of this email template.
+                    </p>
+                  </div>
+                </div>
+                <div className="rt-fields">
                 <>
                   <div className="row fieldset" id="ProfessionTypeDiv">
                     <SAPredefinedChangesNotifyMessageModel
@@ -780,9 +795,21 @@ function AddUpdateEmailTemplate(props) {
                     )}
                   </div>
                 </div>
-                <div>
-                  <h6 className="mt-2">Template Content</h6>
-                  <div className="separator mb-3" />
+                </div>
+                </div>
+                <div className="rt-card rt-content">
+                  <div className="rt-card__head">
+                    <span className="rt-card__icon">
+                      <i className="ri-file-text-line"></i>
+                    </span>
+                    <div>
+                      <h4 className="rt-card__title">Template Content</h4>
+                      <p className="rt-card__desc">
+                        Click a variable to copy it, then paste it into the email body below.
+                      </p>
+                    </div>
+                  </div>
+
                   <div className="fieldset-group helper-variables-div">
                     <label className="fieldset-group-label">Variables</label>
                     <AccountantVariables
@@ -833,8 +860,7 @@ function AddUpdateEmailTemplate(props) {
               </label>
             </div>
 
-            <hr />
-            <Row className="modal-footer">
+            <Row className="modal-footer rt-footer">
               <Col
                 style={{ paddingTop: "14px" }}
                 className="hstack gap-2 justify-content-end"

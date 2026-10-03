@@ -1,0 +1,52 @@
+/* =========================================================
+   ADD / UPDATE EMAIL TEMPLATE
+   Builds on the shared .rt-form layer from
+   Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css.
+   Only the pieces unique to this form live here.
+   ========================================================= */
+
+.container-fluid.et-form {
+  padding: 20px 28px 24px !important;
+}
+
+/* Profession type (and the SA notice inside it) spans both columns */
+.et-form .rt-fields > #ProfessionTypeDiv {
+  grid-column: 1 / -1;
+  margin-bottom: 0 !important;
+}
+
+.et-form .rt-fields > #ProfessionTypeDiv > .col-lg-10 {
+  margin-bottom: 14px !important;
+}
+
+/* react-select multi-value chips (Profession Type) */
+.et-form [class*="-multiValue"] {
+  border-radius: 6px !important;
+  background: var(--rt-accent-soft) !important;
+}
+
+.et-form [class*="-multiValue"] > div:first-child {
+  color: var(--rt-accent-text) !important;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* Is Default label carried an inline padding for the old layout */
+.et-form .rt-fields > .row > [style*="padding"] {
+  padding: 0 !important;
+}
+
+/* Variables panel group heading ("Common Variables :") */
+.et-form .rt-content .variableHeading {
+  display: block;
+  margin: 0 0 10px;
+  color: var(--rt-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .container-fluid.et-form {
+    padding: 16px 12px 20px !important;
+  }
+}
