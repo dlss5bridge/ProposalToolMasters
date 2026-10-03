@@ -1,0 +1,73 @@
+/* =========================================================
+   ADD / UPDATE REMINDER (/add-reminder)
+   Builds on the shared .rt-form layer from
+   ../ReminderEmailTemplate/AddReminderTemplate-redesign.css.
+   This form already used a Bootstrap two-column grid with
+   labels above inputs, so only spacing and type are tuned here.
+   ========================================================= */
+
+/* Package.css sets .container-fluid padding globally */
+.container-fluid.rm-form {
+  padding: 20px 28px 24px !important;
+}
+
+.rm-form .rt-card > .row {
+  --bs-gutter-x: 24px;
+  row-gap: 4px;
+}
+
+.rm-form .rt-card .mb-3 {
+  margin-bottom: 14px !important;
+}
+
+/* Package.css makes every label bold !important */
+.rm-form .rt-card .form-label {
+  margin: 0 0 7px;
+  color: var(--rt-label);
+  font-size: 13.5px;
+  font-weight: 600 !important;
+}
+
+.rm-form .rt-card .input-group {
+  flex-wrap: wrap;
+}
+
+.rm-form .rt-card .input-group > div {
+  width: 100%;
+}
+
+/* Days + Sequence / Repeat + Frequency share a half-width column */
+.rm-form .rt-card .col-lg-6 > .row {
+  --bs-gutter-x: 24px;
+  margin-right: -12px !important;
+  margin-left: -12px !important;
+}
+
+/* react-select multi-value chips (Document Status) */
+.rm-form [class*="-multiValue"] {
+  border-radius: 6px !important;
+  background: var(--rt-accent-soft) !important;
+}
+
+.rm-form [class*="-multiValue"] > div:first-child {
+  color: var(--rt-accent-text) !important;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* Validation labels: keep them small, not bold */
+.rm-form .validation {
+  font-weight: 500 !important;
+}
+
+/* Footer: the inner column carried mt-3 and text-right */
+.rm-form .rt-footer > .col-lg-12 {
+  margin-top: 0 !important;
+  padding: 0 4px !important;
+}
+
+@media (max-width: 767px) {
+  .container-fluid.rm-form {
+    padding: 16px 12px 20px !important;
+  }
+}

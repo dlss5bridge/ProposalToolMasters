@@ -7,6 +7,8 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import SuccessModal from "../../../../components/SuccessModal";
 import "../../../../pages/configure/packages/Package.css";
 import "../../../configure/services/ServiceStyle.css";
+import "../ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "./AddUpdateReminder-redesign.css";
 import { ERROR_MESSAGES } from "../../../../components/GlobalMessage";
 import { useDispatch, useSelector } from "react-redux";
 import AcceptSuperAdminChangesConfirmation from "../../../../components/AcceptSuperAdminChangesConfirmation";
@@ -504,7 +506,7 @@ function AddUpdateReminder(props) {
 
   return (
     <>
-      <div className="container-fluid new-item-page-container">
+      <div className="container-fluid new-item-page-container rt-form rm-form">
         <div className="new-item-page-content">
           <div className="row form-row">
             <div className="col-lg-12">
@@ -517,6 +519,18 @@ function AddUpdateReminder(props) {
               <div className="separator mb-3"></div>
               <div className="template-height scrollbar" id="style-1">
                 <div className="tab-content force-overflow">
+                  <div className="rt-card">
+                  <div className="rt-card__head">
+                    <span className="rt-card__icon">
+                      <i className="ri-notification-3-line"></i>
+                    </span>
+                    <div>
+                      <h4 className="rt-card__title">Reminder Details</h4>
+                      <p className="rt-card__desc">
+                        Name, email template, recipient and which documents it applies to.
+                      </p>
+                    </div>
+                  </div>
                   <div className="row">
                     <SAPredefinedChangesNotifyMessageModel Params={{ moduleName: moduleName, SAChanges: location.state.Type }} />
 
@@ -614,6 +628,46 @@ function AddUpdateReminder(props) {
                       </div>
                     </div>
 
+                    <div className="col-lg-6">
+                      <div className="mb-3">
+                        <label className="form-label">
+                          Document Status
+                          <span className="text-danger">*</span>
+                        </label>
+                        <div className="input-group">
+                          <Select
+                            isMulti
+                            className="user-role-select"
+                            placeholder="Select..."
+                            options={documentStatusTypeLookupList}
+                            value={documentStatusValue}
+                            onChange={handleSelectChange}
+                          />
+                        </div>
+                        {requireErrorMessage && (
+                          <label className="validation">
+                            {!reminderObj.status || reminderObj.status.length === 0
+                              ? ERROR_MESSAGES
+                              : ""}
+                          </label>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                  <div className="rt-card">
+                  <div className="rt-card__head">
+                    <span className="rt-card__icon">
+                      <i className="ri-timer-line"></i>
+                    </span>
+                    <div>
+                      <h4 className="rt-card__title">Schedule</h4>
+                      <p className="rt-card__desc">
+                        When the reminder is sent and whether it repeats.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="row">
                     <div className="col-lg-6">
                       <div className="row">
                         <div className="col-lg-6">
@@ -772,31 +826,7 @@ function AddUpdateReminder(props) {
                         )}
                       </div>
                     </div>
-                    <div className="col-lg-6">
-                      <div className="mb-3">
-                        <label className="form-label">
-                          Document Status
-                          <span className="text-danger">*</span>
-                        </label>
-                        <div className="input-group">
-                          <Select
-                            isMulti
-                            className="user-role-select"
-                            placeholder="Select..."
-                            options={documentStatusTypeLookupList}
-                            value={documentStatusValue}
-                            onChange={handleSelectChange}
-                          />
-                        </div>
-                        {requireErrorMessage && (
-                          <label className="validation">
-                            {!reminderObj.status || reminderObj.status.length === 0
-                              ? ERROR_MESSAGES
-                              : ""}
-                          </label>
-                        )}
-                      </div>
-                    </div>
+                  </div>
                   </div>
                 </div>
               </div>
@@ -808,7 +838,7 @@ function AddUpdateReminder(props) {
                   .replace(/contract/gi, EngagementName)}
               </label>
               <div className="separator"></div>
-              <div className="row fieldset modal-footer">
+              <div className="row fieldset modal-footer rt-footer">
                 <div className="col-lg-12 hstack gap-2 justify-content-end text-right mt-3">
                   {location.state?.Type ? (<>
                     <button
