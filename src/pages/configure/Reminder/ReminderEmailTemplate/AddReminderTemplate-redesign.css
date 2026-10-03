@@ -52,8 +52,16 @@
   line-height: 1.25;
 }
 
-.rt-form .separator {
+/* Hide only the bare divider lines. Some components (Text Block,
+   First Page) wrap their editor in a .separator, so never hide one
+   that has content. */
+.rt-form .separator:empty {
   display: none;
+}
+
+.rt-form .separator:not(:empty) {
+  margin-bottom: 0 !important;
+  border-bottom: 0;
 }
 
 /* Scroll area */

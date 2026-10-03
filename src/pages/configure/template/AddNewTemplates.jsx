@@ -1,6 +1,8 @@
 /* global $ */
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "./template.css";
+import "../Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "./AddNewTemplates-redesign.css";
 import { Row, Col, Card, Alert } from "reactstrap";
 import Select from "react-select";
 import { AuthContextProvider } from "../../../AuthContext/AuthContext";
@@ -1925,7 +1927,7 @@ function Add_New_Templates(props) {
   };
 
   return (
-    <div className="container-fluid new-item-page-container">
+    <div className="container-fluid new-item-page-container rt-form tpl-form">
       <div
         ref={TemplateDivContainerRef}
         onClick={(e) => scrollUptoCurrentPosition(e, TemplateDivContainerRef)}
@@ -1942,6 +1944,19 @@ function Add_New_Templates(props) {
             <div class="separator mb-3"></div>
             <div className="template-height scrollbar" id="style-1">
               <div class="tab-content  force-overflow">
+                <div className="rt-card">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-file-list-3-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Template Details</h4>
+                    <p className="rt-card__desc">
+                      Who this template is for, its type and its name.
+                    </p>
+                  </div>
+                </div>
+                <div className="rt-fields">
                 <>
                   <div className="row mb-2" id="ProfessionTypeDiv">
                     <SAPredefinedChangesNotifyMessageModel
@@ -2190,6 +2205,21 @@ function Add_New_Templates(props) {
                     )}
                   </div>
                 </div>
+                </div>
+                </div>
+                <div className="rt-card">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-layout-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Layout &amp; Pages</h4>
+                    <p className="rt-card__desc">
+                      Font, watermark, first page and page orientation.
+                    </p>
+                  </div>
+                </div>
+                <div className="tpl-settings">
                 <div className="row mb-2" id="FontFamily">
                   <div
                     style={{ padding: "10px" }}
@@ -2221,6 +2251,51 @@ function Add_New_Templates(props) {
                           }),
                         }}
                       />
+                    </div>
+                  </div>
+                </div>
+                <div className="row mb-2" id="ViewMode">
+                  <div
+                    style={{ padding: "10px" }}
+                    className="col-lg-3  text-left"
+                  >
+                    <div className="mb-1">
+                      <label className="form-label">Orientation</label>
+                    </div>
+                  </div>
+                  <div className="col-lg-9">
+                    <div
+                      class="col-md-9 col-sm-9 col-lg-9 me-4"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div className="row">
+                        <div className="col-md-3 col-lg-3 me-4">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="orientation"
+                            value={1}
+                            checked={TemplateObj.orientationID === 1}
+                            onChange={handleOrientationChange}
+                            defaultChecked
+                          />
+                          <label className="form-check-lable">Portrait</label>
+                        </div>
+                        <div className="col-md-3 col-lg-3">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="orientation"
+                            value={2}
+                            checked={TemplateObj.orientationID === 2}
+                            onChange={handleOrientationChange}
+                          />
+                          <label className="form-check-label">Landscape</label>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2430,58 +2505,30 @@ function Add_New_Templates(props) {
                             </CustomWidthTooltip>
                           }
                         />
+                        <div className="text-muted helpMessage">
+                          Show the header and footer on the first page as
+                          well.
+                        </div>
                       </FormGroup>
                     </div>
                   </div>
                 </div>
-                <div className="row mb-2" id="ViewMode">
-                  <div
-                    style={{ padding: "10px" }}
-                    className="col-lg-3  text-left"
-                  >
-                    <div className="mb-1">
-                      <label className="form-label">Orientation</label>
-                    </div>
-                  </div>
-                  <div className="col-lg-9">
-                    <div
-                      class="col-md-9 col-sm-9 col-lg-9 me-4"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div className="row">
-                        <div className="col-md-3 col-lg-3 me-4">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="orientation"
-                            value={1}
-                            checked={TemplateObj.orientationID === 1}
-                            onChange={handleOrientationChange}
-                            defaultChecked
-                          />
-                          <label className="form-check-lable">Portrait</label>
-                        </div>
-                        <div className="col-md-3 col-lg-3">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="orientation"
-                            value={2}
-                            checked={TemplateObj.orientationID === 2}
-                            onChange={handleOrientationChange}
-                          />
-                          <label className="form-check-label">Landscape</label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
+                </div>
+                <div className="rt-card tpl-content">
                 {TemplateObj.templateTypeID !== null && (
                   <>
-                    <h6 className="mt-2">Template Content</h6>
+                    <div className="rt-card__head">
+                      <span className="rt-card__icon">
+                        <i className="ri-file-text-line"></i>
+                      </span>
+                      <div>
+                        <h4 className="rt-card__title">Template Content</h4>
+                        <p className="rt-card__desc">
+                          Click a variable to copy it, then paste it into an element below.
+                        </p>
+                      </div>
+                    </div>
                   </>
                 )}
                 <div className="row" id="VariablesDiv">
@@ -2569,6 +2616,7 @@ function Add_New_Templates(props) {
                     </div>
                   </div>
                 </div>
+                </div>
                 {/* <div className="row" >
                   <div className="col-12">
                     <div className="overflow-hidden">
@@ -2591,6 +2639,13 @@ function Add_New_Templates(props) {
                   </div>
                 </div> */}
               </div>
+              {templateElementList?.length > 0 && (
+                <div className="tpl-elements-head">
+                  <i className="ri-stack-line"></i>
+                  <span>Elements</span>
+                  <small>Drag a block to reorder it</small>
+                </div>
+              )}
               {templateElementList?.map((item, index) => {
                 let componentToRender = null;
                 switch (item.templateElementTypeID) {
@@ -3750,13 +3805,41 @@ function Add_New_Templates(props) {
                     style={{ opacity: "1" }}
                     draggable="true"
                     onDragStart={(e) => {
+                      // Only the block itself starts a reorder. Drags of text or
+                      // images inside an editor bubble up here too; leave those
+                      // to the editor.
+                      if (e.target !== e.currentTarget) return;
                       e.dataTransfer.setData("index", index);
+                      e.dataTransfer.effectAllowed = "move";
+                      e.currentTarget.classList.add("is-dragging");
+                    }}
+                    onDragEnd={(e) => {
+                      e.currentTarget.classList.remove("is-dragging");
+                      document
+                        .querySelectorAll(".element-block.is-drop-target")
+                        .forEach((el) => el.classList.remove("is-drop-target"));
                     }}
                     onDragOver={(e) => {
                       e.preventDefault();
+                      if (e.dataTransfer.types.includes("index")) {
+                        e.currentTarget.classList.add("is-drop-target");
+                      }
                     }}
-                    onDrop={(e) => {
+                    onDragLeave={(e) => {
+                      if (!e.currentTarget.contains(e.relatedTarget)) {
+                        e.currentTarget.classList.remove("is-drop-target");
+                      }
+                    }}
+                    // Handled in the capture phase: the Jodit editor inside a
+                    // Text Block treats any drop on it as a paste and stops the
+                    // event, so a bubbling onDrop never fired on those blocks.
+                    onDropCapture={(e) => {
+                      if (!e.dataTransfer.types.includes("index")) return;
                       e.preventDefault();
+                      e.stopPropagation();
+                      document
+                        .querySelectorAll(".element-block.is-drop-target")
+                        .forEach((el) => el.classList.remove("is-drop-target"));
                       const sourceIndex = e.dataTransfer.getData("index");
                       const targetIndex = index;
                       setRequireElementTypeErrorMessage({
@@ -3799,11 +3882,15 @@ function Add_New_Templates(props) {
                     }}
                     key={index}
                   >
+                    <span className="tpl-element__grip">
+                      <i className="ri-drag-move-2-line"></i>
+                      Element {index + 1}
+                    </span>
                     <button
                       onClick={() => DeleteBtnClicked(index)}
                       className="btn btn-sm btn-danger delete-element-btn"
                     >
-                      <i className="ion ion-md-trash mr-1"></i>Delete Element
+                      <i className="ri-delete-bin-6-line"></i>Delete Element
                     </button>
 
                     <div className="element">
@@ -3912,9 +3999,9 @@ function Add_New_Templates(props) {
               </label>
             </div>
 
-            <hr />
-            <Row className="modal-footer">
-              <p className="text-danger">
+            <Row className="modal-footer rt-footer tpl-footer">
+              <p className="text-danger tpl-footer__note">
+                <i className="ri-information-line"></i>
                 Note - Selected PDF size should be less than 20MB.
               </p>
               <Col
@@ -3956,8 +4043,9 @@ function Add_New_Templates(props) {
                     <button
                       onClick={AddElementBtnClicked}
                       style={{ float: "right", paddingTop: "5px" }}
-                      className="btn btn-md btn-success create-item-btn"
+                      className="btn btn-md btn-success create-item-btn tpl-add-element"
                     >
+                      <i className="ri-add-line"></i>
                       <span>Add Element</span>
                     </button>
                   </>

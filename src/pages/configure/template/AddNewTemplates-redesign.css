@@ -1,0 +1,529 @@
+/* =========================================================
+   ADD / UPDATE TEMPLATE (/add-template)
+   Builds on the shared .rt-form layer from
+   Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css.
+   Only the pieces unique to this form live here.
+   ========================================================= */
+
+/* template.css sets .container-fluid padding globally */
+.container-fluid.tpl-form {
+  padding: 20px 28px 24px !important;
+}
+
+/* template.css forces every label to full width */
+.tpl-form .tpl-settings label,
+.tpl-form .element-block .form-check-label {
+  width: auto !important;
+}
+
+/* ---------- Template Details ---------- */
+.tpl-form .rt-fields > #ProfessionTypeDiv {
+  grid-column: 1 / -1;
+  margin-bottom: 0 !important;
+}
+
+.tpl-form .rt-fields > #ProfessionTypeDiv > .col-lg-9 {
+  margin-bottom: 14px !important;
+}
+
+.tpl-form .rt-fields .input-group {
+  flex-wrap: wrap;
+}
+
+.tpl-form .rt-fields > .row > [style*="padding"] {
+  padding: 0 !important;
+}
+
+/* react-select multi-value chips */
+.tpl-form [class*="-multiValue"] {
+  border-radius: 6px !important;
+  background: var(--rt-accent-soft) !important;
+}
+
+.tpl-form [class*="-multiValue"] > div:first-child {
+  color: var(--rt-accent-text) !important;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* ---------- Layout & Pages ----------
+   Two-column grid, labels above controls:
+   Font Family | Orientation
+   Watermark (full width)
+   First Page tile | Header/Footer tile
+   -------------------------------------- */
+.tpl-form .tpl-settings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+}
+
+.tpl-form .tpl-settings > .row {
+  display: block;
+  margin: 0 !important;
+}
+
+.tpl-form .tpl-settings > .row > [class*="col-"] {
+  width: 100%;
+  max-width: 100%;
+  flex: none;
+  padding: 0 !important;
+}
+
+.tpl-form .tpl-settings > .row > [class*="col-"] > [class*="col-"] {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 !important;
+  padding: 0;
+}
+
+.tpl-form .tpl-settings .mb-1,
+.tpl-form .tpl-settings .mb-2 {
+  margin-bottom: 0 !important;
+}
+
+.tpl-form .tpl-settings .form-label {
+  display: block;
+  margin: 0 0 7px;
+  color: var(--rt-label);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.tpl-form .tpl-settings > #WatermarkDiv {
+  grid-column: 1 / -1;
+}
+
+/* Orientation: two-option segmented control, same height as a select */
+.tpl-form .tpl-settings > #ViewMode .row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.tpl-form .tpl-settings > #ViewMode .row > [class*="col-"] {
+  position: relative;
+  width: auto;
+  max-width: none;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 0 14px;
+  border: 1px solid var(--rt-border);
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.tpl-form .tpl-settings > #ViewMode .row > [class*="col-"]:has(input:checked) {
+  border-color: var(--rt-accent);
+  background: var(--rt-accent-soft);
+}
+
+.tpl-form .tpl-settings > #ViewMode .form-check-input {
+  flex: none;
+  margin: 0;
+  cursor: pointer;
+}
+
+.tpl-form .tpl-settings > #ViewMode .form-check-label,
+.tpl-form .tpl-settings > #ViewMode .form-check-lable {
+  margin: 0;
+  color: var(--rt-text);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.tpl-form .tpl-settings > #ViewMode .row > [class*="col-"]:has(input:checked) label {
+  color: var(--rt-accent-text);
+  font-weight: 600;
+}
+
+.tpl-form .form-check-input:checked {
+  border-color: var(--rt-accent);
+  background-color: var(--rt-accent);
+}
+
+/* First Page + Header/Footer: toggle tiles
+   (wrappers flattened so title, switch and note share one grid) */
+.tpl-form .tpl-settings > #FirstPage,
+.tpl-form .tpl-settings > .row:has(#FirstPageHeaderFooter) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 16px 18px !important;
+  border: 1px solid var(--rt-line);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.tpl-form .tpl-settings > #FirstPage > [class*="col-"]:not(:first-child),
+.tpl-form .tpl-settings > #FirstPage > [class*="col-"] > [class*="col-"],
+.tpl-form .tpl-settings > #FirstPage .MuiFormGroup-root,
+.tpl-form .tpl-settings > .row:has(#FirstPageHeaderFooter) > [class*="col-"]:not(:first-child),
+.tpl-form .tpl-settings > .row:has(#FirstPageHeaderFooter) > [class*="col-"] > [class*="col-"],
+.tpl-form .tpl-settings > .row:has(#FirstPageHeaderFooter) .MuiFormGroup-root {
+  display: contents !important;
+}
+
+.tpl-form .tpl-settings > #FirstPage > [class*="col-"]:first-child,
+.tpl-form .tpl-settings > .row:has(#FirstPageHeaderFooter) > [class*="col-"]:first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.tpl-form .tpl-settings > #FirstPage .form-label,
+.tpl-form .tpl-settings > .row:has(#FirstPageHeaderFooter) .form-label {
+  margin: 0;
+  color: var(--rt-text);
+  font-size: 14px;
+}
+
+.tpl-form .tpl-settings .MuiFormControlLabel-root {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0 -8px 0 0;
+}
+
+.tpl-form .tpl-settings .helpMessage {
+  grid-column: 1 / -1;
+  margin: 0 !important;
+  color: var(--rt-muted) !important;
+  font-size: 12.5px;
+  line-height: 1.5;
+  text-align: left !important;
+}
+
+.tpl-form .tpl-settings .helpMessage b {
+  display: none;
+}
+
+/* Android12Switch: neutral off, accent on (no red/green) */
+.tpl-form .tpl-settings .MuiSwitch-track {
+  background: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+.tpl-form .tpl-settings .Mui-checked + .MuiSwitch-track {
+  background: var(--rt-accent) !important;
+}
+
+.tpl-form .tpl-settings .MuiSwitch-thumb {
+  background: #fff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
+}
+
+.tpl-form .tpl-settings .MuiSwitch-track::after {
+  display: none;
+}
+
+/* Watermark upload */
+.tpl-form #WatermarkDiv input[type="file"] {
+  width: 100%;
+  padding: 18px;
+  border: 1.5px dashed #b9c6d6;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: var(--rt-muted);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.tpl-form #WatermarkDiv input[type="file"]:hover {
+  border-color: var(--rt-accent);
+  background: #f2fbfd;
+}
+
+.tpl-form #WatermarkDiv input[type="file"]::file-selector-button {
+  margin-right: 14px;
+  padding: 8px 16px;
+  border: 1px solid rgba(15, 181, 212, 0.4);
+  border-radius: 8px;
+  background: var(--rt-accent-soft);
+  color: var(--rt-accent-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tpl-form #WatermarkDiv .input-group.mt-3 {
+  margin-top: 0 !important;
+}
+
+.tpl-form #WatermarkDiv p {
+  margin-bottom: 8px;
+  color: var(--rt-muted);
+  font-size: 13px;
+}
+
+.tpl-form #WatermarkDiv iframe {
+  border: 1px solid var(--rt-line) !important;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+/* Soft red delete buttons (watermark + elements) */
+.tpl-form .remove-item-btn,
+.tpl-form .element-block .delete-element-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: #fdecee !important;
+  color: #d93b4a !important;
+  font-size: 12.5px !important;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.tpl-form .remove-item-btn:hover,
+.tpl-form .element-block .delete-element-btn:hover {
+  background: #fbdade !important;
+}
+
+.tpl-form .remove-item-btn {
+  margin: 0 0 10px !important;
+}
+
+.tpl-form .remove-item-btn .margin-right {
+  margin-right: 0;
+}
+
+.tpl-form .element-block .delete-element-btn i {
+  font-size: 14px;
+}
+
+/* ---------- Template Content ---------- */
+/* hide the card until a template type is chosen */
+.tpl-form .tpl-content:not(:has(.rt-card__head)) {
+  display: none;
+}
+
+.tpl-form .tpl-content #VariablesDiv {
+  margin: 0;
+}
+
+.tpl-form .tpl-content #VariablesDiv > .col-12 {
+  padding: 0;
+}
+
+.tpl-form .tpl-content .fieldset-group.helper-variables-div {
+  margin: 0 !important;
+  padding: 16px 18px 8px !important;
+}
+
+.tpl-form .rt-content .variableHeading,
+.tpl-form .tpl-content .variableHeading {
+  display: block;
+  margin: 0 0 10px;
+  color: var(--rt-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ---------- Elements ---------- */
+.tpl-form .tpl-elements-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 26px 2px 0;
+  color: var(--rt-text);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tpl-form .tpl-elements-head i {
+  align-self: center;
+  color: var(--rt-accent-text);
+  font-size: 18px;
+}
+
+.tpl-form .tpl-elements-head small {
+  color: var(--rt-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.tpl-form .element-block {
+  position: relative;
+  margin: 14px 0 0 !important;
+  padding: 52px 24px 22px !important;
+  border: 1px solid var(--rt-line) !important;
+  border-radius: 14px;
+  background: #fff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  text-align: left;
+  cursor: move;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tpl-form .element-block:hover {
+  border-color: #cfe9f0 !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+/* Drag and drop feedback */
+.tpl-form .element-block.is-dragging {
+  opacity: 0.45;
+}
+
+.tpl-form .element-block.is-drop-target {
+  border-color: var(--rt-accent) !important;
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.18);
+  background: #f7fdfe !important;
+}
+
+.tpl-form .tpl-element__grip {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.tpl-form .tpl-element__grip i {
+  color: #94a3b8;
+  font-size: 16px;
+}
+
+.tpl-form .element-block .delete-element-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  margin: 0 !important;
+}
+
+.tpl-form .element-block .element {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* "Content" sub-heading inside Text Block / First Page elements */
+.tpl-form .element h5 {
+  margin: 0 0 8px !important;
+  color: var(--rt-label);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* Editors inside elements match the framed editor used elsewhere */
+.tpl-form .element .jodit-container:not(.jodit_inline) {
+  overflow: hidden;
+  border: 1px solid #dfe5ec !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+}
+
+.tpl-form .element .jodit-toolbar__box:not(:empty) {
+  border-bottom: 1px solid #e8edf3 !important;
+  background: #f8fafc !important;
+}
+
+.tpl-form .element .jodit-toolbar-editor-collection_mode_horizontal {
+  background-image: none !important;
+}
+
+.tpl-form .element .jodit-wysiwyg {
+  padding: 16px 18px !important;
+}
+
+/* Element Type: label above select */
+.tpl-form .element > .row.fieldset:first-child {
+  margin: 0 0 16px !important;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.tpl-form .element > .row.fieldset:first-child > [class*="col-md"] {
+  width: 100%;
+  max-width: 100%;
+  flex: 0 0 100%;
+  padding: 0 !important;
+}
+
+.tpl-form .element .fieldset-label {
+  margin: 0 0 7px;
+  color: var(--rt-label);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* ---------- Footer ---------- */
+.tpl-form .tpl-footer {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tpl-form .tpl-footer {
+  align-items: center;
+}
+
+.tpl-form .tpl-footer > * {
+  width: auto;
+}
+
+.tpl-form .tpl-footer > [class*="col"] {
+  flex: 0 1 auto;
+  padding-top: 0 !important;
+}
+
+.tpl-form .tpl-footer__note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 !important;
+  color: var(--rt-muted) !important;
+  font-size: 12.5px;
+}
+
+.tpl-form .tpl-footer__note i {
+  color: #d99a1e;
+  font-size: 15px;
+}
+
+.rt-form .rt-footer .btn.create-item-btn.tpl-add-element {
+  gap: 6px;
+  border-color: rgba(15, 181, 212, 0.4) !important;
+  background: var(--rt-accent-soft) !important;
+  box-shadow: none;
+  color: var(--rt-accent-text) !important;
+}
+
+.rt-form .rt-footer .btn.create-item-btn.tpl-add-element:hover {
+  background: #d4f1f8 !important;
+}
+
+.tpl-form .tpl-add-element i {
+  font-size: 16px;
+}
+
+@media (max-width: 767px) {
+  .container-fluid.tpl-form {
+    padding: 16px 12px 20px !important;
+  }
+
+  .tpl-form .tpl-settings {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tpl-form .element-block {
+    padding: 52px 16px 18px !important;
+  }
+}
