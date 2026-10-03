@@ -6,6 +6,8 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Android12Switch from "../../../components/AndroidSwitch";
 import "../email_template/EmailTemplate.css";
+import "../Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "./AddNewTemplateHeaderFooter-redesign.css";
 import { Row, Col } from "reactstrap";
 import Select from "react-select";
 import { AuthContextProvider } from "../../../AuthContext/AuthContext";
@@ -1095,7 +1097,7 @@ if (isHeaderEmpty && isFooterEmpty) {
   // }
 
   return (
-    <div className="container-fluid new-item-page-container">
+    <div className="container-fluid new-item-page-container rt-form thf-form">
       <div class="new-item-page-nav"></div>
       <div class="new-item-page-content">
         <div class="row form-row">
@@ -1109,6 +1111,19 @@ if (isHeaderEmpty && isFooterEmpty) {
             <div class="separator mb-3"></div>
             <div className="template-height scrollbar" id="style-1">
               <div class="tab-content">
+                <div className="rt-card">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-file-list-3-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Template Details</h4>
+                    <p className="rt-card__desc">
+                      Which templates this header/footer applies to, its name and type.
+                    </p>
+                  </div>
+                </div>
+                <div className="rt-fields">
                 <>
                   {(common.professionTypeLists?.length > 1 ||
                     common.organisationKeyID === null) && (
@@ -1259,6 +1274,53 @@ if (isHeaderEmpty && isFooterEmpty) {
                   </div>
                 </div>
 
+                <div className="row fieldset" id="TemplateTypeDiv">
+                  <div className="col-lg-3 template-label text-left">
+                    <div className="mb-1">
+                      <label className="form-label">
+                        Template Type
+                        <span className="text-danger">*</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="col-lg-9 ">
+                    <div className="">
+                      <div className="input-group">
+                        <Select
+                          className="user-role-select"
+                          options={TemplateTypeLookupList}
+                          value={TemplateTypeLookupList.find((t) => t.value === TemplateObj.templateTypeID) || null}
+                          onChange={(e) => {
+                            setRequireErrorMessage(false);
+                            handleChangeTemplateType(e);
+                          }}
+                        />
+                      </div>
+                      {requireErrorMessage &&
+                        (TemplateObj.templateTypeID == "" ||
+                          TemplateObj.templateTypeID == null) ? (
+                        <label className="validation">{ERROR_MESSAGES}</label>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  </div>
+                </div>
+                </div>
+                </div>
+                <div className="rt-card">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-ruler-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Size &amp; Lines</h4>
+                    <p className="rt-card__desc">
+                      Height of the header and footer areas, and separator lines.
+                    </p>
+                  </div>
+                </div>
+                <div className="rt-fields thf-layout">
                 <div className="row fieldset" id="TemplateNameDiv">
                   <div className="col-lg-3 template-label text-left">
                     <div className="mb-1">
@@ -1353,41 +1415,22 @@ if (isHeaderEmpty && isFooterEmpty) {
                     </div>
                   </div>
                 </div>
-                <div className="row fieldset" id="TemplateTypeDiv">
-                  <div className="col-lg-3 template-label text-left">
-                    <div className="mb-1">
-                      <label className="form-label">
-                        Template Type
-                        <span className="text-danger">*</span>
-                      </label>
-                    </div>
-                  </div>
-                  <div className="col-lg-9 ">
-                    <div className="">
-                      <div className="input-group">
-                        <Select
-                          className="user-role-select"
-                          options={TemplateTypeLookupList}
-                          value={TemplateTypeLookupList.find((t) => t.value === TemplateObj.templateTypeID) || null}
-                          onChange={(e) => {
-                            setRequireErrorMessage(false);
-                            handleChangeTemplateType(e);
-                          }}
-                        />
-                      </div>
-                      {requireErrorMessage &&
-                        (TemplateObj.templateTypeID == "" ||
-                          TemplateObj.templateTypeID == null) ? (
-                        <label className="validation">{ERROR_MESSAGES}</label>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  </div>
+                </div>
                 </div>
                 {(TemplateObj.templateTypeID === 42 ||
                   TemplateObj.templateTypeID === "42") && (
-                    <>
+                    <div className="rt-card thf-images">
+                      <div className="rt-card__head">
+                        <span className="rt-card__icon">
+                          <i className="ri-image-line"></i>
+                        </span>
+                        <div>
+                          <h4 className="rt-card__title">Header &amp; Footer Images</h4>
+                          <p className="rt-card__desc">
+                            Upload the images shown at the top and bottom of each page.
+                          </p>
+                        </div>
+                      </div>
                       <div className="row">
                         <div className="col-lg-3 template-label text-left">
                           <div className="mb-1">
@@ -1615,7 +1658,7 @@ if (isHeaderEmpty && isFooterEmpty) {
                           </div>
                         </div>
                       </div>
-                    </>
+                    </div>
                   )}
   
                 {(TemplateObj.templateTypeID === 42 ||
@@ -1652,9 +1695,19 @@ if (isHeaderEmpty && isFooterEmpty) {
 
                 {(TemplateObj.templateTypeID === 41 ||
                   TemplateObj.templateTypeID === "41") && (
-                    <div>
-                      <h6 className="mt-2">Template Content For Header</h6>
-                      <div className="separator mb-3" />
+                    <div className="rt-card rt-content">
+                      <div className="rt-card__head">
+                        <span className="rt-card__icon">
+                          <i className="ri-layout-top-line"></i>
+                        </span>
+                        <div>
+                          <h4 className="rt-card__title">Template Content For Header</h4>
+                          <p className="rt-card__desc">
+                            Click a variable to copy it, then paste it into the header below.
+                          </p>
+                        </div>
+                      </div>
+
                       <div className="fieldset-group helper-variables-div">
                         <label className="fieldset-group-label">Variables</label>
                         <AccountantVariables
@@ -1696,9 +1749,19 @@ if (isHeaderEmpty && isFooterEmpty) {
 
                 {(TemplateObj.templateTypeID === 41 ||
                   TemplateObj.templateTypeID === "41") && (
-                    <div>
-                      <h6 className="mt-2">Template Content For Footer</h6>
-                      <div className="separator mb-3" />
+                    <div className="rt-card rt-content">
+                      <div className="rt-card__head">
+                        <span className="rt-card__icon">
+                          <i className="ri-layout-bottom-line"></i>
+                        </span>
+                        <div>
+                          <h4 className="rt-card__title">Template Content For Footer</h4>
+                          <p className="rt-card__desc">
+                            Click a variable to copy it, then paste it into the footer below.
+                          </p>
+                        </div>
+                      </div>
+
                       <div className="fieldset-group helper-variables-div">
                         <label className="fieldset-group-label">Variables</label>
                         <AccountantVariables
@@ -1752,8 +1815,7 @@ if (isHeaderEmpty && isFooterEmpty) {
               </label>
             </div>
 
-            <hr />
-            <Row className="modal-footer">
+            <Row className="modal-footer rt-footer">
               <Col
                 style={{ paddingTop: "14px" }}
                 className="hstack gap-2 justify-content-end"
