@@ -607,6 +607,7 @@ const Prospects = () => {
       const responseData = data?.data?.responseData?.data;
 
       const formatted = responseData.map((item) => ({
+        prospectVariableKeyID: item.prospectVariableKeyID,
         globalVariableKeyID: item.globalVariableKeyID,
         globalVariableID: item.globalVariableID,
         globalVariableName: item.globalVariableName,
