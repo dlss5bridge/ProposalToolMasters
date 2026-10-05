@@ -9,6 +9,9 @@ import "react-calendar/dist/Calendar.css";
 import SuccessModal from "../../../../components/SuccessModal";
 import "../../../../pages/configure/packages/Package.css";
 import "../../../configure/services/ServiceStyle.css";
+import "../../../configure/Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "../../../configure/Reminder/Reminders/AddUpdateReminder-redesign.css";
+import "./SuperAdminMarketingReminderAddUpdate-redesign.css";
 import { ERROR_MESSAGES } from "../../../../components/GlobalMessage";
 import { useDispatch, useSelector } from "react-redux";
 import { EmailTemplates, MarketingEmailAddressIdType } from "../../../../Middleware/enums";
@@ -369,7 +372,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
 
   return (
     <>
-      <div className="container-fluid new-item-page-container">
+      <div className="container-fluid new-item-page-container rt-form rm-form mkr-form">
         <div className="new-item-page-content">
           <div className="row form-row">
             <div className="col-lg-12">
@@ -382,6 +385,18 @@ function SuperAdminMarketingReminderAddUpdate(props) {
               <div className="separator mb-3"></div>
               <div className="template-height scrollbar" id="style-1">
                 <div className="tab-content force-overflow">
+                  <div className="rt-card">
+                  <div className="rt-card__head">
+                    <span className="rt-card__icon">
+                      <i className="ri-notification-3-line"></i>
+                    </span>
+                    <div>
+                      <h4 className="rt-card__title">Reminder Details</h4>
+                      <p className="rt-card__desc">
+                        Name, email template and who receives this marketing reminder.
+                      </p>
+                    </div>
+                  </div>
                   <div className="row">
                     <div className="col-lg-6">
                       <div className="mb-3">
@@ -487,6 +502,21 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                       </div>
                     </div>
 
+                  </div>
+                  </div>
+                  <div className="rt-card">
+                  <div className="rt-card__head">
+                    <span className="rt-card__icon">
+                      <i className="ri-timer-line"></i>
+                    </span>
+                    <div>
+                      <h4 className="rt-card__title">Schedule</h4>
+                      <p className="rt-card__desc">
+                        When the reminder is sent and whether it repeats.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="row">
                     <div className="col-lg-6">
                       <div className="row">
                         <div className="col-lg-6">
@@ -711,6 +741,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                       </div>
                     </div>
                   </div>
+                  </div>
                 </div>
               </div>
               <label
@@ -720,7 +751,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                 {errorMessage}
               </label>
               <div className="separator"></div>
-              <div className="row fieldset modal-footer">
+              <div className="row fieldset modal-footer rt-footer">
                 <div className="col-lg-12 hstack gap-2 justify-content-end text-right mt-3">
                   <button
                     className="btn btn-md btn-light"

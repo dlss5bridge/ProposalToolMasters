@@ -11,6 +11,16 @@
   padding: 20px 28px 24px !important;
 }
 
+/* No inner scroll box: app.min.css forces .template-height { overflow-x: hidden
+   !important; overflow-y: scroll }, which clipped dropdown menus and the date
+   picker at the bottom of the cards. These forms are short, so the area grows
+   with its content and the page scrolls instead. Shared by /add-reminder and
+   /add-update-marketing-reminder. */
+.rm-form .template-height {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
 .rm-form .rt-card > .row {
   --bs-gutter-x: 24px;
   row-gap: 4px;

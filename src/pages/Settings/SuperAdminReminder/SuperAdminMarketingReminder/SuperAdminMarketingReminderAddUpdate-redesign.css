@@ -1,0 +1,165 @@
+/* =========================================================
+   ADD / UPDATE MARKETING REMINDER (/add-update-marketing-reminder)
+   Same layout as the Add/Update Reminder form: builds on .rt-form
+   (AddReminderTemplate-redesign.css) and .rm-form
+   (AddUpdateReminder-redesign.css). Only the Custom Date picker is
+   styled here. Visual only.
+   ========================================================= */
+
+/* ---------- Custom Date (react-date-picker) ---------- */
+.mkr-form .react-date-picker {
+  width: 100%;
+}
+
+.mkr-form .react-date-picker__wrapper {
+  height: 42px;
+  padding: 0 8px 0 12px;
+  border: 1px solid var(--rt-border, #c3ccd9) !important;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mkr-form .react-date-picker--open .react-date-picker__wrapper,
+.mkr-form .react-date-picker__wrapper:focus-within {
+  border-color: var(--rt-accent, #0fb5d4) !important;
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14);
+}
+
+/* Each part gets a minimum width so digits are never cut off; single-digit
+   values keep the library's own leading-zero layout. */
+.mkr-form .react-date-picker__inputGroup {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  color: #0f172a;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mkr-form .react-date-picker__inputGroup__leadingZero {
+  font-size: 14px;
+}
+
+.mkr-form .react-date-picker__inputGroup__input,
+.mkr-form .react-date-picker__inputGroup__input:invalid {
+  height: auto;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  background: transparent;
+  outline: none;
+  text-align: left;
+}
+
+.mkr-form .react-date-picker__inputGroup__input:focus {
+  border-radius: 3px;
+  background: #e6f7fb;
+}
+
+.mkr-form .react-date-picker__inputGroup__day:not(.react-date-picker__inputGroup__input--hasLeadingZero),
+.mkr-form .react-date-picker__inputGroup__month:not(.react-date-picker__inputGroup__input--hasLeadingZero) {
+  min-width: calc(2ch + 2px) !important;
+}
+
+.mkr-form .react-date-picker__inputGroup__input--hasLeadingZero {
+  min-width: calc(1ch + 2px) !important;
+}
+
+.mkr-form .react-date-picker__inputGroup__year {
+  min-width: calc(4ch + 2px) !important;
+}
+
+.mkr-form .react-date-picker__inputGroup__divider {
+  padding: 0 2px;
+  color: #94a3b8;
+}
+
+.mkr-form .react-date-picker__button svg {
+  stroke: #64748b;
+}
+
+.mkr-form .react-date-picker__button:hover svg {
+  stroke: #0b7f95;
+}
+
+/* Calendar opens centred on screen with the page dimmed behind it, so the
+   scrolling form area cannot clip it. Clicks outside still close it. */
+.mkr-form .react-date-picker__calendar--open {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 1080 !important;
+  width: 340px !important;
+  max-width: calc(100vw - 24px);
+  margin: 0;
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  box-shadow: 0 0 0 100vmax rgba(15, 23, 42, 0.35);
+}
+
+.mkr-form .react-calendar {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dce4ed !important;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  font-family: inherit;
+}
+
+.mkr-form .react-calendar__navigation {
+  margin-bottom: 6px;
+}
+
+.mkr-form .react-calendar__navigation button {
+  min-width: 36px;
+  border-radius: 8px;
+  color: #14243a;
+  font-weight: 600;
+}
+
+.mkr-form .react-calendar__navigation button:enabled:hover,
+.mkr-form .react-calendar__navigation button:enabled:focus {
+  background: #f1f5f9;
+}
+
+.mkr-form .react-calendar__month-view__weekdays__weekday {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mkr-form .react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+
+.mkr-form .react-calendar__tile {
+  padding: 9px 4px;
+  border-radius: 8px;
+  color: #334258;
+  font-size: 13px;
+}
+
+.mkr-form .react-calendar__tile:enabled:hover,
+.mkr-form .react-calendar__tile:enabled:focus {
+  background: #e6f7fb;
+  color: #0b7f95;
+}
+
+.mkr-form .react-calendar__tile--now {
+  background: #f1f5f9;
+  font-weight: 700;
+}
+
+.mkr-form .react-calendar__tile--active,
+.mkr-form .react-calendar__tile--active:enabled:hover,
+.mkr-form .react-calendar__tile--active:enabled:focus {
+  background: #0fb5d4;
+  color: #fff;
+}
+
+.mkr-form .react-calendar__month-view__days__day--neighboringMonth {
+  color: #cbd5e1;
+}
