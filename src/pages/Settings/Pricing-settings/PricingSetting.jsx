@@ -987,7 +987,7 @@ const Pricing_Settings = () => {
                           <div class="col-lg-2 col-md-4 col-sm-12"></div>
                           <div class="fieldset col-12">
                             <label class=" fieldset-label pe-2">
-                              Default Proposal Format
+                              Default {proposalName} Format
                             </label>
                             <Select
                               className="phone-input-country-code selectDropDown Drop-down-width pt-2"
@@ -1012,7 +1012,7 @@ const Pricing_Settings = () => {
                           {pricingSettingObj?.defaultProposalFormatID === 3 && (
                             <div class="fieldset col-12">
                               <label class=" fieldset-label pe-2">
-                                Proposal Types
+                                {proposalName} Types
                               </label>
                               <Select
                                 className="phone-input-country-code selectDropDown Drop-down-width pt-2"
@@ -1073,7 +1073,7 @@ const Pricing_Settings = () => {
                               }}
                             >
                               <label class="fieldset-label table-content-font PricingSetting-Proposal">
-                                <b>Collect Amendment Payment</b>
+                                <b>Collect Web Base {proposalName} Payment</b>
                               </label>
 
                               {/* Step 1: When should payment be collected */}
@@ -1257,6 +1257,7 @@ const Pricing_Settings = () => {
               <div className="col-md-6">
                 <Select
                   isMulti
+                  className="phone-input-country-code selectDropDown Drop-down-width"
                   options={ServiceFeeInflationConfig.ServiceFeeInflationList.filter(
                     (s) => {
                       // Fixed price services (pricingTypeID !== formula type) that are

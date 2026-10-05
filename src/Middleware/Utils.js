@@ -376,7 +376,7 @@ const PreviewSelection = [
   },
   {
     value: 3,
-    label: "Web-Proposal",
+    label: "Web Proposal",
   },
 ];
 const webBasedProposalTypes = [
