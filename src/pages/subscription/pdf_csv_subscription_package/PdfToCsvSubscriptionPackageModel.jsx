@@ -17,6 +17,8 @@ import { AuthContextProvider } from "../../../AuthContext/AuthContext";
 import { useNavigate } from "react-router-dom";
 import BackButtonSvg from "../../../components/BackButtonSvg";
 import Android12Switch from "../../../components/AndroidSwitch";
+import "../../configure/Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "./PdfToCsvSubscriptionPackageModel-redesign.css";
 import DropDown from "../../../components/DropDown";
 import { PdfToCsvValidityList } from "../../../Middleware/Utils";
 import {
@@ -338,7 +340,7 @@ function PdfToCsvSubscriptionPackageModel(props) {
       ref={SubscriptionContainerRef}
       onClick={(e) => scrollUptoCurrentPosition(e, SubscriptionContainerRef)}
     >
-      <div class="container-fluid new-item-page-container">
+      <div class="container-fluid new-item-page-container rt-form pdfsub-form">
         <div class="new-item-page-nav"></div>
         <div class="new-item-page-content">
           <div class="row form-row">
@@ -352,6 +354,18 @@ function PdfToCsvSubscriptionPackageModel(props) {
               <div class="separator mb-3"></div>
 
               <div className="template-height scrollbar" id="style-1">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-file-excel-2-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Package Details</h4>
+                    <p className="rt-card__desc">
+                      Name, page limit, validity and price of this PDF to CSV
+                      package.
+                    </p>
+                  </div>
+                </div>
                 <div class="tab-content">
                   <div className="row" id="PackageName">
                     <div className="col-lg-6">
@@ -835,7 +849,6 @@ function PdfToCsvSubscriptionPackageModel(props) {
               >
                 {errorMessage}
               </label>
-              <hr />
               <Row class="modal-footer">
                 <Col
                   style={{ paddingTop: "14px" }}

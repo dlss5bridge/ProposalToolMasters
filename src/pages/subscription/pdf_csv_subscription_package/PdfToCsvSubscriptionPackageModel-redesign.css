@@ -1,0 +1,208 @@
+/* =========================================================
+   ADD / UPDATE PDF TO CSV SUBSCRIPTION PACKAGE
+   (/pdf-csv-subscriptionModal)
+   Builds on the shared .rt-form layer from
+   configure/Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css.
+   Visual only: inputs, handlers and validation are unchanged.
+
+   Compact layout: one card, every field on one line with its label
+   above it. The wrapper rows are flattened (display: contents) so
+   the label/field cells of Name, Pages, Validity, Months and Price
+   all sit in one grid that fills column by column.
+   ========================================================= */
+
+/* global .container-fluid rules set their own padding */
+.container-fluid.pdfsub-form {
+  padding: 20px 28px 24px !important;
+}
+
+/* ---------- Card ---------- */
+.pdfsub-form .template-height {
+  max-height: none;
+  min-height: 0;
+  margin-top: 20px;
+  padding: 22px 24px 24px !important;
+  /* app.min.css forces .template-height { overflow-x: hidden !important;
+     overflow-y: scroll }, which clips the Validity dropdown menu. The form
+     is short, so the card does not need to scroll. */
+  overflow: visible !important;
+  border: 1px solid var(--rt-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.pdfsub-form .template-height > .rt-card__head {
+  margin-bottom: 18px;
+}
+
+/* ---------- Two-column field grid ----------
+   Cells (label, field, label, field...) are placed explicitly:
+     row 1-2: Name     | Pages
+     row 3-4: Validity | Months (or Price when Months is hidden)
+     row 5-6: Price    |          (only when Months is shown)  */
+.pdfsub-form .template-height > .tab-content {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 7px 24px !important;
+}
+
+/* Name */
+.pdfsub-form #PackageName > :nth-child(1) { grid-column: 1; grid-row: 1; }
+.pdfsub-form #PackageName > :nth-child(2) { grid-column: 1; grid-row: 2; }
+
+/* Pages, Validity */
+.pdfsub-form #validity > :nth-child(1) { grid-column: 2; grid-row: 1; }
+.pdfsub-form #validity > :nth-child(2) { grid-column: 2; grid-row: 2; }
+.pdfsub-form #validity > :nth-child(3) { grid-column: 1; grid-row: 3; }
+.pdfsub-form #validity > :nth-child(4) { grid-column: 1; grid-row: 4; }
+
+/* Months (when shown) then Price */
+.pdfsub-form #discountedPrice > :nth-child(1) { grid-column: 2; grid-row: 3; }
+.pdfsub-form #discountedPrice > :nth-child(2) { grid-column: 2; grid-row: 4; }
+.pdfsub-form #discountedPrice > :nth-child(3) { grid-column: 1; grid-row: 5; }
+.pdfsub-form #discountedPrice > :nth-child(4) { grid-column: 1; grid-row: 6; }
+
+/* space between one field and the label below it */
+.pdfsub-form #validity > :nth-child(3),
+.pdfsub-form #discountedPrice > :nth-child(1),
+.pdfsub-form #discountedPrice > :nth-child(3) {
+  margin-top: 12px !important;
+}
+
+.pdfsub-form .tab-content > #PackageName,
+.pdfsub-form .tab-content > .row.p-2,
+.pdfsub-form .tab-content .fieldset-group,
+.pdfsub-form .tab-content #validity,
+.pdfsub-form .tab-content #discountedPrice {
+  display: contents;
+}
+
+/* the old fieldset legend: the card heading replaces it */
+.pdfsub-form .fieldset-group > .fieldset-group-label {
+  display: none !important;
+}
+
+/* every label cell / field cell */
+.pdfsub-form .tab-content [class*="col-"] {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+.pdfsub-form .tab-content label:not(.validation) {
+  display: block;
+  width: auto !important;
+  margin: 0 !important;
+  color: var(--rt-label);
+  font-size: 13.5px;
+  font-weight: 600 !important;
+  text-align: left !important;
+}
+
+.pdfsub-form .tab-content label .text-danger {
+  margin-left: 3px;
+}
+
+.pdfsub-form .tab-content .input-group {
+  flex-wrap: wrap;
+}
+
+.pdfsub-form .tab-content .input-group > div {
+  width: 100% !important;
+}
+
+.pdfsub-form .tab-content .validation {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+/* ---------- Footer (the row right after the error message) ---------- */
+.pdfsub-form #ErrorMessage + div {
+  display: flex;
+  justify-content: flex-end;
+  margin: 16px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+/* buttons are Add then Cancel in the markup; show Cancel first */
+.pdfsub-form #ErrorMessage + div > div {
+  width: auto;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 10px;
+  padding: 0 4px !important;
+}
+
+.pdfsub-form #ErrorMessage + div .btn {
+  float: none !important;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 20px !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.pdfsub-form #ErrorMessage + div .btn.create-item-btn {
+  background: var(--rt-accent) !important;
+  box-shadow: 0 4px 12px rgba(15, 181, 212, 0.22);
+  color: #fff !important;
+}
+
+.pdfsub-form #ErrorMessage + div .btn.create-item-btn:hover {
+  background: var(--rt-accent-hover) !important;
+}
+
+.pdfsub-form #ErrorMessage + div .btn.create-item-btn:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.pdfsub-form #ErrorMessage + div .btn.btn-light {
+  background: #eaf1fb !important;
+  color: #334155 !important;
+}
+
+.pdfsub-form #ErrorMessage + div .btn.btn-light:hover {
+  background: #dde7f5 !important;
+}
+
+/* phones: one field per line, label above field (DOM order) */
+@media (max-width: 767px) {
+  .pdfsub-form .template-height > .tab-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pdfsub-form .tab-content [class*="col-"] {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  .pdfsub-form .tab-content label:not(.validation) {
+    margin-top: 12px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .container-fluid.pdfsub-form {
+    padding: 16px 12px 20px !important;
+  }
+
+  .pdfsub-form .template-height {
+    padding: 18px 16px !important;
+  }
+}
