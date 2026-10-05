@@ -1,0 +1,36 @@
+/* =========================================================
+   ADD / UPDATE SUPER ADMIN EMAIL TEMPLATE
+   (/super-admin-email-template-model)
+   Builds on the shared .rt-form layer from
+   configure/Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css.
+   Only the pieces unique to this form live here. Visual only.
+   ========================================================= */
+
+/* global .container-fluid rules set their own padding */
+.container-fluid.sae-form {
+  padding: 20px 28px 24px !important;
+}
+
+/* Is Default label carried an inline padding for the old layout */
+.sae-form .rt-fields > .row > [style*="padding"] {
+  padding: 0 !important;
+}
+
+/* Variables panel group headings ("Common Variables :", "Template Type Variables:") */
+.sae-form .rt-content .variableHeading {
+  display: block;
+  margin: 0 0 10px;
+  color: var(--rt-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sae-form .rt-content .helper-variables-div .variableHeading:not(:first-child) {
+  margin-top: 12px;
+}
+
+@media (max-width: 767px) {
+  .container-fluid.sae-form {
+    padding: 16px 12px 20px !important;
+  }
+}
