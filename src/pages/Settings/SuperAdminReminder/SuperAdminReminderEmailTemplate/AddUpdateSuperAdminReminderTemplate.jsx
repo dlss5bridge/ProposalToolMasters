@@ -2,6 +2,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Utils from "../../../../Middleware/Utils";
+import "../../../configure/email_template/EmailTemplate.css";
+import "../../../configure/Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "../../super_admin_email_template/SuperAdminEmailTemplateModel-redesign.css";
 import { Row, Col } from "reactstrap";
 import Select from "react-select";
 
@@ -368,7 +371,7 @@ function AddUpdateSuperAdminReminderTemplate(props) {
   );
 
   return (
-    <div className="container-fluid new-item-page-container ">
+    <div className="container-fluid new-item-page-container rt-form sae-form">
       <div class="new-item-page-nav"></div>
       <div class="new-item-page-content">
         <div class="row form-row">
@@ -382,6 +385,19 @@ function AddUpdateSuperAdminReminderTemplate(props) {
             <div class="separator mb-3"></div>
             <div className="template-height scrollbar">
               <div class="tab-content">
+                <div className="rt-card">
+                <div className="rt-card__head">
+                  <span className="rt-card__icon">
+                    <i className="ri-mail-settings-line"></i>
+                  </span>
+                  <div>
+                    <h4 className="rt-card__title">Template Details</h4>
+                    <p className="rt-card__desc">
+                      Name, type and subject line of this reminder email.
+                    </p>
+                  </div>
+                </div>
+                <div className="rt-fields">
                 <div className="row" id="TemplateNameDiv">
                   <div className="col-lg-2 template-label text-left">
                     <div className="mb-1">
@@ -553,9 +569,21 @@ function AddUpdateSuperAdminReminderTemplate(props) {
                     )}
                   </div>
                 </div>
-                <div>
-                  <h6 className="mt-2">Template Content</h6>
-                  <div className="separator mb-3" />
+                </div>
+                </div>
+                <div className="rt-card rt-content">
+                  <div className="rt-card__head">
+                    <span className="rt-card__icon">
+                      <i className="ri-file-text-line"></i>
+                    </span>
+                    <div>
+                      <h4 className="rt-card__title">Template Content</h4>
+                      <p className="rt-card__desc">
+                        Click a variable to copy it, then paste it into the email body below.
+                      </p>
+                    </div>
+                  </div>
+
                   {/* <div className="fieldset-group helper-variables-div"> */}
                   {/* <label className="fieldset-group-label">Variables</label> */}
                   {/* <AccountantVariables
@@ -612,8 +640,7 @@ function AddUpdateSuperAdminReminderTemplate(props) {
               </label>
             </div>
 
-            <hr />
-            <Row className="modal-footer">
+            <Row className="modal-footer rt-footer">
               <Col
                 style={{ paddingTop: "14px" }}
                 className="hstack gap-2 justify-content-end"
