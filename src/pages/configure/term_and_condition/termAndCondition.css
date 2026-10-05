@@ -497,12 +497,15 @@ body {
   padding-bottom: 40px !important; */
 }
 
+/* Same values as Bootstrap's .container-fluid. No !important: this file stays
+   loaded after leaving the page, and !important here overrode every later
+   page's own spacing (pages lost their gap from the sidebar until refresh). */
 .container-fluid {
-  width: 100% !important;
-  padding-right: 12px !important;
-  padding-left: 12px !important;
-  margin-right: auto !important;
-  margin-left: auto !important;
+  width: 100%;
+  padding-right: 12px;
+  padding-left: 12px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .new-item-page-nav {
