@@ -21,6 +21,7 @@ import {
 import Loadable from "../loader/Loadable";
 import { useDispatch, useSelector } from "react-redux";
 import { AuthContextProvider } from "../AuthContext/AuthContext";
+import { loadTemplateFonts, loadGoogleMaps } from "../utils/externalAssets";
 import Loader from "../loader/Loader";
 import LoginPageLoader from "../loader/LoginPageLoader";
 import { resetState } from "../redux/Persist";
@@ -34,7 +35,10 @@ import Login from "../Auth/login/Login";
 // import SuperAdminMarketingReminderList from "../pages/Settings/SuperAdminReminder/SuperAdminMarketingReminder/SuperAdminMarketingReminderList";
 // import SuperAdminMarketingReminderAddUpdate from "../pages/Settings/SuperAdminReminder/SuperAdminMarketingReminder/SuperAdminMarketingReminderAddUpdate";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import ChatWidget from "../components/Ai/ChatWidget";
+// Lazy so the AI chat stack (@ai-sdk/react, ai, react-markdown, remark-gfm) is
+// split out of the eager first-load bundle; it only loads for accounts with the
+// AI agent enabled, when the widget actually renders.
+const ChatWidget = lazy(() => import("../components/Ai/ChatWidget"));
 
 // ------------------------------------Pages with loader--------------------------------------------
 export const Topbar = Loadable(lazy(() => import("../components/Topbar")));
@@ -1115,6 +1119,18 @@ function Index() {
     hasBookkeeping,
   } = useContext(AuthContextProvider);
 
+  // Inject the heavy template fonts + Google Maps only once the user is
+  // authenticated. They are moved out of public/index.html (see
+  // src/utils/externalAssets.js) so the public login/landing page's critical
+  // path stays small; every authenticated page that needs them is mounted only
+  // after a token exists, so loading here covers all of those call sites.
+  useEffect(() => {
+    if (common.token) {
+      loadTemplateFonts();
+      loadGoogleMaps();
+    }
+  }, [common.token]);
+
   return (
     <div id="layout-wrapper">
       <Suspense fallback={<Loader />}>
@@ -1484,7 +1500,11 @@ function Index() {
                         </Routes>
                       </div>
                       <AppContent />
-                      {subscriptionPlan?.enableAIAgent && <ChatWidget />}
+                      {subscriptionPlan?.enableAIAgent && (
+                        <Suspense fallback={null}>
+                          <ChatWidget />
+                        </Suspense>
+                      )}
                     </div>
                   </ColorProvider>
                 )}

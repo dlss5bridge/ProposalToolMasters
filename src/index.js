@@ -12,7 +12,11 @@ import { Provider } from "react-redux";
 import { PublicClientApplication, EventType } from "@azure/msal-browser";
 import { msalConfig } from "./config/microsoftConfig.js";
 import { MsalProvider } from "@azure/msal-react";
-import { Document, Page, pdfjs } from "react-pdf";
+
+// react-pdf (and its bundled pdf.js) is intentionally NOT imported here anymore.
+// It was only used to set pdfjs.GlobalWorkerOptions.workerSrc, which dragged the
+// whole library into the eager entry bundle. The worker is now configured inside
+// the lazy PdfViewers component where react-pdf is actually rendered.
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -22,9 +26,6 @@ msalInstance.addEventCallback((event) => {
     msalInstance.setActiveAccount(account);
   }
 });
-
-// 👇 Set workerSrc properly using pdfjs version and CDN
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const AppWrapper = () => {
   return (
