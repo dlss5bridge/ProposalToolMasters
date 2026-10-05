@@ -17,6 +17,8 @@ import { AuthContextProvider } from "../../../AuthContext/AuthContext";
 import { useNavigate } from "react-router-dom";
 import BackButtonSvg from "../../../components/BackButtonSvg";
 import Android12Switch from "../../../components/AndroidSwitch";
+import "../../configure/Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css";
+import "./SubscriptionPackageModel-redesign.css";
 function SubscriptionPackageModel(props) {
   const moduleName = "Subscription Package";
   // Declare all State
@@ -563,7 +565,7 @@ function SubscriptionPackageModel(props) {
       ref={SubscriptionContainerRef}
       onClick={(e) => scrollUptoCurrentPosition(e, SubscriptionContainerRef)}
     >
-      <div class="container-fluid new-item-page-container">
+      <div class="container-fluid new-item-page-container rt-form sub-form">
         <div class="new-item-page-nav"></div>
         <div class="new-item-page-content">
           <div class="row form-row">
@@ -1273,9 +1275,14 @@ function SubscriptionPackageModel(props) {
                     </div>
                   </div>
                   {!subscriptionPackageObj.isFreePackage && (
-                    <>
-                      <hr />
-                      <p> Discounts For Annual Bills</p>
+                    <div className="sub-discounts">
+                      <div className="sub-discounts__head">
+                        <h4 className="sub-discounts__title">Discounts</h4>
+                        <p className="sub-discounts__desc">
+                          Tick a discount to enable it, then enter its value.
+                        </p>
+                      </div>
+                      <p className="sub-discounts__group"> Discounts For Annual Bills</p>
                       <div className="row">
                         <div className="mt-3 col-6">
                           <div className="row">
@@ -1706,8 +1713,7 @@ function SubscriptionPackageModel(props) {
                         </div>
                       </div>
 
-                      <hr />
-                      <p>Discounts for Monthly Bills </p>
+                      <p className="sub-discounts__group">Discounts for Monthly Bills </p>
                       <div className="row">
                         <div className="mt-3 col-6">
                           <div className="row">
@@ -2145,7 +2151,7 @@ function SubscriptionPackageModel(props) {
                           </div>
                         </div>
                       </div>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
@@ -2156,7 +2162,6 @@ function SubscriptionPackageModel(props) {
               >
                 {errorMessage}
               </label>
-              <hr />
               <Row class="modal-footer">
                 <Col
                   style={{ paddingTop: "14px" }}

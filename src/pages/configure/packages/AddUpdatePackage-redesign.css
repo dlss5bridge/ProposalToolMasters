@@ -1,0 +1,209 @@
+/* =========================================================
+   ADD / UPDATE PACKAGE (/add-update-package)
+   The page uses the proposal wizard's look (.proposal-ui from
+   pages/proposals/proposal-ui.css), which also styles the shared
+   Select Services and Additional Information steps. This file only
+   covers what is unique to the package wizard. Visual only.
+   ========================================================= */
+
+/* Package.css sets .container-fluid padding globally */
+.container-fluid.pkg-form {
+  padding: 0 16px !important;
+}
+
+/* ---------- Basic Information ---------- */
+.pkg-form .bi-field--full {
+  grid-column: 1 / -1;
+}
+
+/* The Super Admin changes notice renders an empty element when there is
+   nothing to show; hide it so it does not add a gap above the fields. */
+.pkg-form .basicinfo-card__body > :empty {
+  display: none;
+}
+
+.pkg-form .bi-field .input-group {
+  flex-wrap: wrap;
+}
+
+.pkg-form .bi-field .input-group > div,
+.pkg-form .bi-field .input-group > .input-text {
+  width: 100%;
+}
+
+/* react-select multi-value chips */
+.pkg-form .bi-field [class*="-multiValue"] {
+  border-radius: 6px !important;
+  background: #e6f7fb !important;
+}
+
+.pkg-form .bi-field [class*="-multiValue"] > div:first-child {
+  color: #0b7f95 !important;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* ---------- Pricing Information ---------- */
+.pkg-form .pkg-pricing-card + * {
+  margin-top: 0;
+}
+
+.pkg-form .pkg-pricing-card .basicinfo-card__body > .row {
+  margin: 0;
+}
+
+.pkg-form .pkg-pricing-card .basicinfo-card__body > .row > .col-12 {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+}
+
+/* each field row: label above input, two fields side by side
+   (rows hold [label, input] or [label, input, label, input]) */
+.pkg-form .pkg-pricing-card .col-12 > .row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+  row-gap: 8px;
+  margin: 0 !important;
+}
+
+.pkg-form .pkg-pricing-card .col-12 > .row > [class*="col-"] {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.pkg-form .pkg-pricing-card .col-12 > .row > :nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.pkg-form .pkg-pricing-card .col-12 > .row > :nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.pkg-form .pkg-pricing-card .col-12 > .row > :nth-child(3) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.pkg-form .pkg-pricing-card .col-12 > .row > :nth-child(4) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.pkg-form .pkg-pricing-card .mb-1 {
+  margin-bottom: 0 !important;
+}
+
+.pkg-form .pkg-pricing-card .fieldset-label,
+.pkg-form .pkg-pricing-card .form-label {
+  margin: 0 !important;
+  color: var(--pu-ink);
+  font-size: 13px;
+  font-weight: 600 !important;
+}
+
+.pkg-form .pkg-pricing-card .input-group {
+  flex-wrap: wrap;
+}
+
+.pkg-form .pkg-pricing-card .input-group > .input-text {
+  width: 100%;
+}
+
+/* the empty spacer before the table */
+.pkg-form .pkg-pricing-card .col-12 > .mb-3:empty {
+  display: none;
+}
+
+/* Summary table: rounded, bordered, matches the proposal review tables */
+.pkg-form .pkg-pricing-card .table {
+  margin: 4px 0 0;
+  overflow: hidden;
+  border: 1px solid var(--pu-line);
+  border-radius: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  color: var(--pu-ink);
+}
+
+.pkg-form .pkg-pricing-card .table td,
+.pkg-form .pkg-pricing-card .table th {
+  padding: 12px 16px;
+  border-color: var(--pu-line);
+  vertical-align: middle;
+}
+
+.pkg-form .pkg-pricing-card .table .head-row > td,
+.pkg-form .pkg-pricing-card .table .head-grey-row > td {
+  font-size: 14px;
+}
+
+.pkg-form .pkg-pricing-card .table tbody tr:not([class]) > td {
+  border-bottom: 1px solid var(--pu-line);
+}
+
+/* ---------- Footer buttons by role ----------
+   proposal-ui.css colours footer buttons by position (second-to-last =
+   navy "Next", last = green). Here the roles are tagged explicitly so
+   "Back" on the last step stays outlined. Doubled class for specificity. */
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--cancel,
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--back {
+  border: 1px solid var(--pu-line) !important;
+  background: #fff !important;
+  color: var(--pu-ink) !important;
+}
+
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--cancel:hover,
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--back:hover {
+  background: var(--pu-soft) !important;
+}
+
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--next {
+  border: 1px solid var(--pu-ink) !important;
+  background: var(--pu-ink) !important;
+  color: #fff !important;
+}
+
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--next:hover {
+  border-color: #1e293b !important;
+  background: #1e293b !important;
+}
+
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--save {
+  border: 1px solid var(--pu-success) !important;
+  background: var(--pu-success) !important;
+  color: #fff !important;
+}
+
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--save:hover {
+  border-color: var(--pu-success-hover) !important;
+  background: var(--pu-success-hover) !important;
+}
+
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--decline {
+  border: 1px solid #f3c2c0 !important;
+  background: #fff !important;
+  color: var(--pu-danger) !important;
+}
+
+.pkg-form.pkg-form .row .hstack > .btn.pf-btn--decline:hover {
+  background: #fef3f2 !important;
+}
+
+@media (max-width: 780px) {
+  .pkg-form .pkg-pricing-card .col-12 > .row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pkg-form .pkg-pricing-card .col-12 > .row > :nth-child(n) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}

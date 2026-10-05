@@ -1,6 +1,8 @@
 /* global $ */
 import React, { useContext, useEffect, useState, lazy, Suspense } from "react";
 import "./Package.css";
+import "../../proposals/proposal-ui.css";
+import "./AddUpdatePackage-redesign.css";
 import Select from "react-select";
 import SuccessModal from "../../../components/SuccessModal";
 import { AuthContextProvider } from "../../../AuthContext/AuthContext";
@@ -44,176 +46,164 @@ export const BasicInformationComponent = (props) => {
       <div className="scrollbar">
         <div className="tab-content">
           <div className="tab-pane p-3 active">
-            {/* {props.common.roleTypeId === 1 && ( */}
-            <div class="row fieldset">
-              <SAPredefinedChangesNotifyMessageModel Params={{ moduleName: props.moduleName, SAChanges: props.modelRequestData.Type }} />
-              {(props.common.professionTypeLists?.length > 1 ||
-                props.common.organisationKeyID === null) && (
-                  <>
-                    <div class="col-md-3 col-sm-12 text-start text-md-end">
-                      <div class="mb-1">
-                        <label class="form-label">
+            <div className="basicinfo-card">
+              <div className="basicinfo-card__head">
+                <div className="basicinfo-card__icon">
+                  <i className="bi-box-seam"></i>
+                </div>
+                <div className="basicinfo-card__head-text">
+                  <p className="basicinfo-card__title">
+                    Basic Information
+                    <span className="basicinfo-card__badge">Required</span>
+                  </p>
+                  <p className="basicinfo-card__desc">
+                    Name the package and choose which businesses it is offered
+                    to.
+                  </p>
+                </div>
+              </div>
+
+              <div className="basicinfo-card__body">
+                <SAPredefinedChangesNotifyMessageModel Params={{ moduleName: props.moduleName, SAChanges: props.modelRequestData.Type }} />
+                <div className="bi-field-grid">
+                  {(props.common.professionTypeLists?.length > 1 ||
+                    props.common.organisationKeyID === null) && (
+                      <div className="bi-field">
+                        <label className="bi-field__label">
                           Profession Type
                           <span class="text-danger">*</span>
                         </label>
-                      </div>
-                    </div>
-                    <div class="col-md-9 col-sm-12">
-                      <div className="input-group">
-                        {props.common.professionTypeLists?.length > 1 ||
-                          props.common.organisationKeyID === null ? (
-                          <Select
-                            isMulti={
-                              props.common.organisationKeyID === null
-                                ? false
-                                : true
-                            }
-                            style={{ padding: "5px" }}
-                            className="user-role-select"
-                            options={props.ProfessionalTypeLookeupListOptions}
-                            value={props.ProfessionTypeValue}
-                            onChange={props.OnProfessionTypeChange}
-                          />
+                        <div className="input-group">
+                          {props.common.professionTypeLists?.length > 1 ||
+                            props.common.organisationKeyID === null ? (
+                            <Select
+                              isMulti={
+                                props.common.organisationKeyID === null
+                                  ? false
+                                  : true
+                              }
+                              style={{ padding: "5px" }}
+                              className="user-role-select"
+                              options={props.ProfessionalTypeLookeupListOptions}
+                              value={props.ProfessionTypeValue}
+                              onChange={props.OnProfessionTypeChange}
+                            />
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                        {props.requireMessage &&
+                          (props.common.professionTypeLists?.length > 1 ||
+                            props.common.organisationKeyID === null) &&
+                          props.packageObj.professionTypeList?.length === 0 ? (
+                          <span className="validation">{ERROR_MESSAGES}</span>
                         ) : (
                           ""
-                          // <input
-                          //   disabled
-                          //   style={{ padding: "5px" }}
-                          //   type="text"
-                          //   class="input-text"
-                          //   placeholder=" Profession Type"
-                          //   value={
-                          //     props.professionTypeInputValue[0]?.professionTypeName
-                          //   }
-                          // />
                         )}
                       </div>
+                    )}
+
+                  <div className="bi-field">
+                    <label className="bi-field__label">
+                      Package Name
+                      <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        placeholder="Package Name"
+                        class="input-text"
+                        maxLength={100}
+                        value={props.packageObj.servicePackageName}
+                        onChange={(e) => {
+                          let trimmedValue = e.target.value.trimStart();
+                          const capitalizedValue =
+                            trimmedValue.charAt(0).toUpperCase() +
+                            trimmedValue.slice(1);
+                          props.setPackageObj({
+                            ...props.packageObj,
+                            servicePackageName: capitalizedValue,
+                          });
+                          props.DisableTabOnChange();
+                        }}
+                      />
                       {props.requireMessage &&
-                        (props.common.professionTypeLists?.length > 1 ||
-                          props.common.organisationKeyID === null) &&
-                        props.packageObj.professionTypeList?.length === 0 ? (
+                        (props.packageObj.servicePackageName === null ||
+                          props.packageObj.servicePackageName === "") ? (
                         <span className="validation">{ERROR_MESSAGES}</span>
                       ) : (
                         ""
                       )}
                     </div>
-                  </>
-                )}
-            </div>
-            <div class="row fieldset">
-              <div class="col-md-3 col-sm-12 text-start text-md-end">
-                <div class="mb-1">
-                  <label class="form-label">
-                    Package Name
-                    <span class="text-danger">*</span>
-                  </label>
-                </div>
-              </div>
-              <div class="col-md-9 col-sm-12">
-                <div class="input-group">
-                  <input
-                    type="text"
-                    placeholder="Package Name"
-                    class="input-text"
-                    maxLength={100}
-                    value={props.packageObj.servicePackageName}
-                    onChange={(e) => {
-                      let trimmedValue = e.target.value.trimStart();
-                      const capitalizedValue =
-                        trimmedValue.charAt(0).toUpperCase() +
-                        trimmedValue.slice(1);
-                      props.setPackageObj({
-                        ...props.packageObj,
-                        servicePackageName: capitalizedValue,
-                      });
-                      props.DisableTabOnChange();
-                    }}
-                  />
-                  {props.requireMessage &&
-                    (props.packageObj.servicePackageName === null ||
-                      props.packageObj.servicePackageName === "") ? (
-                    <span className="validation">{ERROR_MESSAGES}</span>
-                  ) : (
-                    ""
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="row fieldset">
-              <div class="col-md-3 col-sm-12 text-start text-md-end">
-                <div class="mb-1">
-                  <label class="form-label">
-                    Nature Of Business
-                    <span class="text-danger">*</span>
-                  </label>
-                </div>
-              </div>
-              <div className="col-md-9 col-sm-12">
-                <div className="input-group ">
-                  <Select
-                    isMulti
-                    className="user-role-select"
-                    style={{ padding: "5px", width: "20%" }}
-                    options={
-                      props.packageObj.businessNatureID.length + 1 ===
-                        props.NatureOfBusinessTypeLookupList.length
-                        ? props.NatureOfBusinessTypeLookupList.slice(1)
-                        : props.NatureOfBusinessTypeLookupList
-                    }
-                    value={props.NOBTypeValue.filter(
-                      (item) => item.value !== null
-                    )}
-                    onChange={(e) => {
-                      props.OnNOBChange(e);
-                    }}
-                  />
-                  {props.requireMessage &&
-                    props.packageObj.businessNatureID.length === 0 ? (
-                    <span className="validation">{ERROR_MESSAGES}</span>
-                  ) : (
-                    ""
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="row fieldset">
-              <div class="col-md-3 col-sm-12 text-start text-md-end">
-                <div class="mb-1">
-                  <label class="form-label">
-                    {props.prospectName} Type
-                    <span class="text-danger">*</span>
-                  </label>
-                </div>
-              </div>
-              <div className="col-md-9 col-sm-12">
-                <div className="input-group">
-                  <Select
-                    isMulti
-                    className="user-role-select"
-                    style={{ padding: "5px", width: "20%" }}
-                    options={
-                      props.packageObj.clientBusinessTypeID.length ===
-                        props.BusinessTypeLookupList.length
-                        ? props.BusinessTypeLookupList
-                        : [
-                          {
-                            value: null,
-                            label: "All",
-                          },
-                          ...props.BusinessTypeLookupList,
-                        ]
-                    }
-                    value={props.ClientTypeValue}
-                    onChange={(e) => {
-                      props.OnClientTypeChange(e);
-                    }}
-                  />
-                  {props.requireMessage &&
-                    props.packageObj.clientBusinessTypeID.length === 0 ? (
-                    <span className="validation">{ERROR_MESSAGES}</span>
-                  ) : (
-                    ""
-                  )}
+                  </div>
+
+                  <div className="bi-field">
+                    <label className="bi-field__label">
+                      Nature Of Business
+                      <span class="text-danger">*</span>
+                    </label>
+                    <div className="input-group ">
+                      <Select
+                        isMulti
+                        className="user-role-select"
+                        style={{ padding: "5px", width: "20%" }}
+                        options={
+                          props.packageObj.businessNatureID.length + 1 ===
+                            props.NatureOfBusinessTypeLookupList.length
+                            ? props.NatureOfBusinessTypeLookupList.slice(1)
+                            : props.NatureOfBusinessTypeLookupList
+                        }
+                        value={props.NOBTypeValue.filter(
+                          (item) => item.value !== null
+                        )}
+                        onChange={(e) => {
+                          props.OnNOBChange(e);
+                        }}
+                      />
+                      {props.requireMessage &&
+                        props.packageObj.businessNatureID.length === 0 ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bi-field">
+                    <label className="bi-field__label">
+                      {props.prospectName} Type
+                      <span class="text-danger">*</span>
+                    </label>
+                    <div className="input-group">
+                      <Select
+                        isMulti
+                        className="user-role-select"
+                        style={{ padding: "5px", width: "20%" }}
+                        options={
+                          props.packageObj.clientBusinessTypeID.length ===
+                            props.BusinessTypeLookupList.length
+                            ? props.BusinessTypeLookupList
+                            : [
+                              {
+                                value: null,
+                                label: "All",
+                              },
+                              ...props.BusinessTypeLookupList,
+                            ]
+                        }
+                        value={props.ClientTypeValue}
+                        onChange={(e) => {
+                          props.OnClientTypeChange(e);
+                        }}
+                      />
+                      {props.requireMessage &&
+                        props.packageObj.clientBusinessTypeID.length === 0 ? (
+                        <span className="validation">{ERROR_MESSAGES}</span>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -224,14 +214,14 @@ export const BasicInformationComponent = (props) => {
       <div class="row fieldset modal-footer">
         <div class="col-lg-12 hstack gap-2 justify-content-end text-right mt-3">
           {props.getSAChanges ?
-            <button class="btn btn-md btn-success declined-item-btn" onClick={() => props.DeclineSuperAdminChangesData("Decline")}>
+            <button class="btn btn-md btn-success declined-item-btn pf-btn--decline" onClick={() => props.DeclineSuperAdminChangesData("Decline")}>
               <span>Decline</span>
-            </button> : <button class="btn btn-md  btn-light" onClick={props.handleCancel}>
+            </button> : <button class="btn btn-md  btn-light pf-btn--cancel" onClick={props.handleCancel}>
               <span>{props.getCrudButtonTextName("Cancel")}</span>
             </button>
           }
           <button
-            class="btn btn-md btn-primary create-item-btn"
+            class="btn btn-md btn-primary create-item-btn pf-btn--next"
             onClick={() => props.HandleTabChange(2)}
           >
             <span>Next</span>
@@ -508,10 +498,21 @@ export const PricingInformation = (props) => {
         {props.selectedRecurringServiceList?.length !== 0 && (
           <div className="tab-content">
             <div class="tab-pane p-3 active">
+              <div className="basicinfo-card pkg-pricing-card">
+                <div className="basicinfo-card__head">
+                  <div className="basicinfo-card__icon">
+                    <i className="bi-arrow-repeat"></i>
+                  </div>
+                  <div className="basicinfo-card__head-text">
+                    <p className="basicinfo-card__title">Recurring Services</p>
+                    <p className="basicinfo-card__desc">
+                      Set the default and minimum price for the recurring services in this package.
+                    </p>
+                  </div>
+                </div>
+                <div className="basicinfo-card__body">
               <div class="row">
                 <div class="col-12">
-                  <h6>Recurring Services</h6>
-                  <div class="separator mb-3"></div>
                   <div className="row fieldset">
                     <div class="col-md-2 col-sm-12 text-start text-md-end">
                       <label class="fieldset-label required">
@@ -835,16 +836,29 @@ export const PricingInformation = (props) => {
                   </table>
                 </div>
               </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
         {props.selectedOneOffServiceList.length !== 0 && (
           <div className="tab-content">
             <div class="tab-pane p-3 active">
+              <div className="basicinfo-card pkg-pricing-card">
+                <div className="basicinfo-card__head">
+                  <div className="basicinfo-card__icon">
+                    <i className="bi-lightning-charge"></i>
+                  </div>
+                  <div className="basicinfo-card__head-text">
+                    <p className="basicinfo-card__title">One-Off Services</p>
+                    <p className="basicinfo-card__desc">
+                      Set the default and minimum price for the one-off services in this package.
+                    </p>
+                  </div>
+                </div>
+                <div className="basicinfo-card__body">
               <div class="row">
                 <div class="col-12">
-                  <h6>One-Off Services</h6>
-                  <div class="separator mb-3"></div>
                   <div className="row fieldset">
                     <div class="col-md-2 col-sm-12 text-md-end">
                       <label class="form-label">Original Price ({props.currencySymbol})</label>
@@ -1147,6 +1161,8 @@ export const PricingInformation = (props) => {
                   </table>
                 </div>
               </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -1161,9 +1177,9 @@ export const PricingInformation = (props) => {
       <div class="row fieldset">
         <div class="col-lg-12 hstack gap-2 justify-content-end text-right mt-3">
           {props.getSAChanges ?
-            <button class="btn btn-md btn-success declined-item-btn" onClick={() => props.DeclineSuperAdminChangesData("Decline")}>
+            <button class="btn btn-md btn-success declined-item-btn pf-btn--decline" onClick={() => props.DeclineSuperAdminChangesData("Decline")}>
               <span>Decline</span>
-            </button> : <button class="btn btn-md  btn-light" onClick={props.handleCancel}>
+            </button> : <button class="btn btn-md  btn-light pf-btn--cancel" onClick={props.handleCancel}>
               <span>{props.getCrudButtonTextName("Cancel")}</span>
             </button>
           }
@@ -1175,20 +1191,20 @@ export const PricingInformation = (props) => {
               props.TabHide ? props.HandleBack(3) : props.HandleBack(2);
             }}
             style={{ paddingTop: "5px", marginRight: "5px" }}
-            className="btn btn-md btn-success create-item-btn"
+            className="btn btn-md btn-success create-item-btn pf-btn--back"
           >
             <span>Back</span>
           </button>
           {props.getSAChanges ?
             <button
-              class="btn btn-md btn-success accept-item-btn"
+              class="btn btn-md btn-success accept-item-btn pf-btn--save"
               onClick={() => props.HandleTabChange(5, "Accept")}
             >
               <span>
                 Accept
               </span>
             </button> : <button
-              class="btn btn-md btn-success create-item-btn"
+              class="btn btn-md btn-success create-item-btn pf-btn--save"
               onClick={() => props.HandleTabChange(5)}
             >
               <span>
@@ -3397,13 +3413,21 @@ const AddUpdatePackage = (props) => {
     }
   }
   //E] Designing part:
+  // Stepper colours only: PackageHeader values are in step order.
+  const getPackageStepState = (tabValue) => {
+    if (activeTab === tabValue) return " is-active";
+    if (tabValue < activeTab) return " is-complete";
+    return "";
+  };
+
   return (
     <div>
       {" "}
-      <div className="container-fluid">
+      <div className="container-fluid proposal-ui proposal-ui--fluid pkg-form">
         <div>
           <div className="row form-row">
             <div className="col-12">
+              <div className="proposal-header">
               <h3 class="modal-title">
                 <BackButtonSvg onClick={handleCancel} />
                 {modelAction === "Add"
@@ -3420,7 +3444,7 @@ const AddUpdatePackage = (props) => {
               </h3>
 
               <div
-                className="steps overflow-auto"
+                className="steps proposal-header__steps"
                 style={{ pointerEvents: "all" }}
               >
                 <ul className="steps-list">
@@ -3436,7 +3460,7 @@ const AddUpdatePackage = (props) => {
                           : isValidForm.BasicForm === true
                             ? "step tab-field-center"
                             : "step disabled cursor-not-allowed tab-field-center"
-                      } w-90`}
+                      } w-90${getPackageStepState(PackageHeader.BasicInformation)}`}
                     >
                       <span class="stepCount">1</span>
                       <span class="stepTitle">Basic Information</span>
@@ -3459,7 +3483,7 @@ const AddUpdatePackage = (props) => {
                           : isValidForm.BasicForm === true
                             ? "step tab-field-center"
                             : "step disabled cursor-not-allowed tab-field-center"
-                      } w-90`}
+                      } w-90${getPackageStepState(PackageHeader.SelectServices)}`}
                     >
                       <span class="stepCount">2</span>
                       <span class="stepTitle">Select Services</span>
@@ -3484,7 +3508,7 @@ const AddUpdatePackage = (props) => {
                           : isValidForm.SelectService === true
                             ? "step tab-field-center"
                             : "step disabled cursor-not-allowed tab-field-center"
-                      } w-90`}
+                      } w-90${getPackageStepState(PackageHeader.AdditionalInformation)}`}
                     >
                       <span className="stepCount">3</span>
                       <span className="stepTitle">Additional Information</span>
@@ -3511,7 +3535,7 @@ const AddUpdatePackage = (props) => {
                               )
                             ? "step tab-field-center"
                             : "step disabled cursor-not-allowed tab-field-center"
-                      } w-90`}
+                      } w-90${getPackageStepState(PackageHeader.PricingInformation)}`}
                     >
                       <span class="stepCount">{TabHide ? `4` : `3`}</span>
                       <span class="stepTitle">Pricing Information</span>
@@ -3525,6 +3549,7 @@ const AddUpdatePackage = (props) => {
                     </div>
                   </li>
                 </ul>
+              </div>
               </div>
               {activeTab === PackageHeader.BasicInformation && (
                 <BasicInformationComponent

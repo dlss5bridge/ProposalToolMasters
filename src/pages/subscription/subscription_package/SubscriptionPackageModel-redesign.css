@@ -1,0 +1,371 @@
+/* =========================================================
+   ADD / UPDATE SUBSCRIPTION PACKAGE (/subscriptionModal)
+   Builds on the shared .rt-form layer from
+   configure/Reminder/ReminderEmailTemplate/AddReminderTemplate-redesign.css
+   (page shell, title, scroll area, inputs). Visual only: every
+   handler, switch, field and validation is unchanged in the JSX.
+   ========================================================= */
+
+/* global .container-fluid rules set their own padding */
+.container-fluid.sub-form {
+  padding: 20px 28px 24px !important;
+}
+
+/* ---------- Layout: name on top, feature groups in a 2-column grid ---------- */
+.sub-form .template-height > .tab-content {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 18px 20px !important;
+}
+
+.sub-form .tab-content > #PackageName,
+.sub-form .tab-content > .sub-discounts {
+  grid-column: 1 / -1;
+}
+
+/* some groups sit inside a ".row p-2" wrapper; flatten it */
+.sub-form .tab-content > .row.p-2 {
+  display: block;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ---------- Cards ---------- */
+.sub-form .tab-content > #PackageName,
+.sub-form .tab-content .fieldset-group,
+.sub-form .sub-discounts {
+  margin: 0 !important;
+  padding: 20px 22px !important;
+  border: 1px solid var(--rt-line) !important;
+  border-radius: 14px !important;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.sub-form .tab-content .fieldset-group {
+  position: static;
+  height: 100%;
+}
+
+/* Package name */
+.sub-form #PackageName > [class*="col-"] {
+  width: 100%;
+  max-width: 100%;
+  flex: 0 0 100%;
+  padding: 0;
+}
+
+.sub-form #PackageName label:not(.validation) {
+  width: auto !important;
+  margin: 0 0 7px;
+  color: var(--rt-label);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.sub-form #PackageName .text-danger {
+  margin-left: 3px;
+}
+
+/* Group title: the old fieldset legend becomes the card heading */
+.sub-form .fieldset-group > .fieldset-group-label {
+  position: static !important;
+  top: auto !important;
+  display: block;
+  width: auto !important;
+  margin: 0 0 4px !important;
+  padding: 0 0 12px !important;
+  border-bottom: 1px solid #eef2f6;
+  background: transparent !important;
+  color: var(--rt-text) !important;
+  font-size: 15.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* ---------- Setting rows: label on the left, Yes/No + switch on the right ---------- */
+.sub-form .fieldset-group > .row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 0;
+  margin: 0 !important;
+}
+
+.sub-form .fieldset-group > .row > [class*="col-"] {
+  width: auto;
+  max-width: none;
+  flex: none;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+/* label cell + switch cell share a divider line */
+.sub-form .fieldset-group > .row > :has(> .form-label),
+.sub-form .fieldset-group > .row > [style*="flex"] {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.sub-form .fieldset-group > .row > [style*="flex"] {
+  justify-content: flex-end;
+  padding-left: 16px !important;
+}
+
+/* no divider under the last label/switch pair */
+.sub-form .fieldset-group > .row > :has(> .form-label):nth-last-child(2),
+.sub-form .fieldset-group > .row > [style*="flex"]:last-child {
+  border-bottom: 0;
+}
+
+.sub-form .fieldset-group .form-label {
+  width: auto !important;
+  margin: 0 !important;
+  color: var(--rt-text);
+  font-size: 14px;
+  font-weight: 500 !important;
+}
+
+/* "Yes" / "No" text next to each switch */
+.sub-form .fieldset-group [style*="flex"] > div:first-child {
+  margin: 0 !important;
+  color: var(--rt-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.sub-form .fieldset-group .MuiFormControlLabel-root {
+  margin: 0 -8px 0 4px;
+}
+
+/* number fields and validation span the whole card */
+.sub-form .fieldset-group > .row > :has(.MuiTextField-root),
+.sub-form .fieldset-group > .row > .validation {
+  grid-column: 1 / -1;
+}
+
+.sub-form .fieldset-group > .row > :has(.MuiTextField-root) {
+  margin-top: 12px !important;
+}
+
+.sub-form .fieldset-group > .row > .validation {
+  margin-top: 6px !important;
+}
+
+/* Android12Switch: neutral off, accent on (no red/green) */
+.sub-form .MuiSwitch-track {
+  background: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+.sub-form .Mui-checked + .MuiSwitch-track {
+  background: var(--rt-accent) !important;
+}
+
+.sub-form .Mui-disabled + .MuiSwitch-track {
+  opacity: 0.45 !important;
+}
+
+.sub-form .MuiSwitch-thumb {
+  background: #fff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
+}
+
+.sub-form .MuiSwitch-track::after {
+  display: none;
+}
+
+/* ---------- MUI text fields ---------- */
+.sub-form .MuiTextField-root {
+  width: 100%;
+}
+
+.sub-form .MuiOutlinedInput-root {
+  border-radius: 8px !important;
+  background: #fff;
+  font-size: 14.5px;
+  transition: box-shadow 0.15s ease;
+}
+
+.sub-form .MuiOutlinedInput-input {
+  padding: 10px 14px !important;
+}
+
+.sub-form .MuiOutlinedInput-notchedOutline {
+  border-color: var(--rt-border) !important;
+}
+
+.sub-form .MuiOutlinedInput-root:hover:not(.Mui-disabled) .MuiOutlinedInput-notchedOutline {
+  border-color: #aab6c6 !important;
+}
+
+.sub-form .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 0 3px rgba(15, 181, 212, 0.14);
+}
+
+.sub-form .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-width: 1px !important;
+  border-color: var(--rt-accent) !important;
+}
+
+.sub-form .MuiOutlinedInput-root.Mui-disabled {
+  background: #f5f7fa;
+}
+
+.sub-form .MuiInputLabel-root {
+  color: #475569 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.sub-form .MuiInputLabel-root.Mui-focused {
+  color: var(--rt-accent-text) !important;
+}
+
+/* ---------- Discounts card ---------- */
+.sub-form .sub-discounts__head {
+  margin-bottom: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.sub-form .sub-discounts__title {
+  margin: 0;
+  color: var(--rt-text);
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.sub-form .sub-discounts__desc {
+  margin: 3px 0 0;
+  color: var(--rt-muted);
+  font-size: 13px;
+}
+
+.sub-form .sub-discounts__group {
+  margin: 18px 0 0;
+  color: #334155;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sub-form .sub-discounts > .row {
+  --bs-gutter-x: 20px;
+}
+
+/* checkbox + field side by side */
+.sub-form .sub-discounts .col-6 > .row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.sub-form .sub-discounts .col-6 > .row > .col-2 {
+  width: 18px;
+  max-width: 18px;
+  flex: 0 0 18px;
+  padding: 0;
+}
+
+.sub-form .sub-discounts .col-6 > .row > .col-10 {
+  width: auto;
+  max-width: none;
+  flex: 1 1 auto;
+  padding: 0;
+}
+
+.sub-form .sub-discounts input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0;
+  accent-color: var(--rt-accent);
+  cursor: pointer;
+}
+
+/* ---------- Footer (the row right after the error message) ---------- */
+.sub-form #ErrorMessage + div {
+  display: flex;
+  justify-content: flex-end;
+  margin: 16px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+/* buttons are Add then Cancel in the markup; show Cancel first */
+.sub-form #ErrorMessage + div > div {
+  width: auto;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 10px;
+  padding: 0 4px !important;
+}
+
+.sub-form #ErrorMessage + div .btn {
+  float: none !important;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 20px !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.sub-form #ErrorMessage + div .btn.create-item-btn {
+  background: var(--rt-accent) !important;
+  box-shadow: 0 4px 12px rgba(15, 181, 212, 0.22);
+  color: #fff !important;
+}
+
+.sub-form #ErrorMessage + div .btn.create-item-btn:hover {
+  background: var(--rt-accent-hover) !important;
+}
+
+.sub-form #ErrorMessage + div .btn.create-item-btn:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.sub-form #ErrorMessage + div .btn.btn-light {
+  background: #eaf1fb !important;
+  color: #334155 !important;
+}
+
+.sub-form #ErrorMessage + div .btn.btn-light:hover {
+  background: #dde7f5 !important;
+}
+
+@media (max-width: 991px) {
+  .sub-form .template-height > .tab-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .container-fluid.sub-form {
+    padding: 16px 12px 20px !important;
+  }
+
+  .sub-form .sub-discounts .row > .col-6 {
+    width: 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
