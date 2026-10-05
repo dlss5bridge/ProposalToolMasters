@@ -9738,6 +9738,7 @@ const Add_Update_Engagement_Letter = () => {
   const [clientLookUpOptions, setClientLookUpOptions] = useState([]);
   const [recurringServiceList, setRecurringServiceList] = useState([]);
   const [oneOffServiceList, setOneOffServiceList] = useState([]);
+  const [servicesLoading, setServicesLoading] = useState(false); // Dedicated flag for the Select Services fetch. Services loader stays up until both lists are actually ready.
   const [templateLookUpOptions, setTemplateLookUpOptions] = useState([]);
   const [proposalLookUpOptions, setProposalLookUpOptions] = useState([]);
   const [additionalInformationList, setAdditionalInformationList] = useState(
@@ -10534,8 +10535,8 @@ const Add_Update_Engagement_Letter = () => {
 
   // load both recurring and one-off lists
   const loadServiceLists = async () => {
-    debugger;
     setLoader(true);
+    setServicesLoading(true);
     try {
       await Promise.all([
         GetRecurringServiceListData(),
@@ -10545,6 +10546,7 @@ const Add_Update_Engagement_Letter = () => {
       setErrorMessage("Failed to load services");
     } finally {
       setLoader(false);
+      setServicesLoading(false);
     }
   };
 
@@ -18869,6 +18871,7 @@ const Add_Update_Engagement_Letter = () => {
               {activeTab === EngagementLetterHeader.SelectServices && (
                 <Suspense>
                   <SelectServices
+                    servicesLoading={servicesLoading}
                     DisableTabOnChange={DisableTabOnChange}
                     oneOffObj={oneOffObj}
                     requireMessage={requireMessage}
