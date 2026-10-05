@@ -435,8 +435,7 @@ const Pricing_Settings = () => {
         PrevPricingSettingObj.globalPricingDriverID &&
       pricingSettingObj.isCollectPaymentBeforeProposalAmendment ==
         PrevPricingSettingObj.isCollectPaymentBeforeProposalAmendment &&
-      pricingSettingObj.ppcid ==
-        PrevPricingSettingObj.ppcid &&
+      pricingSettingObj.ppcid == PrevPricingSettingObj.ppcid &&
       pricingSettingObj.paymentModeID == PrevPricingSettingObj.paymentModeID
     ) {
       SetPrevError(true);
@@ -1107,7 +1106,7 @@ const Pricing_Settings = () => {
                                         });
                                       }}
                                     />
-                                    Before Contract Sign
+                                    Before {EngagementName} Sign
                                   </label>
                                   <label
                                     className="d-flex align-items-center gap-2"
@@ -1130,7 +1129,7 @@ const Pricing_Settings = () => {
                                         });
                                       }}
                                     />
-                                    After Contract Sign
+                                    After {EngagementName} Sign
                                   </label>
                                 </div>
                               </div>
@@ -1141,14 +1140,15 @@ const Pricing_Settings = () => {
                                 style={{ marginTop: "16px" }}
                               >
                                 <label class="fieldset-label table-content-font PricingSetting-Proposal">
-                                  Should payment be collected for both
-                                  services or only one?
+                                  Should payment be collected for both services
+                                  or only one?
                                 </label>
                                 <Select
                                   className="phone-input-country-code selectDropDown Drop-down-width mt-1"
                                   options={PaymentPriorityConfigurationOptions}
                                   value={PaymentPriorityConfigurationOptions.find(
-                                    (item) => item.value === pricingSettingObj.ppcid,
+                                    (item) =>
+                                      item.value === pricingSettingObj.ppcid,
                                   )}
                                   onChange={(selectedOption) => {
                                     setPricingSettingObj({
@@ -1164,15 +1164,13 @@ const Pricing_Settings = () => {
                               </div>
 
                               {/* Step 3: only applicable when a single service payment is being collected */}
-                              {pricingSettingObj.ppcid ===
-                                2 && (
+                              {pricingSettingObj.ppcid === 2 && (
                                 <div
                                   class="col-lg-12 fieldset"
                                   style={{ marginTop: "16px" }}
                                 >
                                   <label class="fieldset-label table-content-font PricingSetting-Proposal">
-                                    Which service payment should be
-                                    collected?
+                                    Which service payment should be collected?
                                   </label>
                                   <Select
                                     className="phone-input-country-code selectDropDown Drop-down-width mt-1"
