@@ -174,14 +174,6 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       return;
     }
 
-    if (themeSettings?.isCollectPaymentBeforeProposalAmendment) {
-      // TODO: Implement payment-before-acceptance flow
-      setAcceptError(
-        "Payment is required before this proposal can be accepted.",
-      );
-      return;
-    }
-
     try {
       await dispatch(
         addUpdateQuote({
@@ -201,9 +193,6 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       return;
     }
 
-    // eslint-disable-next-line no-debugger
-    debugger; // TEMP: inspect AddUpdateQuote payload/response before navigating away.
-
     setAcceptError(null);
 
     // No ServicePackageKeyID here — this is a Service-based (non-package)
@@ -214,10 +203,20 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       Action: "Accepted",
       ContractSignatoryKeyID: themeSettings?.contractSignatoryKeyID ?? "",
     });
+    // generate-contract itself redirects to payment before showing the sign
+    // step when this is true (see GetSendToSignEasyData there) — mirrors
+    // StandardProposal.jsx's own accept flow rather than blocking here.
+    params.set(
+      "paymentBeforeContractSign",
+      String(themeSettings?.isCollectPaymentBeforeProposalAmendment === true),
+    );
 
     // Full navigation, not react-router — generate-contract lives on the
     // production proposal domain, not necessarily this app's origin.
-    window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
+    // TODO: need to remove later — dev-tunnel URL for testing the
+    // payment-before-sign loader locally instead of redirectUri.
+    // window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
+    window.location.href = `https://9nptb6lw-3000.inc1.devtunnels.ms/generate-contract?${params.toString()}`;
   };
 
   // /generate-contract calls GenerateContractFromProposal on mount and hands
@@ -238,14 +237,6 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     // never submits.
     if (isPackageBased && !selectedPackageKeyID) {
       setAcceptError("Please select a package to continue.");
-      return;
-    }
-
-    if (themeSettings?.isCollectPaymentBeforeProposalAmendment) {
-      // TODO: Implement payment-before-acceptance flow
-      setAcceptError(
-        "Payment is required before this proposal can be accepted.",
-      );
       return;
     }
 
@@ -277,9 +268,6 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
       return;
     }
 
-    // eslint-disable-next-line no-debugger
-    debugger; // TEMP: inspect AddUpdateQuote payload/response before navigating away.
-
     setAcceptError(null);
 
     // ServicePackageKeyID needs a lookup (see resolveServicePackageKeyID)
@@ -299,10 +287,20 @@ export default function StandardProposalWithInputs({ proposal, theme }) {
     if (servicePackageKeyID) {
       params.set("ServicePackageKeyID", servicePackageKeyID);
     }
+    // generate-contract itself redirects to payment before showing the sign
+    // step when this is true (see GetSendToSignEasyData there) — mirrors
+    // StandardProposal.jsx's own accept flow rather than blocking here.
+    params.set(
+      "paymentBeforeContractSign",
+      String(themeSettings?.isCollectPaymentBeforeProposalAmendment === true),
+    );
 
     // Full navigation, not react-router — generate-contract lives on the
     // production proposal domain, not necessarily this app's origin.
-    window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
+    // TODO: need to remove later — dev-tunnel URL for testing the
+    // payment-before-sign loader locally instead of redirectUri.
+    // window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
+    window.location.href = `https://9nptb6lw-3000.inc1.devtunnels.ms/generate-contract?${params.toString()}`;
   };
 
   const steps = [

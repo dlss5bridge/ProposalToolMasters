@@ -34,6 +34,21 @@ function AcceptInvitation() {
   const [templateElementList, setTemplateElementList] = useState([]);
   const [pricingVariablesForEmail, setPricingVariablesForEmail] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
+  // Shown instead of the default "Generating Your Engagement Letter" text
+  // whenever payment is collected before signing — that text is wrong for
+  // this whole flow, not just the final redirect: everything here still
+  // ends in a payment redirect, not a signed letter. Read directly off
+  // window.location.search (not the `paymentBeforeContractSign` const
+  // below, which isn't computed yet at this point in the component and
+  // also falls back to router state) with a lazy initializer so this is
+  // correct on the very first render, no flash of the old text first.
+  const [statusMessage, setStatusMessage] = useState(() =>
+    new URLSearchParams(window.location.search).get(
+      "paymentBeforeContractSign",
+    ) === "true"
+      ? "Please wait while we prepare your payment..."
+      : "",
+  );
   const [generatePdfData, setGeneratePdfData] = useState([]);
   const [MergePdfUrl, setMergePdfUrl] = useState("");
   const [isDefaultFirstPage, setIsDefaultFirstPage] = useState(null);
@@ -117,6 +132,9 @@ function AcceptInvitation() {
   const ContractSignatoryKeyID = urlParams.get("ContractSignatoryKeyID");
   const Action = urlParams.get("Action");
   const ServicePackageKeyID = urlParams.get("ServicePackageKeyID");
+  const paymentBeforeContractSign = urlParams.has("paymentBeforeContractSign")
+    ? urlParams.get("paymentBeforeContractSign") === "true"
+    : location.state?.signEasyRedirection === true;
   const [quoteInfo, setQuoteInfo] = useState({
     templateKeyID: null,
     clientID: null,
@@ -2725,14 +2743,52 @@ function AcceptInvitation() {
   };
   // send To Sign Easy Data
   const GetSendToSignEasyData = async (params) => {
+    // When payment is collected before signing, this same API call responds
+    // with the payment gateway URL instead of a SignEasy signing URL — the
+    // payment gateway itself redirects to SignEasy afterwards, this page
+    // never gets a signing URL directly for that case. "Generating Your
+    // Engagement Letter" (the default loader text) is accurate for the
+    // contract-generation calls that already ran before this one, but not
+    // for this specific call, so switch the message for its duration
+    // instead of leaving the engagement-letter text up.
+    if (paymentBeforeContractSign) {
+      setStatusMessage("Waiting for payment...");
+    }
     try {
       const data = await GetSendToSignEasy(params);
       if (data?.data?.statusCode === 200) {
+        const responseData = data?.data?.responseData;
+        if (
+          paymentBeforeContractSign &&
+          responseData?.isPaymentRequired === true
+        ) {
+          const paymentRedirectUrl = responseData?.paymentRedirectUrl;
+          const markdownLinkMatch = paymentRedirectUrl?.match(
+            /^\[[^\]]+\]\((https?:\/\/[^)]+)\)$/,
+          );
+          const redirectUrl = markdownLinkMatch?.[1] ?? paymentRedirectUrl;
+
+          try {
+            const parsedRedirectUrl = new URL(redirectUrl);
+            if (!["http:", "https:"].includes(parsedRedirectUrl.protocol)) {
+              throw new Error("Unsupported payment redirect URL protocol.");
+            }
+            setStatusMessage("Redirecting to payment...");
+            window.location.assign(parsedRedirectUrl.href);
+          } catch {
+            setErrorMessage(
+              "Failed to open the payment page. Please try again.",
+            );
+            setLoader(false);
+          }
+          return;
+        }
+
         debugger; //TODO:remove debugger later.
         setLoader(false);
         let acceptedDeclinedByEmailID =
-          data?.data?.responseData?.acceptedDeclinedByEmailID;
-        const signingUrls = data?.data?.responseData?.sentMailResponse;
+          responseData?.acceptedDeclinedByEmailID;
+        const signingUrls = responseData?.sentMailResponse;
         let SignEasyUrlForEmail = signingUrls.find(
           (item) => item.email == acceptedDeclinedByEmailID,
         );
@@ -2764,7 +2820,10 @@ function AcceptInvitation() {
       } */}
       {/* {
         SvgShow ? */}
-      <GeneratePdfLoaderPage message={errorMessage} />
+      <GeneratePdfLoaderPage
+        message={errorMessage || statusMessage}
+        showSpinner={!errorMessage && !!statusMessage}
+      />
       {/* :
 
           <React.Fragment>

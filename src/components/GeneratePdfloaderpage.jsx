@@ -19,7 +19,14 @@ function GeneratePdfLoaderPage(props) {
                           ? `Generating Your Engagement Letter`
                           : props.message}{" "}
                       </h4>
-                      {props.message == null || props.message == "" ? (
+                      {/* No message still shows the spinner (unchanged
+                          default). A message normally hides it (today's
+                          error-message look), but a caller can pass
+                          showSpinner to keep it for an informational status
+                          message instead, e.g. "Redirecting you to payment...". */}
+                      {props.message == null ||
+                      props.message == "" ||
+                      props.showSpinner === true ? (
                         <>
                           <div
                             style={{
