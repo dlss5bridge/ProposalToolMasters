@@ -2363,6 +2363,7 @@ const TopbarClone = () => {
                                                 </Link>
                                               </li>
                                             )}
+                                            {hasConnectedBookkeeping && (
                                             <li className="nav-item">
                                               <Link
                                                 to="/fee-assurance"
@@ -2372,6 +2373,7 @@ const TopbarClone = () => {
                                                 Fee Assurance
                                               </Link>
                                             </li>
+                                            )}
                                           </ul>
                                         </div>
                                           </li>

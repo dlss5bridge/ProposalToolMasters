@@ -212,7 +212,10 @@ const Prospects = () => {
     };
 
     checkClientConnections();
-  }, [clientList, activePlatform, organisationKeyID]);
+    // isRefreshing is included so that an explicit refresh trigger (e.g. after a
+    // per-prospect OAuth connect completes) re-checks every client's connection
+    // status without needing a manual page refresh.
+  }, [clientList, activePlatform, organisationKeyID, isRefreshing]);
 
   useEffect(() => {
     if (isAddUpdateActionDone) {
@@ -882,6 +885,9 @@ const Prospects = () => {
         .unwrap()
         .then((res) => {
           setOpenSuccessModal(true);
+          // Re-check connection badges so the mapped/connected state reflects
+          // immediately instead of requiring a manual refresh.
+          refreshIntegrationState();
         })
         .catch((err) => {
           console.log("Current err object state:", err);
@@ -938,6 +944,18 @@ const Prospects = () => {
     }
   };
 
+  // Re-pull both the practice-level connection status (drives activePlatform /
+  // the Link-Unlink buttons) and the per-prospect connection badges. Used after
+  // a connect/map action that completes out of band (e.g. an OAuth popup) so the
+  // UI reflects the new state without a manual page refresh.
+  const refreshIntegrationState = () => {
+    if (organisationKeyID) {
+      dispatch(xeroConnectionStatus(organisationKeyID));
+      dispatch(quickBooksConnectionStatus(organisationKeyID));
+    }
+    setIsRefreshing((prev) => !prev);
+  };
+
   const handleIntegrationPlatformSelect = async (platform) => {
     // No "noopener" here — we need a real reference to navigate later.
     const authWindow = window.open("", "_blank");
@@ -959,6 +977,18 @@ const Prospects = () => {
           authWindow.location.href = res.data.connectionUrl;
         } else {
           window.open(res.data.connectionUrl, "_blank", "noopener,noreferrer");
+        }
+        // The connection actually completes inside the OAuth popup, which gives
+        // the main page no completion signal. Watch for the popup to close and
+        // then refresh the integration state (practice-level connection + every
+        // prospect's connection badge) so the UI updates without a manual reload.
+        if (authWindow) {
+          const popupTimer = setInterval(() => {
+            if (authWindow.closed) {
+              clearInterval(popupTimer);
+              refreshIntegrationState();
+            }
+          }, 1000);
         }
       } else if (authWindow) {
         authWindow.close();

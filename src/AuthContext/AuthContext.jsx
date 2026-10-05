@@ -406,15 +406,16 @@ const AuthContext = ({ children }) => {
     setMenuVisible(!isMenuVisible);
   };
 
-  const hasBookkeeping = (() => {
-    const data = JSON.parse(
-      localStorage.getItem("persist:Bookkeeping") || "{}"
-    );
-
-    const bookkeeping = JSON.parse(data.bookkeeping || "{}");
-
-    return {Xero: bookkeeping.Xero === true, Quickbooks: bookkeeping.QuickBooks === true};
-  })();
+  // Derived straight from the redux store (not a one-off localStorage read) so
+  // it stays reactive: the moment a connection-status thunk updates
+  // state.auth.bookkeeping, every consumer re-renders and the Xero/QBO-gated UI
+  // (Link/Unlink buttons etc.) appears without a manual page refresh. The output
+  // shape is kept identical ({ Xero, Quickbooks }) for existing consumers.
+  const bookkeepingState = useSelector((state) => state.auth?.bookkeeping);
+  const hasBookkeeping = {
+    Xero: bookkeepingState?.Xero === true,
+    Quickbooks: bookkeepingState?.QuickBooks === true,
+  };
 
   // const updateImageUrlsInHtml = async (htmlContent) => {
   //   // Regular expression to match base64 images
