@@ -139,6 +139,12 @@ const AccesskeyModal = (props) => {
         ExpiryDate: formattedDate,
       });
 
+    } else {
+      // The picker's clear (x) button sends null: empty the date.
+      setAccessKeyObj({
+        ...accessKeyObj,
+        ExpiryDate: null,
+      });
     }
   };
   // handleFunction
@@ -164,14 +170,25 @@ const AccesskeyModal = (props) => {
       data-bs-keyboard="false"
     >
       <div class="modal-dialog modal-md modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content access-key-uses-modal access-key-form-modal">
           {/*Heading Start */}
-          <div class="modal-header bg-light p-3">
-            <h5 class="modal-title" id="exampleModalLabel">
-              {modelAction === "Add"
-                ? getCrudPopUpTitleName("Add", moduleName)
-                : getCrudPopUpTitleName("Update", moduleName)}
-            </h5>
+          <div class="modal-header access-key-uses-modal__head">
+            <div className="access-key-uses-modal__head-text">
+              <span className="access-key-uses-modal__icon">
+                <i className="bi bi-key-fill"></i>
+              </span>
+              <div>
+                <h5 class="modal-title" id="exampleModalLabel">
+                  {modelAction === "Add"
+                    ? getCrudPopUpTitleName("Add", moduleName)
+                    : getCrudPopUpTitleName("Update", moduleName)}
+                </h5>
+                <p className="access-key-uses-modal__subtitle">
+                  Choose the organisation, name the key and set when it
+                  expires
+                </p>
+              </div>
+            </div>
             {/* Close Button Start */}
             <button
               type="button"
@@ -186,7 +203,7 @@ const AccesskeyModal = (props) => {
           </div>
           {/*Heading End */}
 
-          <div class="modal-body">
+          <div class="modal-body akf-body">
             <div class="p-3">
               <div class="row fieldset">
                 <div class="col-lg-4 col-md-4 col-sm-12 text-start text-md-end">
@@ -305,7 +322,7 @@ const AccesskeyModal = (props) => {
 
           {/*Modal body End */}
           {/*Footer body button Start */}
-          <div class="modal-footer">
+          <div class="modal-footer access-key-uses-modal__footer">
             <div class="hstack gap-2 justify-content-end">
               <button
                 type="button"

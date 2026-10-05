@@ -986,3 +986,339 @@
   transform: translateY(0);
   box-shadow: 0 4px 10px rgba(20, 181, 209, 0.3) !important;
 }
+
+/* =========================================================
+   ADD / UPDATE ACCESS KEY MODAL
+   Reuses the Uses modal's navy header and footer bar
+   (.access-key-uses-modal__head / __footer). Below: the body
+   fields and buttons. Visual only.
+   ========================================================= */
+
+.access-key-form-modal .akf-body {
+  padding: 22px 24px 8px;
+}
+
+.access-key-form-modal .akf-body > .p-3 {
+  padding: 0 !important;
+}
+
+/* label above field */
+.access-key-form-modal .akf-body .row.fieldset {
+  display: block;
+  margin: 0 0 16px !important;
+}
+
+.access-key-form-modal .akf-body .row.fieldset > [class*="col-"] {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  text-align: left !important;
+}
+
+.access-key-form-modal .akf-body .row.fieldset label:not(.validation) {
+  display: block;
+  width: auto !important;
+  margin: 0 0 7px;
+  color: #1f2a3a;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.access-key-form-modal .akf-body .text-danger {
+  margin-left: 3px;
+  color: #e5484d !important;
+}
+
+.access-key-form-modal .akf-body .input-group {
+  flex-wrap: wrap;
+}
+
+.access-key-form-modal .akf-body .input-group > div {
+  width: 100% !important;
+}
+
+/* text input */
+.access-key-form-modal .akf-body .input-text {
+  width: 100% !important;
+  height: 42px !important;
+  padding: 0 14px !important;
+  border: 1px solid #c3ccd9 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  outline: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.access-key-form-modal .akf-body .input-text::placeholder {
+  color: #94a3b8;
+}
+
+.access-key-form-modal .akf-body .input-text:focus {
+  border-color: #14b5d1 !important;
+  box-shadow: 0 0 0 3px rgba(20, 181, 209, 0.15) !important;
+}
+
+/* organisation select (react-select) */
+.access-key-form-modal .akf-body [class*="-control"]:not([class*="-control-"]) {
+  min-height: 42px !important;
+  border: 1px solid #c3ccd9 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  font-size: 14px;
+}
+
+.access-key-form-modal .akf-body [class*="-control"]:focus-within {
+  border-color: #14b5d1 !important;
+  box-shadow: 0 0 0 3px rgba(20, 181, 209, 0.15) !important;
+}
+
+.access-key-form-modal .akf-body [class*="-indicatorSeparator"] {
+  display: none;
+}
+
+.access-key-form-modal .akf-body [class*="-placeholder"] {
+  color: #94a3b8;
+}
+
+/* expiry date (react-date-picker) */
+.access-key-form-modal .akf-body .react-date-picker {
+  width: 100%;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__wrapper {
+  height: 42px;
+  padding: 0 8px 0 12px;
+  border: 1px solid #c3ccd9 !important;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.access-key-form-modal .akf-body .react-date-picker--open .react-date-picker__wrapper,
+.access-key-form-modal .akf-body .react-date-picker__wrapper:focus-within {
+  border-color: #14b5d1 !important;
+  box-shadow: 0 0 0 3px rgba(20, 181, 209, 0.15);
+}
+
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__input {
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__button svg {
+  stroke: #64748b;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__button:hover svg {
+  stroke: #0b7f95;
+}
+
+.access-key-form-modal .akf-body .validation {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+/* footer buttons: pill shape like the Uses modal's OK button */
+.access-key-form-modal .access-key-uses-modal__footer .hstack {
+  gap: 10px !important;
+}
+
+.access-key-form-modal .access-key-uses-modal__footer .btn {
+  min-height: 42px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 22px !important;
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  line-height: 1;
+}
+
+.access-key-form-modal .access-key-uses-modal__footer .btn.btn-light {
+  border-color: #dce4ed !important;
+  background: #fff !important;
+  color: #334258 !important;
+}
+
+.access-key-form-modal .access-key-uses-modal__footer .btn.btn-light:hover {
+  background: #f4f7fb !important;
+}
+
+.access-key-form-modal .access-key-uses-modal__footer .btn.create-item-btn {
+  background: #14b5d1 !important;
+  box-shadow: 0 6px 16px rgba(20, 181, 209, 0.32) !important;
+  color: #fff !important;
+}
+
+.access-key-form-modal .access-key-uses-modal__footer .btn.create-item-btn:hover {
+  background: #0da5c1 !important;
+}
+
+/* ---------- Expiry date calendar ----------
+   The Uses modal look sets overflow: hidden on .modal-content (for the
+   rounded header), which clipped the calendar. Here the card lets content
+   spill out and the header rounds its own top corners instead. */
+.access-key-form-modal.access-key-uses-modal {
+  overflow: visible !important;
+}
+
+.access-key-form-modal .access-key-uses-modal__head {
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+
+.access-key-form-modal .access-key-uses-modal__footer {
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* calendar opens as a pop-up in the middle of the screen. The modal dialog
+   has no transform once shown, so position: fixed is relative to the viewport.
+   The large shadow dims the page behind it; clicks outside still reach the
+   page, so the date picker closes on outside click as before. */
+.access-key-form-modal .akf-body .react-date-picker__calendar--open {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 1080 !important;
+  margin: 0;
+  width: 340px !important;
+  max-width: calc(100vw - 24px);
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  box-shadow: 0 0 0 100vmax rgba(15, 23, 42, 0.35);
+}
+
+.access-key-form-modal .akf-body .react-calendar {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dce4ed !important;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  font-family: inherit;
+}
+
+.access-key-form-modal .akf-body .react-calendar__navigation {
+  margin-bottom: 6px;
+}
+
+.access-key-form-modal .akf-body .react-calendar__navigation button {
+  min-width: 36px;
+  border-radius: 8px;
+  color: #14243a;
+  font-weight: 600;
+}
+
+.access-key-form-modal .akf-body .react-calendar__navigation button:enabled:hover,
+.access-key-form-modal .akf-body .react-calendar__navigation button:enabled:focus {
+  background: #f1f5f9;
+}
+
+.access-key-form-modal .akf-body .react-calendar__month-view__weekdays__weekday {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.access-key-form-modal .akf-body .react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+
+.access-key-form-modal .akf-body .react-calendar__tile {
+  padding: 9px 4px;
+  border-radius: 8px;
+  color: #334258;
+  font-size: 13px;
+}
+
+.access-key-form-modal .akf-body .react-calendar__tile:enabled:hover,
+.access-key-form-modal .akf-body .react-calendar__tile:enabled:focus {
+  background: #e6f7fb;
+  color: #0b7f95;
+}
+
+.access-key-form-modal .akf-body .react-calendar__tile--now {
+  background: #f1f5f9;
+  font-weight: 700;
+}
+
+.access-key-form-modal .akf-body .react-calendar__tile--active,
+.access-key-form-modal .akf-body .react-calendar__tile--active:enabled:hover,
+.access-key-form-modal .akf-body .react-calendar__tile--active:enabled:focus {
+  background: #14b5d1;
+  color: #fff;
+}
+
+.access-key-form-modal .akf-body .react-calendar__tile:disabled {
+  background: transparent;
+  color: #cbd5e1;
+}
+
+.access-key-form-modal .akf-body .react-calendar__month-view__days__day--neighboringMonth {
+  color: #cbd5e1;
+}
+
+/* date inputs: no pink "invalid" boxes or black focus outline while empty */
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__input,
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__input:invalid {
+  background: transparent;
+  outline: none;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__input:focus {
+  border-radius: 3px;
+  background: #e6f7fb;
+}
+
+/* Date parts were cut off ("0/11/2026"): react-date-picker sizes each input
+   from its text once, which can come out narrower than the digits (e.g. when
+   the web font finishes loading after the modal mounts). A minimum width per
+   part keeps day, month and year fully visible. Single-digit values keep the
+   library's own leading-zero layout (a separate "0" + the input overlapping it). */
+.access-key-form-modal .akf-body .react-date-picker__inputGroup {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  color: #0f172a;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__leadingZero {
+  font-size: 14px;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__input {
+  height: auto;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  text-align: left;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__day:not(.react-date-picker__inputGroup__input--hasLeadingZero),
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__month:not(.react-date-picker__inputGroup__input--hasLeadingZero) {
+  min-width: calc(2ch + 2px) !important;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__input--hasLeadingZero {
+  min-width: calc(1ch + 2px) !important;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__year {
+  min-width: calc(4ch + 2px) !important;
+}
+
+.access-key-form-modal .akf-body .react-date-picker__inputGroup__divider {
+  padding: 0 2px;
+  color: #94a3b8;
+}
