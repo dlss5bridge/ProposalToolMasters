@@ -248,7 +248,7 @@ function ConfirmModel({
                 )}
                 {modelRequestData.Action === "Disconnect" && (
                   <span class="text-muted mb-0">
-                    Are you sure want to unauthorised organisation.
+                    Are you sure want to disconnect organisation.
                   </span>
                 )}
                 {modelRequestData.Action === "Add Contact" && (

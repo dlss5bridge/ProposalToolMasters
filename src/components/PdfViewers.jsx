@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
-// // 👇 Set workerSrc properly using pdfjs version and CDN
-// pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// 👇 Set workerSrc here (where react-pdf is actually rendered) instead of in
+// src/index.js. Keeping it in the entry file pulled all of react-pdf + its
+// bundled pdf.js into the eager main bundle on every page load. This component
+// is only reached through lazy chunks (PreviewComponentpdf, ViewPdf), so the
+// worker config runs before any <Document> renders without taxing first load.
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const PdfViewer = ({ pdfFile, isVisible }) => {
   const [numPages, setNumPages] = useState(null);

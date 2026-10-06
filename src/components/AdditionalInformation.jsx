@@ -6,6 +6,7 @@ import Utils from "../Middleware/Utils";
 import { AuthContextProvider } from "../AuthContext/AuthContext";
 import { Tooltip } from "@mui/material";
 import Text_Editor from "./Text_Editor";
+import ProspectVariables from "./ProspectVariables";
 import { statusID } from "../Middleware/enums";
 import DatePicker from "react-datepicker";
 import { parse, isValid, format, isAfter, isBefore, isEqual } from "date-fns";
@@ -433,11 +434,33 @@ const AdditionalInformation = (props) => {
       <div className="create-practice-height scrollbar">
         <div className="tab-content">
           <div class="tab-pane p-3 active">
+            {(props.moduleName === "Quote" || props.moduleName === "Contract") &&
+              props.prospectVariables?.length > 0 && (
+                <>
+                  <ProspectVariables
+                    prospectVariables={props.prospectVariables}
+                    setProspectVariables={props.setProspectVariables}
+                    invalidFieldIds={props.invalidProspectVariableIds}
+                    moduleName={props.moduleName}
+                    prospectName={props.prospectName}
+                    isMobile={isMobile}
+                    onChange={props.DisableTabOnChange}
+                  />
+                  {props.additionalInformationList?.filter(
+                    (item) => item.driverTypeID !== 1,
+                  ).length > 0 && (
+                    <>
+                      <h3 className="modal-title mt-4 mb-2">Service Information</h3>
+                      <div className="separator"></div>
+                    </>
+                  )}
+                </>
+              )}
             {props.additionalInformationList
               ?.filter((item) => item.driverTypeID !== 1)
               ?.map((i) => {
                 return (
-                  <div class="row fieldset add-new-package">
+                  <div class="row fieldset add-new-package mt-3">
                     {i.driverVisibility && i.driverTypeID === 2 && (
                       <>
                         <div
