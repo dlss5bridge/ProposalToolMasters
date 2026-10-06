@@ -21,6 +21,7 @@ import { UploadManuallySignedContract } from "../../redux/Services/Setting/Organ
 import SuccessModal from "../../components/SuccessModal";
 import ErrorModel from "../../components/ErrorModel";
 import { SendEmailsToManuallySignedContract } from "../../redux/Services/SignEasy";
+import BinarySelect from "../../components/BinarySelect";
 
 const View_Engagement_Latter = () => {
   const common = useSelector((state) => state.Storage);
@@ -1829,12 +1830,11 @@ const View_Engagement_Latter = () => {
                                   <div className="col-md-10 mb-2">
                                     <div className="input-group">
                                       {/* Add your Select component here */}
-                                      <Select
-                                        // isDisabled
-                                        className="phone-input-country-code selectDropDown Drop-down-width"
-                                        value={feeTypeValue}
+                                      <BinarySelect
                                         options={Utils.feeInProposal}
+                                        value={feeTypeValue}
                                         onChange={handleChangeFeesType}
+                                        ariaLabel="Fees display"
                                       />
                                     </div>
                                   </div>

@@ -415,6 +415,7 @@
 .deviation-list-redesign .deviation-list-page {
   width: 100% !important;
   max-width: 1500px !important;
+  padding-left: 10px !important;
 
   margin-left: 0 !important;
   margin-right: auto !important;

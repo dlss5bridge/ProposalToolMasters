@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import Utils from "../../../../Middleware/Utils";
 import "../../email_template/EmailTemplate.css";
 import "./AddReminderTemplate-redesign.css";
+import "../../../../styles/fancy-select.css";
+import BinarySelect from "../../../../components/BinarySelect";
 import { Row, Col } from "reactstrap";
 import Select from "react-select";
 import { AuthContextProvider } from "../../../../AuthContext/AuthContext";
@@ -653,6 +655,7 @@ function AddUpdateReminderTemplate(props) {
                       <div className="input-group">
                         <Select
                           className="user-role-select"
+                          classNamePrefix="fx-select"
                           options={TemplateTypeLookupList}
                           value={templateTypeFilter}
                           onChange={(e) => {
@@ -735,9 +738,7 @@ function AddUpdateReminderTemplate(props) {
                   </div>
                   <div className="col-lg-10">
                     <div className="mb-2 input-group">
-                      <Select
-                        isDisabled={modelAction === "Update" ? true : false}
-                        className="user-role-select"
+                      <BinarySelect
                         options={Utils.IS_default}
                         value={IsActiveFilter}
                         onChange={(e) =>
@@ -746,6 +747,8 @@ function AddUpdateReminderTemplate(props) {
                             isDefault: e.value,
                           })
                         }
+                        isDisabled={modelAction === "Update" ? true : false}
+                        ariaLabel="Is Default"
                       />
                     </div>
                     {modelAction === "Update" ? (

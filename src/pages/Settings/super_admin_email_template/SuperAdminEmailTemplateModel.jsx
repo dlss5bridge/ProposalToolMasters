@@ -26,6 +26,7 @@ import BackButtonSvg from "../../../components/BackButtonSvg";
 
 import Text_Editor from "../../../components/Text_Editor";
 import SuperAdminEmailTemplateVariable from "../../../components/Variables/SuperAdminEmailTemplateVariables";
+import BinarySelect from "../../../components/BinarySelect";
 function SuperAdminEmailTemplateModel(props) {
   //Declare State:
   const moduleName = "Super Admin Email Template";
@@ -542,9 +543,7 @@ function SuperAdminEmailTemplateModel(props) {
                   </div>
                   <div className="col-lg-10">
                     <div className="mb-2 input-group">
-                      <Select
-                        isDisabled={modelAction === "Update" ? true : false}
-                        className="user-role-select"
+                      <BinarySelect
                         options={Utils.IS_default}
                         value={IsActiveFilter}
                         onChange={(e) =>
@@ -553,6 +552,8 @@ function SuperAdminEmailTemplateModel(props) {
                             isDefault: e.value,
                           })
                         }
+                        isDisabled={modelAction === "Update" ? true : false}
+                        ariaLabel="Is Default"
                       />
                     </div>
                     {modelAction === "Update" ? (

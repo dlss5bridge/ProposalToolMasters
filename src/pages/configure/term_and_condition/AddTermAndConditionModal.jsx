@@ -39,6 +39,7 @@ import Text_Editor from "../../../components/Text_Editor";
 import { NotifySuperAdminPredefinedChangesToAdmin } from "../../../redux/Services/Setting/NotificationApi";
 import { DeclineSuperAdminChanges } from "../../../redux/Services/Config/ServiceCategoryApi";
 import ErrorModel from "../../../components/ErrorModel";
+import BinarySelect from "../../../components/BinarySelect";
 function Add_New_Term_And_Condition(props) {
   //Declare State:
   const moduleName = "Terms & Conditions";
@@ -926,9 +927,7 @@ function Add_New_Term_And_Condition(props) {
                   <div className="col-lg-9">
                     <div className="">
                       <div className="input-group">
-                        <Select
-                          isDisabled={modelAction === "Update" ? true : false}
-                          className="user-role-select"
+                        <BinarySelect
                           options={Utils.IS_default}
                           value={IsActiveFilter}
                           onChange={(e) =>
@@ -937,6 +936,8 @@ function Add_New_Term_And_Condition(props) {
                               isDefault: e.value,
                             })
                           }
+                          isDisabled={modelAction === "Update" ? true : false}
+                          ariaLabel="Is Default"
                         />
                       </div>
                       {requireErrorMessage &&

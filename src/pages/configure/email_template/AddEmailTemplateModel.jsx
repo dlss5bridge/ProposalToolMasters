@@ -29,6 +29,7 @@ import AcceptSuperAdminChangesConfirmation from "../../../components/AcceptSuper
 import ErrorModel from "../../../components/ErrorModel";
 import { DeclineSuperAdminChanges } from "../../../redux/Services/Config/ServiceCategoryApi";
 import SAPredefinedChangesNotifyMessageModel from "../../../components/SAPredefinedChangesNotifyMessageModel";
+import BinarySelect from "../../../components/BinarySelect";
 
 function AddUpdateEmailTemplate(props) {
   //Declare State:
@@ -768,9 +769,7 @@ function AddUpdateEmailTemplate(props) {
                   </div>
                   <div className="col-lg-10">
                     <div className="mb-2 input-group">
-                      <Select
-                        isDisabled={modelAction === "Update" ? true : false}
-                        className="user-role-select"
+                      <BinarySelect
                         options={Utils.IS_default}
                         value={IsActiveFilter}
                         onChange={(e) =>
@@ -779,6 +778,8 @@ function AddUpdateEmailTemplate(props) {
                             isDefault: e.value,
                           })
                         }
+                        isDisabled={modelAction === "Update" ? true : false}
+                        ariaLabel="Is Default"
                       />
                     </div>
                     {modelAction === "Update" ? (

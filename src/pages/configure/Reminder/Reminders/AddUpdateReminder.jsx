@@ -28,6 +28,7 @@ import Utils from "../../../../Middleware/Utils";
 import { NotifySuperAdminPredefinedChangesToAdmin } from "../../../../redux/Services/Setting/NotificationApi";
 import { DeclineSuperAdminChanges } from "../../../../redux/Services/Config/ServiceCategoryApi";
 import SAPredefinedChangesNotifyMessageModel from "../../../../components/SAPredefinedChangesNotifyMessageModel";
+import BinarySelect from "../../../../components/BinarySelect";
 function AddUpdateReminder(props) {
   const moduleName = "Reminder";
   const navigate = useNavigate();
@@ -775,9 +776,7 @@ function AddUpdateReminder(props) {
                               Repeat <span className="text-danger">*</span>
                             </label>
                             <div className="input-group">
-                              <Select
-                                className="user-role-select"
-                                placeholder="Select..."
+                              <BinarySelect
                                 options={Utils.repeats}
                                 value={Repeat}
                                 onChange={(selectedOption) => {
@@ -786,6 +785,7 @@ function AddUpdateReminder(props) {
                                     repeats: selectedOption.value,
                                   }));
                                 }}
+                                ariaLabel="Repeat"
                               />
                             </div>
                           </div>

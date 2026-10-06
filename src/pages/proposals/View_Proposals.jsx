@@ -13,6 +13,7 @@ import "../configure/packages/Package.css";
 import "./View_Proposals-redesign-v4.css";
 import { fieldToIdMap, statusID } from "../../Middleware/enums";
 import { Base_Url } from "../../Base-Url/Base_Url";
+import BinarySelect from "../../components/BinarySelect";
 
 const View_Proposals = () => {
   const common = useSelector((state) => state.Storage);
@@ -3119,12 +3120,11 @@ const View_Proposals = () => {
                                           <div className="col-lg-9">
                                             <div className="input-group">
                                               {/* Add your Select component here */}
-                                              <Select
-                                                // isDisabled
-                                                className="phone-input-country-code selectDropDown Drop-down-width"
-                                                value={feeTypeValue}
+                                              <BinarySelect
                                                 options={Utils.feeInProposal}
+                                                value={feeTypeValue}
                                                 onChange={handleChangeFeesType}
+                                                ariaLabel="Fees display"
                                               />
                                             </div>
                                           </div>
@@ -6269,12 +6269,11 @@ const View_Proposals = () => {
                                   <div className="col-lg-9">
                                     <div className="input-group">
                                       {/* Add your Select component here */}
-                                      <Select
-                                        // isDisabled
-                                        className="phone-input-country-code selectDropDown Drop-down-width"
-                                        value={feeTypeValue}
+                                      <BinarySelect
                                         options={Utils.feeInProposal}
+                                        value={feeTypeValue}
                                         onChange={handleChangeFeesType}
+                                        ariaLabel="Fees display"
                                       />
                                     </div>
                                   </div>

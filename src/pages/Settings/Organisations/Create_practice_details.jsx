@@ -52,6 +52,7 @@ import {
 import { RefreshToken } from "../../../redux/Services/Auth/loginApi";
 import "./Create-practice-details.css";
 import "../../../components/ChoosePlanForPurchase.css";
+import BinarySelect from "../../../components/BinarySelect";
 
 // Basic Information component
 const Basic_information = (props) => {
@@ -2412,8 +2413,7 @@ const OtherInformation = (props) => {
 
                 <div className="cp-field">
                   <label className="cp-label">{taxName} Registered</label>
-                  <Select
-                    className="CurrencySelect cp-select"
+                  <BinarySelect
                     options={Utils.VAT_Registered}
                     value={VATRegFilter}
                     onChange={(e) =>
@@ -2422,6 +2422,7 @@ const OtherInformation = (props) => {
                         VATReg: e.value,
                       })
                     }
+                    ariaLabel="VAT Registered"
                   />
                 </div>
 

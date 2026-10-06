@@ -12,6 +12,7 @@ import { parse, isValid, format, isAfter, isBefore, isEqual } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-calendar/dist/Calendar.css";
 import dayjs from "dayjs";
+import BinarySelect from "./BinarySelect";
 
 // Matches Select Services' own summary sidebar (Theme 2/3/4): show this
 // many items per group before collapsing the rest behind "View all".
@@ -1205,7 +1206,7 @@ const AdditionalInformation = (props) => {
                         </div>
                         <div className="col-lg-9 col-md-9 col-sm-12">
                           <div className="input-group">
-                            <Select
+                            <BinarySelect
                               options={Utils.SignaturePosition}
                               value={Utils.SignaturePosition.find(
                                 (item) => item.value == SignaturePositionValue,
@@ -1222,8 +1223,7 @@ const AdditionalInformation = (props) => {
                                   );
                                 props.setContractSignatoriesList(updatedList);
                               }}
-                              menuPortalTarget={document.body}
-                              styles={SELECT_MENU_PORTAL_STYLES}
+                              ariaLabel="Signature Position"
                             />
                           </div>
                           {props.requireMessage &&

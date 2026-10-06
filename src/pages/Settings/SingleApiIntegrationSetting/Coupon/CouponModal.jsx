@@ -10,8 +10,8 @@ import DatePicker from "react-date-picker";
 import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "./CouponCode.css"
-import Select from "react-select";
 import Utils from "../../../../Middleware/Utils";
+import BinarySelect from "../../../../components/BinarySelect";
 const AccesskeyModal = (props) => {
   // A] States Declaration :
   const moduleName = "Coupon";
@@ -273,8 +273,8 @@ const AccesskeyModal = (props) => {
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-12">
                   <div class="input-group">
-                    <Select
-                      className=" selectDropDown Drop-down-width"
+                    <BinarySelect
+                      options={Utils.CouponTypeIDs}
                       value={CouponTypeValue}
                       onChange={(e) => {
 
@@ -283,8 +283,7 @@ const AccesskeyModal = (props) => {
                           couponTypeID: e.value,
                         });
                       }}
-                      options={Utils.CouponTypeIDs}
-                      aria-label="Select Payment Gateway"
+                      ariaLabel="Coupon Type"
                     />
                     {RequireErrorMessage && (couponObj.couponTypeID === "" || couponObj.couponTypeID === undefined || couponObj.couponTypeID === null) ? (
                       <label className="validation">{ERROR_MESSAGES}</label>

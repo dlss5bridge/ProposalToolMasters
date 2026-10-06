@@ -57,6 +57,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import SAPredefinedChangesNotifyMessageModel from "../../../components/SAPredefinedChangesNotifyMessageModel";
 import CommonProspectVariable from "../../../components/Variables/CommonProspectVariable";
 import FileTablePreview from "../../../components/FileTablePreview";
+import BinarySelect from "../../../components/BinarySelect";
 
 function Add_New_Templates(props) {
   //Declare State:
@@ -2171,9 +2172,7 @@ function Add_New_Templates(props) {
                   </div>
                   <div className="col-lg-9">
                     <div className="mb-2 input-group">
-                      <Select
-                        isDisabled={modelAction === "Update" ? true : false}
-                        className="user-role-select"
+                      <BinarySelect
                         options={Utils.IS_default}
                         value={IsActiveFilter}
                         onChange={(e) =>
@@ -2182,6 +2181,8 @@ function Add_New_Templates(props) {
                             isDefault: e.value,
                           })
                         }
+                        isDisabled={modelAction === "Update" ? true : false}
+                        ariaLabel="Is Default"
                       />
                       {requireErrorMessage &&
                       (TemplateObj.status === "" ||

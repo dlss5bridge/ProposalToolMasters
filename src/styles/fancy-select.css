@@ -1,0 +1,404 @@
+/* =========================================================
+   FANCY SELECT — modern look for react-select dropdowns
+   Opt-in per dropdown: add  classNamePrefix="fx-select"  to a <Select>.
+   Only the look changes; options, values and handlers are untouched.
+   Repeated class names raise specificity over page-level react-select rules
+   (e.g. .rt-form [class*="-control"]:not(...) is 0,3,0; the field rules here are 0,4,0).
+   ========================================================= */
+
+/* ---------- Field ---------- */
+.fx-select__control.fx-select__control.fx-select__control.fx-select__control {
+  min-height: 44px !important;
+  padding: 0 4px 0 2px;
+  border: 1px solid #cfd8e3 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.fx-select__control.fx-select__control.fx-select__control.fx-select__control:hover {
+  border-color: #9fdcea !important;
+  background: #fbfeff !important;
+}
+
+.fx-select__control.fx-select__control.fx-select__control.fx-select__control--is-focused,
+.fx-select__control.fx-select__control.fx-select__control.fx-select__control--menu-is-open {
+  border-color: #14b5d1 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 4px rgba(20, 181, 209, 0.14) !important;
+}
+
+.fx-select__control.fx-select__control.fx-select__control.fx-select__control--is-disabled {
+  border-color: #e2e8f0 !important;
+  background: #f5f7fa !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+.fx-select__value-container.fx-select__value-container {
+  padding: 2px 12px !important;
+}
+
+.fx-select__placeholder.fx-select__placeholder {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.fx-select__single-value.fx-select__single-value {
+  color: #0f172a;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.fx-select__control--is-disabled .fx-select__single-value {
+  color: #64748b;
+}
+
+.fx-select__input-container.fx-select__input-container {
+  color: #0f172a;
+}
+
+/* ---------- Arrow: no divider, rotates when open ---------- */
+.fx-select__indicator-separator.fx-select__indicator-separator {
+  display: none;
+}
+
+.fx-select__dropdown-indicator.fx-select__dropdown-indicator {
+  margin-right: 4px;
+  padding: 6px;
+  border-radius: 8px;
+  color: #64748b;
+  transition:
+    transform 0.2s ease,
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.fx-select__control:hover .fx-select__dropdown-indicator {
+  background: #eef9fc;
+  color: #0b7f95;
+}
+
+.fx-select__control--menu-is-open .fx-select__dropdown-indicator.fx-select__dropdown-indicator {
+  transform: rotate(180deg);
+  color: #0b7f95;
+}
+
+.fx-select__control--is-disabled .fx-select__dropdown-indicator.fx-select__dropdown-indicator {
+  color: #cbd5e1;
+  background: transparent;
+}
+
+.fx-select__clear-indicator.fx-select__clear-indicator {
+  padding: 6px;
+  border-radius: 8px;
+  color: #94a3b8;
+}
+
+.fx-select__clear-indicator.fx-select__clear-indicator:hover {
+  background: #fdecee;
+  color: #d93b4a;
+}
+
+/* ---------- Menu: floating card ---------- */
+@keyframes fx-select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.fx-select__menu.fx-select__menu {
+  z-index: 1060;
+  margin-top: 8px;
+  overflow: hidden;
+  border: 1px solid #e3e8ef;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.14),
+    0 4px 10px rgba(15, 23, 42, 0.06);
+  transform-origin: top center;
+  animation: fx-select-in 0.14s ease-out;
+}
+
+.fx-select__menu-list.fx-select__menu-list {
+  max-height: 280px;
+  padding: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.fx-select__menu-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.fx-select__menu-list::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background: #cbd5e1;
+}
+
+/* ---------- Options ---------- */
+.fx-select__option.fx-select__option {
+  position: relative;
+  margin: 1px 0;
+  padding: 10px 36px 10px 12px;
+  border-radius: 8px;
+  background: transparent;
+  color: #334258;
+  font-size: 14px;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.fx-select__option.fx-select__option--is-focused {
+  background: #f0fbfd;
+  color: #0b7f95;
+}
+
+.fx-select__option.fx-select__option:active {
+  background: #e0f5fa;
+}
+
+/* selected: soft tint + bold + check mark (instead of a solid blue bar) */
+.fx-select__option.fx-select__option--is-selected {
+  background: #e6f7fb;
+  color: #0b6f83;
+  font-weight: 600;
+}
+
+.fx-select__option.fx-select__option--is-selected::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2314b5d1' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+.fx-select__option.fx-select__option--is-disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+/* ---------- Empty / loading ---------- */
+.fx-select__menu-notice.fx-select__menu-notice {
+  padding: 18px 12px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* ---------- Multi-select chips ---------- */
+.fx-select__multi-value.fx-select__multi-value {
+  margin: 2px 4px 2px 0;
+  border-radius: 6px;
+  background: #e6f7fb;
+}
+
+.fx-select__multi-value__label.fx-select__multi-value__label {
+  padding: 3px 4px 3px 8px;
+  color: #0b7f95;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.fx-select__multi-value__remove.fx-select__multi-value__remove {
+  border-radius: 0 6px 6px 0;
+  color: #0b7f95;
+}
+
+.fx-select__multi-value__remove.fx-select__multi-value__remove:hover {
+  background: #fdecee;
+  color: #d93b4a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-select__menu.fx-select__menu,
+  .fx-select__dropdown-indicator.fx-select__dropdown-indicator {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* =========================================================
+   FANCY TOGGLE — Yes/No switch for boolean fields
+   <button type="button" role="switch" className="fx-toggle [is-on]">
+     <span className="fx-toggle__track"><span className="fx-toggle__thumb" /></span>
+     <span className="fx-toggle__text">Yes|No</span>
+   </button>
+   ========================================================= */
+.fx-toggle {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fx-toggle:focus-visible {
+  outline: none;
+}
+
+.fx-toggle:focus-visible .fx-toggle__track {
+  box-shadow: 0 0 0 4px rgba(20, 181, 209, 0.2);
+}
+
+.fx-toggle__track {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  flex: none;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.15s ease;
+}
+
+.fx-toggle:hover:not(:disabled) .fx-toggle__track {
+  background: #b8c4d3;
+}
+
+.fx-toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.fx-toggle.is-on {
+  color: #0b6f83;
+}
+
+.fx-toggle.is-on .fx-toggle__track,
+.fx-toggle.is-on:hover:not(:disabled) .fx-toggle__track {
+  background: #14b5d1;
+}
+
+.fx-toggle.is-on .fx-toggle__thumb {
+  transform: translateX(18px);
+}
+
+.fx-toggle:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.fx-toggle:disabled .fx-toggle__track {
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-toggle__track,
+  .fx-toggle__thumb {
+    transition: none;
+  }
+}
+
+.fx-toggle.is-unset .fx-toggle__text {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* =========================================================
+   FANCY SEGMENTED — two named choices side by side
+   (used by <BinarySelect> when the options are not Yes/No)
+   ========================================================= */
+.fx-segmented {
+  width: 100%;
+  min-height: 44px;
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #cfd8e3;
+  border-radius: 10px;
+  background: #f4f7fb;
+}
+
+.fx-segmented__option {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #475569;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.fx-segmented__option:hover:not(:disabled):not(.is-active) {
+  background: #e9eff6;
+  color: #0f172a;
+}
+
+.fx-segmented__option.is-active {
+  background: #fff;
+  color: #0b6f83;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(20, 181, 209, 0.35);
+}
+
+.fx-segmented__option:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(20, 181, 209, 0.25);
+}
+
+.fx-segmented.is-disabled {
+  background: #f5f7fa;
+  border-color: #e2e8f0;
+}
+
+.fx-segmented__option:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.fx-segmented.is-disabled .fx-segmented__option.is-active {
+  color: #64748b;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-segmented__option {
+    transition: none;
+  }
+}

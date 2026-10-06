@@ -67,6 +67,7 @@ import ConfirmModel from "../../../components/ConfirmationBox";
 import Android12Switch from "../../../components/AndroidSwitch";
 import { updateState } from "../../../redux/Persist";
 import InstructionModal from "../Email_config/InstructionModel";
+import BinarySelect from "../../../components/BinarySelect";
 
 const Update_Practice_Details = () => {
   // A] Declare State
@@ -2659,12 +2660,11 @@ const Update_Practice_Details = () => {
 
                 <div className="pd-field">
                   <label className="pd-label">{taxName} Registered</label>
-                  <Select
-                    defaultValue="Select..."
-                    className="CurrencySelect pd-select"
+                  <BinarySelect
                     options={Utils.VAT_Registered}
                     value={VATRegFilter}
                     onChange={(e) => handleVATStatusChange(e)}
+                    ariaLabel="VAT Registered"
                   />
                 </div>
 

@@ -31,6 +31,7 @@ import {
 } from "../../../../redux/Services/Setting/MarketingReminderApi";
 import SuperAdminMarketingReminderList from "./SuperAdminMarketingReminderList";
 import Utils from "../../../../Middleware/Utils";
+import BinarySelect from "../../../../components/BinarySelect";
 
 function SuperAdminMarketingReminderAddUpdate(props) {
   const moduleName = "Other Reminder";
@@ -676,9 +677,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                               Repeat <span className="text-danger">*</span>
                             </label>
                             <div className="input-group">
-                              <Select
-                                className="user-role-select"
-                                placeholder="Select..."
+                              <BinarySelect
                                 options={Utils.repeats}
                                 value={Utils.repeats.find(
                                   (repeat) =>
@@ -690,6 +689,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                                     isRepeat: selectedOption.value,
                                   }));
                                 }}
+                                ariaLabel="Repeat"
                               />
                             </div>
                           </div>
