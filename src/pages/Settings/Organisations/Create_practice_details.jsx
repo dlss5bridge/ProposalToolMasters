@@ -292,7 +292,7 @@ const Basic_information = (props) => {
 
                 <div className="cp-card-body">
                   <div className="cp-grid">
-                    <div className="cp-field cp-field-full">
+                    <div className="cp-field">
                       <label className="cp-label">
                         Trading Name<span className="cp-req">*</span>
                       </label>
@@ -378,7 +378,7 @@ const Basic_information = (props) => {
                       )}
                     </div>
 
-                    <div className="cp-field cp-field-full">
+                    <div className="cp-field">
                       <label className="cp-label">
                         Trading Address<span className="cp-req">*</span>
                       </label>
@@ -563,7 +563,7 @@ const Basic_information = (props) => {
 
                 <div className="cp-card-body">
                   <div className="cp-grid">
-                    <div className="cp-field cp-field-full cp-field-search">
+                    <div className="cp-field cp-field-search">
                       <label className="cp-label">Search Company</label>
                       <input
                         type="text"
@@ -705,7 +705,7 @@ const Basic_information = (props) => {
                       )}
                     </div>
 
-                    <div className="cp-field cp-field-full">
+                    <div className="cp-field">
                       <label className="cp-label">
                         Registered Office Address
                       </label>
@@ -760,7 +760,7 @@ const Basic_information = (props) => {
 
                 <div className="cp-card-body">
                   <div className="cp-grid">
-                    <div className="cp-field cp-field-full">
+                    <div className="cp-field">
                       <label className="cp-label">
                         Trading Name<span className="cp-req">*</span>
                       </label>
@@ -845,7 +845,7 @@ const Basic_information = (props) => {
                       )}
                     </div>
 
-                    <div className="cp-field cp-field-full">
+                    <div className="cp-field">
                       <label className="cp-label">
                         Trading Address<span className="cp-req">*</span>
                       </label>
@@ -1407,7 +1407,7 @@ const OfficerDetails = (props) => {
                           ))}
                       </div>
 
-                      <div className="cp-field cp-field-full">
+                      <div className="cp-field">
                         <label className="cp-label">
                           Practice Address<span className="cp-req">*</span>
                         </label>
@@ -1747,7 +1747,7 @@ const OfficerDetails = (props) => {
                             ))}
                         </div>
 
-                        <div className="cp-field cp-field-full">
+                        <div className="cp-field">
                           <label className="cp-label">
                             Residential Address<span className="cp-req">*</span>
                           </label>
@@ -2148,7 +2148,7 @@ const OfficerDetails = (props) => {
                             ))}
                         </div>
 
-                        <div className="cp-field cp-field-full">
+                        <div className="cp-field">
                           <label className="cp-label">
                             Correspondence Address
                             <span className="cp-req">*</span>
@@ -2577,7 +2577,7 @@ const OtherInformation = (props) => {
                   )}
                 </div>
 
-                <div className="cp-field cp-field-full">
+                <div className="cp-field">
                   <label className="cp-label">
                     Contact Phone<span className="cp-req">*</span>
                   </label>

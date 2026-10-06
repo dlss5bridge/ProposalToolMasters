@@ -1879,7 +1879,7 @@ const Update_Practice_Details = () => {
                 {(basicInfo.businessTypeID === CLIENT_TYPES.Sole_Trader ||
                   basicInfo.businessTypeID === CLIENT_TYPES.Partnership) && (
                   <>
-                    <div className="pd-field pd-field-full" id="TradingName">
+                    <div className="pd-field" id="TradingName">
                       <label className="pd-label">
                         Trading Name<span className="pd-req">*</span>
                       </label>
@@ -1963,7 +1963,7 @@ const Update_Practice_Details = () => {
                       )}
                     </div>
 
-                    <div className="pd-field pd-field-full" id="TradingAddress">
+                    <div className="pd-field" id="TradingAddress">
                       <label className="pd-label">
                         Trading Address<span className="pd-req">*</span>
                       </label>
@@ -1994,7 +1994,7 @@ const Update_Practice_Details = () => {
                   basicInfo.businessTypeID === CLIENT_TYPES.LLP) && (
                   <>
                     <div
-                      className="pd-field pd-field-full pd-field-search"
+                      className="pd-field pd-field-search"
                       id="UpdateCompany"
                     >
                       <label className="pd-label">Update Company</label>
@@ -2132,7 +2132,7 @@ const Update_Practice_Details = () => {
                       )}
                     </div>
 
-                    <div className="pd-field pd-field-full" id="CompanyAddress">
+                    <div className="pd-field" id="CompanyAddress">
                       <label className="pd-label">
                         Registered Office Address
                       </label>
@@ -2195,7 +2195,7 @@ const Update_Practice_Details = () => {
 
               <div className="pd-card-body">
                 <div className="pd-grid">
-                  <div className="pd-field pd-field-full">
+                  <div className="pd-field">
                     <label className="pd-label">
                       Trading Name<span className="pd-req">*</span>
                     </label>
@@ -2279,7 +2279,7 @@ const Update_Practice_Details = () => {
                     )}
                   </div>
 
-                  <div className="pd-field pd-field-full">
+                  <div className="pd-field">
                     <label className="pd-label">
                       Trading Address<span className="pd-req">*</span>
                     </label>
@@ -2832,7 +2832,7 @@ const Update_Practice_Details = () => {
                   )}
                 </div>
 
-                <div className="pd-field pd-field-full">
+                <div className="pd-field">
                   <label className="pd-label">Business Tagline</label>
                   <input
                     maxLength={100}
@@ -3109,7 +3109,7 @@ const Update_Practice_Details = () => {
                           ))}
                       </div>
 
-                      <div className="pd-field pd-field-full">
+                      <div className="pd-field">
                         <label className="pd-label">
                           Practice Address<span className="pd-req">*</span>
                         </label>
@@ -3406,7 +3406,7 @@ const Update_Practice_Details = () => {
                             ))}
                         </div>
 
-                        <div className="pd-field pd-field-full">
+                        <div className="pd-field">
                           <label className="pd-label">
                             Residential Address<span className="pd-req">*</span>
                           </label>
@@ -3806,7 +3806,7 @@ const Update_Practice_Details = () => {
                             ))}
                         </div>
 
-                        <div className="pd-field pd-field-full">
+                        <div className="pd-field">
                           <label className="address-label pd-label">
                             Correspondence Address
                             <span className="pd-req">*</span>
