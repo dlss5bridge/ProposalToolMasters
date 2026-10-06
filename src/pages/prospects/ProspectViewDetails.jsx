@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import CommonButtonComponent from "../../components/CommonButtonComponent";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import Switch from "@mui/material/Switch";
 import "../proposals/Proposals.css";
 import { AuthContextProvider } from "../../AuthContext/AuthContext";
 import { GetClientInformationModel } from "../../redux/Services/client/clientAPI";
@@ -12,6 +11,7 @@ import Footer from "../../components/Footer";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import "./Prospects.css";
 import "./ProspectViewDetails-redesign.css";
+import Android12Switch from "../../components/AndroidSwitch";
 const ProspectViewDetails = () => {
   const [title, setTitle] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -706,7 +706,7 @@ const ProspectViewDetails = () => {
                                               ? "Authorised"
                                               : "Not Authorised"}
                                           </span>
-                                          <Switch
+                                          <Android12Switch
                                             checked={
                                               officersForm[index]
                                                 ?.isAuthorisedSignatory

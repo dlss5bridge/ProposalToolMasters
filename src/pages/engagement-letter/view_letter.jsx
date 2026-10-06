@@ -10,7 +10,6 @@ import { AuthContextProvider } from "../../AuthContext/AuthContext";
 import Footer from "../../components/Footer";
 import { GetContractDetailsModel } from "../../redux/Services/EngagementLetter/EngagementLetterApi";
 import axios from "axios";
-import Switch from "@mui/material/Switch";
 import { useSelector } from "react-redux";
 import Utils from "../../Middleware/Utils";
 import { fieldToIdMap, statusID } from "../../Middleware/enums";
@@ -22,6 +21,7 @@ import SuccessModal from "../../components/SuccessModal";
 import ErrorModel from "../../components/ErrorModel";
 import { SendEmailsToManuallySignedContract } from "../../redux/Services/SignEasy";
 import BinarySelect from "../../components/BinarySelect";
+import Android12Switch from "../../components/AndroidSwitch";
 
 const View_Engagement_Latter = () => {
   const common = useSelector((state) => state.Storage);
@@ -3476,7 +3476,7 @@ const View_Engagement_Latter = () => {
                                               : "Not Authorised"}
                                           </span>
 
-                                          <Switch
+                                          <Android12Switch
                                             checked={
                                               officersForm[index]
                                                 ?.isAuthorisedSignatory

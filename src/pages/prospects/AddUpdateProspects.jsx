@@ -21,7 +21,6 @@ import {
 } from "../../redux/Services/Master/companyDetailsAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { CountryCode, CountryName } from "../../redux/Services/CountryApi";
-import Switch from "@mui/material/Switch";
 import { CLIENT_TYPES, CREATE_PRACTICE_DETAILS } from "../../Middleware/enums";
 import { useLocation, useNavigate } from "react-router-dom";
 import DatePicker from "react-date-picker";
@@ -43,6 +42,7 @@ import ErrorModel from "../../components/ErrorModel";
 import { Tooltip } from "@mui/material";
 import dayjs from "dayjs";
 import "./AddUpdateProspect-redesign.css";
+import Android12Switch from "../../components/AndroidSwitch";
 
 const PROSPECT_TYPE_ICONS = {
   [CLIENT_TYPES.Individual]: "ri-user-line",
@@ -1408,7 +1408,7 @@ const OfficerDetails = (props) => {
       )}
       <div className="pf-signatory">
         <span>Authorised Signatory</span>
-        <Switch
+        <Android12Switch
           checked={props.officersForm[index]?.isAuthorisedSignatory}
           onChange={(e) => handleSwitchToggle(e, index)}
           color="primary"

@@ -41,7 +41,6 @@ import {
   templateForPartnershipList,
   templateForSoleTraderList,
 } from "../../../redux/Services/Config/TemplateApi";
-import Switch from "@mui/material/Switch";
 import DatePicker from "react-date-picker";
 import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
@@ -3177,7 +3176,7 @@ const Update_Practice_Details = () => {
                         </span>
                         <div className="pd-subcard-actions">
                           <div className="pd-signatory">
-                            <Switch
+                            <Android12Switch
                               id="checkbox"
                               checked={
                                 officersForm[index]?.isAuthorisedSignatory
@@ -3485,7 +3484,7 @@ const Update_Practice_Details = () => {
                         </span>
                         <div className="pd-subcard-actions">
                           <div className="pd-signatory">
-                            <Switch
+                            <Android12Switch
                               id="checkbox"
                               checked={
                                 officersForm[index]?.isAuthorisedSignatory

@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Tooltip from "@mui/material/Tooltip";
 import "./Proposals.css";
-import Switch from "@mui/material/Switch";
 import Select from "react-select";
 import { AuthContextProvider } from "../../AuthContext/AuthContext";
 import Footer from "../../components/Footer";
@@ -14,6 +13,7 @@ import "./View_Proposals-redesign-v4.css";
 import { fieldToIdMap, statusID } from "../../Middleware/enums";
 import { Base_Url } from "../../Base-Url/Base_Url";
 import BinarySelect from "../../components/BinarySelect";
+import Android12Switch from "../../components/AndroidSwitch";
 
 const View_Proposals = () => {
   const common = useSelector((state) => state.Storage);
@@ -7919,7 +7919,7 @@ const View_Proposals = () => {
                                               : "Not Authorised"}
                                           </span>
 
-                                          <Switch
+                                          <Android12Switch
                                             checked={
                                               officersForm[index]
                                                 ?.isAuthorisedSignatory

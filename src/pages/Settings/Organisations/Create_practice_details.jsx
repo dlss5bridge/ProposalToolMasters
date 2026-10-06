@@ -21,7 +21,6 @@ import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { CountryCode, CountryName } from "../../../redux/Services/CountryApi";
-import Switch from "@mui/material/Switch";
 import CancelIcon from "@mui/icons-material/Cancel";
 import {
   CLIENT_TYPES,
@@ -53,6 +52,7 @@ import { RefreshToken } from "../../../redux/Services/Auth/loginApi";
 import "./Create-practice-details.css";
 import "../../../components/ChoosePlanForPurchase.css";
 import BinarySelect from "../../../components/BinarySelect";
+import Android12Switch from "../../../components/AndroidSwitch";
 
 // Basic Information component
 const Basic_information = (props) => {
@@ -1470,7 +1470,7 @@ const OfficerDetails = (props) => {
                         </span>
                         <div className="cp-subcard-actions">
                           <div className="cp-signatory">
-                            <Switch
+                            <Android12Switch
                               id={`checkbox${index}`}
                               checked={
                                 props.officersForm[index]?.isAuthorisedSignatory
@@ -1813,7 +1813,7 @@ const OfficerDetails = (props) => {
                         </span>
                         <div className="cp-subcard-actions">
                           <div className="cp-signatory">
-                            <Switch
+                            <Android12Switch
                               id="checkbox"
                               checked={
                                 props.officersForm[index]?.isAuthorisedSignatory
@@ -2860,7 +2860,7 @@ const SubscriptionPlanView = (props) => {
                 <FormControlLabel
                   className="choose-plan-switch-label"
                   control={
-                    <Switch
+                    <Android12Switch
                       checked={props.isYearly}
                       onChange={props.handleToggle}
                       color="primary"

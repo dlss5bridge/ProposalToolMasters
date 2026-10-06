@@ -13,8 +13,9 @@ import {
 } from "../redux/Services/Setting/PaymentGatewayApi";
 import { AuthContextProvider } from "../AuthContext/AuthContext";
 import { useSelector } from "react-redux";
-import { FormControlLabel, Switch } from "@mui/material";
+import { FormControlLabel } from "@mui/material";
 import "./ChoosePlanForPurchase.css";
+import Android12Switch from "./AndroidSwitch";
 
 const ChoosePlanForPurchase = (props) => {
   const {
@@ -433,7 +434,7 @@ const ChoosePlanForPurchase = (props) => {
             <FormControlLabel
               className="choose-plan-switch-label"
               control={
-                <Switch
+                <Android12Switch
                   checked={isYearly}
                   onChange={handleToggle}
                   color="primary"
