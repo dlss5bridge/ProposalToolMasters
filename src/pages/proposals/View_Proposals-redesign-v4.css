@@ -333,7 +333,7 @@
 }
 
 /* Pricing tables */
-.view-proposal-redesign #product .table-responsive {
+.view-proposal-redesign #product .table-responsive:not(:has(> table.pricing-table)) {
   width: 100%;
   overflow-x: auto !important;
   border: 1px solid var(--vp-border);
@@ -349,19 +349,19 @@
   border-radius: 999px;
   background: #c9d3df;
 }
-.view-proposal-redesign #product .table {
+.view-proposal-redesign #product .table:not(.pricing-table) {
   min-width: 720px;
   margin-bottom: 0 !important;
   border-collapse: collapse !important;
 }
-.view-proposal-redesign #product .table thead,
-.view-proposal-redesign #product .table .head-row {
+.view-proposal-redesign #product .table:not(.pricing-table) thead,
+.view-proposal-redesign #product .table:not(.pricing-table) .head-row {
   background: var(--vp-navy) !important;
 }
-.view-proposal-redesign #product .table thead th,
-.view-proposal-redesign #product .table thead td,
-.view-proposal-redesign #product .table .head-row > th,
-.view-proposal-redesign #product .table .head-row > td {
+.view-proposal-redesign #product .table:not(.pricing-table) thead th,
+.view-proposal-redesign #product .table:not(.pricing-table) thead td,
+.view-proposal-redesign #product .table:not(.pricing-table) .head-row > th,
+.view-proposal-redesign #product .table:not(.pricing-table) .head-row > td {
   padding: 12px 14px !important;
   border: 0 !important;
   background: var(--vp-navy) !important;
@@ -370,8 +370,8 @@
   font-weight: 600 !important;
   vertical-align: middle !important;
 }
-.view-proposal-redesign #product .table tbody td,
-.view-proposal-redesign #product .table tbody th {
+.view-proposal-redesign #product .table:not(.pricing-table) tbody td,
+.view-proposal-redesign #product .table:not(.pricing-table) tbody th {
   padding: 11px 14px !important;
   border-top: 0 !important;
   border-left: 0 !important;
@@ -383,12 +383,12 @@
   line-height: 1.45;
   vertical-align: middle;
 }
-.view-proposal-redesign #product .table th,
-.view-proposal-redesign #product .table td {
+.view-proposal-redesign #product .table:not(.pricing-table) th,
+.view-proposal-redesign #product .table:not(.pricing-table) td {
   border-left: 0 !important;
   border-right: 0 !important;
 }
-.view-proposal-redesign #product .a-la-carte-services-review-head-row th {
+.view-proposal-redesign #product .table:not(.pricing-table) .a-la-carte-services-review-head-row th {
   padding: 9px 14px !important;
   border: 0 !important;
   border-bottom: 1px solid #dfe8f0 !important;
@@ -397,20 +397,20 @@
   font-size: 13px !important;
   font-weight: 700 !important;
 }
-.view-proposal-redesign #product .head-grey-row td,
-.view-proposal-redesign #product .head-grey-row th {
+.view-proposal-redesign #product .table:not(.pricing-table) .head-grey-row td,
+.view-proposal-redesign #product .table:not(.pricing-table) .head-grey-row th {
   background: #34445c !important;
   color: #fff !important;
   font-size: 12.5px !important;
   font-weight: 600 !important;
 }
-.view-proposal-redesign #product .table .fa-check {
+.view-proposal-redesign #product .table:not(.pricing-table) .fa-check {
   color: #1a9a72;
 }
-.view-proposal-redesign #product .table .fa-times {
+.view-proposal-redesign #product .table:not(.pricing-table) .fa-times {
   color: #d05261;
 }
-.view-proposal-redesign #product .table .text-right {
+.view-proposal-redesign #product .table:not(.pricing-table) .text-right {
   text-align: right !important;
 }
 
@@ -1932,7 +1932,7 @@
 .view-proposal-redesign
   #product
   .tab-pane.p-3.active:has(h6)
-  .table-responsive {
+  .table-responsive:not(:has(> table.pricing-table)) {
   width: 100% !important;
   max-width: 100% !important;
 
@@ -1954,7 +1954,7 @@
   #product
   .tab-pane.p-3.active:has(h6)
   .table-responsive
-  > table {
+  > table:not(.pricing-table) {
   min-width: 720px !important;
   width: 100% !important;
 
@@ -1966,7 +1966,7 @@
   #product
   .tab-pane.p-3.active:has(h6)
   .table-responsive
-  thead {
+  > table:not(.pricing-table) thead {
   overflow: hidden;
 }
 

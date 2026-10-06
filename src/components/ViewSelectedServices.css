@@ -1,0 +1,313 @@
+/* =========================================================
+   VIEW PROPOSAL / VIEW ENGAGEMENT LETTER — "Selected Services" tab
+   Brings the Review Services layout (components/ReviewPricing.css) to the
+   read-only view pages. Hooks added in the JSX (markup/class names only):
+     .vs-toolbar               the Fees / Payment Gateway / Show Discount card
+     .review-section__head     section header (icon, title, count, description)
+     .review-pricing-panel     wrapper round the price fields
+   The view pages' own #product rules use IDs and !important, so the rules
+   below carry #product (and #recurring_Default / #OneOff_Default where the
+   page rules do) to take precedence. Visual only.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Toolbar card
+   --------------------------------------------------------- */
+
+/* View Proposal (package view): the card is a .tab-pane */
+:is(.view-proposal-redesign, .view-engagement-redesign)
+  #product
+  .tab-content
+  > .tab-pane.p-3.active.vs-toolbar {
+  margin: 0 0 16px !important;
+  padding: 14px 20px !important;
+  overflow: visible !important;
+  border: 1px solid var(--rv-line, #e5eaf0) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* View Proposal (services view) wrapper and the EL config card
+   (class repeated: page rules reset margins on #product children) */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product div.vs-toolbar.vs-toolbar.vs-toolbar:not(.tab-pane) {
+  margin: 0 0 16px !important;
+  padding: 14px 20px !important;
+  overflow: visible !important;
+  border: 1px solid var(--rv-line, #e5eaf0) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Each setting is a column: label on top, control below (same pattern as
+   the price panel). The first setting (Fees) keeps its natural width, the
+   rest share the remaining width evenly, separated by thin dividers. */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product div.vs-toolbar:not(.tab-pane),
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .tab-content > .tab-pane.p-3.active.vs-toolbar > .row {
+  display: grid !important;
+  grid-auto-flow: column !important;
+  grid-template-rows: auto auto !important;
+  grid-template-columns: auto !important;
+  grid-auto-columns: minmax(0, 1fr) !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .row.fieldset {
+  display: contents !important;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .row.fieldset > [class*="col-"] {
+  width: auto !important;
+  max-width: none !important;
+  flex: none !important;
+  margin: 0 !important;
+  padding: 0 24px !important;
+  border-left: 1px solid var(--rv-line, #e5eaf0);
+  text-align: left !important;
+}
+
+/* label cell (top) and control cell (bottom) */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .row.fieldset > [class*="col-"]:first-child {
+  padding-top: 2px !important;
+  padding-bottom: 8px !important;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .row.fieldset > [class*="col-"]:last-child {
+  display: flex !important;
+  align-items: center;
+  min-height: 44px;
+  padding-bottom: 2px !important;
+}
+
+/* no divider before the first setting */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .row.fieldset:first-child > [class*="col-"] {
+  padding-left: 0 !important;
+  border-left: 0;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .fieldset-label {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--rv-text, #334155) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .input-group {
+  min-height: 40px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+/* Payment Gateway select fills its column (up to 320px) */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .input-group:has(.selectDropDown) {
+  width: 100%;
+  max-width: 320px;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .fx-segmented {
+  width: auto;
+  min-width: 0;
+}
+
+/* options size to their labels so nothing is cut off */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .fx-segmented__option {
+  flex: 0 0 auto;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* plain-text values (Accepted Package / Package Name) */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .input-group > :is(label.fieldset-label, b) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px !important;
+  border: 1px solid #c6eff6;
+  border-radius: 999px;
+  background: var(--rv-accent-soft, #e6f8fb);
+  color: var(--rv-accent-text, #0b8aa3) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+/* Show Discount: the same native, read-only checkbox drawn as a switch */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar input[type="checkbox"] {
+  position: relative;
+  width: 40px !important;
+  min-width: 40px;
+  height: 22px !important;
+  margin: 0 !important;
+  padding: 0;
+  flex: 0 0 40px;
+  border: 0;
+  border-radius: 999px;
+  background: #cbd5e1;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: default;
+  opacity: 1;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+  transition: transform 0.18s ease;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar input[type="checkbox"]:checked {
+  background: var(--rv-accent, #14b5d1);
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar input[type="checkbox"]:checked::before {
+  transform: translateX(18px);
+}
+
+/* ---------------------------------------------------------
+   Section header (replaces the old h6 + icon + separators)
+   --------------------------------------------------------- */
+
+/* the page removes column padding so tables run edge to edge; the header
+   and price panel get their own inset instead */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .tab-pane.p-3.active .review-section__head {
+  margin: 0 0 16px !important;
+  padding: 18px 18px 0;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign)
+  #product
+  .tab-pane.p-3.active
+  .review-section__head
+  h6.review-section__title {
+  position: static !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--rv-ink, #0f172a) !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign)
+  #product
+  .tab-pane.p-3.active
+  .review-section__head
+  h6.review-section__title::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* ---------------------------------------------------------
+   Price fields: label above value, one column per field
+   --------------------------------------------------------- */
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .tab-pane.p-3.active .review-pricing-panel {
+  margin: 0 18px 16px;
+}
+
+/* the page rules pad #recurring_Default / #OneOff_Default columns with
+   two IDs; match that here */
+:is(.view-proposal-redesign, .view-engagement-redesign)
+  #product
+  .tab-pane.p-3.active
+  .review-pricing-panel
+  > :is(#recurring_Default, #OneOff_Default, .row)
+  > [class*="col-"] {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign)
+  #product
+  .tab-pane.p-3.active
+  .review-pricing-panel
+  :is(.fieldset-label, .form-label) {
+  margin: 0 !important;
+  white-space: nowrap;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign)
+  #product
+  .tab-pane.p-3.active
+  .review-pricing-panel
+  .mb-1 {
+  margin-bottom: 0 !important;
+}
+
+/* package view with several packages: no discount field is shown,
+   so hide the empty panel instead of leaving a grey strip */
+:is(.view-proposal-redesign, .view-engagement-redesign)
+  #product
+  .review-pricing-panel:not(:has(input, .selectDropDown)) {
+  display: none !important;
+}
+
+/* Fixed 4-column grid like the wizard: a lone field (e.g. Payment
+   Frequency on a multi-package proposal) takes one column, not the row */
+@media (min-width: 992px) {
+  :is(.view-proposal-redesign, .view-engagement-redesign) #product .tab-pane.p-3.active .review-pricing-panel {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---------------------------------------------------------
+   Pricing tables: the wizard's look (components/PricingTable.css),
+   inset inside the section card instead of running edge to edge
+   --------------------------------------------------------- */
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .tab-pane.p-3.active .table-responsive:has(> table.pricing-table) {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 18px 18px !important;
+  padding: 0 !important;
+  overflow-x: auto;
+  border: 0 !important;
+  border-radius: 10px;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:is(.view-proposal-redesign, .view-engagement-redesign) #product .tab-pane.p-3.active .col-lg-12 > .mb-3:empty {
+  display: none;
+}
+
+/* ---------------------------------------------------------
+   Small screens: toolbar settings stack, two per row
+   --------------------------------------------------------- */
+@media (max-width: 991px) {
+  :is(.view-proposal-redesign, .view-engagement-redesign) #product div.vs-toolbar:not(.tab-pane),
+  :is(.view-proposal-redesign, .view-engagement-redesign) #product .tab-content > .tab-pane.p-3.active.vs-toolbar > .row {
+    grid-auto-flow: row !important;
+    grid-template-rows: none !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  :is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .row.fieldset > [class*="col-"] {
+    padding: 0 !important;
+    border-left: 0;
+  }
+
+  :is(.view-proposal-redesign, .view-engagement-redesign) #product .vs-toolbar .row.fieldset:not(:first-child) > [class*="col-"]:first-child {
+    margin-top: 12px !important;
+  }
+}

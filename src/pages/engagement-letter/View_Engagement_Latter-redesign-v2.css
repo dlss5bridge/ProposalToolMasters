@@ -601,7 +601,7 @@
   padding-right: 8px !important;
 }
 
-.view-engagement-redesign #product .tab-pane.p-3.active .table-responsive {
+.view-engagement-redesign #product .tab-pane.p-3.active .table-responsive:not(:has(> table.pricing-table)) {
   width: 100% !important;
   max-width: 100% !important;
   margin: 14px 0 0 !important;
@@ -615,22 +615,22 @@
   scrollbar-width: thin;
 }
 
-.view-engagement-redesign #product .table-responsive > table {
+.view-engagement-redesign #product .table-responsive > table:not(.pricing-table) {
   width: 100% !important;
   min-width: 720px !important;
   margin: 0 !important;
   border-collapse: collapse !important;
 }
 
-.view-engagement-redesign #product .table thead,
-.view-engagement-redesign #product .table .head-row {
+.view-engagement-redesign #product .table:not(.pricing-table) thead,
+.view-engagement-redesign #product .table:not(.pricing-table) .head-row {
   background: var(--ve-navy) !important;
 }
 
-.view-engagement-redesign #product .table thead th,
-.view-engagement-redesign #product .table thead td,
-.view-engagement-redesign #product .table .head-row > th,
-.view-engagement-redesign #product .table .head-row > td {
+.view-engagement-redesign #product .table:not(.pricing-table) thead th,
+.view-engagement-redesign #product .table:not(.pricing-table) thead td,
+.view-engagement-redesign #product .table:not(.pricing-table) .head-row > th,
+.view-engagement-redesign #product .table:not(.pricing-table) .head-row > td {
   padding: 11px 13px !important;
   border: 0 !important;
 
@@ -640,8 +640,8 @@
   font-weight: 600 !important;
 }
 
-.view-engagement-redesign #product .table tbody td,
-.view-engagement-redesign #product .table tbody th {
+.view-engagement-redesign #product .table:not(.pricing-table) tbody td,
+.view-engagement-redesign #product .table:not(.pricing-table) tbody th {
   padding: 10px 13px !important;
 
   border-top: 0 !important;
@@ -654,13 +654,13 @@
   font-size: 12.5px !important;
 }
 
-.view-engagement-redesign #product .a-la-carte-services-review-head-row th {
+.view-engagement-redesign #product .table:not(.pricing-table) .a-la-carte-services-review-head-row th {
   background: #eef8fa !important;
   color: #087f98 !important;
 }
 
-.view-engagement-redesign #product .head-grey-row td,
-.view-engagement-redesign #product .head-grey-row th {
+.view-engagement-redesign #product .table:not(.pricing-table) .head-grey-row td,
+.view-engagement-redesign #product .table:not(.pricing-table) .head-grey-row th {
   background: #34445c !important;
   color: #fff !important;
 }
@@ -1508,7 +1508,7 @@ html body .view-engagement-redesign > .page-content {
 .view-engagement-redesign
   #product
   .tab-pane.p-3.active:has(h6)
-  .table-responsive {
+  .table-responsive:not(:has(> table.pricing-table)) {
   width: 100% !important;
   max-width: 100% !important;
 
@@ -1529,7 +1529,7 @@ html body .view-engagement-redesign > .page-content {
   #product
   .tab-pane.p-3.active:has(h6)
   .table-responsive
-  > table {
+  > table:not(.pricing-table) {
   width: 100% !important;
   min-width: 720px !important;
 

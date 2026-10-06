@@ -22,6 +22,9 @@ import ErrorModel from "../../components/ErrorModel";
 import { SendEmailsToManuallySignedContract } from "../../redux/Services/SignEasy";
 import BinarySelect from "../../components/BinarySelect";
 import Android12Switch from "../../components/AndroidSwitch";
+import "../../components/PricingTable.css";
+import "../../components/ReviewPricing.css";
+import "../../components/ViewSelectedServices.css";
 
 const View_Engagement_Latter = () => {
   const common = useSelector((state) => state.Storage);
@@ -1820,7 +1823,7 @@ const View_Engagement_Latter = () => {
                           >
                             <div className="separator mb-3"></div>
                             <>
-                              <div className="view-engagement-service-config-card">
+                              <div className="view-engagement-service-config-card vs-toolbar">
                                 <div className="row fieldset">
                                   <div className="col-md-2 mb-2 text-md-end">
                                     <label className="fieldset-label required">
@@ -1899,10 +1902,27 @@ const View_Engagement_Latter = () => {
                                   <div className="tab-pane p-3 active">
                                     <div className="row">
                                       <div className="col-lg-12">
-                                        <div className="separator mb-2"></div>
-                                        <h6>Recurring Services</h6>
-                                        <div className="separator mb-3"></div>
+                                        <div className="review-section__head">
+                                          <span className="review-section__icon">
+                                            <i className="ri-repeat-line" aria-hidden="true"></i>
+                                          </span>
+                                          <div className="review-section__heading">
+                                            <div className="review-section__title-row">
+                                              <h6 className="review-section__title">Recurring Services</h6>
+                                              <span className="review-section__badge">
+                                                {(selectedRecurringServiceList || []).reduce(
+                                                  (count, category) =>
+                                                    count + (category?.servicesList?.length || 0),
+                                                  0,
+                                                )}{" "}
+                                                Active Services
+                                              </span>
+                                            </div>
+                                            <p className="review-section__desc">Ongoing services billed on a regular schedule</p>
+                                          </div>
+                                        </div>
 
+                                        <div className="review-pricing-panel">
                                         <div className="row fieldset">
                                           <div className="col-md-2 col-sm-12  text-md-end">
                                             <label className="fieldset-label">
@@ -2008,6 +2028,7 @@ const View_Engagement_Latter = () => {
                                             />
                                           </div>
                                         </div>
+                                        </div>
                                         <div className="mb-3"></div>
                                         {pricingTableColumnIDs === null ||
                                         pricingTableColumnIDs === "" ||
@@ -2016,7 +2037,7 @@ const View_Engagement_Latter = () => {
                                             style={{ marginTop: "0px" }}
                                             className="table-responsive"
                                           >
-                                            <table className="table align-middle table-nowrap">
+                                            <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
                                               <thead className="table-light table-header-font">
                                                 <tr className="head-row">
                                                   <th className="tr-table-class text-white">
@@ -2197,7 +2218,7 @@ const View_Engagement_Latter = () => {
                                             style={{ marginTop: "0px" }}
                                             className="table-responsive"
                                           >
-                                            <table className="table align-middle table-nowrap">
+                                            <table className="table align-middle table-nowrap pricing-table pricing-table--recurring">
                                               <thead className="table-dark text-white">
                                                 <tr className="head-row">
                                                   {visibleFieldsCustomTemp?.serviceCategory && (
@@ -2584,10 +2605,27 @@ const View_Engagement_Latter = () => {
                                   <div className="tab-pane p-3 active">
                                     <div className="row">
                                       <div className="col-lg-12">
-                                        <div className="separator mb-2"></div>
-                                        <h6>One-Off Services</h6>
-                                        <div className="separator mb-3"></div>
+                                        <div className="review-section__head">
+                                          <span className="review-section__icon">
+                                            <i className="ri-flashlight-line" aria-hidden="true"></i>
+                                          </span>
+                                          <div className="review-section__heading">
+                                            <div className="review-section__title-row">
+                                              <h6 className="review-section__title">One-Off Services</h6>
+                                              <span className="review-section__badge">
+                                                {(selectedOneOffServiceList || []).reduce(
+                                                  (count, category) =>
+                                                    count + (category?.servicesList?.length || 0),
+                                                  0,
+                                                )}{" "}
+                                                Active Services
+                                              </span>
+                                            </div>
+                                            <p className="review-section__desc">Single-delivery services billed once</p>
+                                          </div>
+                                        </div>
 
+                                        <div className="review-pricing-panel">
                                         <div className="row fieldset">
                                           <div className="col-md-2 col-sm-12  text-md-end">
                                             <label className="fieldset-label">
@@ -2682,6 +2720,7 @@ const View_Engagement_Latter = () => {
                                             />
                                           </div>
                                         </div>
+                                        </div>
                                         <div className="mb-3"></div>
                                         {pricingTableColumnIDs === null ||
                                         pricingTableColumnIDs === "" ||
@@ -2690,7 +2729,7 @@ const View_Engagement_Latter = () => {
                                             style={{ marginTop: "0px" }}
                                             className="table-responsive"
                                           >
-                                            <table className="table align-middle table-nowrap">
+                                            <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
                                               <thead className="table-light table-header-font">
                                                 <tr className="head-row">
                                                   <th className="tr-table-class text-white">
@@ -2871,7 +2910,7 @@ const View_Engagement_Latter = () => {
                                             style={{ marginTop: "0px" }}
                                             className="table-responsive"
                                           >
-                                            <table className="table align-middle table-nowrap">
+                                            <table className="table align-middle table-nowrap pricing-table pricing-table--oneoff">
                                               <thead className="table-dark text-white">
                                                 <tr className="head-row">
                                                   {visibleFieldsCustomTemp?.serviceCategory && (
