@@ -98,7 +98,7 @@
   max-width: 720px;
   margin: 4px 0 0;
   color: var(--ve-muted);
-  font-size: 11.5px;
+  font-size: 14px;
   line-height: 1.45;
 }
 
@@ -123,7 +123,7 @@
   border-radius: 8px;
   background: var(--ve-cyan);
   color: #fff;
-  font-size: 11px;
+  font-size: 13.5px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -150,7 +150,7 @@
 
 .view-engagement-reference-card span {
   color: #8894a4;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.025em;
 }
@@ -159,7 +159,7 @@
   margin-top: 3px;
   overflow: hidden;
   color: #23334b;
-  font-size: 11px;
+  font-size: 13.5px;
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -264,7 +264,7 @@
   border-radius: 0 !important;
   background: transparent !important;
   color: #637086 !important;
-  font-size: 11px !important;
+  font-size: 13.5px !important;
   font-weight: 600 !important;
   white-space: nowrap;
   box-shadow: none !important;
@@ -350,14 +350,14 @@
 .view-engagement-info-card-head h3 {
   margin: 0;
   color: #213149;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .view-engagement-info-card-head p {
   margin: 3px 0 0;
   color: #8995a5;
-  font-size: 9.5px;
+  font-size: 11.5px;
 }
 
 .view-engagement-info-card-body {
@@ -385,13 +385,13 @@
 .view-engagement-field span {
   margin-bottom: 4px;
   color: #8692a3;
-  font-size: 8.5px;
+  font-size: 11px;
 }
 
 .view-engagement-field strong {
   overflow-wrap: anywhere;
   color: #273850;
-  font-size: 10.5px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -439,13 +439,13 @@
 
 .view-engagement-linked-proposal-copy small {
   color: #8a96a6;
-  font-size: 8.5px;
+  font-size: 11px;
 }
 
 .view-engagement-linked-proposal-copy strong {
   margin-top: 2px;
   color: #26384f;
-  font-size: 10.5px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -478,7 +478,7 @@
 .view-engagement-redesign #product .form-label {
   margin: 0 !important;
   color: #657388;
-  font-size: 10px;
+  font-size: 12.5px;
   font-weight: 500;
 }
 
@@ -504,7 +504,7 @@
   border-radius: 8px !important;
   background: #f8fafc !important;
   color: #2f4057 !important;
-  font-size: 10.5px !important;
+  font-size: 13px !important;
 }
 
 .view-engagement-redesign #product .tab-content {
@@ -549,7 +549,7 @@
   border-bottom: 1px solid #e1e7ee;
   background: #fbfcfe;
   color: #213149 !important;
-  font-size: 13px !important;
+  font-size: 14.5px !important;
   font-weight: 700 !important;
 }
 
@@ -569,7 +569,7 @@
   background: #eaf8fb;
   color: #0788a3;
   font-family: "Font Awesome 6 Free";
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 900;
 }
 
@@ -636,7 +636,7 @@
 
   background: var(--ve-navy) !important;
   color: #fff !important;
-  font-size: 9.5px !important;
+  font-size: 11.5px !important;
   font-weight: 600 !important;
 }
 
@@ -651,7 +651,7 @@
 
   background: #fff;
   color: #44546a;
-  font-size: 10px !important;
+  font-size: 12.5px !important;
 }
 
 .view-engagement-redesign #product .a-la-carte-services-review-head-row th {
@@ -687,7 +687,7 @@
 
   border-bottom: 1px solid #e1e7ee;
   color: #213149;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -703,7 +703,7 @@
 .view-engagement-redesign #sof .card-body {
   padding: 20px !important;
   color: #43536a;
-  font-size: 11px;
+  font-size: 13.5px;
   line-height: 1.65;
 }
 
@@ -723,14 +723,14 @@
 .view-engagement-section-intro h3 {
   margin: 0;
   color: #213149;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
 }
 
 .view-engagement-section-intro p {
   margin: 3px 0 0;
   color: #8591a2;
-  font-size: 9.5px;
+  font-size: 11.5px;
 }
 
 .view-engagement-count-pill {
@@ -744,7 +744,7 @@
   border-radius: 999px;
   background: #eef8fa;
   color: #087f98;
-  font-size: 8.5px;
+  font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -795,7 +795,7 @@
   border-radius: 50%;
   background: #e8f7fa;
   color: #0788a3;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -808,14 +808,14 @@
 
 .view-engagement-person-title small {
   color: #8a96a6;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .view-engagement-person-title strong {
   margin-top: 2px;
   overflow: hidden;
   color: #22334b;
-  font-size: 11px;
+  font-size: 13.5px;
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -842,7 +842,7 @@
   justify-content: center;
 
   border-radius: 999px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -892,7 +892,7 @@
   border-radius: 7px;
   background: #f0f8fa;
   color: #0788a3;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .view-engagement-person-field > div {
@@ -903,14 +903,14 @@
 
 .view-engagement-person-field small {
   color: #8a96a6;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .view-engagement-person-field strong {
   margin-top: 3px;
   overflow-wrap: anywhere;
   color: #2a3b52;
-  font-size: 10px;
+  font-size: 12.5px;
   font-weight: 600;
   line-height: 1.35;
 }
@@ -952,7 +952,7 @@
 .view-engagement-sign-manually .text-muted.p-2 p {
   margin: 0 !important;
   padding: 0 !important;
-  font-size: 10px;
+  font-size: 12.5px;
   line-height: 1.5;
 }
 
@@ -1064,7 +1064,7 @@
   .view-engagement-tab-card .nav-tabs .nav-link {
     min-height: 56px;
     padding: 0 9px !important;
-    font-size: 10px !important;
+    font-size: 12.5px !important;
   }
 
   .view-engagement-tab-card > .tab-content {
@@ -1250,7 +1250,7 @@ html body .view-engagement-redesign > .page-content {
 
 .view-engagement-redesign .view-engagement-service-config-card .fieldset-label {
   color: #586a80 !important;
-  font-size: 10.5px !important;
+  font-size: 13px !important;
   font-weight: 400 !important;
   line-height: 1.4 !important;
 }
@@ -1293,12 +1293,12 @@ html body .view-engagement-redesign > .page-content {
   .selectDropDown
   [class*="singleValue"] {
   color: #273850 !important;
-  font-size: 11px !important;
+  font-size: 13.5px !important;
 }
 
 .view-engagement-redesign .view-engagement-service-config-card b {
   color: #273850;
-  font-size: 11px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 
@@ -1395,7 +1395,7 @@ html body .view-engagement-redesign > .page-content {
 
   color: #213149 !important;
 
-  font-size: 13px !important;
+  font-size: 14.5px !important;
   font-weight: 700 !important;
 }
 
@@ -1463,7 +1463,7 @@ html body .view-engagement-redesign > .page-content {
 
   color: #586a80 !important;
 
-  font-size: 10.5px !important;
+  font-size: 13px !important;
   font-weight: 400 !important;
   line-height: 1.35 !important;
 }
@@ -1486,7 +1486,7 @@ html body .view-engagement-redesign > .page-content {
   background: #f8fafc !important;
   color: #26384f !important;
 
-  font-size: 10.5px !important;
+  font-size: 13px !important;
 }
 
 .view-engagement-redesign
