@@ -306,11 +306,20 @@ const buildChargeTypeTotals = ({
   let note = null;
 
   if (isPackageBased) {
-    // A negative package discount percentage is a surcharge (raises the
+    // Mirrors AddUpdateProposal.jsx's GetNetTotalValueByRecurringPackage,
+    // which deliberately uses the 2-decimal-rounded discount percentage
+    // (RecurringPricingInfo.DiscountPercentagePackageOne — itself just
+    // Number(discountPercentageWithAllDecimal).toFixed(2)) rather than the
+    // full-precision stored value, specifically "so the discount amount
+    // shown doesn't match the percentage displayed next to it" is avoided.
+    // Using the raw full-precision percentage here instead made the amount
+    // (and everything built on it below) come out a few pence off from what
+    // multiplying the displayed percentage by the net total would give. A
+    // negative package discount percentage is a surcharge (raises the
     // total), not a discount to ignore, so don't gate on `> 0` here — a
     // negative % naturally produces a negative discountAmount below.
     if (Number(adminDiscountPercentage)) {
-      discountPercentage = Number(adminDiscountPercentage);
+      discountPercentage = Number(Number(adminDiscountPercentage).toFixed(2));
     }
   } else {
     const defaultNetTotal = Number(defaultFinalAmount?.netTotal) || 0;
