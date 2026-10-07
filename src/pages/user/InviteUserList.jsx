@@ -1180,7 +1180,7 @@ const InviteUser = () => {
                                             </td>
                                             <td
                                               style={{ width: "10%" }}
-                                              className="tr-table-class text-white"
+                                              className="tr-table-class text-white users-action-column"
                                             >
                                               {(userAccessData.User_CanDelete ||
                                                 userAccessData.User_CanEdit) && (
@@ -1440,7 +1440,7 @@ const InviteUser = () => {
                                                   </td>
                                                   <td
                                                     style={{ width: "5%" }}
-                                                    className="table-content-font"
+                                                    className="table-content-font users-action-column"
                                                   >
                                                     <div class="d-flex gap-2">
                                                       {userAccessData.User_CanEdit && (
@@ -1776,7 +1776,7 @@ const InviteUser = () => {
                                             {/* <td className="tr-table-class text-white">
                                     Status
                                   </td> */}
-                                            <td className="tr-table-class text-white">
+                                            <td className="tr-table-class text-white users-action-column">
                                               {userAccessData.User_CanDelete && (
                                                 <>Action</>
                                               )}
@@ -1820,7 +1820,7 @@ const InviteUser = () => {
                                                     {users.acceptanceStatus}
                                                   </td>
 
-                                                  <td className="switch">
+                                                  <td className="switch users-action-column">
                                                     <div class="d-flex gap-2">
                                                       {userAccessData.User_CanDelete && (
                                                         <Tooltip

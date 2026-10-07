@@ -1154,3 +1154,39 @@
     padding: 0 !important;
   }
 }
+
+/* =========================================================
+   STICKY ACTION COLUMN — pinned to the right edge while the
+   table scrolls sideways (same treatment as the Proposal / EL lists)
+   ========================================================= */
+
+.users-list-redesign.users-list-redesign table.table td.users-action-column {
+  position: sticky !important;
+  right: 0 !important;
+  z-index: 8;
+
+  text-align: center !important;
+
+  background: #ffffff !important;
+  box-shadow: -10px 0 14px -14px rgba(15, 27, 51, 0.55);
+}
+
+.users-list-redesign.users-list-redesign table.table thead td.users-action-column {
+  z-index: 12;
+
+  background: var(--users-navy) !important;
+  color: #ffffff !important;
+
+  box-shadow: -10px 0 14px -14px rgba(0, 0, 0, 0.7);
+}
+
+.users-list-redesign.users-list-redesign table.table tbody tr:hover td.users-action-column {
+  background: #fbfdff !important;
+}
+
+.users-list-redesign.users-list-redesign table.table td.users-action-column > .d-flex {
+  width: 100%;
+
+  align-items: center !important;
+  justify-content: center !important;
+}
