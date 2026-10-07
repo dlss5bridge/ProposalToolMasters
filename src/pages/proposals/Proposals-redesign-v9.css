@@ -742,57 +742,6 @@
 }
 
 /* =========================================================
-   STATUS PILLS
-   Existing conditions/values remain exactly the same.
-   ========================================================= */
-
-.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p {
-  width: fit-content;
-  min-width: 68px;
-  min-height: 27px;
-
-  margin: 0 !important;
-  padding: 0 10px !important;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 999px !important;
-
-  font-size: 9px !important;
-  font-weight: 600 !important;
-  line-height: 1 !important;
-
-  white-space: nowrap;
-}
-
-.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="DAA520"] {
-  background: #fff6df !important;
-  color: #9b7118 !important;
-}
-
-.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="626ED4"] {
-  background: #f0eefc !important;
-  color: #6255af !important;
-}
-
-.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="008000"] {
-  background: #eaf8f3 !important;
-  color: #18845f !important;
-}
-
-.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="FF0000"] {
-  background: #fff0f2 !important;
-  color: #cf4052 !important;
-}
-
-.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p[style*="38A4F8"] {
-  background: #eaf7fb !important;
-  color: #177d9a !important;
-}
-
-/* =========================================================
    VALUE / DOCUMENT / LAST UPDATED
    ========================================================= */
 
@@ -1272,15 +1221,6 @@
   font-weight: 600 !important;
 }
 
-/* Status pill */
-.proposal-list-v4.proposal-list-v4 #customerTable tbody td:nth-child(3) > p {
-  min-height: 30px !important;
-  padding: 0 11px !important;
-
-  font-size: 10.5px !important;
-  font-weight: 600 !important;
-}
-
 /* Value / package / recurring text */
 .proposal-list-v4.proposal-list-v4 #customerTable tbody p.mb-0 {
   font-size: 11.5px !important;
@@ -1716,56 +1656,86 @@
 }
 
 /* =========================================================
-   SOFT STATUS PILLS
-   Same states, lighter styling like Prospect list.
+   STATUS PILLS
+   Soft tint + thin border. Every Proposal tab uses
+   these classes; the inline solid colours on the main tab are
+   overridden here (the inline styles themselves are unchanged).
    ========================================================= */
 
 .proposal-list-v4.proposal-list-v4 .proposal-status-pill {
+  --pill-bg: #f2f4f7;
+  --pill-border: #e4e7ec;
+  --pill-text: #344054;
+
   width: auto !important;
-  min-width: 62px !important;
-  min-height: 26px !important;
+  min-width: 0 !important;
+  height: 24px !important;
+  min-height: 0 !important;
 
   margin: 0 !important;
-  padding: 0 9px !important;
+  padding: 0 10px !important;
 
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-
+  border: 1px solid var(--pill-border) !important;
   border-radius: 999px !important;
 
-  font-size: 9px !important;
-  font-weight: 600 !important;
+  background: var(--pill-bg) !important;
+  color: var(--pill-text) !important;
+
+  font-size: 12px !important;
+  font-weight: 500 !important;
   line-height: 1 !important;
+  letter-spacing: 0.005em;
 
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 .proposal-list-v4.proposal-list-v4 .proposal-status-draft {
-  background: #fff6df !important;
-  color: #9b7118 !important;
+  --pill-bg: #fffaeb;
+  --pill-border: #fedf89;
+  --pill-text: #93370d;
 }
 
-.proposal-list-v4.proposal-list-v4 .proposal-status-sent,
+.proposal-list-v4.proposal-list-v4 .proposal-status-sent {
+  --pill-bg: #eef4ff;
+  --pill-border: #c7d7fe;
+  --pill-text: #3538cd;
+}
+
 .proposal-list-v4.proposal-list-v4 .proposal-status-awaiting {
-  background: #f0eefc !important;
-  color: #6255af !important;
+  --pill-bg: #f4f3ff;
+  --pill-border: #d9d6fe;
+  --pill-text: #5925dc;
 }
 
-.proposal-list-v4.proposal-list-v4 .proposal-status-accepted,
+.proposal-list-v4.proposal-list-v4 .proposal-status-accepted {
+  --pill-bg: #ecfdf3;
+  --pill-border: #abefc6;
+  --pill-text: #067647;
+}
+
 .proposal-list-v4.proposal-list-v4 .proposal-status-signed {
-  background: #eaf8f3 !important;
-  color: #18845f !important;
+  /* signed = completed: deeper green than Accepted */
+  --pill-bg: #d3f8df;
+  --pill-border: #75e0a7;
+  --pill-text: #05603a;
+
+  font-weight: 600 !important;
 }
 
 .proposal-list-v4.proposal-list-v4 .proposal-status-declined {
-  background: #fff0f2 !important;
-  color: #cf4052 !important;
+  --pill-bg: #fef3f2;
+  --pill-border: #fecdca;
+  --pill-text: #b42318;
 }
 
 .proposal-list-v4.proposal-list-v4 .proposal-status-skipped {
-  background: #eaf7fb !important;
-  color: #177d9a !important;
+  --pill-bg: #f0f9ff;
+  --pill-border: #b9e6fe;
+  --pill-text: #026aa2;
 }
 
 /* =========================================================

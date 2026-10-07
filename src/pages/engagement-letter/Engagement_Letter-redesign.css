@@ -792,89 +792,93 @@
 }
 
 /* =========================================================
-   SOFT STATUS PILLS
-   Conditions and values are unchanged; only colors are softened.
+   STATUS PILLS
+   Soft tint + thin border, same design as the Proposal list.
+   The inline solid colours in the JSX are overridden here
+   (the inline styles and status conditions are unchanged).
    ========================================================= */
 
-.engagement-list-redesign.engagement-list-redesign #customerTable tbody td:nth-child(3) > p {
-  width: fit-content;
-  min-width: 62px;
-  min-height: 26px;
+.engagement-list-redesign.engagement-list-redesign .el-status-pill {
+  --pill-bg: #f2f4f7;
+  --pill-border: #e4e7ec;
+  --pill-text: #344054;
+
+  width: auto !important;
+  min-width: 0 !important;
+  height: 24px !important;
+  min-height: 0 !important;
 
   margin: 0 !important;
-  padding: 0 9px !important;
+  padding: 0 10px !important;
 
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 
+  border: 1px solid var(--pill-border) !important;
   border-radius: 999px !important;
 
-  font-size: 9px !important;
-  font-weight: 600 !important;
+  background: var(--pill-bg) !important;
+  color: var(--pill-text) !important;
+
+  font-size: 12px !important;
+  font-weight: 500 !important;
   line-height: 1 !important;
+  letter-spacing: 0.005em;
 
   white-space: nowrap;
+  vertical-align: middle;
 }
 
-/* Draft */
-.engagement-list-redesign.engagement-list-redesign
-  #customerTable
-  tbody
-  td:nth-child(3)
-  > p[style*="DAA520"] {
-  background: #fff6df !important;
-  color: #9b7118 !important;
+.engagement-list-redesign.engagement-list-redesign .el-status-draft {
+  --pill-bg: #fffaeb;
+  --pill-border: #fedf89;
+  --pill-text: #93370d;
 }
 
-/* Sent / Awaiting */
-.engagement-list-redesign.engagement-list-redesign
-  #customerTable
-  tbody
-  td:nth-child(3)
-  > p[style*="626ED4"] {
-  background: #f0eefc !important;
-  color: #6255af !important;
+.engagement-list-redesign.engagement-list-redesign .el-status-sent {
+  --pill-bg: #eef4ff;
+  --pill-border: #c7d7fe;
+  --pill-text: #3538cd;
 }
 
-/* Accepted / Signed */
-.engagement-list-redesign.engagement-list-redesign
-  #customerTable
-  tbody
-  td:nth-child(3)
-  > p[style*="008000"] {
-  background: #eaf8f3 !important;
-  color: #18845f !important;
+.engagement-list-redesign.engagement-list-redesign .el-status-awaiting {
+  --pill-bg: #f4f3ff;
+  --pill-border: #d9d6fe;
+  --pill-text: #5925dc;
 }
 
-/* Declined */
-.engagement-list-redesign.engagement-list-redesign
-  #customerTable
-  tbody
-  td:nth-child(3)
-  > p[style*="FF0000"] {
-  background: #fff0f2 !important;
-  color: #cf4052 !important;
+.engagement-list-redesign.engagement-list-redesign .el-status-accepted {
+  --pill-bg: #ecfdf3;
+  --pill-border: #abefc6;
+  --pill-text: #067647;
 }
 
-/* Skipped */
-.engagement-list-redesign.engagement-list-redesign
-  #customerTable
-  tbody
-  td:nth-child(3)
-  > p[style*="38A4F8"] {
-  background: #eaf7fb !important;
-  color: #177d9a !important;
+.engagement-list-redesign.engagement-list-redesign .el-status-signed {
+  /* signed = completed: deeper green than Accepted */
+  --pill-bg: #d3f8df;
+  --pill-border: #75e0a7;
+  --pill-text: #05603a;
+
+  font-weight: 600 !important;
 }
 
-/* Void */
-.engagement-list-redesign.engagement-list-redesign
-  #customerTable
-  tbody
-  td:nth-child(3)
-  > p[style*="1897ad"] {
-  background: #eaf7fb !important;
-  color: #177d9a !important;
+.engagement-list-redesign.engagement-list-redesign .el-status-declined {
+  --pill-bg: #fef3f2;
+  --pill-border: #fecdca;
+  --pill-text: #b42318;
+}
+
+.engagement-list-redesign.engagement-list-redesign .el-status-skipped {
+  --pill-bg: #f0f9ff;
+  --pill-border: #b9e6fe;
+  --pill-text: #026aa2;
+}
+
+.engagement-list-redesign.engagement-list-redesign .el-status-void {
+  --pill-bg: #f8fafc;
+  --pill-border: #cbd5e1;
+  --pill-text: #475467;
 }
 
 /* =========================================================

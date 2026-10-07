@@ -2199,7 +2199,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font ">
                                                           <p
-                                                            className="  p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-draft"
                                                             style={{
                                                               background:
                                                                 "#DAA520",
@@ -2215,7 +2215,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-sent"
                                                             style={{
                                                               background:
                                                                 " #626ED4",
@@ -2231,7 +2231,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-accepted"
                                                             style={{
                                                               background:
                                                                 "#008000",
@@ -2247,7 +2247,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-awaiting"
                                                             style={{
                                                               background:
                                                                 "#626ED4",
@@ -2264,7 +2264,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-declined"
                                                             style={{
                                                               background:
                                                                 "#FF0000",
@@ -2280,7 +2280,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-signed"
                                                             style={{
                                                               background:
                                                                 "#008000",
@@ -2296,7 +2296,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-skipped"
                                                             style={{
                                                               background:
                                                                 "#38A4F8",
@@ -2986,7 +2986,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font ">
                                                           <p
-                                                            className="  p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-draft"
                                                             style={{
                                                               background:
                                                                 "#DAA520",
@@ -3002,7 +3002,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-sent"
                                                             style={{
                                                               background:
                                                                 " #626ED4",
@@ -3018,7 +3018,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-accepted"
                                                             style={{
                                                               background:
                                                                 "#008000",
@@ -3034,7 +3034,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-awaiting"
                                                             style={{
                                                               background:
                                                                 "#626ED4",
@@ -3051,7 +3051,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-declined"
                                                             style={{
                                                               background:
                                                                 "#FF0000",
@@ -3067,7 +3067,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-signed"
                                                             style={{
                                                               background:
                                                                 "#008000",
@@ -3083,7 +3083,7 @@ const Proposals = () => {
                                                       <>
                                                         <td className="table-content-font">
                                                           <p
-                                                            className=" p-1 text-center text-white rounded"
+                                                            className="p-1 text-center text-white rounded proposal-status-pill proposal-status-skipped"
                                                             style={{
                                                               background:
                                                                 "#38A4F8",

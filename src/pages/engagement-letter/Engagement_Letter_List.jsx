@@ -1903,7 +1903,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#DAA520",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-draft"
                                                             >
                                                               {engagement.status
                                                                 ?.charAt(0)
@@ -1920,7 +1920,7 @@ const Engagement_Letter = () => {
                                                         <>
                                                           <td class="table-content-font">
                                                             <p
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-sent"
                                                               style={{
                                                                 background:
                                                                   "#626ED4",
@@ -1943,7 +1943,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#008000",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-accepted"
                                                             >
                                                               {engagement.status
                                                                 ?.charAt(0)
@@ -1964,7 +1964,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#626ED4",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-awaiting"
                                                             >
                                                               {engagement.status
                                                                 ?.charAt(0)
@@ -1985,7 +1985,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#FF0000",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-declined"
                                                             >
                                                               {engagement.status
                                                                 ?.charAt(0)
@@ -2006,7 +2006,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#008000",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-signed"
                                                             >
                                                               {/* {engagement.status?.charAt(0)?.toUpperCase() +
                                                       engagement.status?.slice(1)} */}
@@ -2024,7 +2024,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#38A4F8",
                                                               }}
-                                                              className="p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-skipped"
                                                             >
                                                               {engagement.status
                                                                 ?.charAt(0)
@@ -2197,7 +2197,7 @@ const Engagement_Letter = () => {
                                                                   background:
                                                                     "#DAA520",
                                                                 }}
-                                                                className=" p-1 text-center text-white rounded"
+                                                                className="p-1 text-center text-white rounded el-status-pill el-status-draft"
                                                               >
                                                                 {
                                                                   engagement.statusName
@@ -2211,7 +2211,7 @@ const Engagement_Letter = () => {
                                                           <>
                                                             <td class="table-content-font">
                                                               <p
-                                                                className=" p-1 text-center text-white rounded"
+                                                                className="p-1 text-center text-white rounded el-status-pill el-status-sent"
                                                                 style={{
                                                                   background:
                                                                     "#626ED4",
@@ -2233,7 +2233,7 @@ const Engagement_Letter = () => {
                                                                   background:
                                                                     "#008000",
                                                                 }}
-                                                                className=" p-1 text-center text-white rounded"
+                                                                className="p-1 text-center text-white rounded el-status-pill el-status-accepted"
                                                               >
                                                                 {
                                                                   engagement.statusName
@@ -2251,7 +2251,7 @@ const Engagement_Letter = () => {
                                                                   background:
                                                                     "#626ED4",
                                                                 }}
-                                                                className=" p-1 text-center text-white rounded"
+                                                                className="p-1 text-center text-white rounded el-status-pill el-status-awaiting"
                                                               >
                                                                 {
                                                                   engagement.statusName
@@ -2269,7 +2269,7 @@ const Engagement_Letter = () => {
                                                                   background:
                                                                     "#FF0000",
                                                                 }}
-                                                                className=" p-1 text-center text-white rounded"
+                                                                className="p-1 text-center text-white rounded el-status-pill el-status-declined"
                                                               >
                                                                 {
                                                                   engagement.statusName
@@ -2287,7 +2287,7 @@ const Engagement_Letter = () => {
                                                                   background:
                                                                     "#008000",
                                                                 }}
-                                                                className=" p-1 text-center text-white rounded"
+                                                                className="p-1 text-center text-white rounded el-status-pill el-status-signed"
                                                               >
                                                                 {
                                                                   engagement.statusName
@@ -2305,7 +2305,7 @@ const Engagement_Letter = () => {
                                                                   background:
                                                                     "#38A4F8",
                                                                 }}
-                                                                className="p-1 text-center text-white rounded"
+                                                                className="p-1 text-center text-white rounded el-status-pill el-status-skipped"
                                                               >
                                                                 {
                                                                   engagement.statusName
@@ -2323,7 +2323,7 @@ const Engagement_Letter = () => {
                                                                   background:
                                                                     "#1897ad",
                                                                 }}
-                                                                className="p-1 text-center text-white rounded"
+                                                                className="p-1 text-center text-white rounded el-status-pill el-status-void"
                                                               >
                                                                 {
                                                                   engagement.statusName
@@ -3108,7 +3108,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#DAA520",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-draft"
                                                             >
                                                               {
                                                                 engagement.statusName
@@ -3122,7 +3122,7 @@ const Engagement_Letter = () => {
                                                         <>
                                                           <td class="table-content-font">
                                                             <p
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-sent"
                                                               style={{
                                                                 background:
                                                                   "#626ED4",
@@ -3144,7 +3144,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#008000",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-accepted"
                                                             >
                                                               {
                                                                 engagement.statusName
@@ -3162,7 +3162,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#626ED4",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-awaiting"
                                                             >
                                                               {
                                                                 engagement.statusName
@@ -3180,7 +3180,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#FF0000",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-declined"
                                                             >
                                                               {
                                                                 engagement.statusName
@@ -3198,7 +3198,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#008000",
                                                               }}
-                                                              className=" p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-signed"
                                                             >
                                                               {
                                                                 engagement.statusName
@@ -3216,7 +3216,7 @@ const Engagement_Letter = () => {
                                                                 background:
                                                                   "#38A4F8",
                                                               }}
-                                                              className="p-1 text-center text-white rounded"
+                                                              className="p-1 text-center text-white rounded el-status-pill el-status-skipped"
                                                             >
                                                               {
                                                                 engagement.statusName
