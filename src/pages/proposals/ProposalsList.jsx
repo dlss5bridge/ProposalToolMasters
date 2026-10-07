@@ -54,6 +54,7 @@ import {
   ResendAddUpdateQuote,
 } from "../../redux/Services/EmailFailureStatusAPI/EmailFailureStatusAPI";
 import EmailFailurePopUP from "../../components/EmailFailurePopUp";
+import PdfFileIcon from "../../components/PdfFileIcon";
 const Proposals = () => {
   const SaveAsDraft = "SaveAsDraft";
 
@@ -2086,7 +2087,9 @@ const Proposals = () => {
                                                           item.pdfUrl &&
                                                           item.status !==
                                                             statusNames.Signed && (
+                                                            <Tooltip title={`View ${proposalName} PDF`} placement="top">
                                                             <p
+                                                              className="proposal-pdf-link"
                                                               onClick={() => {
                                                                 handleViewOldProposalPdf(
                                                                   item.pdfUrl,
@@ -2101,15 +2104,19 @@ const Proposals = () => {
                                                                 color: "blue",
                                                               }}
                                                             >
-                                                              {proposalName} PDF
+                                                              <PdfFileIcon />
+                                                              <span className="visually-hidden">{proposalName} PDF</span>
                                                             </p>
+                                                            </Tooltip>
                                                           )}
                                                         {item.status !==
                                                           statusNames.Draft &&
                                                           item.pdfUrl &&
                                                           item.status ===
                                                             statusNames.Signed && (
+                                                            <Tooltip title={`View ${proposalName} PDF`} placement="top">
                                                             <p
+                                                              className="proposal-pdf-link"
                                                               onClick={() => {
                                                                 handleViewOldProposalPdf(
                                                                   item.pdfUrl,
@@ -2123,8 +2130,10 @@ const Proposals = () => {
                                                                   "pointer",
                                                               }}
                                                             >
-                                                              {proposalName} PDF
+                                                              <PdfFileIcon />
+                                                              <span className="visually-hidden">{proposalName} PDF</span>
                                                             </p>
+                                                            </Tooltip>
                                                           )}
                                                         {/* </a> */}
                                                       </td>
@@ -2418,7 +2427,9 @@ const Proposals = () => {
                                                         item.quotePDFUrl &&
                                                         item.statusID !==
                                                           statusID.Signed && (
+                                                          <Tooltip title={`View ${proposalName} PDF`} placement="top">
                                                           <p
+                                                            className="proposal-pdf-link"
                                                             onClick={() => {
                                                               handleViewPdf(
                                                                 item,
@@ -2432,15 +2443,19 @@ const Proposals = () => {
                                                               color: "blue",
                                                             }}
                                                           >
-                                                            {proposalName} PDF
+                                                            <PdfFileIcon />
+                                                            <span className="visually-hidden">{proposalName} PDF</span>
                                                           </p>
+                                                          </Tooltip>
                                                         )}
                                                       {item.statusID !==
                                                         statusID.Draft &&
                                                         item.quotePDFUrl &&
                                                         item.statusID ===
                                                           statusID.Signed && (
+                                                          <Tooltip title={`Download ${proposalName} PDF`} placement="top">
                                                           <p
+                                                            className="proposal-pdf-link"
                                                             onClick={() => {
                                                               handleDownload(
                                                                 item,
@@ -2452,8 +2467,10 @@ const Proposals = () => {
                                                               cursor: "pointer",
                                                             }}
                                                           >
-                                                            {proposalName} PDF
+                                                            <PdfFileIcon />
+                                                            <span className="visually-hidden">{proposalName} PDF</span>
                                                           </p>
+                                                          </Tooltip>
                                                         )}
                                                       {/* </a> */}
                                                     </td>
@@ -3204,7 +3221,9 @@ const Proposals = () => {
                                                         item.quotePDFUrl &&
                                                         item.statusID !==
                                                           statusID.Signed && (
+                                                          <Tooltip title={`View ${proposalName} PDF`} placement="top">
                                                           <p
+                                                            className="proposal-pdf-link"
                                                             onClick={() => {
                                                               handleViewPdf(
                                                                 item,
@@ -3218,15 +3237,19 @@ const Proposals = () => {
                                                               color: "blue",
                                                             }}
                                                           >
-                                                            {proposalName} PDF
+                                                            <PdfFileIcon />
+                                                            <span className="visually-hidden">{proposalName} PDF</span>
                                                           </p>
+                                                          </Tooltip>
                                                         )}
                                                       {item.statusID !==
                                                         statusID.Draft &&
                                                         item.quotePDFUrl &&
                                                         item.statusID ===
                                                           statusID.Signed && (
+                                                          <Tooltip title={`Download ${proposalName} PDF`} placement="top">
                                                           <p
+                                                            className="proposal-pdf-link"
                                                             onClick={() => {
                                                               handleDownload(
                                                                 item,
@@ -3238,8 +3261,10 @@ const Proposals = () => {
                                                               cursor: "pointer",
                                                             }}
                                                           >
-                                                            {proposalName} PDF
+                                                            <PdfFileIcon />
+                                                            <span className="visually-hidden">{proposalName} PDF</span>
                                                           </p>
+                                                          </Tooltip>
                                                         )}
                                                       {/* </a> */}
                                                     </td>

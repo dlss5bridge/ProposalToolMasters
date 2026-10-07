@@ -57,6 +57,7 @@ import {
 } from "../../redux/Services/EmailFailureStatusAPI/EmailFailureStatusAPI";
 import EmailFailurePopUP from "../../components/EmailFailurePopUp";
 import { CreateEngagementInvoice } from "../../redux/reducer/engagementSlice";
+import PdfFileIcon from "../../components/PdfFileIcon";
 
 const Engagement_Letter = () => {
   let getEngagementListApiCallCount = 0;
@@ -2075,7 +2076,9 @@ const Engagement_Letter = () => {
                                                           engagement.pdfUrl &&
                                                           engagement.status !==
                                                             statusNames.Signed && (
+                                                            <Tooltip title={`View ${EngagementName} PDF`} placement="top">
                                                             <p
+                                                              className="el-pdf-link"
                                                               onClick={() => {
                                                                 handleViewOldProposalPdf(
                                                                   engagement.pdfUrl,
@@ -2090,16 +2093,19 @@ const Engagement_Letter = () => {
                                                                 color: "blue",
                                                               }}
                                                             >
-                                                              {EngagementName}{" "}
-                                                              PDF
+                                                              <PdfFileIcon />
+                                                              <span className="visually-hidden">{EngagementName} PDF</span>
                                                             </p>
+                                                            </Tooltip>
                                                           )}
                                                         {engagement.status !==
                                                           statusNames.Draft &&
                                                           engagement.pdfUrl &&
                                                           engagement.status ===
                                                             statusNames.Signed && (
+                                                            <Tooltip title={`Download ${EngagementName} PDF`} placement="top">
                                                             <p
+                                                              className="el-pdf-link"
                                                               onClick={() => {
                                                                 handleDownloadMigratedEl(
                                                                   engagement,
@@ -2111,9 +2117,10 @@ const Engagement_Letter = () => {
                                                                 color: "blue",
                                                               }}
                                                             >
-                                                              {EngagementName}{" "}
-                                                              PDF
+                                                              <PdfFileIcon />
+                                                              <span className="visually-hidden">{EngagementName} PDF</span>
                                                             </p>
+                                                            </Tooltip>
                                                           )}
                                                       </td>
                                                     </tr>
@@ -2370,7 +2377,9 @@ const Engagement_Letter = () => {
                                                             engagement.documents &&
                                                             engagement.statusID !==
                                                               statusID.Signed && (
+                                                              <Tooltip title={`View ${EngagementName} PDF`} placement="top">
                                                               <p
+                                                                className="el-pdf-link"
                                                                 onClick={() => {
                                                                   handleViewPdf(
                                                                     engagement,
@@ -2385,9 +2394,10 @@ const Engagement_Letter = () => {
                                                                   color: "blue",
                                                                 }}
                                                               >
-                                                                {EngagementName}{" "}
-                                                                PDF
+                                                                <PdfFileIcon />
+                                                                <span className="visually-hidden">{EngagementName} PDF</span>
                                                               </p>
+                                                              </Tooltip>
                                                             )}
                                                           {engagement.statusID !==
                                                             statusID.Draft &&
@@ -2396,7 +2406,9 @@ const Engagement_Letter = () => {
                                                             engagement.documents &&
                                                             engagement.statusID ===
                                                               statusID.Signed && (
+                                                              <Tooltip title={`Download ${EngagementName} PDF`} placement="top">
                                                               <p
+                                                                className="el-pdf-link"
                                                                 onClick={() => {
                                                                   handleDownload(
                                                                     engagement,
@@ -2408,9 +2420,10 @@ const Engagement_Letter = () => {
                                                                   color: "blue",
                                                                 }}
                                                               >
-                                                                {EngagementName}{" "}
-                                                                PDF
+                                                                <PdfFileIcon />
+                                                                <span className="visually-hidden">{EngagementName} PDF</span>
                                                               </p>
+                                                              </Tooltip>
                                                             )}
                                                         </td>
                                                         <td className="table-content-font">
@@ -3264,7 +3277,9 @@ const Engagement_Letter = () => {
                                                           engagement.documents &&
                                                           engagement.statusID !==
                                                             statusID.Signed && (
+                                                            <Tooltip title={`View ${EngagementName} PDF`} placement="top">
                                                             <p
+                                                              className="el-pdf-link"
                                                               onClick={() => {
                                                                 handleViewPdf(
                                                                   engagement,
@@ -3279,16 +3294,19 @@ const Engagement_Letter = () => {
                                                                 color: "blue",
                                                               }}
                                                             >
-                                                              {EngagementName}{" "}
-                                                              PDF
+                                                              <PdfFileIcon />
+                                                              <span className="visually-hidden">{EngagementName} PDF</span>
                                                             </p>
+                                                            </Tooltip>
                                                           )}
                                                         {engagement.statusID !==
                                                           statusID.Draft &&
                                                           engagement.documents &&
                                                           engagement.statusID ===
                                                             statusID.Signed && (
+                                                            <Tooltip title={`Download ${EngagementName} PDF`} placement="top">
                                                             <p
+                                                              className="el-pdf-link"
                                                               onClick={() => {
                                                                 handleDownload(
                                                                   engagement,
@@ -3300,9 +3318,10 @@ const Engagement_Letter = () => {
                                                                 color: "blue",
                                                               }}
                                                             >
-                                                              {EngagementName}{" "}
-                                                              PDF
+                                                              <PdfFileIcon />
+                                                              <span className="visually-hidden">{EngagementName} PDF</span>
                                                             </p>
+                                                            </Tooltip>
                                                           )}
                                                       </td>
                                                       <td className="table-content-font engagement-action-column">
