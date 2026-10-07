@@ -12219,12 +12219,15 @@ ${
               <Select
                 menuPosition="auto"
                 className="phone-input-country-code selectDropDown"
-                options={
-                  !common.enableEL ||
-                  !props?.pricingSettingObj?.remainingESignatures
-                    ? Utils.PreviewSelection.filter((x) => x.value === 2) // only PDF
-                    : Utils.PreviewSelection
-                }
+                options={(!common.enableEL ||
+                !props?.pricingSettingObj?.remainingESignatures
+                  ? Utils.PreviewSelection.filter((x) => x.value === 2) // only PDF
+                  : Utils.PreviewSelection
+                ).filter(
+                  (x) =>
+                    x.value !== 3 ||
+                    activeOrganizationSubscriptionPlan?.enableWebBasedProposal,
+                )}
                 onChange={handleFormate}
                 value={ProposalFormatValue}
               />

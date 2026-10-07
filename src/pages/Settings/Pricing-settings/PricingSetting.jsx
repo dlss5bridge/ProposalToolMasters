@@ -72,6 +72,7 @@ const Pricing_Settings = () => {
     isCollectPaymentBeforeProposalAmendment: false,
     ppcid: null,
     paymentModeID: null,
+    enableWebBasedProposal: false,
   });
   const [ServiceFeeInflationConfig, setServiceFeeInflationConfig] = useState({
     OrganisationKeyID: null,
@@ -122,6 +123,7 @@ const Pricing_Settings = () => {
     isCollectPaymentBeforeProposalAmendment: false,
     ppcid: null,
     paymentModeID: null,
+    enableWebBasedProposal: false,
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [feeInflationErrorMessage, setFeeInflationErrorMessage] = useState("");
@@ -158,10 +160,17 @@ const Pricing_Settings = () => {
   }, [common.organisationKeyID]);
 
   const getProposalFormatOptions = () => {
-    if (PrevPricingSettingObj.remainingESignatures !== true) {
-      return Utils.PreviewSelection.filter((x) => x.value === 3);
+    let options =
+      PrevPricingSettingObj.remainingESignatures !== true
+        ? Utils.PreviewSelection.filter((x) => x.value === 3)
+        : Utils.PreviewSelection;
+
+    // Web Proposal (value 3) is only offered when the organisation has Web Based Proposal enabled
+    if (!PrevPricingSettingObj.enableWebBasedProposal) {
+      options = options.filter((x) => x.value !== 3);
     }
-    return Utils.PreviewSelection;
+
+    return options;
   };
 
   // const getProposalFormatValue = () => {
@@ -203,6 +212,7 @@ const Pricing_Settings = () => {
               ModelData?.isCollectPaymentBeforeProposalAmendment || false,
             ppcid: ModelData?.ppcid || null,
             paymentModeID: ModelData?.paymentModeID || null,
+            enableWebBasedProposal: ModelData?.enableWebBasedProposal || false,
           });
           setPrevPricingSettingObj({
             ...pricingSettingObj,
@@ -224,6 +234,7 @@ const Pricing_Settings = () => {
               ModelData?.isCollectPaymentBeforeProposalAmendment || false,
             ppcid: ModelData?.ppcid || null,
             paymentModeID: ModelData?.paymentModeID || null,
+            enableWebBasedProposal: ModelData?.enableWebBasedProposal || false,
           });
         }
       } else {
