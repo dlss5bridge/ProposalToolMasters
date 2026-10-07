@@ -1907,7 +1907,9 @@ const Proposals = () => {
                                                   return (
                                                     <tr class="table_new">
                                                       <td className="table-content-font">
-                                                        {item.refID}
+                                                        <Tooltip title={item.refID} placement="top">
+                                                          <span className="ref-id-text">{item.refID}</span>
+                                                        </Tooltip>
                                                       </td>
                                                       <td className="table-content-font">
                                                         {item.clientName}
@@ -2192,7 +2194,9 @@ const Proposals = () => {
                                                 return (
                                                   <tr class="table_new">
                                                     <td className="table-content-font">
-                                                      {item.prefix}
+                                                      <Tooltip title={item.prefix} placement="top">
+                                                        <span className="ref-id-text">{item.prefix}</span>
+                                                      </Tooltip>
                                                     </td>
                                                     <td className="table-content-font">
                                                       {item.clientName}
@@ -2987,7 +2991,9 @@ const Proposals = () => {
                                                           )
                                                         }
                                                       />{" "}
-                                                      {item.prefix}
+                                                      <Tooltip title={item.prefix} placement="top">
+                                                        <span className="ref-id-text">{item.prefix}</span>
+                                                      </Tooltip>
                                                     </td>
                                                     <td className="table-content-font">
                                                       {item.clientName}

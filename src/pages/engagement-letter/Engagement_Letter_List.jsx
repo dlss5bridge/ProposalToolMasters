@@ -1885,7 +1885,9 @@ const Engagement_Letter = () => {
                                                   <>
                                                     <tr class="table_new">
                                                       <td className="table-content-font">
-                                                        {engagement.refID}
+                                                        <Tooltip title={engagement.refID} placement="top">
+                                                          <span className="ref-id-text">{engagement.refID}</span>
+                                                        </Tooltip>
                                                       </td>
                                                       <td className="table-content-font">
                                                         {engagement.clientName}
@@ -2183,7 +2185,9 @@ const Engagement_Letter = () => {
                                                     <>
                                                       <tr class="table_new">
                                                         <td className="table-content-font">
-                                                          {engagement.prefix}
+                                                          <Tooltip title={engagement.prefix} placement="top">
+                                                            <span className="ref-id-text">{engagement.prefix}</span>
+                                                          </Tooltip>
                                                         </td>
                                                         <td className="table-content-font">
                                                           {
@@ -3102,7 +3106,9 @@ const Engagement_Letter = () => {
                                                             )
                                                           }
                                                         />
-                                                        {engagement.prefix}
+                                                        <Tooltip title={engagement.prefix} placement="top">
+                                                          <span className="ref-id-text">{engagement.prefix}</span>
+                                                        </Tooltip>
                                                       </td>
                                                       <td className="table-content-font">
                                                         {engagement.clientName}
