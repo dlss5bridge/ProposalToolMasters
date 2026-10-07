@@ -45,6 +45,7 @@ import { updateState } from "../../../redux/Persist";
 import { GetInviteUsersList } from "../../../redux/Services/Setting/InviteUserApi";
 import RecordsAvailablePopupModel from "../../../components/RecordsAvailablePopupModel";
 import { Funnel } from "lucide-react";
+import PdfFileIcon from "../../../components/PdfFileIcon";
 function Predefined_Templates() {
   //A]Declare state
   const moduleName = "Template";
@@ -1561,6 +1562,7 @@ function Predefined_Templates() {
                                                   </td>
 
                                                   <td>
+                                                    <Tooltip title="View Document" placement="top">
                                                     <a
                                                       // href="https://teststaging.outbooks.com/api/quote/preview-pdf/b8c4365d-d32a-40ef-9835-f90800aa476b"
                                                       href={Template.pdf}
@@ -1568,9 +1570,16 @@ function Predefined_Templates() {
                                                       rel="noreferrer"
                                                       className="template-list-document-link"
                                                     >
-                                                      {" "}
-                                                      View Document
+                                                      <PdfFileIcon
+                                                        {...(/\.xlsx?(\?|#|$)/i.test(Template.pdf || "")
+                                                          ? { label: "XLS", tagColor: "#079455" }
+                                                          : /\.csv(\?|#|$)/i.test(Template.pdf || "")
+                                                            ? { label: "CSV", tagColor: "#079455" }
+                                                            : {})}
+                                                      />
+                                                      <span className="visually-hidden">View Document</span>
                                                     </a>
+                                                    </Tooltip>
                                                   </td>
 
                                                   <td className="Switch">
