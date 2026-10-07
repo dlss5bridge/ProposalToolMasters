@@ -186,17 +186,26 @@ export default function PreviewComponentPdf(props) {
   }, [props.isCreateMode, props.pricingSettingObj]);
 
   const handleFormate = (selectedOption) => {
+    // Bank Transfer (paymentGatewayID === 4) is not supported for the Web-Proposal
+    // format, so fall back to "Not Applicable" when switching to Web-Proposal while
+    // Bank Transfer was selected (Number() guards against a string ID from the API).
+    const isSwitchingToWebProposal = selectedOption.value === 3;
+    const isBankTransferSelected =
+      Number(props.ProposalObject.paymentGatewayID) === 4;
+
     props.setProposalObject({
       ...props.ProposalObject,
       ProposalFormate: selectedOption.value,
-      webProposalTypeID:
-        selectedOption.value === 3
-          ? props.ProposalObject.webProposalTypeID
-          : null,
-      globalPricingDriverID:
-        selectedOption.value === 3
-          ? props.ProposalObject.globalPricingDriverID
-          : [],
+      webProposalTypeID: isSwitchingToWebProposal
+        ? props.ProposalObject.webProposalTypeID
+        : null,
+      globalPricingDriverID: isSwitchingToWebProposal
+        ? props.ProposalObject.globalPricingDriverID
+        : [],
+      paymentGatewayID:
+        isSwitchingToWebProposal && isBankTransferSelected
+          ? 1 // Not Applicable
+          : props.ProposalObject.paymentGatewayID,
     });
     props.setRequireMessage(false);
   };
@@ -12067,45 +12076,51 @@ ${
 
   const modifiedPaymentGatewayType =
     props.paymentGatewayObj !== undefined &&
-    Utils.payment_gateway.map((option) => {
-      // Check if GoCardless access token is invalid
-      const isGoCardlessTokenInvalid =
-        props.paymentGatewayObj.goCardlessAccessToken === null ||
-        props.paymentGatewayObj.goCardlessAccessToken === undefined ||
-        props.paymentGatewayObj.goCardlessAccessToken === "";
+    Utils.payment_gateway
+      .filter((option) => {
+        // Bank Transfer is not supported for the Web-Proposal format
+        const isWebProposalFormat = props.ProposalObject?.ProposalFormate === 3;
+        return !(option.value === 4 && isWebProposalFormat);
+      })
+      .map((option) => {
+        // Check if GoCardless access token is invalid
+        const isGoCardlessTokenInvalid =
+          props.paymentGatewayObj.goCardlessAccessToken === null ||
+          props.paymentGatewayObj.goCardlessAccessToken === undefined ||
+          props.paymentGatewayObj.goCardlessAccessToken === "";
 
-      // Check if Stripe keys are invalid
-      const isStripeKeysInvalid =
-        (props.paymentGatewayObj.stripePublishableKey === null ||
-          props.paymentGatewayObj.stripePublishableKey === undefined ||
-          props.paymentGatewayObj.stripePublishableKey === "") &&
-        (props.paymentGatewayObj.stripeSecretKey === null ||
-          props.paymentGatewayObj.stripeSecretKey === undefined ||
-          props.paymentGatewayObj.stripeSecretKey === "");
+        // Check if Stripe keys are invalid
+        const isStripeKeysInvalid =
+          (props.paymentGatewayObj.stripePublishableKey === null ||
+            props.paymentGatewayObj.stripePublishableKey === undefined ||
+            props.paymentGatewayObj.stripePublishableKey === "") &&
+          (props.paymentGatewayObj.stripeSecretKey === null ||
+            props.paymentGatewayObj.stripeSecretKey === undefined ||
+            props.paymentGatewayObj.stripeSecretKey === "");
 
-      // Check if Bank Transfer details are invalid
-      const isBankTransferInvalid =
-        (props.paymentGatewayObj.AccountNumber === null ||
-          props.paymentGatewayObj.AccountNumber === undefined ||
-          props.paymentGatewayObj.AccountNumber === "") &&
-        (props.paymentGatewayObj.bankTransferName === null ||
-          props.paymentGatewayObj.bankTransferName === undefined ||
-          props.paymentGatewayObj.bankTransferName === "") &&
-        (props.paymentGatewayObj.sortCode === null ||
-          props.paymentGatewayObj.sortCode === undefined ||
-          props.paymentGatewayObj.sortCode === "");
+        // Check if Bank Transfer details are invalid
+        const isBankTransferInvalid =
+          (props.paymentGatewayObj.AccountNumber === null ||
+            props.paymentGatewayObj.AccountNumber === undefined ||
+            props.paymentGatewayObj.AccountNumber === "") &&
+          (props.paymentGatewayObj.bankTransferName === null ||
+            props.paymentGatewayObj.bankTransferName === undefined ||
+            props.paymentGatewayObj.bankTransferName === "") &&
+          (props.paymentGatewayObj.sortCode === null ||
+            props.paymentGatewayObj.sortCode === undefined ||
+            props.paymentGatewayObj.sortCode === "");
 
-      // Return the modified option based on conditions
-      if (option.value === 3 && isGoCardlessTokenInvalid) {
-        return { ...option, isDisabled: true }; // Disable GoCardless option
-      } else if (option.value === 2 && isStripeKeysInvalid) {
-        return { ...option, isDisabled: true }; // Disable Stripe option
-      } else if (option.value === 4 && isBankTransferInvalid) {
-        return { ...option, isDisabled: true }; // Disable Bank Transfer option
-      } else {
-        return { ...option, isDisabled: false }; // Otherwise, leave it enabled (false is default)
-      }
-    });
+        // Return the modified option based on conditions
+        if (option.value === 3 && isGoCardlessTokenInvalid) {
+          return { ...option, isDisabled: true }; // Disable GoCardless option
+        } else if (option.value === 2 && isStripeKeysInvalid) {
+          return { ...option, isDisabled: true }; // Disable Stripe option
+        } else if (option.value === 4 && isBankTransferInvalid) {
+          return { ...option, isDisabled: true }; // Disable Bank Transfer option
+        } else {
+          return { ...option, isDisabled: false }; // Otherwise, leave it enabled (false is default)
+        }
+      });
 
   const handleAttachmentSelect = (item) => {
     const keyID = item.templatePDFKeyID;
