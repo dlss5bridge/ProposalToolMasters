@@ -10,6 +10,8 @@ import DatePicker from "react-date-picker";
 import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "./CouponCode.css"
+import "./CouponModal-redesign.css";
+import { TicketPercent } from "lucide-react";
 import Utils from "../../../../Middleware/Utils";
 import BinarySelect from "../../../../components/BinarySelect";
 const AccesskeyModal = (props) => {
@@ -202,15 +204,25 @@ const AccesskeyModal = (props) => {
       data-bs-backdrop="static"
       data-bs-keyboard="false"
     >
-      <div class="modal-dialog modal-md modal-dialog-centered pricing-driver-popup">
+      <div class="modal-dialog modal-md modal-dialog-centered pricing-driver-popup cp-form">
         <div class="modal-content">
           {/*Heading Start */}
           <div class="modal-header bg-light p-3">
-            <h5 class="modal-title" id="exampleModalLabel">
-              {modelAction === "Add"
-                ? getCrudPopUpTitleName("Add", moduleName)
-                : getCrudPopUpTitleName("Update", moduleName)}
-            </h5>
+            <div className="cp-head">
+              <span className="cp-head__icon" aria-hidden="true">
+                <TicketPercent size={20} strokeWidth={1.9} />
+              </span>
+              <div className="cp-head__text">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  {modelAction === "Add"
+                    ? getCrudPopUpTitleName("Add", moduleName)
+                    : getCrudPopUpTitleName("Update", moduleName)}
+                </h5>
+                <p className="cp-head__sub">
+                  Set the coupon code, discount and validity period.
+                </p>
+              </div>
+            </div>
             {/* Close Button Start */}
             <button
               type="button"

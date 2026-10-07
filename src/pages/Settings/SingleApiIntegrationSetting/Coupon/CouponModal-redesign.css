@@ -1,0 +1,367 @@
+/* =========================================================
+   ADD / UPDATE COUPON MODAL  (.cp-form)
+   Layout and look only: the existing inputs, handlers and
+   validation messages are untouched.
+   ========================================================= */
+
+.cp-form {
+  --cp-text: #14243a;
+  --cp-muted: #667085;
+  --cp-border: #d5dde7;
+  --cp-accent: #14b5d1;
+  --cp-accent-dark: #0b7f95;
+}
+
+.modal-dialog.cp-form.cp-form {
+  max-width: 720px;
+  width: calc(100% - 32px);
+}
+
+.cp-form .modal-content {
+  overflow: visible;
+
+  border: 0;
+  border-radius: 16px;
+
+  box-shadow: 0 24px 56px -18px rgba(15, 23, 42, 0.35);
+}
+
+/* ---------- Header ---------- */
+.cp-form .modal-header.modal-header {
+  align-items: center;
+
+  padding: 18px 22px !important;
+
+  border-bottom: 1px solid #e8edf3;
+  border-radius: 16px 16px 0 0;
+
+  background: #ffffff !important;
+}
+
+.cp-head {
+  min-width: 0;
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cp-head__icon {
+  width: 42px;
+  height: 42px;
+  flex: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: #e8f7fb;
+  color: var(--cp-accent-dark);
+}
+
+.cp-head__text {
+  min-width: 0;
+}
+
+.cp-form .cp-head .modal-title {
+  margin: 0;
+
+  color: var(--cp-text);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.cp-head__sub {
+  margin: 2px 0 0;
+
+  color: var(--cp-muted);
+  font-size: 13px;
+}
+
+/* ---------- Body: two-column grid, labels above inputs ---------- */
+.cp-form .modal-body.gpd-scroll {
+  max-height: none;
+  overflow: visible;
+
+  padding: 0;
+}
+
+.cp-form .modal-body > .p-3 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+
+  padding: 22px !important;
+}
+
+/* field order: code, type | min value, amount | from, to | count | description */
+.cp-form .modal-body > .p-3 > .fieldset:nth-child(1) { order: 1; }
+.cp-form .modal-body > .p-3 > .fieldset:nth-child(2) { order: 2; }
+.cp-form .modal-body > .p-3 > .fieldset:nth-child(3) { order: 3; }
+.cp-form .modal-body > .p-3 > .fieldset:nth-child(4) { order: 4; }
+.cp-form .modal-body > .p-3 > .fieldset:nth-child(6) { order: 5; }
+.cp-form .modal-body > .p-3 > .fieldset:nth-child(7) { order: 6; }
+.cp-form .modal-body > .p-3 > .fieldset:nth-child(5) { order: 7; }
+.cp-form .modal-body > .p-3 > .fieldset:nth-child(8) {
+  order: 8;
+  grid-column: 1 / -1;
+}
+
+/* general error message (from the API) */
+.cp-form .modal-body > .p-3 > label.validation {
+  order: 9;
+  grid-column: 1 / -1;
+
+  margin: 0;
+}
+
+.cp-form .modal-body > .p-3 > label.validation:empty {
+  display: none !important;
+}
+
+.cp-form .row.fieldset {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  margin: 0 !important;
+}
+
+.cp-form .row.fieldset > [class*="col-"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 auto !important;
+
+  padding: 0 !important;
+
+  text-align: left !important;
+}
+
+.cp-form .row.fieldset > [class*="col-"] > label:not(.validation) {
+  margin: 0;
+
+  color: #344054;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.cp-form .row.fieldset .text-danger {
+  margin-left: 2px;
+}
+
+/* ---------- Inputs ---------- */
+.cp-form .input-text {
+  width: 100%;
+  height: 44px;
+
+  padding: 0 14px;
+
+  border: 1px solid var(--cp-border);
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: var(--cp-text);
+
+  font-size: 14px;
+
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.cp-form textarea.input-text {
+  height: auto;
+  min-height: 96px;
+
+  padding: 11px 14px;
+
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.cp-form .input-text::placeholder {
+  color: #98a2b3;
+}
+
+.cp-form .input-text:hover {
+  border-color: #b9c4d2;
+}
+
+.cp-form .input-text:focus {
+  border-color: var(--cp-accent);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(20, 181, 209, 0.14);
+}
+
+/* coupon type switch fills its column */
+.cp-form .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cp-form .input-group > .fx-segmented {
+  width: 100%;
+}
+
+/* validation text under each field */
+.cp-form .row.fieldset label.validation {
+  margin: 4px 0 0;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* ---------- Date pickers: same box as the inputs ---------- */
+.cp-form .engagementCalender.react-date-picker {
+  width: 100%;
+}
+
+.cp-form .engagementCalender .react-date-picker__wrapper {
+  height: 44px;
+
+  padding: 0 8px 0 14px;
+
+  border: 1px solid var(--cp-border) !important;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.cp-form .engagementCalender.react-date-picker--open .react-date-picker__wrapper,
+.cp-form .engagementCalender .react-date-picker__wrapper:focus-within {
+  border-color: var(--cp-accent) !important;
+  box-shadow: 0 0 0 4px rgba(20, 181, 209, 0.14);
+}
+
+.cp-form .engagementCalender .react-date-picker__inputGroup {
+  min-width: 0;
+  color: var(--cp-text);
+  font-size: 14px;
+}
+
+.cp-form .engagementCalender .react-date-picker__inputGroup__input {
+  color: var(--cp-text);
+}
+
+.cp-form .engagementCalender .react-date-picker__inputGroup__day:not(.react-date-picker__inputGroup__input--hasLeadingZero),
+.cp-form .engagementCalender .react-date-picker__inputGroup__month:not(.react-date-picker__inputGroup__input--hasLeadingZero) {
+  min-width: calc(2ch + 2px) !important;
+}
+
+.cp-form .engagementCalender .react-date-picker__inputGroup__input--hasLeadingZero {
+  min-width: calc(1ch + 2px) !important;
+}
+
+.cp-form .engagementCalender .react-date-picker__inputGroup__year {
+  min-width: calc(4ch + 2px) !important;
+}
+
+.cp-form .engagementCalender .react-date-picker__inputGroup__divider {
+  padding: 0 2px;
+  color: #98a2b3;
+}
+
+.cp-form .engagementCalender .react-date-picker__button {
+  padding: 4px 6px;
+}
+
+.cp-form .engagementCalender .react-date-picker__button svg {
+  stroke: #98a2b3;
+}
+
+.cp-form .engagementCalender .react-date-picker__button:hover svg {
+  stroke: var(--cp-accent-dark);
+}
+
+/* calendar popup: above the modal footer, styled like the menus */
+.cp-form .react-date-picker__calendar {
+  z-index: 1080 !important;
+}
+
+.cp-form .react-date-picker__calendar .react-calendar {
+  overflow: hidden;
+
+  border: 1px solid #e3e8ef;
+  border-radius: 12px;
+
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+
+  font-size: 13px;
+}
+
+/* ---------- Footer ---------- */
+.cp-form .modal-footer {
+  padding: 14px 22px 18px;
+
+  border-top: 1px solid #e8edf3;
+}
+
+.cp-form .modal-footer .hstack {
+  gap: 10px !important;
+}
+
+.cp-form .modal-footer .btn {
+  height: 42px !important;
+  min-width: 104px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 22px !important;
+
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.cp-form .modal-footer .btn-light {
+  border: 1px solid var(--cp-border) !important;
+  background: #ffffff !important;
+  color: #344054 !important;
+}
+
+.cp-form .modal-footer .btn-light:hover {
+  border-color: #b9c4d2 !important;
+  background: #f6f8fb !important;
+}
+
+.cp-form .modal-footer #add-btn.create-item-btn {
+  border: 1px solid #0ea5c0 !important;
+  background: var(--cp-accent) !important;
+  color: #ffffff !important;
+
+  box-shadow: 0 6px 16px -6px rgba(20, 181, 209, 0.7);
+}
+
+.cp-form .modal-footer #add-btn.create-item-btn:hover {
+  border-color: #0b92ab !important;
+  background: #0ea5c0 !important;
+}
+
+/* ---------- Narrow screens: one column ---------- */
+@media (max-width: 575.98px) {
+  .cp-form .modal-body > .p-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-form .modal-body > .p-3 > .fieldset {
+    grid-column: 1 / -1;
+  }
+}
