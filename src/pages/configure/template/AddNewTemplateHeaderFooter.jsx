@@ -1892,6 +1892,7 @@ if (isHeaderEmpty && isFooterEmpty) {
         {/* <!-- end card --> */}
       </div>
       <SuccessModal
+        keepPopup
         handleClose={handleClose}
         setDismissModal={setDismissModal}
         setIsCheck={setIsCheck}

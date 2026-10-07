@@ -25613,6 +25613,7 @@ const Add_Update_Proposal = (props) => {
           modelRequestData={modelRequestData}
         />
         <SuccessModal
+          keepPopup={openEmailFailurePopUp}
           handleClose={handleClose}
           setOpenSuccessModal={setOpenSuccessModal}
           openSuccessModal={openSuccessModal}

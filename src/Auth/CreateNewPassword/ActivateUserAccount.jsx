@@ -737,6 +737,7 @@ const CreateNewPassword = () => {
         </div>
       </div>
       <SuccessModal
+        keepPopup
         openSuccessModal={openSuccessModal}
         handleClose={handleCloseModal}
         isBackDropDisplay={true}

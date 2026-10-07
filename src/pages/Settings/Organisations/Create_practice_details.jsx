@@ -4911,6 +4911,7 @@ const Create_practice_details = () => {
         modelAction={modelAction}
       />
       <SuccessModal
+        keepPopup
         handleClose={handleSuccessPopupOk}
         setDismissModal={setDismissModal}
         setOpenSuccessModal={setOpenSuccessModal}

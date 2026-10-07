@@ -1,6 +1,7 @@
 // ------------------------------------Pages with loader--------------------------------------------
 import { useEffect, useState } from "react";
 import Index from "./routes/Index";
+import { SuccessToastHost } from "./components/SuccessToast";
 import Img from "../src/assets/images/internetdis.png";
 // -----------------------------------App Component------------------------------------------------
 function App() {
@@ -77,6 +78,7 @@ function App() {
 
   return (
     <>
+      <SuccessToastHost />
       {status ? (
         <Index />
       ) : (

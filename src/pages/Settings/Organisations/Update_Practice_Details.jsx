@@ -95,6 +95,8 @@ const Update_Practice_Details = () => {
   const [dismissModal, setDismissModal] = useState(null);
   const [DateValidation, setDateValidation] = useState(false);
   const [openSuccessModal, setOpenSuccessModal] = React.useState(false);
+  // true while AddUpdateOrganisationData is still running (signature / logo requests)
+  const [isSavingPractice, setIsSavingPractice] = React.useState(false);
   const [officerCount, setOfficerCount] = useState(0);
   const [modelAction, setModelAction] = useState("Update");
   const [isChecked, setIsChecked] = useState(false);
@@ -1234,6 +1236,7 @@ const Update_Practice_Details = () => {
   };
   // Add or Update Service Category Data
   const AddUpdateOrganisationData = async (apiRequestParams) => {
+    setIsSavingPractice(true);
     setLoader(true);
     try {
       const Action = "Update";
@@ -1325,6 +1328,8 @@ const Update_Practice_Details = () => {
     } catch (error) {
       setLoader(false);
       console.error(error);
+    } finally {
+      setIsSavingPractice(false);
     }
   };
 
@@ -3917,6 +3922,7 @@ const Update_Practice_Details = () => {
           otherInfo={otherInfo}
         />
         <SuccessModal
+          holdClose={isSavingPractice}
           handleClose={handleClose}
           setDismissModal={setDismissModal}
           setOpenSuccessModal={setOpenSuccessModal}

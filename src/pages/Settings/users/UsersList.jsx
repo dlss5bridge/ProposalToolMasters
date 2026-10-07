@@ -694,6 +694,7 @@ const UsersList = () => {
         />
 
         <SuccessModal
+          keepPopup
           handleClose={handleClose}
           setOpenSuccessModal={setOpenSuccessModal}
           openSuccessModal={openSuccessModal}
