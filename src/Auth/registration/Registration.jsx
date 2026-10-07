@@ -346,6 +346,7 @@ function Registration() {
                 </label>
                 <div className="phone-input-div phone">
                   <Select
+                    classNamePrefix="app-select"
                     style={{ padding: "5px", width: "100%" }}
                     class="phone-input-country-code"
                     options={CountryCodeOption}
@@ -391,6 +392,7 @@ function Registration() {
                 </label>
 
                 <Select
+                  classNamePrefix="app-select"
                   style={{ padding: "5px", width: "100%" }}
                   class="registrationPhone"
                   options={CountryNameOption.slice(2)}

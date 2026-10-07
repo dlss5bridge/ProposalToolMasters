@@ -415,6 +415,7 @@ function UpdateFreeSubscriptionPackageReminder() {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             className="user-role-select"
                             placeholder="Select..."
                             options={emailTemplateTypeLookupList}
@@ -446,6 +447,7 @@ function UpdateFreeSubscriptionPackageReminder() {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             isDisabled
                             className="user-role-select"
                             placeholder="Select..."
@@ -544,6 +546,7 @@ function UpdateFreeSubscriptionPackageReminder() {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             className="user-role-select"
                             placeholder="Select..."
                             options={Utils.periods}
@@ -568,6 +571,7 @@ function UpdateFreeSubscriptionPackageReminder() {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             isDisabled
                             className="user-role-select"
                             placeholder="Select..."

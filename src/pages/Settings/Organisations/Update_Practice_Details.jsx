@@ -2160,6 +2160,7 @@ const Update_Practice_Details = () => {
                         Incorporated In<span className="pd-req">*</span>
                       </label>
                       <Select
+                        classNamePrefix="app-select"
                         className="CurrencySelect pd-select"
                         options={incorporatedInList}
                         value={IncorporatedValue}
@@ -2610,6 +2611,7 @@ const Update_Practice_Details = () => {
                   </label>
                   <div className="phone-input-div CompanyInfo pd-phone">
                     <Select
+                      classNamePrefix="app-select"
                       className="phone-input-country-code pd-select"
                       options={countryCodes}
                       value={
@@ -2739,6 +2741,7 @@ const Update_Practice_Details = () => {
                     Currency<span className="pd-req">*</span>
                   </label>
                   <Select
+                    classNamePrefix="app-select"
                     className="CurrencySelect pd-select"
                     options={currencyType}
                     value={currencyFilter}
@@ -3020,6 +3023,7 @@ const Update_Practice_Details = () => {
                         </label>
                         <div className="phone-input-div CompanyInfo pd-phone">
                           <Select
+                            classNamePrefix="app-select"
                             className="pd-select"
                             options={countryCodes}
                             value={officersForm[index].phoneCountryCodeID}
@@ -3314,6 +3318,7 @@ const Update_Practice_Details = () => {
                           </label>
                           <div className="phone-input-div pd-phone">
                             <Select
+                              classNamePrefix="app-select"
                               className="phone-input-country-code pd-select"
                               options={countryCodes}
                               value={officersForm[index].phoneCountryCodeID}
@@ -3703,6 +3708,7 @@ const Update_Practice_Details = () => {
                           <label className="pd-label">Phone</label>
                           <div className="phone-input-div pd-phone">
                             <Select
+                              classNamePrefix="app-select"
                               className="phone-input-country-code pd-select"
                               options={countryCodes}
                               value={officersForm[index].phoneCountryCodeID}

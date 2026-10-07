@@ -231,6 +231,7 @@ const Basic_information = (props) => {
                     Profession Types<span className="cp-req">*</span>
                   </label>
                   <Select
+                    classNamePrefix="app-select"
                     isMulti
                     className="cp-select"
                     options={props.ProfessionalTypeLookeupListOptions}
@@ -252,6 +253,7 @@ const Basic_information = (props) => {
                     Business Type<span className="cp-req">*</span>
                   </label>
                   <Select
+                    classNamePrefix="app-select"
                     className="cp-select"
                     options={props.BusinessTypeLookupList}
                     value={{
@@ -729,6 +731,7 @@ const Basic_information = (props) => {
                         Incorporated In<span className="cp-req">*</span>
                       </label>
                       <Select
+                        classNamePrefix="app-select"
                         className="CurrencySelect cp-select"
                         options={props.incorporatedInList}
                         value={IncorporatedValue}
@@ -1271,6 +1274,7 @@ const OfficerDetails = (props) => {
                         </label>
                         <div className="phone-input-div cp-phone">
                           <Select
+                            classNamePrefix="app-select"
                             className="createCompanyInfo cp-select"
                             options={props.countryCodes}
                             value={
@@ -1628,6 +1632,7 @@ const OfficerDetails = (props) => {
                           </label>
                           <div className="phone-input-div cp-phone">
                             <Select
+                              classNamePrefix="app-select"
                               className="createCompanyInfo cp-select"
                               options={props.countryCodes}
                               value={
@@ -2037,6 +2042,7 @@ const OfficerDetails = (props) => {
                           <label className="cp-label">Phone</label>
                           <div className="phone-input-div cp-phone">
                             <Select
+                              classNamePrefix="app-select"
                               className="createCompanyInfo cp-select"
                               options={props.countryCodes}
                               value={
@@ -2390,6 +2396,7 @@ const OtherInformation = (props) => {
                     Preferred Currency<span className="cp-req">*</span>
                   </label>
                   <Select
+                    classNamePrefix="app-select"
                     className="CurrencySelect cp-select"
                     options={props.currencyType}
                     value={currencyFilter}
@@ -2583,6 +2590,7 @@ const OtherInformation = (props) => {
                   </label>
                   <div className="phone-input-div cp-phone">
                     <Select
+                      classNamePrefix="app-select"
                       className="createCompanyInfo cp-select"
                       options={props.countryCodes}
                       value={PhoneValue}

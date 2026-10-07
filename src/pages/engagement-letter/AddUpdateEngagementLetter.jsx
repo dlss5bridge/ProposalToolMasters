@@ -170,6 +170,7 @@ const BasicInformationComponent = (props) => {
                       <span class="text-danger">*</span>
                     </label>
                     <Select
+                      classNamePrefix="app-select"
                       className="phone-input-country-code selectDropDown"
                       value={props.SelectSourceValue}
                       options={props.updatedData}
@@ -208,6 +209,7 @@ const BasicInformationComponent = (props) => {
                         </button>
                       </div>
                       <Select
+                        classNamePrefix="app-select"
                         className="phone-input-country-code selectDropDown"
                         value={
                           props.ClientValue === undefined
@@ -239,6 +241,7 @@ const BasicInformationComponent = (props) => {
                         <span class="text-danger">*</span>
                       </label>
                       <Select
+                        classNamePrefix="app-select"
                         className="phone-input-country-code selectDropDown"
                         value={props.SelectProposalTypeValue}
                         options={props.proposalLookUpOptions}
@@ -268,6 +271,7 @@ const BasicInformationComponent = (props) => {
                         <span class="text-danger">*</span>
                       </label>
                       <Select
+                        classNamePrefix="app-select"
                         className="phone-input-country-code selectDropDown"
                         value={
                           props.selectPackagesTypeValue === undefined
@@ -314,6 +318,7 @@ const BasicInformationComponent = (props) => {
                       <span class="text-danger">*</span>
                     </label>
                     <Select
+                      classNamePrefix="app-select"
                       className="user-role-select"
                       options={props.templateLookUpOptions}
                       value={
@@ -2215,6 +2220,7 @@ const ReviewServicesComponent = (props) => {
                       <div className="input-group">
                         {/* Adjust the Select component as needed */}
                         <Select
+                          classNamePrefix="app-select"
                           className="phone-input-country-code selectDropDown Drop-down-width"
                           value={feeTypeValue}
                           onChange={(e) => {
@@ -2250,6 +2256,7 @@ const ReviewServicesComponent = (props) => {
                         </button>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             className="phone-input-country-code selectDropDown Drop-down-width"
                             value={PaymentGatewayValue}
                             onChange={(e) => {
@@ -2368,6 +2375,7 @@ const ReviewServicesComponent = (props) => {
                         <div className="col-md-4 col-sm-12">
                           <div className="input-group">
                             <Select
+                              classNamePrefix="app-select"
                               className="phone-input-country-code selectDropDown Drop-down-width"
                               value={selectedFrequency}
                               onChange={handlePaymentFrequencyChange}
@@ -6310,6 +6318,7 @@ const ReviewPackagesComponent = (props) => {
                       <div className="input-group">
                         {/* Add your Select component here */}
                         <Select
+                          classNamePrefix="app-select"
                           className="phone-input-country-code selectDropDown Drop-down-width"
                           value={feeTypeValue}
                           onChange={(e) => {
@@ -6347,6 +6356,7 @@ const ReviewPackagesComponent = (props) => {
                       </button>
                       <div className="mb-1 input-group">
                         <Select
+                          classNamePrefix="app-select"
                           className="phone-input-country-code selectDropDown Drop-down-width"
                           value={PaymentGatewayValue}
                           onChange={(e) => {
@@ -6479,6 +6489,7 @@ const ReviewPackagesComponent = (props) => {
                       </div>
                       <div className="col-lg-4">
                         <Select
+                          classNamePrefix="app-select"
                           className="phone-input-country-code selectDropDown Drop-down-width"
                           value={selectedFrequency}
                           onChange={handlePaymentFrequencyChange}

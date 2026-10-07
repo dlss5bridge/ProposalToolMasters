@@ -348,6 +348,7 @@ const BasicInformationComponent = (props) => {
                       <span class="text-danger">*</span>
                     </label>
                     <Select
+                      classNamePrefix="app-select"
                       className="user-role-select"
                       options={props.clientLookUpOptions}
                       value={selectedClientValue}
@@ -372,6 +373,7 @@ const BasicInformationComponent = (props) => {
                       <span class="text-danger">*</span>
                     </label>
                     <Select
+                      classNamePrefix="app-select"
                       className="user-role-select"
                       options={props.templateLookUpOptions}
                       value={selectedTemplateValue}
@@ -3866,6 +3868,7 @@ const ReviewServicesComponent = (props) => {
                       <div className="input-group">
                         {/* Add your Select component here */}
                         <Select
+                          classNamePrefix="app-select"
                           className="phone-input-country-code selectDropDown Drop-down-width"
                           value={feeTypeValue}
                           onChange={(e) => {
@@ -3990,6 +3993,7 @@ const ReviewServicesComponent = (props) => {
                       </div>
                       <div className="col-md-4 col-sm-12">
                         <Select
+                          classNamePrefix="app-select"
                           className="phone-input-country-code selectDropDown Drop-down-width"
                           value={selectedFrequency}
                           onChange={handlePaymentFrequencyChange}
@@ -11618,6 +11622,7 @@ const ReviewPackagesComponent = (props) => {
                       <div className="input-group">
                         {/* Add your Select component here */}
                         <Select
+                          classNamePrefix="app-select"
                           className="phone-input-country-code selectDropDown Drop-down-width"
                           value={feeTypeValue}
                           onChange={(e) => {
@@ -11748,6 +11753,7 @@ const ReviewPackagesComponent = (props) => {
                       </div>
                       <div className="col-lg-4">
                         <Select
+                          classNamePrefix="app-select"
                           className="phone-input-country-code selectDropDown Drop-down-width"
                           value={selectedFrequency}
                           onChange={handlePaymentFrequencyChange}

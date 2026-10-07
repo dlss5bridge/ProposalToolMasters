@@ -3147,6 +3147,7 @@ const View_Proposals = () => {
                                               <div className="input-group">
                                                 {/* Adjust the Select component as needed */}
                                                 <Select
+                                                  classNamePrefix="app-select"
                                                   isDisabled
                                                   className="phone-input-country-code selectDropDown Drop-down-width"
                                                   value={PaymentGatewayValue}
@@ -3262,6 +3263,7 @@ const View_Proposals = () => {
                                               </div>
                                               <div className="col-lg-4">
                                                 <Select
+                                                  classNamePrefix="app-select"
                                                   isDisabled
                                                   className="phone-input-country-code selectDropDown Drop-down-width"
                                                   value={selectedFrequency}
@@ -6330,6 +6332,7 @@ const View_Proposals = () => {
                                       <div className="input-group">
                                         {/* Adjust the Select component as needed */}
                                         <Select
+                                          classNamePrefix="app-select"
                                           isDisabled
                                           className="phone-input-country-code selectDropDown Drop-down-width"
                                           value={PaymentGatewayValue}
@@ -6421,6 +6424,7 @@ const View_Proposals = () => {
                                                 </div>
                                                 <div className="col-md-4 col-sm-12">
                                                   <Select
+                                                    classNamePrefix="app-select"
                                                     isDisabled
                                                     className="phone-input-country-code selectDropDown Drop-down-width"
                                                     value={selectedFrequency}

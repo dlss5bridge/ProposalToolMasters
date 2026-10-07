@@ -397,6 +397,7 @@ function UnpaidUpdateAccountDeletion() {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             className="user-role-select"
                             placeholder="Select..."
                             options={emailTemplateTypeLookupList}
@@ -428,6 +429,7 @@ function UnpaidUpdateAccountDeletion() {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             isDisabled
                             className="user-role-select"
                             placeholder="Select..."
@@ -521,6 +523,7 @@ function UnpaidUpdateAccountDeletion() {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             className="user-role-select"
                             placeholder="Select..."
                             options={Utils.periods}
@@ -545,6 +548,7 @@ function UnpaidUpdateAccountDeletion() {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             isDisabled
                             className="user-role-select"
                             placeholder="Select..."

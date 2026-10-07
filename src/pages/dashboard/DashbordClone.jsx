@@ -1275,6 +1275,7 @@ const Dashboard = () => {
             <div className="row align-items-center left-margin dashboard-filter-row">
               <div className="col-lg-6 col-md-8 col-sm-8 dashboard-filter-col">
                 <Select
+                  classNamePrefix="app-select"
                   className="user-role-select phone-input-country-code"
                   options={Utils.CalenderFilter}
                   value={selectedOption}

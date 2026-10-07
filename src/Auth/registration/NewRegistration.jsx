@@ -779,6 +779,7 @@ const NewRegistration = () => {
                             <div className="phone-input-div">
                               <div className="phone-input-country-code">
                                 <Select
+                                  classNamePrefix="app-select"
                                   style={{ padding: "5px", width: "100%" }}
                                   options={CountryCodeOption}
                                   value={regObj.phoneCode}
@@ -830,6 +831,7 @@ const NewRegistration = () => {
 
                           <div className="row-f country-signup">
                             <Select
+                              classNamePrefix="app-select"
                               style={{ padding: "5px", width: "100%" }}
                               options={CountryNameOption.slice(2)}
                               value={regObj.country}

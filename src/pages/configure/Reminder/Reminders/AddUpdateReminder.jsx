@@ -569,6 +569,7 @@ function AddUpdateReminder(props) {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             className="user-role-select"
                             placeholder="Select..."
                             options={emailTemplateTypeLookupList}
@@ -602,6 +603,7 @@ function AddUpdateReminder(props) {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             className="user-role-select"
                             placeholder="Select..."
                             options={emailAddressTypeLookupList}
@@ -637,6 +639,7 @@ function AddUpdateReminder(props) {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             isMulti
                             className="user-role-select"
                             placeholder="Select..."
@@ -713,6 +716,7 @@ function AddUpdateReminder(props) {
                             </label>
                             <div className="input-group">
                               <Select
+                                classNamePrefix="app-select"
                                 className="user-role-select"
                                 placeholder="Select..."
                                 options={Utils.periods}
@@ -746,6 +750,7 @@ function AddUpdateReminder(props) {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             className="user-role-select"
                             placeholder="Select..."
                             options={triggerPointTypeLookupList}
@@ -800,6 +805,7 @@ function AddUpdateReminder(props) {
                               </label>
                               <div className="input-group">
                                 <Select
+                                  classNamePrefix="app-select"
                                   className="user-role-select"
                                   placeholder="Select..."
                                   options={frequencyTypeLookupList}

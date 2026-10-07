@@ -1854,6 +1854,7 @@ const View_Engagement_Latter = () => {
                                     <div className="input-group">
                                       {/* Adjust the Select component as needed */}
                                       <Select
+                                        classNamePrefix="app-select"
                                         isDisabled
                                         className="phone-input-country-code selectDropDown Drop-down-width"
                                         value={PaymentGatewayValue}
@@ -1968,6 +1969,7 @@ const View_Engagement_Latter = () => {
                                           </div>
                                           <div className="col-md-4 col-sm-12">
                                             <Select
+                                              classNamePrefix="app-select"
                                               isDisabled
                                               className="phone-input-country-code selectDropDown Drop-down-width"
                                               value={selectedFrequency}

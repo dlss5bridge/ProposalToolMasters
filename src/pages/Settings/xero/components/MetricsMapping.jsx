@@ -237,6 +237,7 @@ export default function MappingUI({
               {/* SELECT */}
               <div className="mb-3">
                 <Select
+                  classNamePrefix="app-select"
                   isMulti
                   options={driverOptions}
                   value={data.selectedDrivers || []}

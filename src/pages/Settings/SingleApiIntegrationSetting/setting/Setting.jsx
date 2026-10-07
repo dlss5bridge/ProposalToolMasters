@@ -1550,6 +1550,7 @@ function Setting() {
       </label>
       <div className="api-field-control">
         <Select
+          classNamePrefix="app-select"
           className="selectDropDown Drop-down-width"
           value={value}
           onChange={(e) => {
@@ -1686,6 +1687,7 @@ function Setting() {
               <div className="api-inline-control">
                 <div className="api-field-control api-field-control-grow">
                   <Select
+                    classNamePrefix="app-select"
                     className="selectDropDown Drop-down-width"
                     value={PaymentGatewayValue}
                     onChange={(e) => {
@@ -1777,6 +1779,7 @@ function Setting() {
                 </label>
                 <div className="api-field-control">
                   <Select
+                    classNamePrefix="app-select"
                     className="selectDropDown Drop-down-width"
                     value={TermAndConditionValue}
                     onChange={(e) => {
@@ -1862,6 +1865,7 @@ function Setting() {
                 </label>
                 <div className="api-field-control">
                   <Select
+                    classNamePrefix="app-select"
                     className="selectDropDown Drop-down-width"
                     value={EmailTemplateValueForContract}
                     onChange={(e) => {
@@ -1912,6 +1916,7 @@ function Setting() {
               </label>
               <div className="api-field-control">
                 <Select
+                  classNamePrefix="app-select"
                   isMulti
                   className="selectDropDown Drop-down-width"
                   value={ProposalTypeValue}
@@ -1996,6 +2001,7 @@ function Setting() {
                 </label>
                 <div className="api-field-control">
                   <Select
+                    classNamePrefix="app-select"
                     className="selectDropDown Drop-down-width"
                     value={EmailTemplateValueForQuote}
                     onChange={(e) => {
@@ -2271,6 +2277,7 @@ function Setting() {
                 </label>
                 <div className="api-field-control">
                   <Select
+                    classNamePrefix="app-select"
                     className="selectDropDown Drop-down-width"
                     value={FontFamilyValue}
                     onChange={(e) => {
@@ -2301,6 +2308,7 @@ function Setting() {
                 </label>
                 <div className="api-field-control">
                   <Select
+                    classNamePrefix="app-select"
                     className="selectDropDown Drop-down-width"
                     value={FontSizeHeadingValue}
                     onChange={(e) => {
@@ -2331,6 +2339,7 @@ function Setting() {
                 </label>
                 <div className="api-field-control">
                   <Select
+                    classNamePrefix="app-select"
                     className="selectDropDown Drop-down-width"
                     value={FontSizeTextValue}
                     onChange={(e) => {

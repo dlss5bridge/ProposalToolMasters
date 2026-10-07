@@ -12179,6 +12179,7 @@ ${
             {/* Format Select */}
             <div className="col-lg-4 col-md-4 col-sm-6 d-flex align-items-center  mt-4">
               <Select
+                classNamePrefix="app-select"
                 menuPosition="auto"
                 className="phone-input-country-code selectDropDown"
                 options={
@@ -12219,6 +12220,7 @@ ${
                       + Payment Gateway
                     </button>
                     <Select
+                      classNamePrefix="app-select"
                       className="phone-input-country-code selectDropDown"
                       value={Utils.payment_gateway.find(
                         (item) =>

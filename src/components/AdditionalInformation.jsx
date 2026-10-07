@@ -768,6 +768,7 @@ const AdditionalInformation = (props) => {
                                 <div class="mb-1 ">
                                   <div class="input-group">
                                     <Select
+                                      classNamePrefix="app-select"
                                       options={i.variation?.map((item) => ({
                                         value: item.variationID,
                                         label: item.variationName,
@@ -1051,6 +1052,7 @@ const AdditionalInformation = (props) => {
                                 <div class="mb-1 ">
                                   <div class="input-group">
                                     <Select
+                                      classNamePrefix="app-select"
                                       options={i.slab?.map((item) => ({
                                         value: item.slabID,
                                         label:
@@ -1433,6 +1435,7 @@ const AdditionalInformation = (props) => {
                         <div>
                           <div className="input-group">
                             <Select
+                              classNamePrefix="app-select"
                               options={props.TnCLookupList}
                               value={props?.SelectTnCTemplateValue} // Assuming 'index' is defined somewhere
                               onChange={(e) => {

@@ -433,6 +433,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             className="user-role-select"
                             placeholder="Select..."
                             options={emailTemplateTypeLookupList}
@@ -466,6 +467,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
 
                             className="user-role-select"
                             placeholder="Select..."
@@ -571,6 +573,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                             </label>
                             <div className="input-group">
                               <Select
+                                classNamePrefix="app-select"
                                 className="user-role-select"
                                 placeholder="Select..."
                                 options={Utils.periods}
@@ -608,6 +611,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                         </label>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
 
                             className="user-role-select"
                             placeholder="Select..."
@@ -705,6 +709,7 @@ function SuperAdminMarketingReminderAddUpdate(props) {
                                 </label>
                                 <div className="input-group">
                                   <Select
+                                    classNamePrefix="app-select"
                                     className="user-role-select"
                                     placeholder="Select..."
                                     options={frequencyTypeLookupList}

@@ -4,6 +4,7 @@ import Select from "react-select";
 const DropDown = (props) => {
   return (
     <Select
+      classNamePrefix="app-select"
       className={props.className}
       defaultValue="Select..."
       options={props.options} // Access DialCode from the imported module

@@ -1,0 +1,175 @@
+/* =========================================================
+   DROPDOWN MENUS — one look for every react-select options list
+   ---------------------------------------------------------
+   Matches react-select parts by their BEM class (<prefix>__menu,
+   __option, __option--is-focused …) together with the emotion
+   "css-…" class that only react-select renders, so other components
+   using "__option" names (segmented controls, option cards…) are
+   not touched. Works for every classNamePrefix in the app.
+
+   Only the menu's look changes: no widths, positions or z-index,
+   so menus open where they did before. The fields are unchanged.
+   Repeated attribute selectors + !important keep this above the
+   page-level menu styles so every dropdown looks the same.
+   ========================================================= */
+
+:root {
+  --sm-text: #344054;
+  --sm-muted: #98a2b3;
+  --sm-border: #e3e8ef;
+  --sm-hover-bg: #f1f9fb;
+  --sm-hover-text: #0b6f83;
+  --sm-selected-bg: #e6f6fa;
+  --sm-selected-text: #075e6f;
+  --sm-accent: #14b5d1;
+}
+
+@keyframes sm-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Menu card ---------- */
+[class*="__menu "][class*=" css-"][class*=" css-"] {
+  margin-top: 6px !important;
+  overflow: hidden !important;
+
+  border: 1px solid var(--sm-border) !important;
+  border-radius: 12px !important;
+
+  background: #ffffff !important;
+  box-shadow:
+    0 16px 36px -6px rgba(16, 24, 40, 0.16),
+    0 4px 10px -2px rgba(16, 24, 40, 0.06) !important;
+
+  animation: sm-menu-in 0.14s ease-out;
+}
+
+/* ---------- Scrollable list ---------- */
+[class*="__menu-list"][class*=" css-"][class*=" css-"] {
+  padding: 6px !important;
+
+  scrollbar-width: thin;
+  scrollbar-color: #cfd6df transparent;
+}
+
+[class*="__menu-list"][class*=" css-"]::-webkit-scrollbar {
+  width: 6px;
+}
+
+[class*="__menu-list"][class*=" css-"]::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background: #cfd6df;
+}
+
+/* ---------- Options ---------- */
+[class*="__option"][class*=" css-"][class*=" css-"][class*=" css-"] {
+  position: relative;
+
+  margin: 1px 0 !important;
+  padding: 9px 12px !important;
+
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  color: var(--sm-text) !important;
+
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+
+  cursor: pointer !important;
+
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
+}
+
+/* hover + keyboard focus */
+[class*="__option--is-focused"][class*=" css-"][class*=" css-"][class*=" css-"] {
+  background: var(--sm-hover-bg) !important;
+  color: var(--sm-hover-text) !important;
+}
+
+/* chosen value: soft tint, medium weight and a check mark */
+[class*="__option--is-selected"][class*=" css-"][class*=" css-"][class*=" css-"] {
+  padding-right: 34px !important;
+
+  background: var(--sm-selected-bg) !important;
+  color: var(--sm-selected-text) !important;
+
+  font-weight: 600 !important;
+}
+
+[class*="__option--is-selected"][class*=" css-"][class*=" css-"][class*=" css-"]::after {
+  content: "";
+
+  position: absolute;
+  top: 50%;
+  right: 12px;
+
+  width: 14px;
+  height: 14px;
+
+  transform: translateY(-50%);
+
+  background: var(--sm-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+[class*="__option--is-selected"][class*="__option--is-focused"][class*=" css-"][class*=" css-"][class*=" css-"] {
+  background: #d9f1f7 !important;
+}
+
+/* pressed */
+[class*="__option"][class*=" css-"][class*=" css-"][class*=" css-"]:active {
+  background: #dcf2f7 !important;
+}
+
+/* disabled */
+[class*="__option--is-disabled"][class*=" css-"][class*=" css-"][class*=" css-"] {
+  background: transparent !important;
+  color: #b8c0cc !important;
+  cursor: not-allowed !important;
+}
+
+/* ---------- "No options" / "Loading…" ---------- */
+[class*="__menu-notice"][class*=" css-"][class*=" css-"] {
+  padding: 14px 12px !important;
+
+  color: var(--sm-muted) !important;
+
+  font-size: 13px !important;
+}
+
+/* ---------- Group headings ---------- */
+[class*="__group-heading"][class*=" css-"][class*=" css-"] {
+  margin-bottom: 2px !important;
+  padding: 8px 12px 4px !important;
+
+  color: var(--sm-muted) !important;
+
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="__menu "][class*=" css-"] {
+    animation: none;
+  }
+
+  [class*="__option"][class*=" css-"] {
+    transition: none;
+  }
+}

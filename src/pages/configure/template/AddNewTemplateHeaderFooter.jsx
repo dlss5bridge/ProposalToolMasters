@@ -1142,6 +1142,7 @@ if (isHeaderEmpty && isFooterEmpty) {
                               {common.professionTypeLists?.length > 1 ||
                                 common.organisationKeyID === null ? (
                                 <Select
+                                  classNamePrefix="app-select"
                                   isMulti
                                   style={{ padding: "5px" }}
                                   className="user-role-select"
@@ -1194,6 +1195,7 @@ if (isHeaderEmpty && isFooterEmpty) {
                               <div className="input-group user-role-select">
                                 {common.organisationKeyID !== null ? (
                                     <Select
+                                    classNamePrefix="app-select"
                                     isMulti
                                     className="user-role-select"
                                     options={[allOption, ...TemplateList]}
@@ -1287,6 +1289,7 @@ if (isHeaderEmpty && isFooterEmpty) {
                     <div className="">
                       <div className="input-group">
                         <Select
+                          classNamePrefix="app-select"
                           className="user-role-select"
                           options={TemplateTypeLookupList}
                           value={TemplateTypeLookupList.find((t) => t.value === TemplateObj.templateTypeID) || null}
@@ -1333,6 +1336,7 @@ if (isHeaderEmpty && isFooterEmpty) {
                     <div className="">
                       <div className="mb-1 input-group">
                         <Select
+                        classNamePrefix="app-select"
                         className="user-role-select"
                         options={Utils.heightOptions}
                         value={Utils.heightOptions.find(option => option.value === TemplateObj.headerHeight) || 
@@ -1368,6 +1372,7 @@ if (isHeaderEmpty && isFooterEmpty) {
                     <div className="">
                       <div className="mb-1 input-group">
                       <Select
+                        classNamePrefix="app-select"
                         className="user-role-select"
                         options={Utils.heightOptions}
                         value={Utils.heightOptions.find(option => option.value === TemplateObj.footerHeight) || 

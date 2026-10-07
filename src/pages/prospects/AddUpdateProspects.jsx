@@ -535,6 +535,7 @@ const Basic_information = (props) => {
                   <PfField id={`Phone_Div_${index}`} label="Phone Number">
                     <div className="phone-input-div">
                       <Select
+                        classNamePrefix="app-select"
                         {...PF_SELECT_PROPS}
                         style={{ padding: "5px", width: "20%" }}
                         className="createCompanyInfo"
@@ -820,6 +821,7 @@ const Basic_information = (props) => {
 
             <PfField label="Nature Of Business">
               <Select
+                classNamePrefix="app-select"
                 {...PF_SELECT_PROPS}
                 className="user-role-select"
                 style={{ padding: "5px", width: "20%" }}
@@ -1037,6 +1039,7 @@ const Basic_information = (props) => {
 
               <PfField id="InCorporateIDDiv" label="Incorporated In" required>
                 <Select
+                  classNamePrefix="app-select"
                   {...PF_SELECT_PROPS}
                   className="CurrencySelect"
                   options={props.incorporatedInList}
@@ -1054,6 +1057,7 @@ const Basic_information = (props) => {
 
               <PfField id="NOBTypeDiv" label="Nature Of Business">
                 <Select
+                  classNamePrefix="app-select"
                   {...PF_SELECT_PROPS}
                   className="user-role-select"
                   style={{ padding: "5px", width: "20%" }}
@@ -1356,6 +1360,7 @@ const OfficerDetails = (props) => {
     <PfField id={id} label="Phone Number">
       <div className="phone-input-div">
         <Select
+          classNamePrefix="app-select"
           {...PF_SELECT_PROPS}
           style={{ padding: "5px", width: "20%" }}
           className="createCompanyInfo"

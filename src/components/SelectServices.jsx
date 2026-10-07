@@ -1774,6 +1774,7 @@ export default function SelectServices(props) {
                 <span className="text-danger">*</span>
               </label>
               <Select
+                classNamePrefix="app-select"
                 options={i?.variation.map((variation) => ({
                   value: variation.variationID,
                   label: variation.variationName,
@@ -2171,6 +2172,7 @@ export default function SelectServices(props) {
                 <span className="text-danger">*</span>
               </label>
               <Select
+                classNamePrefix="app-select"
                 // options={i.slab.map(
                 //   (i) => ({
                 //     value: i.slabID,
@@ -2328,6 +2330,7 @@ export default function SelectServices(props) {
                 <span className="text-danger">*</span>
               </label>
               <Select
+                classNamePrefix="app-select"
                 options={i?.variation.map((variation) => ({
                   value: variation.variationID,
                   label: variation.variationName,
@@ -2726,6 +2729,7 @@ export default function SelectServices(props) {
                 <span className="text-danger">*</span>
               </label>
               <Select
+                classNamePrefix="app-select"
                 // options={i.slab.map(
                 //   (i) => ({
                 //     value: i.slabID,

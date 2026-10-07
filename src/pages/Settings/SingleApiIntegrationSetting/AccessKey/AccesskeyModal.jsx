@@ -215,6 +215,7 @@ const AccesskeyModal = (props) => {
                 <div class="col-lg-8 col-md-8 col-sm-12">
                   <div className="input-group">
                     <Select
+                      classNamePrefix="app-select"
                       className=" selectDropDown Drop-down-width"
                       value={OrganisationValue}
                       onChange={(e) => {

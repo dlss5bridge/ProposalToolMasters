@@ -1982,6 +1982,7 @@ function Add_New_Templates(props) {
                             {common.professionTypeLists?.length > 1 ||
                             common.organisationKeyID === null ? (
                               <Select
+                                classNamePrefix="app-select"
                                 isMulti
                                 style={{ padding: "5px" }}
                                 className="user-role-select"
@@ -2033,6 +2034,7 @@ function Add_New_Templates(props) {
                         <div className="col-lg-9">
                           <div className="mb-1 input-group">
                             <Select
+                              classNamePrefix="app-select"
                               isMulti
                               className="user-role-select"
                               options={BusinessTypeLookupList.slice(1, 6)}
@@ -2068,6 +2070,7 @@ function Add_New_Templates(props) {
                   <div className="col-lg-9">
                     <div className="mb-1  input-group">
                       <Select
+                        classNamePrefix="app-select"
                         className="user-role-select"
                         options={ProspectTypeVariation}
                         isMulti
@@ -2097,6 +2100,7 @@ function Add_New_Templates(props) {
                   <div className="col-lg-9">
                     <div className="mb-1 input-group ">
                       <Select
+                        classNamePrefix="app-select"
                         className="user-role-select"
                         options={TemplateTypeLookupList}
                         value={templateTypeFilter}
@@ -2233,6 +2237,7 @@ function Add_New_Templates(props) {
                   <div className="col-lg-9">
                     <div className="mb-2 input-group">
                       <Select
+                        classNamePrefix="app-select"
                         className="user-role-select"
                         options={FontFamilyLookupList}
                         value={FontFamilyValue}
@@ -2834,6 +2839,7 @@ function Add_New_Templates(props) {
                             /> */}
                             <div className="input-group">
                               <Select
+                                classNamePrefix="app-select"
                                 className=" selectDropDown Drop-down-width"
                                 value={Utils.FontSize.find(
                                   (item) =>
@@ -2953,6 +2959,7 @@ function Add_New_Templates(props) {
                             /> */}
                             <div className="input-group">
                               <Select
+                                classNamePrefix="app-select"
                                 className=" selectDropDown Drop-down-width"
                                 value={Utils.FontSize.filter(
                                   (item) =>
@@ -3058,6 +3065,7 @@ function Add_New_Templates(props) {
                           <div className="col-2">
                             <div className="input-group">
                               <Select
+                                classNamePrefix="app-select"
                                 className="selectDropDown Drop-down-width"
                                 value={Utils.FontSize.filter(
                                   (item) =>
@@ -3298,6 +3306,7 @@ function Add_New_Templates(props) {
                             /> */}
                             <div className="input-group">
                               <Select
+                                classNamePrefix="app-select"
                                 className=" selectDropDown Drop-down-width"
                                 value={Utils.FontSize.filter(
                                   (item) =>
@@ -3415,6 +3424,7 @@ function Add_New_Templates(props) {
                             /> */}
                             <div className="input-group">
                               <Select
+                                classNamePrefix="app-select"
                                 className=" selectDropDown Drop-down-width"
                                 value={Utils.FontSize.filter(
                                   (item) =>
@@ -3518,6 +3528,7 @@ function Add_New_Templates(props) {
                           <div className="col-2">
                             <div className="input-group">
                               <Select
+                                classNamePrefix="app-select"
                                 className="selectDropDown Drop-down-width"
                                 value={Utils.FontSize.filter(
                                   (item) =>
@@ -3616,6 +3627,7 @@ function Add_New_Templates(props) {
                             <div className="col-md-10">
                               <div className="input-group">
                                 <Select
+                                  classNamePrefix="app-select"
                                   className="user-role-select"
                                   options={TemplatePdfLookupListList.map(
                                     (item) => ({
@@ -3666,6 +3678,7 @@ function Add_New_Templates(props) {
                             <div className="col-md-10">
                               <div className="input-group">
                                 <Select
+                                  classNamePrefix="app-select"
                                   className="user-role-select"
                                   options={TemplatePdfLookupListList.map(
                                     (item) => ({
@@ -3904,6 +3917,7 @@ function Add_New_Templates(props) {
                         <div className="col-md-10">
                           <div className="input-group">
                             <Select
+                              classNamePrefix="app-select"
                               className="user-role-select"
                               options={TemplateElementLookeupListOptions.filter(
                                 (item) =>

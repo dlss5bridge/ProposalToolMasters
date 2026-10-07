@@ -437,6 +437,7 @@ const UserModelNew = (props) => {
                   </label>
                   <div className="phone-input-div upm-phone">
                     <Select
+                      classNamePrefix="app-select"
                       className="phone-input-country-code upm-select"
                       options={CountryCodeOption}
                       value={CountryCodeOption?.filter(
@@ -496,6 +497,7 @@ const UserModelNew = (props) => {
                   </label>
 
                   <Select
+                    classNamePrefix="app-select"
                     className="upm-select"
                     id="customerName-field"
                     options={CountryNameOption.slice(2)}
@@ -524,6 +526,7 @@ const UserModelNew = (props) => {
                     </label>
 
                     <Select
+                      classNamePrefix="app-select"
                       className="user-role-select upm-select"
                       // id="customerName-field"
                       value={userRoleValue}

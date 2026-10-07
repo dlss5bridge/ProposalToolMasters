@@ -758,6 +758,7 @@ function Add_New_Term_And_Condition(props) {
                                 {common.professionTypeLists?.length > 1 ||
                                   common.organisationKeyID === null ? (
                                   <Select
+                                    classNamePrefix="app-select"
                                     isMulti
                                     className="user-role-select"
                                     options={ProfessionalTypeLookeupListOptions}
@@ -811,6 +812,7 @@ function Add_New_Term_And_Condition(props) {
                         <div className="col-lg-9">
                           <div className=" input-group">
                             <Select
+                              classNamePrefix="app-select"
                               className="user-role-select"
                               options={BusinessTypeLookupList.slice(1, 6)}
                               value={orgBusinessTypeFilter}
@@ -893,6 +895,7 @@ function Add_New_Term_And_Condition(props) {
                     <div className="">
                       <div className="input-group">
                         <Select
+                          classNamePrefix="app-select"
                           className="user-role-select"
                           options={TemplateTypeLookupList}
                           value={templateTypeFilter}

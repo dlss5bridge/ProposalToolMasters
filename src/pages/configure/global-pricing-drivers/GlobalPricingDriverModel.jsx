@@ -2243,6 +2243,7 @@ function Modal(props) {
                           </label>
                           <div className="input-group">
                             <Select
+                              classNamePrefix="app-select"
                               className="user-role-select"
                               value={{
                                 value: slabs[0]?.decimalPlaces ?? 2,
@@ -2303,6 +2304,7 @@ function Modal(props) {
                                     </label>
                                     <div className="input-group">
                                       <Select
+                                        classNamePrefix="app-select"
                                         className="user-role-select"
                                         onChange={(selectedOption) => {
                                           setErrorMessage("");
@@ -3100,6 +3102,7 @@ function Modal(props) {
                           </label>
                           <div className="input-group">
                             <Select
+                              classNamePrefix="app-select"
                               className="user-role-select"
                               onChange={(selectedOption) => {
                                 const updatedDrivers = [...quantity];

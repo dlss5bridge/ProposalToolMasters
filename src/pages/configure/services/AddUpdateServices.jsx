@@ -355,6 +355,7 @@ const handleChangePricingType = async (selectedOption) => {
                         props.common.professionTypeLists?.length > 1 ||
                           props.common.organisationKeyID === null ? (
                           <Select
+                            classNamePrefix="app-select"
                             isMulti={
                               props.common.organisationKeyID === null
                                 ? false
@@ -448,6 +449,7 @@ const handleChangePricingType = async (selectedOption) => {
                 </div>
                 <div className="input-group">
                   <Select
+                    classNamePrefix="app-select"
                     isMulti
                     className="crete-new-category-link Select-value-label"
                     options={props.ServiceCategoryLookeupListOptions}
@@ -471,6 +473,7 @@ const handleChangePricingType = async (selectedOption) => {
                 </label>
                 <div className="input-group">
                   <Select
+                    classNamePrefix="app-select"
                     //
                     className="user-role-select"
                     value={serviceChargeTypeValue}
@@ -505,6 +508,7 @@ const handleChangePricingType = async (selectedOption) => {
                 </label>
                 <div className="input-group ">
                   <Select
+                    classNamePrefix="app-select"
                     isMulti
                     className="user-role-select"
                     style={{ padding: "5px", width: "20%" }}
@@ -542,6 +546,7 @@ const handleChangePricingType = async (selectedOption) => {
                 </label>
                 <div className="mb-1 input-group ">
                   <Select
+                    classNamePrefix="app-select"
                     isMulti
                     className="user-role-select"
                     style={{ padding: "5px", width: "20%" }}
@@ -574,6 +579,7 @@ const handleChangePricingType = async (selectedOption) => {
                 </label>
                 <div className="input-group">
                   <Select
+                    classNamePrefix="app-select"
                     value={pricingTypeValue}
                     className="user-role-select"
                     onChange={(selectedOption) => {
@@ -627,6 +633,7 @@ const handleChangePricingType = async (selectedOption) => {
                       <>
                         <div className="input-group">
                           <Select
+                            classNamePrefix="app-select"
                             isMulti
                             value={props.ServiceDependencyValue}
                             options={props.ServiceDependencyLookupList}
@@ -2124,6 +2131,7 @@ const PricingDriversComponent = (props) => {
                                                           </label>
                                                           <div className="input-group">
                                                             <Select
+                                                              classNamePrefix="app-select"
                                                               className="user-role-select"
                                                               // value={(props.pricingDriver[mainIndex].dependsOn_GlobalPricingDriverKeyID === null || props.pricingDriver[mainIndex].dependsOn_DriverID === null) ? "" : props.pricingDriver[mainIndex].dependsOn_GlobalPricingDriverKeyID !== null ? props.pricingDriver.filter((i) => i.globalPricingDriverKeyID === props.pricingDriver[mainIndex].dependsOn_GlobalPricingDriverKeyID).map((item) => ({ value: item.globalPricingDriverKeyID, label: item.driverName })) : props.pricingDriver.filter((i) => i.temp_GlobalPricingDriverID_ForDependancy === props.pricingDriver[mainIndex].dependsOn_DriverID).map((item) => ({ value: item.globalPricingDriverKeyID, label: item.driverName }))}
                                                               value={
@@ -2373,6 +2381,7 @@ const PricingDriversComponent = (props) => {
                                                               </label>
                                                               <div className="input-group">
                                                                 <Select
+                                                                classNamePrefix="app-select"
                                                                 className="user-role-select"
                                                                 value={
                                                                     props
@@ -2702,6 +2711,7 @@ const PricingDriversComponent = (props) => {
                                     </label>
                                     <div className="input-group">
                                       <Select
+                                        classNamePrefix="app-select"
                                         className="user-role-select"
                                         onChange={(selectedOption) => props.OnDecimalPlacesChange(selectedOption, mainIndex)}
                                         isDisabled={
@@ -2835,6 +2845,7 @@ const PricingDriversComponent = (props) => {
                                     </label>
                                     <div className="input-group">
                                       <Select
+                                        classNamePrefix="app-select"
                                         className="user-role-select"
                                         onChange={(selectedOption) =>
                                           props.OnSlabChange(
@@ -2970,6 +2981,7 @@ const PricingDriversComponent = (props) => {
                                               </label>
                                               <div className="input-group">
                                                 <Select
+                                                  classNamePrefix="app-select"
                                                   className="user-role-select"
                                                   onChange={(selectedOption) =>
                                                     props.OnSlabChange(

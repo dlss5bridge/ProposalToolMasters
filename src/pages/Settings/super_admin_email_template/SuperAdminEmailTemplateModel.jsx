@@ -462,6 +462,7 @@ function SuperAdminEmailTemplateModel(props) {
                     <div className="mb-2 ">
                       <div className="input-group">
                         <Select
+                          classNamePrefix="app-select"
                           className="user-role-select"
                           options={TemplateTypeLookupList}
                           value={templateTypeFilter}

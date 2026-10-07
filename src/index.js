@@ -4,6 +4,7 @@ import "./index.css";
 import "./aiBot.css";
 import "./styles/app-font.css";
 import "./styles/filter-button.css";
+import "./styles/select-menu.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import AuthContext from "./AuthContext/AuthContext.jsx";

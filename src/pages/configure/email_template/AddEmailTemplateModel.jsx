@@ -608,6 +608,7 @@ function AddUpdateEmailTemplate(props) {
                             {common.professionTypeLists?.length > 1 ||
                             common.organisationKeyID === null ? (
                               <Select
+                                classNamePrefix="app-select"
                                 isMulti
                                 style={{ padding: "5px" }}
                                 className="user-role-select"
@@ -686,6 +687,7 @@ function AddUpdateEmailTemplate(props) {
                     <div className="mb-2 ">
                       <div className="input-group">
                         <Select
+                          classNamePrefix="app-select"
                           className="user-role-select"
                           options={TemplateTypeLookupList}
                           value={templateTypeFilter}

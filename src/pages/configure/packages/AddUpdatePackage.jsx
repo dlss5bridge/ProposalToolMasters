@@ -77,6 +77,7 @@ export const BasicInformationComponent = (props) => {
                           {props.common.professionTypeLists?.length > 1 ||
                             props.common.organisationKeyID === null ? (
                             <Select
+                              classNamePrefix="app-select"
                               isMulti={
                                 props.common.organisationKeyID === null
                                   ? false
@@ -144,6 +145,7 @@ export const BasicInformationComponent = (props) => {
                     </label>
                     <div className="input-group ">
                       <Select
+                        classNamePrefix="app-select"
                         isMulti
                         className="user-role-select"
                         style={{ padding: "5px", width: "20%" }}
@@ -176,6 +178,7 @@ export const BasicInformationComponent = (props) => {
                     </label>
                     <div className="input-group">
                       <Select
+                        classNamePrefix="app-select"
                         isMulti
                         className="user-role-select"
                         style={{ padding: "5px", width: "20%" }}
