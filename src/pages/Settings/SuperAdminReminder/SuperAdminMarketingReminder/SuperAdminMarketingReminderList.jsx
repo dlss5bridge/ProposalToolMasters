@@ -24,6 +24,7 @@ import { updateState } from "../../../../redux/Persist";
 
 import RecordsAvailablePopupModel from "../../../../components/RecordsAvailablePopupModel";
 import "./SuperAdminMarketingReminderList-redesign.css";
+import { Funnel } from "lucide-react";
 
 function SuperAdminMarketingReminderList() {
   const moduleName = "Other Reminder";
@@ -484,13 +485,10 @@ function SuperAdminMarketingReminderList() {
                                                   data-bs-toggle="modal"
                                                   data-bs-target="#FilterModel"
                                                 >
-                                                  <i
-                                                    className={
-                                                      isFilterApply
-                                                        ? "ri-filter-fill align-bottom "
-                                                        : "ri-filter-fill align-bottom Filter-apply-color"
-                                                    }
-                                                  ></i>
+                                                  <Funnel size={17} strokeWidth={1.9} className={isFilterApply
+                                                        ? "app-filter-icon"
+                                                        : "Filter-apply-color app-filter-icon"} />
+                                                  <span className="app-filter-label">Filter</span>
                                                 </button>
                                               </div>
                                             </Tooltip>

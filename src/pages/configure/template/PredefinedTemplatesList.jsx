@@ -44,6 +44,7 @@ import { updateState } from "../../../redux/Persist";
 
 import { GetInviteUsersList } from "../../../redux/Services/Setting/InviteUserApi";
 import RecordsAvailablePopupModel from "../../../components/RecordsAvailablePopupModel";
+import { Funnel } from "lucide-react";
 function Predefined_Templates() {
   //A]Declare state
   const moduleName = "Template";
@@ -1359,7 +1360,8 @@ function Predefined_Templates() {
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#FilterModel"
                                               >
-                                                <i className="ri-filter-3-line"></i>
+                                                <Funnel size={17} strokeWidth={1.9} className="app-filter-icon" />
+                                                <span className="app-filter-label">Filter</span>
                                               </button>
                                             </Tooltip>
 

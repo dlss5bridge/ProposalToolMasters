@@ -363,7 +363,7 @@
   display: none !important;
 }
 
-.engagement-list-redesign.engagement-list-redesign .table-responsive.table-card > .row .filter i {
+.engagement-list-redesign.engagement-list-redesign .table-responsive.table-card > .row .filter i,.engagement-list-redesign.engagement-list-redesign .table-responsive.table-card > .row .filter .app-filter-icon {
   margin: 0 !important;
   color: inherit !important;
   font-size: 17px !important;

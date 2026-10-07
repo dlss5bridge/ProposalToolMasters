@@ -28,6 +28,7 @@ import ConfirmModel from "../../components/ConfirmationBox";
 import ErrorModel from "../../components/ErrorModel";
 import SuccessModal from "../../components/SuccessModal";
 import { ChoosePlanApi } from "../../redux/Services/Setting/PaymentGatewayApi";
+import { Funnel } from "lucide-react";
 const Organisation = () => {
   let getOrganisationListCallCount = 0;
   const moduleName = "Organisation/Practice";
@@ -712,7 +713,7 @@ const Organisation = () => {
                   className="btn organisation-apply-filter-btn"
                   onClick={ApplyFilter}
                 >
-                  <i className="ri-filter-3-line"></i>
+                  <Funnel size={17} strokeWidth={1.9} className="app-filter-icon" />
                   <span>Apply Filter</span>
                 </button>
 

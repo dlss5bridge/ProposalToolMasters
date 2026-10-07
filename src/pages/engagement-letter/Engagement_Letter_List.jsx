@@ -58,6 +58,7 @@ import {
 import EmailFailurePopUP from "../../components/EmailFailurePopUp";
 import { CreateEngagementInvoice } from "../../redux/reducer/engagementSlice";
 import PdfFileIcon from "../../components/PdfFileIcon";
+import { Funnel } from "lucide-react";
 
 const Engagement_Letter = () => {
   let getEngagementListApiCallCount = 0;
@@ -1626,13 +1627,10 @@ const Engagement_Letter = () => {
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#FilterModel"
                                                       >
-                                                        <i
-                                                          className={
-                                                            isFilterApply
-                                                              ? "ri-filter-fill align-bottom "
-                                                              : "ri-filter-fill align-bottom Filter-apply-color"
-                                                          }
-                                                        ></i>
+                                                        <Funnel size={17} strokeWidth={1.9} className={isFilterApply
+                                                              ? "app-filter-icon"
+                                                              : "Filter-apply-color app-filter-icon"} />
+                                                        <span className="app-filter-label">Filter</span>
                                                       </button>
                                                     </div>
                                                   </Tooltip>
@@ -1762,13 +1760,10 @@ const Engagement_Letter = () => {
                                                         >
                                                           {/* <i class="ri-pencil-fill"></i> */}
 
-                                                          <i
-                                                            className={
-                                                              isFilterApply
-                                                                ? "ri-filter-fill align-bottom "
-                                                                : "ri-filter-fill align-bottom Filter-apply-color"
-                                                            }
-                                                          ></i>
+                                                          <Funnel size={17} strokeWidth={1.9} className={isFilterApply
+                                                                ? "app-filter-icon"
+                                                                : "Filter-apply-color app-filter-icon"} />
+                                                          <span className="app-filter-label">Filter</span>
                                                         </button>
                                                       </div>
                                                     </Tooltip>

@@ -25,6 +25,7 @@ import ErrorModel from "../../../components/ErrorModel";
 import Footer from "../../../components/Footer";
 import RecordsAvailablePopupModel from "../../../components/RecordsAvailablePopupModel";
 import FilterModel from "../../../components/FilterModel";
+import { Funnel } from "lucide-react";
 const Services = () => {
   // A] States Declaration :
   const moduleName = "Service";
@@ -453,7 +454,7 @@ const Services = () => {
                     data-bs-toggle="modal"
                     data-bs-target="#FilterModel"
                   >
-                    <i className="ri-filter-3-line"></i>
+                    <Funnel size={17} strokeWidth={1.9} className="app-filter-icon" />
                     <span>Filter</span>
 
                     {isFilterApply && (

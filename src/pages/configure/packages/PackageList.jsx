@@ -26,6 +26,7 @@ import Footer from "../../../components/Footer";
 import RecordsAvailablePopupModel from "../../../components/RecordsAvailablePopupModel";
 import { updateState } from "../../../redux/Persist";
 import FilterModel from "../../../components/FilterModel";
+import { Funnel } from "lucide-react";
 const Predefined_Package = () => {
   const moduleName = "Package";
   const dispatch = useDispatch();
@@ -476,7 +477,7 @@ const Predefined_Package = () => {
                     data-bs-toggle="modal"
                     data-bs-target="#FilterModel"
                   >
-                    <i className="ri-filter-3-line"></i>
+                    <Funnel size={17} strokeWidth={1.9} className="app-filter-icon" />
                     <span>Filter</span>
 
                     {isFilterApply && (

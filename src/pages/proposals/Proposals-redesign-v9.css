@@ -375,7 +375,11 @@
   .table-responsive.table-card
   > .row
   .filter
-  i {
+  i,.proposal-list-v4.proposal-list-v4
+  .table-responsive.table-card
+  > .row
+  .filter
+  .app-filter-icon {
   margin: 0 !important;
   color: inherit !important;
   font-size: 18px !important;

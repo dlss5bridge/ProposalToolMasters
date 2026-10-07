@@ -8,7 +8,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { parse, isValid, format } from "date-fns";
 import {
   Search,
-  SlidersHorizontal,
   Plus,
   MoreVertical,
   Trash2,
@@ -18,6 +17,7 @@ import {
   Link2,
   ArrowRightLeft,
   ChevronDown,
+  Funnel,
 } from "lucide-react";
 
 import "./ProspectsFigma.css";
@@ -1854,7 +1854,7 @@ const Prospects = () => {
                         data-bs-toggle="modal"
                         data-bs-target="#FilterModel"
                       >
-                        <SlidersHorizontal size={17} strokeWidth={1.9} />
+                        <Funnel size={17} strokeWidth={1.9} className="app-filter-icon" />
                         <span>Filter</span>
                       </button>
                     </Tooltip>

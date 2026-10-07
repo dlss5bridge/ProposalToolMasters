@@ -30,6 +30,7 @@ import {
   ReminderTemplatesChangeStatus,
   GetChangeIsDefaultStatus,
 } from "../../../../redux/Services/Setting/SuperAdminTemplateApi";
+import { Funnel } from "lucide-react";
 
 function SuperAdminReminderTemplateList() {
   const moduleName = "Super Admin Workflow Email Template";
@@ -449,7 +450,7 @@ function SuperAdminReminderTemplateList() {
                   data-bs-toggle="modal"
                   data-bs-target="#FilterModel"
                 >
-                  <i className="ri-filter-fill"></i>
+                  <Funnel size={17} strokeWidth={1.9} className="app-filter-icon" />
                   <span>Filter</span>
 
                   {isFilterApply && (

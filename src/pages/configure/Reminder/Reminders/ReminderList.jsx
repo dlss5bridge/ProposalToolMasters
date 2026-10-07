@@ -24,7 +24,6 @@ import { updateState } from "../../../../redux/Persist";
 import RecordsAvailablePopupModel from "../../../../components/RecordsAvailablePopupModel";
 import {
   Search,
-  SlidersHorizontal,
   Plus,
   MoreVertical,
   Copy,
@@ -33,6 +32,7 @@ import {
   BellRing,
   Check,
   X,
+  Funnel,
 } from "lucide-react";
 import "./ReminderList.css";
 import "../../../../styles/action-menu.css";
@@ -700,7 +700,7 @@ function ReminderList() {
                     data-bs-toggle="modal"
                     data-bs-target="#FilterModel"
                   >
-                    <SlidersHorizontal size={16} strokeWidth={2} />
+                    <Funnel size={17} strokeWidth={1.9} className="app-filter-icon" />
                     <span>Filter</span>
 
                     {isFilterApply && (

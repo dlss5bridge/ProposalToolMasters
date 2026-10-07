@@ -631,11 +631,12 @@
 
 /* Filter icon should use the same neutral/cyan palette */
 .template-list-redesign .filter i,
-.template-list-redesign .Filter-apply-color {
+.template-list-redesign .Filter-apply-color,
+.template-list-redesign .filter .app-filter-icon {
   color: #536174 !important;
 }
 
-.template-list-redesign .create-item-btn.filter i {
+.template-list-redesign .create-item-btn.filter i,.template-list-redesign .create-item-btn.filter .app-filter-icon {
   color: #087f98 !important;
 }
 
