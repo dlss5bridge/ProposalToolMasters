@@ -1,7 +1,41 @@
 /* global $ */
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { Row, Col, Card, CardBody } from "reactstrap";
+import { Check, X, CreditCard } from "lucide-react";
 import { AuthContextProvider } from "../AuthContext/AuthContext";
+import "./SubscriptionView.css";
+
+// Same status → colour mapping as before, as a pill tone
+const statusTone = (status) =>
+  status === "Active"
+    ? "active"
+    : status === "Expired"
+      ? "expired"
+      : status === "Pending"
+        ? "pending"
+        : status === "InActive"
+          ? "inactive"
+          : "neutral";
+
+const Feature = ({ enabled, children }) => (
+  <li className={`sv-feature ${enabled ? "is-on" : "is-off"}`}>
+    <span className="sv-feature__icon">
+      {enabled ? (
+        <Check size={13} strokeWidth={3} />
+      ) : (
+        <X size={13} strokeWidth={3} />
+      )}
+    </span>
+    <span className="sv-feature__text">{children}</span>
+  </li>
+);
+
+const Field = ({ label, children }) => (
+  <div className="sv-field">
+    <span className="sv-field__label">{label}</span>
+    <span className="sv-field__value">{children}</span>
+  </div>
+);
+
 function SubscriptionView(props) {
   const {
     EngagementName,
@@ -12,6 +46,13 @@ function SubscriptionView(props) {
   } = useContext(AuthContextProvider);
   console.log(props.subscriptionPackageObj);
   // console.log(props.subscriptionPackageObj, "props.subscriptionPackageObj")
+  const pkg = props.subscriptionPackageObj;
+
+  const remainingProposal =
+    pkg.remainingQuotesPerMonth < 0 ? 0 : pkg.remainingQuotesPerMonth;
+  const remainingESignatures =
+    pkg.remainingESignatures < 0 ? 0 : pkg.remainingESignatures;
+
   return (
     <div>
       <div
@@ -23,12 +64,19 @@ function SubscriptionView(props) {
         data-bs-backdrop="static"
         data-bs-keyboard="false"
       >
-        <div className="modal-dialog model-large modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header  p-3">
-              <h5 class="modal-title" id="exampleModalLabel">
-                {props.title}
-              </h5>
+        <div className="modal-dialog model-large modal-dialog-centered sv-dialog">
+          <div class="modal-content sv-modal">
+            {/* Header */}
+            <div class="modal-header sv-head">
+              <span className="sv-head__icon">
+                <CreditCard size={20} strokeWidth={1.9} />
+              </span>
+              <div className="sv-head__text">
+                <h5 class="modal-title sv-head__title" id="exampleModalLabel">
+                  {props.title || "Subscription Overview"}
+                </h5>
+                <p className="sv-head__sub">{pkg.packageName}</p>
+              </div>
               <button
                 type="button"
                 class="btn-close"
@@ -38,293 +86,110 @@ function SubscriptionView(props) {
               ></button>
             </div>
 
-            <div>
-              <div className="tab-content">
-                <div className="container-fluid">
-                  <Row>
-                    <Col md="6">
-                      <Card
-                        className="pricing-box d-flex shadow-lg p-3 rounded"
-                        style={{ marginTop: "15px", height: "56vh" }}
-                      >
-                        <div className="media">
-                          <i className="ion ion-ios-airplane h1 align-self-center"></i>
-                          <div className="media-body text-start">
-                            <h6 className="text-dark text-center ">
-                              Subscription Details
-                            </h6>
-                            <div className="pricing-features mt-5  mr-3 align-items-start ">
-                              <p className=" mb-1 text-dark text-nowrap ">
-                                <b>Package Name</b>:{" "}
-                                {props.subscriptionPackageObj.packageName}
-                              </p>
-                              <p className=" mb-1 text-dark text-nowrap">
-                                <b>Payment Frequency</b>:{" "}
-                                {/* {props.subscriptionPackageObj.packageName} */}
-                                {props.subscriptionPackageObj
-                                  .paymentFrequencyID === 1
-                                  ? "Yearly"
-                                  : props.subscriptionPackageObj
-                                        .paymentFrequencyID === 4
-                                    ? "Monthly"
-                                    : ""}
-                              </p>
-                              <p className=" mb-1 text-dark text-nowrap">
-                                <b>Days</b>:{" "}
-                                {props.subscriptionPackageObj
-                                  .paymentFrequencyID === 1
-                                  ? "365 Days"
-                                  : props.subscriptionPackageObj
-                                        .paymentFrequencyID === 4
-                                    ? "30 Days"
-                                    : "-"}
-                              </p>
-                              <p className=" mb-1 text-dark text-nowrap">
-                                <b>Subscription Date</b>:{" "}
-                                {props.subscriptionPackageObj
-                                  .subscriptionStartDate === null
-                                  ? "-"
-                                  : props.subscriptionPackageObj
-                                      .subscriptionStartDate}
-                              </p>
+            <div className="sv-body">
+              {/* Subscription details */}
+              <section className="sv-card">
+                <h6 className="sv-card__title">Subscription Details</h6>
 
-                              <p className=" mb-1 text-dark text-nowrap">
-                                <b>Next Renewal Date</b>:{" "}
-                                {props.subscriptionPackageObj.renewDate === null
-                                  ? "-"
-                                  : props.subscriptionPackageObj.renewDate}
-                              </p>
-                              <p className=" mb-1 text-dark text-nowrap">
-                                <b>Payment Status</b>:{" "}
-                                {props.subscriptionPackageObj.paymentStatus}
-                              </p>
-                              <p className=" mb-1 text-dark text-nowrap">
-                                <b>Subscription Status</b>:{" "}
-                                {
-                                  <div
-                                    className="p-1   rounded text-nowrap"
-                                    style={{
-                                      color:
-                                        props.subscriptionPackageObj
-                                          .subscriptionStatus === "Active"
-                                          ? "#008000"
-                                          : props.subscriptionPackageObj
-                                                .subscriptionStatus ===
-                                              "Expired"
-                                            ? "#FF0000"
-                                            : props.subscriptionPackageObj
-                                                  .subscriptionStatus ===
-                                                "Pending"
-                                              ? "#DAA520"
-                                              : props.subscriptionPackageObj
-                                                    .subscriptionStatus ===
-                                                  "InActive"
-                                                ? "#772424"
-                                                : "gray",
-                                      width: "100px",
-                                      padding: "1px 8px", // Add padding to the button
-                                      display: "inline-block", // Ensure button stays in line
-                                      borderRadius: "0.5rem", // Adjust border radius
-                                    }}
-                                  >
-                                    {
-                                      props.subscriptionPackageObj
-                                        .subscriptionStatus
-                                    }
-                                  </div>
-                                }
-                              </p>
-                              <p className="mt-0 mb-1 text-dark">
-                                <b>Remaining Proposal</b>:{" "}
-                                {props.subscriptionPackageObj
-                                  .remainingQuotesPerMonth < 0
-                                  ? 0
-                                  : props.subscriptionPackageObj
-                                      .remainingQuotesPerMonth}
-                              </p>
-                              <p className="mt-0 mb-1 text-dark">
-                                <b>Remaining E-Signatures</b>:{" "}
-                                {props.subscriptionPackageObj
-                                  .remainingESignatures < 0
-                                  ? 0
-                                  : props.subscriptionPackageObj
-                                      .remainingESignatures}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    </Col>
-                    <Col md="6">
-                      <Card
-                        className="pricing-box d-flex shadow-lg p-3 rounded"
-                        style={{ marginTop: "15px", height: "56vh" }}
-                      >
-                        <div className="media">
-                          <i className="ion ion-ios-airplane h1 align-self-center"></i>
-                          <div className="media-body text-start">
-                            <h6 className="text-dark text-center">
-                              Package Details
-                            </h6>
-                            <p
-                              style={{ fontWeight: "600" }}
-                              className="text-dark text-center "
-                            >
-                              {formatValue(
-                                props.subscriptionPackageObj?.yearlyValuePlan /
-                                  12,
-                              )}
-                              /Month
-                            </p>
-                            <div className="pricing-features ">
-                              <p className="mt-0 mb-1 text-dark">
-                                {props.subscriptionPackageObj?.apiIntegration ==
-                                true ? (
-                                  <span
-                                    style={{ color: "green" }}
-                                    className="fa fa-check"
-                                  ></span>
-                                ) : (
-                                  <span
-                                    style={{ color: "red", marginRight: "2px" }}
-                                    className="fa fa-times"
-                                  ></span>
-                                )}
-                                <span style={{ marginLeft: "10px" }}>
-                                  {" "}
-                                  API Integration
-                                </span>
-                              </p>
-                              <p className="mt-0 mb-1 text-dark">
-                                {props.subscriptionPackageObj?.prepareQuote ==
-                                true ? (
-                                  <span
-                                    style={{ color: "green" }}
-                                    className="fa fa-check"
-                                  ></span>
-                                ) : (
-                                  <span
-                                    style={{ color: "red", marginRight: "2px" }}
-                                    className="fa fa-times"
-                                  ></span>
-                                )}
-                                <span style={{ marginLeft: "10px" }}>
-                                  {" "}
-                                  Prepare {proposalName}
-                                </span>
-                              </p>
-                              <p className="mt-0 mb-1 text-dark">
-                                {props.subscriptionPackageObj
-                                  ?.prepareContract === true ? (
-                                  <span
-                                    style={{ color: "green" }}
-                                    className="fa fa-check"
-                                  ></span>
-                                ) : (
-                                  <span
-                                    style={{ color: "red", marginRight: "2px" }}
-                                    className="fa fa-times"
-                                  ></span>
-                                )}
-                                <span style={{ marginLeft: "10px" }}>
-                                  {" "}
-                                  Prepare {EngagementName}
-                                </span>
-                              </p>
-                              <p className="mt-0 mb-1 text-dark">
-                                {props.subscriptionPackageObj?.sendQuote ===
-                                true ? (
-                                  <span
-                                    style={{ color: "green" }}
-                                    className="fa fa-check"
-                                  ></span>
-                                ) : (
-                                  <span
-                                    style={{ color: "red", marginRight: "2px" }}
-                                    className="fa fa-times"
-                                  ></span>
-                                )}
-                                <span style={{ marginLeft: "10px" }}>
-                                  {" "}
-                                  Send {proposalName}
-                                </span>
-                              </p>
-                              <p className="mt-0 mb-1 text-dark">
-                              {props.subscriptionPackageObj?.sendQuote === true && props.subscriptionPackageObj?.quotesPerMonth > 0 && 
-                                (
-                                  <>
-                                  <span
-                                  style={{
-                                    color: "green",
-                                  }}
-                                  className="fa fa-check"
-                                ></span>
-                                  <span
-                                    style={{
-                                    marginLeft: "10px",
-                                    }}
-                                  >
-                                  {" "}
-                                  Prepare and Send {proposalName}:{" "}
-                                  {formatValueWithoutCurrencySymbol(props.subscriptionPackageObj?.quotesPerMonth)}
-                                  /Month
-                                </span>
-                                </>
-                              )}
-                              </p>
-                              <p className="mt-0 mb-1 text-dark">
-                                {props.subscriptionPackageObj?.signContract ===
-                                true ? (
-                                  <span
-                                    style={{ color: "green" }}
-                                    className="fa fa-check"
-                                  ></span>
-                                ) : (
-                                  <span
-                                    style={{ color: "red", marginRight: "2px" }}
-                                    className="fa fa-times"
-                                  ></span>
-                                )}
-                                <span style={{ marginLeft: "10px" }}>
-                                  {" "}
-                                  Send And Digitally Sign The {
-                                    EngagementName
-                                  }:{" "}
-                                  {formatValueWithoutCurrencySymbol(
-                                    props.subscriptionPackageObj
-                                      ?.eSignaturePerMonth,
-                                  )}
-                                  /Month
-                                </span>
-                              </p>
-                              <p className="mt-0 mb-1 text-dark">
-                                {props.subscriptionPackageObj?.isMailBox ===
-                                  null ||
-                                !props.subscriptionPackageObj?.isMailBox ? (
-                                  <span
-                                    style={{ color: "red", marginRight: "2px" }}
-                                    className="fa fa-times"
-                                  ></span>
-                                ) : (
-                                  <span
-                                    style={{ color: "green" }}
-                                    className="fa fa-check"
-                                  ></span>
-                                )}
-                                {"  "}
-                                <span style={{ marginLeft: "10px" }}>
-                                  {" "}
-                                  Personalized Outgoing Mailbox
-                                </span>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    </Col>
-                  </Row>
+                <div className="sv-fields">
+                  <Field label="Package Name">{pkg.packageName}</Field>
+                  <Field label="Payment Frequency">
+                    {pkg.paymentFrequencyID === 1
+                      ? "Yearly"
+                      : pkg.paymentFrequencyID === 4
+                        ? "Monthly"
+                        : ""}
+                  </Field>
+                  <Field label="Days">
+                    {pkg.paymentFrequencyID === 1
+                      ? "365 Days"
+                      : pkg.paymentFrequencyID === 4
+                        ? "30 Days"
+                        : "-"}
+                  </Field>
+                  <Field label="Payment Status">{pkg.paymentStatus}</Field>
+                  <Field label="Subscription Date">
+                    {pkg.subscriptionStartDate === null
+                      ? "-"
+                      : pkg.subscriptionStartDate}
+                  </Field>
+                  <Field label="Next Renewal Date">
+                    {pkg.renewDate === null ? "-" : pkg.renewDate}
+                  </Field>
+                  <Field label="Subscription Status">
+                    <span
+                      className={`sv-status sv-status--${statusTone(
+                        pkg.subscriptionStatus,
+                      )}`}
+                    >
+                      {pkg.subscriptionStatus}
+                    </span>
+                  </Field>
                 </div>
-              </div>
+
+                <div className="sv-usage">
+                  <div className="sv-usage__tile">
+                    <span className="sv-usage__label">Remaining Proposal</span>
+                    <span className="sv-usage__value">
+                      {remainingProposal ?? "-"}
+                    </span>
+                  </div>
+                  <div className="sv-usage__tile">
+                    <span className="sv-usage__label">
+                      Remaining E-Signatures
+                    </span>
+                    <span className="sv-usage__value">
+                      {remainingESignatures ?? "-"}
+                    </span>
+                  </div>
+                </div>
+              </section>
+
+              {/* Package details */}
+              <section className="sv-card">
+                <h6 className="sv-card__title">Package Details</h6>
+
+                <div className="sv-price">
+                  <span className="sv-price__value">
+                    {formatValue(pkg?.yearlyValuePlan / 12)}
+                  </span>
+                  <span className="sv-price__unit">/Month</span>
+                </div>
+
+                <ul className="sv-features">
+                  <Feature enabled={pkg?.apiIntegration == true}>
+                    API Integration
+                  </Feature>
+                  <Feature enabled={pkg?.prepareQuote == true}>
+                    Prepare {proposalName}
+                  </Feature>
+                  <Feature enabled={pkg?.prepareContract === true}>
+                    Prepare {EngagementName}
+                  </Feature>
+                  <Feature enabled={pkg?.sendQuote === true}>
+                    Send {proposalName}
+                  </Feature>
+                  {pkg?.sendQuote === true && pkg?.quotesPerMonth > 0 && (
+                    <Feature enabled>
+                      Prepare and Send {proposalName}:{" "}
+                      {formatValueWithoutCurrencySymbol(pkg?.quotesPerMonth)}
+                      /Month
+                    </Feature>
+                  )}
+                  <Feature enabled={pkg?.signContract === true}>
+                    Send And Digitally Sign The {EngagementName}:{" "}
+                    {formatValueWithoutCurrencySymbol(
+                      pkg?.eSignaturePerMonth,
+                    )}
+                    /Month
+                  </Feature>
+                  <Feature
+                    enabled={!(pkg?.isMailBox === null || !pkg?.isMailBox)}
+                  >
+                    Personalized Outgoing Mailbox
+                  </Feature>
+                </ul>
+              </section>
             </div>
           </div>
         </div>

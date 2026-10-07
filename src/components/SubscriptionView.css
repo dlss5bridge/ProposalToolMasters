@@ -1,0 +1,300 @@
+/* =========================================================
+   SUBSCRIPTION VIEW MODAL (My Subscription / Organisation view)
+   ========================================================= */
+
+.sv-dialog.sv-dialog {
+  max-width: 980px;
+  width: calc(100% - 32px);
+}
+
+.sv-modal.sv-modal {
+  overflow: hidden;
+
+  border: 0;
+  border-radius: 16px;
+
+  background: #f7f9fc;
+  box-shadow: 0 24px 56px -18px rgba(15, 23, 42, 0.35);
+}
+
+/* ---------- Header ---------- */
+.sv-modal .sv-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 18px 22px !important;
+
+  border-bottom: 1px solid #e4e9f0;
+  background: #ffffff;
+}
+
+.sv-head__icon {
+  width: 42px;
+  height: 42px;
+  flex: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+  background: #e8f7fb;
+  color: #0b7f95;
+}
+
+.sv-head__text {
+  min-width: 0;
+  flex: 1;
+}
+
+.sv-modal .sv-head__title {
+  margin: 0;
+
+  color: #14243a;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.sv-head__sub {
+  margin: 2px 0 0;
+
+  color: #667085;
+  font-size: 13px;
+}
+
+.sv-modal .sv-head .btn-close {
+  margin: 0;
+  flex: none;
+}
+
+/* ---------- Body ---------- */
+.sv-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+
+  padding: 18px 22px 22px;
+}
+
+.sv-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 18px 20px 20px;
+
+  border: 1px solid #e4e9f0;
+  border-radius: 12px;
+
+  background: #ffffff;
+}
+
+.sv-modal .sv-card__title {
+  margin: 0;
+  padding-bottom: 12px;
+
+  border-bottom: 1px solid #eef2f6;
+
+  color: #14243a;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+/* Subscription details: label/value grid */
+.sv-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.sv-field {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sv-field__label {
+  color: #667085;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sv-field__value {
+  color: #14243a;
+  font-size: 14px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+/* Status pill (same states/colours as before, softened) */
+.sv-status {
+  width: fit-content;
+  height: 24px;
+
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0 10px;
+
+  border: 1px solid #e4e7ec;
+  border-radius: 999px;
+
+  background: #f2f4f7;
+  color: #475467;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.sv-status--active {
+  border-color: #abefc6;
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.sv-status--expired {
+  border-color: #fecdca;
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.sv-status--pending {
+  border-color: #fedf89;
+  background: #fffaeb;
+  color: #93370d;
+}
+
+.sv-status--inactive {
+  border-color: #f0c8c8;
+  background: #fbf1f1;
+  color: #772424;
+}
+
+/* Usage tiles */
+.sv-usage {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  margin-top: auto;
+}
+
+.sv-usage__tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #e4e9f0;
+  border-radius: 10px;
+
+  background: #f8fafc;
+}
+
+.sv-usage__label {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sv-usage__value {
+  color: #14243a;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Package details: price + feature checklist */
+.sv-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #cdeef5;
+  border-radius: 10px;
+
+  background: #f1fbfd;
+}
+
+.sv-price__value {
+  color: #0b6f83;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sv-price__unit {
+  color: #4b6b75;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sv-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.sv-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.sv-feature__icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 1px;
+
+  border-radius: 50%;
+}
+
+.sv-feature.is-on .sv-feature__icon {
+  background: #dcfae6;
+  color: #067647;
+}
+
+.sv-feature.is-on .sv-feature__text {
+  color: #1f2a3c;
+}
+
+.sv-feature.is-off .sv-feature__icon {
+  background: #f2f4f7;
+  color: #98a2b3;
+}
+
+.sv-feature.is-off .sv-feature__text {
+  color: #98a2b3;
+}
+
+@media (max-width: 767.98px) {
+  .sv-body,
+  .sv-fields {
+    grid-template-columns: 1fr;
+  }
+}
