@@ -34,6 +34,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import "./ReminderTemplateListFigma.css";
+import "../../../../styles/action-menu.css";
 
 function ReminderTemplateList() {
   const moduleName = "Workflow Email Template";

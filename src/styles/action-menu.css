@@ -1,0 +1,170 @@
+/* =========================================================
+   ACTION MENU — one size for every list's ⋮ / Actions dropdown
+   (Proposals, Engagement Letters, Prospects, Reminders,
+   Reminder Templates). Sizes and colours both follow the
+   Prospects menu.
+   Doubled classes + the #customerTable scope keep these rules
+   above the page-level menu rules (up to 1,3,0 with !important).
+   ========================================================= */
+
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu {
+  min-width: 200px !important;
+  padding: 6px !important;
+
+  border-radius: 10px !important;
+}
+
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu
+  .dropdown-item.dropdown-item {
+  min-height: 36px !important;
+  padding: 8px 10px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+
+  border-radius: 7px !important;
+
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+  white-space: nowrap;
+}
+
+/* Icons: lucide SVGs and remix icon fonts render at the same size */
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu
+  .dropdown-item.dropdown-item
+  > svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex: none;
+}
+
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu
+  .dropdown-item.dropdown-item
+  i {
+  width: 16px !important;
+  margin: 0 !important;
+  flex: none;
+
+  font-size: 16px !important;
+  line-height: 1 !important;
+  text-align: center;
+}
+
+/* ---------- Colours (taken from the Prospects menu) ----------
+   Extra classes on the menu rule outrank the open-menu shadow on the
+   pinned Proposal / EL action columns (.proposal-action-column .dropdown-menu.show). */
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu.dropdown-menu.dropdown-menu.dropdown-menu.dropdown-menu {
+  border: 1px solid #e1e7ee !important;
+
+  background: #ffffff !important;
+
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.13) !important;
+}
+
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu
+  .dropdown-item.dropdown-item {
+  background: transparent !important;
+  color: #344154 !important;
+}
+
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu
+  .dropdown-item.dropdown-item:is(:hover, :focus-visible, :active) {
+  background: #f4f7fa !important;
+  color: #344154 !important;
+}
+
+/* Icons take the item's text colour, as in the Prospects menu */
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu
+  .dropdown-item.dropdown-item
+  :is(i, svg) {
+  color: inherit !important;
+}
+
+/* Delete actions in red: lists mark them with .text-danger,
+   .reminder-actions__danger, or only a bin icon (Proposals / EL) */
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu
+  .dropdown-item.dropdown-item:is(
+    .text-danger,
+    .reminder-actions__danger,
+    :has(> i[class*="ri-delete-bin"])
+  ),
+:is(
+    .proposal-list-v4 #customerTable,
+    .engagement-list-redesign #customerTable,
+    .prospect-actions,
+    .reminder-actions,
+    .reminder-list-actions
+  )
+  .dropdown-menu.dropdown-menu
+  .dropdown-item.dropdown-item:is(
+    .text-danger,
+    .reminder-actions__danger,
+    :has(> i[class*="ri-delete-bin"])
+  ):is(:hover, :focus-visible, :active) {
+  color: #d64553 !important;
+}

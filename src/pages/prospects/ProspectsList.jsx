@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import "./ProspectsFigma.css";
+import "../../styles/action-menu.css";
 
 import { AuthContextProvider } from "../../AuthContext/AuthContext";
 import FilterModel from "../../components/FilterModel";

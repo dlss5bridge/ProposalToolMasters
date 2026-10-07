@@ -35,6 +35,7 @@ import {
   X,
 } from "lucide-react";
 import "./ReminderList.css";
+import "../../../../styles/action-menu.css";
 
 function ReminderList() {
   const moduleName = "Reminder";

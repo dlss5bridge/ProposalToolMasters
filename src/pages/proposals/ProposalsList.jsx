@@ -4,6 +4,7 @@ import CommonButtonComponent from "../../components/CommonButtonComponent";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Proposals.css";
 import "./Proposals-redesign-v9.css";
+import "../../styles/action-menu.css";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Utils from "../../Middleware/Utils";
