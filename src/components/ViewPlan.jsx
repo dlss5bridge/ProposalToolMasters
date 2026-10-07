@@ -1,8 +1,9 @@
 import React, { useContext, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
-import errorImage from "../assets/images/gif/wired-outline-1140-error.gif";
 import { useNavigate } from "react-router-dom";
+import { ArrowRight, Crown, X } from "lucide-react";
 import { AuthContextProvider } from "../AuthContext/AuthContext";
+import "./ViewPlan.css";
 function ViewPlan(props) {
   const navigate = useNavigate();
 
@@ -30,49 +31,56 @@ function ViewPlan(props) {
         // onHide={handleCloseModel}
         centered
         size="md"
+        dialogClassName="vp-dialog"
+        contentClassName="vp-modal"
       >
-        <Modal.Header >
+        <button
+          type="button"
+          className="vp-close"
+          aria-label="Close"
+          onClick={() => {
+            handleCloseModel();
 
-          <h6>Upgrade Plan</h6>
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => {
-              handleCloseModel();
+          }}
+        >
+          <X size={18} strokeWidth={2} />
+        </button>
 
-            }}
-          ></button>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="text-center mb-3">
-            <img src={errorImage} alt="error_Img" height="70px" width="70px" />
-          </div>
+        <Modal.Body className="vp-body">
+          <span className="vp-icon" aria-hidden="true">
+            <Crown size={26} strokeWidth={1.9} />
+          </span>
+
+          <h6 className="vp-title">Upgrade Plan</h6>
+
           {activeOrganizationSubscriptionPlan?.prepareContract && activeOrganizationSubscriptionPlan?.remainingESignatures < 0 && props?.moduleName !== undefined ? (
-            <p className="text-center mb-3">
+            <p className="vp-message">
               You have reached the monthly e-signature limit for your current plan. To increase your monthly e-signature quota, please upgrade your plan.
             </p>
 
           ) : (
-            <p className="text-center mb-3">
+            <p className="vp-message">
               This feature is not available with your current subscription. Please upgrade to access it.
             </p>
           )}
-
-
         </Modal.Body>
-        <Modal.Footer>
+
+        <Modal.Footer className="vp-footer">
           <button
             onClick={handleCloseModel}
             type="button"
-            class="btn btn-md btn-light cancel-item-btn"
+            class="vp-btn vp-btn--ghost"
             data-bs-dismiss="modal"
-          ></button>
+          >
+            Cancel
+          </button>
           <Button
             type="button"
-            className="btn btn-md btn-success create-item-btn p-8"
+            className="vp-btn vp-btn--primary"
             onClick={handleRedirectSubscription}
           >
             View Plan
+            <ArrowRight size={16} strokeWidth={2.2} />
           </Button>
         </Modal.Footer>
       </Modal>
