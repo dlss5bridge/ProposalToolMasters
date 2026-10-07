@@ -60,6 +60,7 @@ const CategoryCard = ({
                 key={service.serviceID}
                 service={service}
                 isSelected={isSelected}
+                isLocked={isLocked}
                 disabledReason={disabledReason}
                 driverValues={selections[service.serviceID]?.driverValues}
                 fieldErrors={fieldErrors?.[service.serviceID]}

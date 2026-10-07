@@ -99,12 +99,15 @@ export default function ProposalInputFieldsStep({ theme }) {
           inputProps={{
             min: quantity?.quantityFrom ?? undefined,
             max: quantity?.quantityTo ?? undefined,
+            step: "0.01",
           }}
-          onChange={(e) =>
-            handleChange(field.globalPricingDriverID, {
-              driverValue: e.target.value,
-            })
-          }
+          onChange={(e) => {
+            const value = e.target.value;
+            // Blocks a 3rd+ decimal digit as it's typed instead of
+            // formatting it away afterwards.
+            if (value !== "" && !/^\d*\.?\d{0,2}$/.test(value)) return;
+            handleChange(field.globalPricingDriverID, { driverValue: value });
+          }}
           placeholder={`Enter ${field.driverName}`}
           sx={getTextFieldSx(theme)}
         />

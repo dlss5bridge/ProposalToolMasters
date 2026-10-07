@@ -4,6 +4,7 @@ import PricingDriverField from "./PricingDriverField";
 const ServiceRow = ({
   service,
   isSelected,
+  isLocked,
   disabledReason,
   driverValues,
   fieldErrors,
@@ -55,6 +56,7 @@ const ServiceRow = ({
               driver={driver}
               entry={driverValues?.[driver.globalPricingDriverID]}
               errorMessage={fieldErrors?.[driver.globalPricingDriverID]}
+              disabled={isLocked}
               onChange={(patch) =>
                 onDriverChange(driver.globalPricingDriverID, patch)
               }

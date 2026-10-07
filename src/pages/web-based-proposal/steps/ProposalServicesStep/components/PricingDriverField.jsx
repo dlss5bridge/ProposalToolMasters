@@ -1,7 +1,13 @@
 import Select from "react-select";
 
 // driverTypeID: 2 = quantity (number input), 3 = variation (select), 4 = slab (select)
-const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
+const PricingDriverField = ({
+  driver,
+  entry,
+  errorMessage,
+  disabled,
+  onChange,
+}) => {
   if (driver.driverTypeID === 2) {
     const quantity = driver.quantity?.[0];
 
@@ -16,7 +22,15 @@ const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
           value={entry?.value ?? ""}
           min={quantity?.quantityFrom || undefined}
           max={quantity?.quantityTo || undefined}
-          onChange={(e) => onChange({ value: e.target.value })}
+          step="0.01"
+          disabled={disabled}
+          onChange={(e) => {
+            const value = e.target.value;
+            // Blocks a 3rd+ decimal digit as it's typed instead of
+            // formatting it away afterwards.
+            if (value !== "" && !/^\d*\.?\d{0,2}$/.test(value)) return;
+            onChange({ value });
+          }}
           placeholder={`Enter ${driver.driverName}`}
           className={`pss-field-input${errorMessage ? " pss-field-input--error" : ""}`}
         />
@@ -49,6 +63,7 @@ const PricingDriverField = ({ driver, entry, errorMessage, onChange }) => {
         <Select
           options={options}
           value={selected}
+          isDisabled={disabled}
           onChange={(option) =>
             onChange({
               value: option?.value ?? null,
