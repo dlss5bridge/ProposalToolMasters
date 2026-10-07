@@ -67,6 +67,7 @@ function SubscriptionPackageModel(props) {
     isMailBox: false,
     apiIntegration: true,
     noOfPages: null,
+    enableWebBasedProposal: false,
   });
 
   const navigate = useNavigate();
@@ -126,6 +127,7 @@ function SubscriptionPackageModel(props) {
       inPriceOfMonthYear: "",
       inPriceOfMonthMonth: "",
       isMailBox: false,
+      enableWebBasedProposal: false,
     });
     setErrorMessage("");
     setRequireErrorMessage(false);
@@ -194,6 +196,7 @@ function SubscriptionPackageModel(props) {
             enableXERO: ModelData.enableXERO,
             enableQBO: ModelData.enableQBO,
             enableAIAgent: ModelData.enableAIAgent,
+            enableWebBasedProposal: ModelData.enableWebBasedProposal,
             pages: ModelData.noOfPages,
             discountPercentageYear:
               discountPercentageYear === undefined ? 0 : discountPercentageYear,
@@ -367,6 +370,7 @@ function SubscriptionPackageModel(props) {
       enableQBO: subscriptionPackageObj.enableQBO,
       enableXERO: subscriptionPackageObj.enableXERO,
       enableAIAgent: subscriptionPackageObj?.enableAIAgent,
+      enableWebBasedProposal: subscriptionPackageObj?.enableWebBasedProposal,
       noOfPages: Number(subscriptionPackageObj.pages),
       sendContract: subscriptionPackageObj.sendContract,
       signContract: subscriptionPackageObj.sendContract,
@@ -489,6 +493,9 @@ function SubscriptionPackageModel(props) {
       ...subscriptionPackageObj,
       prepareQuote: prepareQuoteValue,
       sendQuote: prepareQuoteValue ? subscriptionPackageObj.sendQuote : false,
+      enableWebBasedProposal: prepareQuoteValue
+        ? subscriptionPackageObj.enableWebBasedProposal
+        : false,
     });
   };
   const handleApiIntegrationChange = (e) => {
@@ -1166,6 +1173,43 @@ function SubscriptionPackageModel(props) {
                           />
                         </FormGroup>
                       </div>
+                      {subscriptionPackageObj.prepareQuote && (
+                        <>
+                          <div class="col-lg-3 col-md-3 col-sm-6 text-start text-md-end mt-2">
+                            <label class="form-label">
+                              Web Based {proposalName}
+                            </label>
+                          </div>
+                          <div
+                            class="col-lg-3 col-md-3 col-sm-6"
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <div style={{ width: "40px", marginBottom: "5px" }}>
+                              {subscriptionPackageObj.enableWebBasedProposal
+                                ? "Yes"
+                                : "No"}
+                            </div>
+                            <FormGroup>
+                              <FormControlLabel
+                                control={
+                                  <Android12Switch
+                                    checked={
+                                      subscriptionPackageObj.enableWebBasedProposal
+                                    }
+                                    onClick={(e) => {
+                                      setSubscriptionPackageObj({
+                                        ...subscriptionPackageObj,
+                                        enableWebBasedProposal:
+                                          !subscriptionPackageObj.enableWebBasedProposal,
+                                      });
+                                    }}
+                                  />
+                                }
+                              />
+                            </FormGroup>
+                          </div>
+                        </>
+                      )}
                       {/* <div class="col-lg-6 col-md-6 col-sm-6 text-start text-md-end mt-2 p-2">
                         <TextField
                           label={<span>Yearly value for the plan </span>}
