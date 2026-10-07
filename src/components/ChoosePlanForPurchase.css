@@ -533,3 +533,12 @@
     min-height: auto;
   }
 }
+
+/* Plan amounts: standard Inter, like the rest of the app. At this size the
+   browser would otherwise pick Inter's large "Display" optical cut. */
+.choose-plan-current-price,
+.choose-plan-original-price {
+  font-family: var(--app-font-sans);
+  font-optical-sizing: none;
+  font-variation-settings: "opsz" 14;
+}

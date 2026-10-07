@@ -505,6 +505,7 @@ const ChoosePlanForPurchase = (props) => {
                             <div className="choose-plan-original-price">
                               {formatValue(
                                 PurchasePlanList?.yearlyValuePlan / 12,
+                                1,
                               )}{" "}
                               / Month
                             </div>
@@ -518,12 +519,14 @@ const ChoosePlanForPurchase = (props) => {
                                 if (discount.offerType === 1) {
                                   return `${formatValue(
                                     PurchasePlanList?.yearlyValuePlan / 12,
+                                    1,
                                   )}/${discount.firstValue} months`;
                                 }
 
                                 if (discount.offerType === 2) {
                                   return `${formatValue(
                                     PurchasePlanList?.yearlyValuePlan / 12,
+                                    1,
                                   )}/${discount.firstValue + 1} months`;
                                 }
 
@@ -533,12 +536,14 @@ const ChoosePlanForPurchase = (props) => {
                                 ) {
                                   return `${formatValue(
                                     discount.firstValue,
+                                    1,
                                   )}/Month`;
                                 }
                               }
 
                               return `${formatValue(
                                 PurchasePlanList?.yearlyValuePlan / 12,
+                                1,
                               )}/Month`;
                             })()}
                           </div>
@@ -547,8 +552,11 @@ const ChoosePlanForPurchase = (props) => {
                         <>
                           {yearlyDiscount && (
                             <div className="choose-plan-original-price">
-                              {formatValue(PurchasePlanList?.yearlyValuePlan)} /
-                              Year
+                              {formatValue(
+                                PurchasePlanList?.yearlyValuePlan,
+                                1,
+                              )}{" "}
+                              / Year
                             </div>
                           )}
 
@@ -560,12 +568,14 @@ const ChoosePlanForPurchase = (props) => {
                                 if (discount.offerType === 1) {
                                   return `${formatValue(
                                     PurchasePlanList?.yearlyValuePlan,
+                                    1,
                                   )}/${discount.firstValue} months`;
                                 }
 
                                 if (discount.offerType === 2) {
                                   return `${formatValue(
                                     PurchasePlanList?.yearlyValuePlan,
+                                    1,
                                   )}/${discount.firstValue + 12} months`;
                                 }
 
@@ -575,12 +585,14 @@ const ChoosePlanForPurchase = (props) => {
                                 ) {
                                   return `${formatValue(
                                     discount.firstValue,
+                                    1,
                                   )}/Year`;
                                 }
                               }
 
                               return `${formatValue(
                                 PurchasePlanList?.yearlyValuePlan,
+                                1,
                               )}/Year`;
                             })()}
                           </div>
