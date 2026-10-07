@@ -229,7 +229,7 @@ input.input-text:read-only {
 
 .pro-back-button {
   font-size: 13px;
-  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-family: var(--app-font-sans);
 }
 
 .cus-card {
@@ -243,13 +243,13 @@ input.input-text:read-only {
 .view-prospect label {
   color: #5b626b;
   font-size: 14px;
-  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-family: var(--app-font-sans);
 }
 
 .view-prospect input {
   color: #5b626b;
   font-size: 14px;
-  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-family: var(--app-font-sans);
 }
 
 .new-prospect-form {

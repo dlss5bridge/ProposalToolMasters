@@ -320,7 +320,7 @@ input.form-control:read-only {
 }
 .css-ahj2mt-MuiTypography-root {
   margin-right: 25px;
-  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-family: var(--app-font-sans);
   font-weight: 400;
   font-size: 12px;
   line-height: 1.5;

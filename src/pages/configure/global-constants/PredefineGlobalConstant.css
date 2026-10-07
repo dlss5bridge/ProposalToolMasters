@@ -149,7 +149,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--app-font-sans);
   font-weight: 600;
   color: #6c757d;
 }
@@ -333,7 +333,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--app-font-sans);
   font-weight: 600;
 }
 
@@ -419,7 +419,7 @@ tbody {
 
 body {
   margin: 0;
-  font-family: "Roboto", sans-serif;
+  font-family: var(--app-font-sans);
 
   font-weight: 400;
   line-height: 1.5;

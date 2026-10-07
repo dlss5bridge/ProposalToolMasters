@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import "./aiBot.css";
+import "./styles/app-font.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import AuthContext from "./AuthContext/AuthContext.jsx";

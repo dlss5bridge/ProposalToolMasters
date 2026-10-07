@@ -1,0 +1,83 @@
+/* =========================================================
+   APP FONT — Inter, everywhere in the app UI
+   (Inter is loaded from Google Fonts in public/index.html.)
+
+   - Page stylesheets point their UI fonts at var(--app-font-sans).
+   - The base font (Bootstrap theme variables + body) is Inter.
+   - MUI components and the sidebar, which set their own font, follow.
+
+   Left untouched on purpose:
+   - icon fonts (Remix, Bootstrap Icons, Font Awesome, MDI)
+   - monospace for keys / variable tokens / code
+   - document content (proposal / letter previews, PDFs, editors and
+     signatures), which set their fonts inline from the template settings
+   ========================================================= */
+
+:root {
+  --app-font-sans:
+    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+/* Bootstrap theme (app.min.css / bootstrap.min.css set Gantari here) */
+:root:root,
+:root[data-bs-theme] {
+  --tb-font-sans-serif: var(--app-font-sans);
+  --tb-body-font-family: var(--app-font-sans);
+}
+
+/* app.min.css forces "Roboto ... !important" on body, h1–h6, .h1–.h6 and td.
+   Override it for the UI only: anything inside content that sets its own
+   font (document previews / PDFs use inline font-family) or inside the
+   editors keeps exactly what it renders today. */
+html body,
+html
+  body
+  :is(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, td):not(
+    [style*="font-family"]
+  ):not([style*="font-family"] *):not(.jodit-wysiwyg *):not(
+    .jodit-wysiwyg
+  ) {
+  font-family: var(--app-font-sans) !important;
+}
+
+/* The editors' writing area has no font of its own and used to inherit the
+   forced Roboto from body; keep that so document text looks the same. */
+.jodit-wysiwyg.jodit-wysiwyg {
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+}
+
+html body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
+}
+
+/* Form controls don't inherit the page font in every browser */
+html body :is(button, input, select, textarea, optgroup) {
+  font-family: inherit;
+}
+
+/* Sidebar links: app.min.css / layout.css name Gantari directly */
+.navbar-menu.navbar-menu .navbar-nav .nav-link,
+.navbar-menu.navbar-menu .navbar-nav .nav-sm .nav-link,
+.menu_dropdown.menu_dropdown .nav-link,
+.subList.subList .nav-link,
+.ff-secondary.ff-secondary,
+.ff-base.ff-base {
+  font-family: var(--app-font-sans);
+}
+
+/* MUI components default to Roboto (there is no MUI theme in the app).
+   Icons are SVGs and unaffected. */
+[class*="Mui"]:not(.MuiSvgIcon-root):not(svg) {
+  font-family: var(--app-font-sans);
+}
+
+/* Figures line up in columns (amounts, dates, reference numbers) */
+#customerTable td,
+table.table td,
+.pagination {
+  font-variant-numeric: tabular-nums;
+}

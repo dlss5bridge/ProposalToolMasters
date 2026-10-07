@@ -3,7 +3,7 @@
 }
 
 button.accordion-button.collapsed {
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--app-font-sans);
   font-weight: 600;
   font-size: 16px;
   color: #6c757d;

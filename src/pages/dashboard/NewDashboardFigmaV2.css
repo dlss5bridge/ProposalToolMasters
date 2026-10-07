@@ -53,7 +53,7 @@
   margin: 0 !important;
   padding: 0 !important;
   color: var(--nd-heading) !important;
-  font-family: "Sarabun", sans-serif !important;
+  font-family: var(--app-font-sans) !important;
   font-size: 30px !important;
   font-weight: 700 !important;
   line-height: 1.18 !important;
@@ -267,6 +267,9 @@
    ========================================================= */
 
 .nd-card {
+  /* counter cards keep their previous font (not the app-wide Inter) */
+  font-family: Roboto, Helvetica, Arial, sans-serif !important;
+
   position: relative !important;
   min-width: 0 !important;
   min-height: 154px !important;
@@ -468,7 +471,7 @@
 
   color: var(--nd-heading) !important;
 
-  font-family: "Sarabun", sans-serif !important;
+  font-family: var(--app-font-sans) !important;
   font-size: 18px !important;
   font-weight: 700 !important;
   line-height: 1.2 !important;

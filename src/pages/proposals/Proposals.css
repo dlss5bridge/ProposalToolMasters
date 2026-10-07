@@ -146,13 +146,13 @@
   font-size: 14px;
   margin-right: 8px;
   color: #5b626b;
-  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-family: var(--app-font-sans);
 }
 
 .packaged-pricing-default-price {
   font-size: 14px;
   color: #5b626b;
-  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-family: var(--app-font-sans);
 }
 .date-picker-proposal {
   margin-top: 4px;
