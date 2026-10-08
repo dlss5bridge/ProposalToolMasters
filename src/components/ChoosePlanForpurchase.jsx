@@ -1151,6 +1151,38 @@ const ChoosePlanForPurchase = (props) => {
                                                                   </span>
                                                                 </div>
 
+                                                                {/* web based proposal enable start  */}
+                                                                <div>
+                                                                  {PurchasePlanList?.enableWebBasedProposal ===
+                                                                  true ? (
+                                                                    <span
+                                                                      style={{
+                                                                        color:
+                                                                          "green",
+                                                                      }}
+                                                                      className="fa fa-check"
+                                                                    ></span>
+                                                                  ) : (
+                                                                    <span
+                                                                      style={{
+                                                                        color:
+                                                                          "red",
+                                                                      }}
+                                                                      className="fa fa-times"
+                                                                    ></span>
+                                                                  )}
+                                                                  <span
+                                                                    style={{
+                                                                      marginLeft:
+                                                                        "10px",
+                                                                    }}
+                                                                  >
+                                                                    {" "}
+                                                                    Web Based
+                                                                    Proposal
+                                                                  </span>
+                                                                </div>
+
                                                                 {PurchasePlanList && (
                                                                   <div
                                                                     className="d-flex flex-column"
