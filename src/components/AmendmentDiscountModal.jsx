@@ -4,8 +4,15 @@ import Backdrop from "@mui/material/Backdrop";
 import { isAmendmentDiscountFieldValid } from "../pages/proposals/utils/amendmentDiscount";
 
 const sanitizePercentageInput = (value) => {
-  // Only digits and a single decimal point - up to 2 decimal places.
-  let sanitized = value.replace(/[^0-9.]/g, "");
+  // Digits and a single decimal point - up to 2 decimal places - plus an
+  // optional leading "-" since negative (markup) discounts are allowed.
+  let sanitized = value.replace(/[^0-9.-]/g, "");
+
+  // Only a leading "-" is meaningful; drop any other occurrence of it.
+  const isNegative = sanitized.startsWith("-");
+  sanitized = sanitized.replace(/-/g, "");
+  if (isNegative) sanitized = `-${sanitized}`;
+
   const firstDot = sanitized.indexOf(".");
   if (firstDot !== -1) {
     sanitized =

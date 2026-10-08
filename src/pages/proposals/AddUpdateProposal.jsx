@@ -114,6 +114,15 @@ const PricingTableTemplatesModal = lazy(
 // );
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
+// Shared monetary rounding boundary used by Net Total/VAT/Grand Total
+// calculations across BasicInformationComponent, ReviewServicesComponent,
+// ReviewPackagesComponent and Add_Update_Proposal.
+const roundMoney = (value) => {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 0;
+  return Math.round((number + Number.EPSILON) * 100) / 100;
+};
+
 const BasicInformationComponent = (props) => {
   const navigate = useNavigate();
   const isEnabledMasterProposalType = props?.isEnabledMasterProposal;
@@ -2786,7 +2795,9 @@ const ReviewServicesComponent = (props) => {
         //   Number(netTotal) *
         //   (Math.abs(props.RecurringFrequencyPricingInfo.DefaultDiscount) / 100);
 
-        addOnValue = DiscountedPriceWithoutRoundOff - netTotalWithoutRoundOff;
+        addOnValue = roundMoney(
+          DiscountedPriceWithoutRoundOff - netTotalWithoutRoundOff,
+        );
       } else if (props.RecurringFrequencyPricingInfo.DefaultDiscount > 0) {
         discountAmount =
           netTotalWithoutRoundOff - DiscountedPriceWithoutRoundOff;
@@ -2835,7 +2846,7 @@ const ReviewServicesComponent = (props) => {
     // }
 
     //Calculate discountedTotalAmount
-    discountedTotalAmount = DiscountedPriceWithoutRoundOff;
+    discountedTotalAmount = roundMoney(DiscountedPriceWithoutRoundOff);
     //Number(netTotal) + Number(addOnValue) - discountAmount;
 
     //Calculate : vatPercentage,vatTotalAmount
@@ -2847,8 +2858,7 @@ const ReviewServicesComponent = (props) => {
       if (props.vatPercentage > 0) {
         vatPercentage = props.vatPercentage;
         vatTotalAmount = (Number(discountedTotalAmount) * vatPercentage) / 100;
-        vatTotalAmount =
-          props.GetTwoDecimalValueWithoutRoundOff(vatTotalAmount);
+        vatTotalAmount = roundMoney(vatTotalAmount);
       }
     }
 
@@ -2946,7 +2956,9 @@ const ReviewServicesComponent = (props) => {
         // addOnValue =
         //   Number(netTotal) *
         //   (Math.abs(props.OneOffPricingInfoCopy.DefaultDiscount) / 100);
-        addOnValue = DiscountedPriceWithoutRoundOff - netTotalWithoutRoundOff;
+        addOnValue = roundMoney(
+          DiscountedPriceWithoutRoundOff - netTotalWithoutRoundOff,
+        );
       } else if (props.OneOffPricingInfoCopy.DefaultDiscount > 0) {
         discountAmount =
           netTotalWithoutRoundOff - DiscountedPriceWithoutRoundOff;
@@ -2961,7 +2973,7 @@ const ReviewServicesComponent = (props) => {
     }
 
     //Calculate discountedTotalAmount
-    discountedTotalAmount = DiscountedPriceWithoutRoundOff;
+    discountedTotalAmount = roundMoney(DiscountedPriceWithoutRoundOff);
 
     //Calculate : vatPercentage,vatTotalAmount
     if (
@@ -2972,8 +2984,7 @@ const ReviewServicesComponent = (props) => {
       if (props.vatPercentage > 0) {
         vatPercentage = props.vatPercentage;
         vatTotalAmount = (Number(discountedTotalAmount) * vatPercentage) / 100;
-        vatTotalAmount =
-          props.GetTwoDecimalValueWithoutRoundOff(vatTotalAmount);
+        vatTotalAmount = roundMoney(vatTotalAmount);
       }
     }
 
@@ -10103,8 +10114,9 @@ const ReviewPackagesComponent = (props) => {
         discountAmount = 0;
         //discountedTotalAmount = null;//Number(netTotal);
       } else if (defaultDiscountPercentage < 0) {
-        addOnValue =
-          Number(netTotal) * (Math.abs(defaultDiscountPercentage) / 100);
+        addOnValue = roundMoney(
+          Number(netTotal) * (Math.abs(defaultDiscountPercentage) / 100),
+        );
       } else if (defaultDiscountPercentage > 0) {
         discountAmount =
           ((Number(netTotal) + Number(addOnValue)) *
@@ -10174,10 +10186,11 @@ const ReviewPackagesComponent = (props) => {
     // }
 
     //Calculate discountedTotalAmount
-    discountedTotalAmount =
+    discountedTotalAmount = roundMoney(
       Number(netTotal) +
-      Number(addOnValue) -
-      (Math.floor(discountAmount * 100) / 100).toFixed(2);
+        Number(addOnValue) -
+        (Math.floor(discountAmount * 100) / 100).toFixed(2),
+    );
 
     //Calculate : vatPercentage,vatTotalAmount
     if (
@@ -10188,8 +10201,7 @@ const ReviewPackagesComponent = (props) => {
       if (props.vatPercentage > 0) {
         vatTotalAmount =
           (Number(discountedTotalAmount) * props.vatPercentage) / 100;
-        vatTotalAmount =
-          props.GetTwoDecimalValueWithoutRoundOff(vatTotalAmount);
+        vatTotalAmount = roundMoney(vatTotalAmount);
       }
     }
 
@@ -10421,8 +10433,9 @@ const ReviewPackagesComponent = (props) => {
         discountAmount = 0;
         //discountedTotalAmount = Number(netTotal);
       } else if (defaultDiscountPercentage < 0) {
-        addOnValue =
-          Number(netTotal) * (Math.abs(defaultDiscountPercentage) / 100);
+        addOnValue = roundMoney(
+          Number(netTotal) * (Math.abs(defaultDiscountPercentage) / 100),
+        );
       } else if (defaultDiscountPercentage > 0) {
         discountAmount =
           ((Number(netTotal) + Number(addOnValue)) *
@@ -10492,10 +10505,11 @@ const ReviewPackagesComponent = (props) => {
     // }
 
     //Calculate discountedTotalAmount
-    discountedTotalAmount =
+    discountedTotalAmount = roundMoney(
       Number(netTotal) +
-      Number(addOnValue) -
-      (Math.floor(discountAmount * 100) / 100).toFixed(2);
+        Number(addOnValue) -
+        (Math.floor(discountAmount * 100) / 100).toFixed(2),
+    );
 
     //Calculate : vatPercentage,vatTotalAmount
     if (
@@ -10506,8 +10520,7 @@ const ReviewPackagesComponent = (props) => {
       if (props.vatPercentage > 0) {
         vatTotalAmount =
           (Number(discountedTotalAmount) * props.vatPercentage) / 100;
-        vatTotalAmount =
-          props.GetTwoDecimalValueWithoutRoundOff(vatTotalAmount);
+        vatTotalAmount = roundMoney(vatTotalAmount);
       }
     }
 
