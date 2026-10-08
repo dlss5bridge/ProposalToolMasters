@@ -16536,6 +16536,7 @@ const Add_Update_Proposal = (props) => {
     webProposalTypeID: null,
     globalPricingDriverID: [],
     remainingESignatures: null,
+    enableWebBasedProposal: null,
   });
   const [modelRequestData, setModelRequestData] = useState({
     Action: null,
@@ -24618,6 +24619,7 @@ const Add_Update_Proposal = (props) => {
             webProposalTypeID: ModelData.webProposalTypeID,
             globalPricingDriverID: ModelData.globalPricingDriverID || [],
             remainingESignatures: ModelData.remainingESignatures,
+            enableWebBasedProposal: ModelData.enableWebBasedProposal,
           });
 
           if (

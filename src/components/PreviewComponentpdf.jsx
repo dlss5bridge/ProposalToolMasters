@@ -12074,6 +12074,21 @@ ${
     }
   }, [props.templateElementList]);
 
+  // Hide Web Proposal (value 3) only when it is explicitly disabled (null or false)
+  // on the org's Pricing Settings or the subscription plan; HTML/PDF logic unchanged.
+  const enableWebBasedProposalValue =
+    props?.pricingSettingObj?.enableWebBasedProposal ??
+    activeOrganizationSubscriptionPlan?.enableWebBasedProposal;
+  const isWebBasedProposalDisabled =
+    enableWebBasedProposalValue === null ||
+    enableWebBasedProposalValue === false;
+
+  const proposalFormatOptions = (
+    !common.enableEL || !props?.pricingSettingObj?.remainingESignatures
+      ? Utils.PreviewSelection.filter((x) => x.value === 2) // only PDF
+      : Utils.PreviewSelection
+  ).filter((x) => x.value !== 3 || !isWebBasedProposalDisabled);
+
   const modifiedPaymentGatewayType =
     props.paymentGatewayObj !== undefined &&
     Utils.payment_gateway
@@ -12219,15 +12234,7 @@ ${
               <Select
                 menuPosition="auto"
                 className="phone-input-country-code selectDropDown"
-                options={(!common.enableEL ||
-                !props?.pricingSettingObj?.remainingESignatures
-                  ? Utils.PreviewSelection.filter((x) => x.value === 2) // only PDF
-                  : Utils.PreviewSelection
-                ).filter(
-                  (x) =>
-                    x.value !== 3 ||
-                    activeOrganizationSubscriptionPlan?.enableWebBasedProposal,
-                )}
+                options={proposalFormatOptions}
                 onChange={handleFormate}
                 value={ProposalFormatValue}
               />
