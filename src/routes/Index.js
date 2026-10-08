@@ -120,7 +120,7 @@ const StripePaymentCanceledPage = Loadable(
   lazy(() => import("../components/PaymentCancelPage")),
 );
 const ChoosePlanForPurchase = Loadable(
-  lazy(() => import("../components/ChoosePlanForpurchase")),
+  lazy(() => import("../components/ChoosePlanForPurchase")),
 );
 const MySubscription = Loadable(
   lazy(() => import("../components/MySubscription")),
