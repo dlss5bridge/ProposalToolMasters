@@ -949,6 +949,42 @@ const MySubscription = () => {
                                                         </span>
                                                       </p>
                                                     )}
+
+                                                  {/* Web Based Proposal  */}
+                                                  {subScriptionActiveList &&
+                                                    subScriptionActiveList?.enableWebBasedProposal !==
+                                                      null && (
+                                                      <p className="mt-0 mb-1 text-dark">
+                                                        {subScriptionActiveList?.enableWebBasedProposal ===
+                                                          null ||
+                                                        !subScriptionActiveList?.enableWebBasedProposal ? (
+                                                          <span
+                                                            style={{
+                                                              color: "red",
+                                                              marginRight:
+                                                                "2px",
+                                                            }}
+                                                            className="fa fa-times"
+                                                          ></span>
+                                                        ) : (
+                                                          <span
+                                                            style={{
+                                                              color: "green",
+                                                            }}
+                                                            className="fa fa-check"
+                                                          ></span>
+                                                        )}
+                                                        {"  "}
+                                                        <span
+                                                          style={{
+                                                            marginLeft: "10px",
+                                                          }}
+                                                        >
+                                                          {" "}
+                                                          Web Based Proposal
+                                                        </span>
+                                                      </p>
+                                                    )}
                                                 </div>
                                               </CardBody>
                                             </div>
