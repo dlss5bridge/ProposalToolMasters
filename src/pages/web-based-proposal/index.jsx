@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import ProposalAmendment from "./proposalTypes/ProposalAmendment";
 import StandardProposalWithInputs from "./proposalTypes/ProposalInputForm";
 import StandardProposal from "./proposalTypes/StandardProposal";
+import ProposalAlreadyAccepted from "./ProposalAlreadyAccepted";
 import { Loader2 } from "lucide-react";
 import {
   getProposalTheme,
@@ -87,6 +88,14 @@ export default function WebBasedProposal() {
 
   if (error || !quoteModel) {
     return <div>Failed to load proposal.</div>;
+  }
+
+  // GetOrganisationThemeSettings's statusName tells us whether this quote
+  // has already been accepted — once it has, the Standard/Standard-with-
+  // Input-Fields/Amendment accept flow no longer applies, so every
+  // webProposalTypeID shows this screen instead of its usual flow.
+  if (themeSettings?.statusName === "Accepted") {
+    return <ProposalAlreadyAccepted theme={theme} />;
   }
 
   const proposal = {
