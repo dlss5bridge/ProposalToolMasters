@@ -391,9 +391,12 @@ function CalculationBlock({
   vatPercentage,
   vatAmount,
   grandTotal,
+  isPackageBased,
 }) {
   const hasDiscount = Number(discountPercentage) !== 0;
-  const isSurcharge = Number(discountPercentage) < 0;
+  // "Surcharge" only applies to Package/Custom Package quotes — Service
+  // quotes keep calling a negative adjustment a "Discount".
+  const isSurcharge = isPackageBased && Number(discountPercentage) < 0;
 
   return (
     // A plain top divider separates the totals from the line items above;
@@ -842,7 +845,11 @@ function FeeSection({
                       color: theme.textSecondary,
                     }}
                   >
-                    Discount
+                    {packageTotalsList.some(
+                      ({ totals }) => Number(totals.discountPercentage) < 0,
+                    )
+                      ? "Surcharge"
+                      : "Discount"}
                   </div>
                   {packageTotalsList.map(({ pkg, totals }) => {
                     const pct = Number(totals.discountPercentage);
@@ -1071,6 +1078,7 @@ function FeeSection({
               vatPercentage={vatPercentage}
               vatAmount={vatAmount}
               grandTotal={grandTotal}
+              isPackageBased={isPackageBased}
             />
           </>
         )}
