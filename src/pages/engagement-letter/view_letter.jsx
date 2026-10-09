@@ -2152,7 +2152,7 @@ const View_Engagement_Latter = () => {
                                                     </>
                                                   )}
 
-                                                {vatPercentage && (
+                                                {Number(vatPercentage) > 0 && (
                                                   <>
                                                     <tr class="head-grey-row">
                                                       <td className="tr-table-class font-14 text-white">
@@ -2826,7 +2826,7 @@ const View_Engagement_Latter = () => {
                                                       </tr>
                                                     </>
                                                   )}
-                                                {vatPercentage && (
+                                                {Number(vatPercentage) > 0 && (
                                                   <>
                                                     <tr class="head-grey-row">
                                                       <td className="tr-table-class font-14 text-white">
