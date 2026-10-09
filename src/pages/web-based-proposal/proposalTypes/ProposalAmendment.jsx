@@ -429,6 +429,7 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     try {
       // An amendment persists as a new quote record, so Generate Contract
       // needs the returned quoteKeyID, not the original.
+      debugger; // eslint-disable-line no-debugger -- inspect addUpdateQuote payload on amendment accept
       amendedQuoteKeyID = await dispatch(
         addUpdateQuote({
           ...finalPayload,

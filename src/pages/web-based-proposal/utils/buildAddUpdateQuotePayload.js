@@ -267,10 +267,137 @@ export const buildQuotationFinalAmountListForServiceType = ({
   return rows;
 };
 
-// Dispatches quotationFinalAmountList building by proposal type. Only
-// Service quotes can go stale from a Services-step edit, so Package/Custom
-// Package always keep the quoteModel passthrough. isAmend gates the rebuild
-// too — an unamended Service Amendment has nothing to rebuild either.
+// Custom Package quotes store one quotationFinalAmountList row per selected
+// package per charge type (each tagged with its own servicePackageID) —
+// mirrors ProposalPricingTableStep.jsx's own findFinalAmount/
+// buildPackageTotalsList and generateAmendmentPdf.js's
+// findFinalAmountRowForPackage/packageTotals (same fix, applied here to the
+// actual AddUpdateQuote payload instead of just the PDF). Unlike Package,
+// Custom Package DOES have a client-editable Services step (locked default
+// services plus whatever the client adds on top), so a client-added service
+// makes every package's stored netTotal stale the same way a Service quote's
+// does — this rebuilds it live from the current selections' own per-package
+// price (priceForSelectedPackage, Custom Package's flat packageOne/Two/
+// ThreeValue branch) while still reapplying each package's own
+// already-agreed discount percentage and VAT rate from its stored row,
+// exactly like the Service-type rebuild above does for discount/VAT.
+// Standard Package has no Services step at all (ProposalAmendment.jsx's
+// isAmend is always false for it), so it's deliberately excluded here and
+// keeps the plain passthrough via buildQuotationFinalAmountList below.
+const PACKAGE_PRICE_SLOTS_FOR_TOTALS = [
+  { idKey: "packageOneID", valueKey: "packageOneValue" },
+  { idKey: "packageTwoID", valueKey: "packageTwoValue" },
+  { idKey: "packageThreeID", valueKey: "packageThreeValue" },
+];
+
+const priceForSelectedPackageTotals = (item, packageID) => {
+  if (!item || packageID === null || packageID === undefined) return null;
+  const slot = PACKAGE_PRICE_SLOTS_FOR_TOTALS.find(
+    ({ idKey }) =>
+      item[idKey] !== null && String(item[idKey]) === String(packageID),
+  );
+  if (!slot) return null;
+
+  const membership = (item.servicePackageIDs || []).map(String);
+  if (!membership.includes(String(packageID))) return null;
+  return Number(item[slot.valueKey]) || 0;
+};
+
+export const buildQuotationFinalAmountListForCustomPackageType = ({
+  quoteModel,
+  recurringSelections,
+  oneOffSelections,
+  pricing,
+  servicePackageList,
+  vatPercentage: fallbackVatPercentage,
+}) => {
+  const packages = Array.isArray(servicePackageList) ? servicePackageList : [];
+  if (packages.length === 0) {
+    return quoteModel?.quotationFinalAmountList ?? null;
+  }
+
+  const pricingItemByServiceID = new Map();
+  (pricing || []).forEach((item) => {
+    pricingItemByServiceID.set(
+      `${item.serviceChargeTypeID}:${item.serviceID}`,
+      item,
+    );
+  });
+
+  const existingRows = Array.isArray(quoteModel?.quotationFinalAmountList)
+    ? quoteModel.quotationFinalAmountList
+    : [];
+  const findExistingRow = (serviceChargeTypeID, servicePackageID) =>
+    existingRows.find(
+      (row) =>
+        Number(row.serviceChargeTypeID) === serviceChargeTypeID &&
+        row.servicePackageID != null &&
+        String(row.servicePackageID) === String(servicePackageID),
+    ) || null;
+
+  const buildRow = (selections, serviceChargeTypeID, servicePackageID) => {
+    const selectedIDs = Object.keys(selections || {});
+    if (selectedIDs.length === 0) return null;
+
+    const netTotal = selectedIDs.reduce((sum, serviceID) => {
+      const item = pricingItemByServiceID.get(
+        `${serviceChargeTypeID}:${serviceID}`,
+      );
+      return sum + (priceForSelectedPackageTotals(item, servicePackageID) || 0);
+    }, 0);
+
+    const existingRow = findExistingRow(serviceChargeTypeID, servicePackageID);
+    const discountPercentage =
+      Number(existingRow?.discountPercentageWithAllDecimal) || 0;
+    const vatPercentage =
+      existingRow?.vatPercentage ?? fallbackVatPercentage ?? null;
+
+    const discounted = (netTotal * discountPercentage) / 100;
+    const discountedTotal = netTotal - discounted;
+    const vat =
+      vatPercentage == null
+        ? null
+        : Math.floor((discountedTotal * Number(vatPercentage)) / 100 * 100) / 100;
+    const grandTotal = vat == null ? null : discountedTotal + vat;
+
+    return {
+      moduleKeyID: quoteModel?.quoteKeyID ?? null,
+      serviceChargeTypeID,
+      servicePackageID,
+      discountPercentageWithAllDecimal:
+        existingRow?.discountPercentageWithAllDecimal ?? null,
+      netTotal,
+      discounted,
+      discountedTotal,
+      vatPercentage,
+      vat,
+      grandTotal,
+      netVAT: null,
+      vatDiscount: null,
+      netFeesIncVAT: null,
+      discountedFeesIncVAT: null,
+    };
+  };
+
+  const rows = packages.flatMap((pkg) =>
+    [
+      buildRow(recurringSelections, 1, pkg.servicePackageID),
+      buildRow(oneOffSelections, 2, pkg.servicePackageID),
+    ].filter(Boolean),
+  );
+
+  // A package genuinely rebuilt to zero rows (e.g. this org's live pricing
+  // has no data for it yet) would otherwise silently drop that package's
+  // existing totals from the payload — fall back to the full passthrough
+  // rather than send an incomplete list.
+  return rows.length > 0 ? rows : (quoteModel?.quotationFinalAmountList ?? null);
+};
+
+// Dispatches quotationFinalAmountList building by proposal type. Service and
+// Custom Package quotes can both go stale from a Services-step edit (Custom
+// Package's is locked defaults + client additions); Standard Package has no
+// such step and always keeps the quoteModel passthrough. isAmend gates the
+// rebuild too — an unamended Amendment has nothing to rebuild either.
 // Defaults to true so existing non-Amendment callers keep rebuilding.
 export const buildQuotationFinalAmountList = ({
   quoteModel,
@@ -278,6 +405,7 @@ export const buildQuotationFinalAmountList = ({
   oneOffSelections,
   pricing,
   vatPercentage,
+  servicePackageList,
   isAmend = true,
 }) => {
   if (isAmend && quoteModel?.quoteTypeID === QUOTE_TYPE_ID.Service) {
@@ -286,6 +414,17 @@ export const buildQuotationFinalAmountList = ({
       recurringSelections,
       oneOffSelections,
       pricing,
+      vatPercentage,
+    });
+  }
+
+  if (isAmend && quoteModel?.quoteTypeID === QUOTE_TYPE_ID.CustomPackage) {
+    return buildQuotationFinalAmountListForCustomPackageType({
+      quoteModel,
+      recurringSelections,
+      oneOffSelections,
+      pricing,
+      servicePackageList,
       vatPercentage,
     });
   }
@@ -2622,6 +2761,7 @@ export const buildAddUpdateQuotePayload = (
     oneOffSelections: serviceSelectionsForTotals?.oneOffSelections,
     pricing: serviceSelectionsForTotals?.pricing,
     vatPercentage: serviceSelectionsForTotals?.vatPercentage,
+    servicePackageList: serviceSelectionsForTotals?.servicePackageList,
     isAmend,
   });
 
