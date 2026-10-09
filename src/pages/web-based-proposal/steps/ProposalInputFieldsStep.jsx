@@ -117,10 +117,18 @@ export default function ProposalInputFieldsStep({ theme }) {
     if (field.driverTypeID === 3 || field.driverTypeID === 4) {
       const isSlab = field.driverTypeID === 4;
       const source = isSlab ? field.slab : field.variation;
+      // slabTypeName is the slab's *type* (e.g. "Slab Block"), not this
+      // particular bracket's label — using it here showed every option as
+      // the same generic "Slab Block" instead of its actual From-To range
+      // (e.g. "1 - 100"). Mirrors ProposalAdditionalInformationStep.jsx's
+      // own slab options, including the slabTypeID 2 ("Other" — a typed
+      // exact number, no from/to range) special case.
       const options = (source || []).map((option) => ({
         value: isSlab ? option.slabID : option.variationID,
         label: isSlab
-          ? option.slabTypeName || `${option.slabFrom} - ${option.slabTo}`
+          ? option.slabTypeID === 2
+            ? "Other"
+            : `${option.slabFrom} - ${option.slabTo}`
           : option.variationName,
       }));
       const selected =
