@@ -181,7 +181,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
               theme={theme}
               // Custom Package: locked default services show their values
               // read-only; only client-added services stay editable.
-              lockedServiceIDs={isCustomPackageType ? lockedServiceIDs : undefined}
+              lockedServiceIDs={
+                isCustomPackageType ? lockedServiceIDs : undefined
+              }
             />
           ),
         },
@@ -418,7 +420,9 @@ export default function ProposalAmendment({ theme, proposal, services }) {
       }
 
       if (!mergedPdfUrl) {
-        setAcceptError("Failed to generate the amendment PDF. Please try again.");
+        setAcceptError(
+          "Failed to generate the amendment PDF. Please try again.",
+        );
         return;
       }
 
@@ -478,8 +482,8 @@ export default function ProposalAmendment({ theme, proposal, services }) {
     // production proposal domain, not necessarily this app's origin.
     // TODO: need to remove later — dev-tunnel URL for testing the
     // payment-before-sign loader locally instead of redirectUri.
-    // window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
-    window.location.href = `https://9nptb6lw-3000.inc1.devtunnels.ms/generate-contract?${params.toString()}`;
+    window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
+    // window.location.href = `https://9nptb6lw-3000.inc1.devtunnels.ms/generate-contract?${params.toString()}`;
   };
 
   return (

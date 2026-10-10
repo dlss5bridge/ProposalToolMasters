@@ -130,8 +130,8 @@ export default function StandardProposal({ proposal, theme }) {
     // production proposal domain, not necessarily this app's origin.
     // TODO: need to remove later — dev-tunnel URL for testing the
     // payment-before-sign loader locally instead of redirectUri.
-    // window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
-    window.location.href = `https://9nptb6lw-3000.inc1.devtunnels.ms/generate-contract?${params.toString()}`;
+    window.location.href = `${redirectUri}/generate-contract?${params.toString()}`;
+    // window.location.href = `https://9nptb6lw-3000.inc1.devtunnels.ms/generate-contract?${params.toString()}`;
   };
 
   // Non-package proposals have nothing to step through, so ProposalStepper
