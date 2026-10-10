@@ -4074,7 +4074,7 @@ const View_Proposals = () => {
                                                       </>
                                                     )}
 
-                                                  {vatPercentage && (
+                                                  {Boolean(vatPercentage) && (
                                                     <>
                                                       <tr class="head-grey-row">
                                                         <td className="tr-table-class font-14 text-white">
@@ -5583,7 +5583,7 @@ const View_Proposals = () => {
                                                         </tr>
                                                       </>
                                                     )}
-                                                  {vatPercentage && (
+                                                  {Boolean(vatPercentage) && (
                                                     <>
                                                       <tr class="head-grey-row">
                                                         <td className="tr-table-class text-white">
@@ -6719,7 +6719,7 @@ const View_Proposals = () => {
                                                       </>
                                                     )}
 
-                                                  {vatPercentage && (
+                                                  {Boolean(vatPercentage) && (
                                                     <>
                                                       <tr class="head-grey-row">
                                                         <td className="tr-table-class text-white">
@@ -7469,7 +7469,7 @@ const View_Proposals = () => {
                                                         </tr>
                                                       </>
                                                     )}
-                                                  {vatPercentage && (
+                                                  {Boolean(vatPercentage) && (
                                                     <>
                                                       <tr class="head-grey-row">
                                                         <td className="tr-table-class text-white">
