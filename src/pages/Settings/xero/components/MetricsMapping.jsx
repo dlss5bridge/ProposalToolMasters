@@ -96,7 +96,7 @@ export default function MappingUI({
         ) {
           driverItem.services.forEach((service) => {
             services.push({
-              serviceID: service.serviceId,
+              serviceID: Number(service.serviceId),
               serviceName: service.serviceName,
             });
           });
@@ -105,7 +105,7 @@ export default function MappingUI({
         // ================= LOCAL SERVICES =================
         if (driverItem.scope === "local" && driverItem.serviceName) {
           services.push({
-            serviceID: driverItem.serviceId,
+            serviceID: Number(driverItem.serviceId),
             serviceName: driverItem.serviceName,
           });
         }
@@ -281,7 +281,7 @@ export default function MappingUI({
                         driver.services.forEach((service) => {
                           payloadDrivers.push({
                             globalPricingDriverId: driver.id,
-                            serviceId: service.serviceID,
+                            serviceId: Number(service.serviceID),
                           });
 
                           services.push({

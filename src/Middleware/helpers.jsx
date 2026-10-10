@@ -1109,3 +1109,90 @@ export const calculateCustomServiceFooter = ({
     ),
   };
 };
+
+export const validateProspectVariables = (prospectVariables = []) =>
+  prospectVariables
+    .filter((v) => {
+      const type = Number(v.dataType);
+      if (type === 2) {
+        const val = Number(v.value);
+        if (v.value === "" || v.value === null || v.value === undefined || isNaN(val))
+          return true;
+        if (!v.quantity?.length) return false;
+        return !v.quantity.some((q) => {
+          const from = Number(q.quantityFrom);
+          const to = Number(q.quantityTo);
+          return !isNaN(from) && !isNaN(to) && val >= from && val <= to;
+        });
+      }
+      if (type === 4) return v.isOther ? !v.otherValue : !v.value;
+      if (type === 3) return !v.value;
+      if (type === 5) return !v.value;
+      if (type === 6) return !v.value;
+      return false;
+    })
+    .map((v) => v.globalVariableID);
+
+export const buildProspectVariablePayload = (
+  prospectVariables,
+  clientKeyID,
+  userKeyID,
+  organisationKeyID,
+) => ({
+  clientKeyID,
+  userKeyID,
+  organisationKeyID,
+  variables: prospectVariables.map((v) => ({
+    prospectVariableKeyID: v.prospectVariableKeyID ?? null,
+    globalPricingDriverID: v.globalVariableID,
+    value: (() => {
+      const r = v.isOther ? v.otherValue : v.value;
+      return r !== null && r !== undefined && r !== "" ? String(r) : null;
+    })(),
+    isActive: true,
+  })),
+});
+
+export const initializeProspectVariable = (variable) => {
+  const has =
+    variable.value !== null && variable.value !== undefined && variable.value !== "";
+  const fmt = (n, dp) =>
+    Number(n).toFixed(dp ?? 2).replace(/\B(?=(\d{3})+(?!\.))/g, ",");
+
+  if (variable.dataType == 4 && variable.slab?.length) {
+    const hasOther = variable.slab.some((i) => i.slabTypeID === 2);
+    if (has) {
+      const matched = variable.slab.find(
+        (i) =>
+          i.slabTypeID !== 2 &&
+          `${fmt(i.slabFrom, i.decimalPlaces)} - ${fmt(i.slabTo, i.decimalPlaces)}` ===
+            variable.value,
+      );
+      if (matched) return { ...variable, isOther: false, otherValue: "" };
+      const isOther = hasOther && !!variable.value;
+      return {
+        ...variable,
+        isOther,
+        otherValue: isOther ? variable.value : "",
+        value: isOther ? "Other" : variable.value,
+      };
+    }
+    const def = variable.slab.find((i) => i.isDefault);
+    if (!def) return { ...variable, isOther: false, otherValue: "" };
+    if (def.slabTypeID === 2)
+      return { ...variable, value: "Other", isOther: true, otherValue: "" };
+    return {
+      ...variable,
+      isOther: false,
+      otherValue: "",
+      value: `${fmt(def.slabFrom, def.decimalPlaces)} - ${fmt(def.slabTo, def.decimalPlaces)}`,
+    };
+  }
+
+  if (variable.dataType == 3 && variable.variation?.length && !has) {
+    const def = variable.variation.find((i) => i.isDefault);
+    return { ...variable, value: def ? def.variationName : "" };
+  }
+
+  return variable;
+};

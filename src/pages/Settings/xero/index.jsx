@@ -20,6 +20,7 @@ import {
   GetMetricMappings,
 } from "../../../redux/reducer/metricsSlice";
 import MappingUI from "./components/MetricsMapping";
+import { GetDisconnectImpact } from "../../../redux/Services/Xero/XeroApi";
 
 function XeroAuthentication() {
   const dispatch = useDispatch();
@@ -28,6 +29,8 @@ function XeroAuthentication() {
   const metrics = useSelector((state) => state.quickBook.metrics);
   const metricMappings = useSelector((state) => state.metric.metricMappings);
   const activePlatform = getActivePlatform();
+  const [impact, setImpact] = useState(null);
+  const [includeClients, setIncludeClients] = useState(false);
 
   //=====================state========================
   const { handleErrorMessage } = useContext(AuthContextProvider);
@@ -81,6 +84,7 @@ function XeroAuthentication() {
         DisconnectIntegration({
           organisationKeyID: auth?.organisationKeyID,
           activePlatform,
+          includeClients,
         }),
       ).unwrap();
 
@@ -100,6 +104,17 @@ function XeroAuthentication() {
 
         modalInstance.hide();
       }
+    }
+  };
+
+  const loadDisconnectImpact = async () => {
+    setIncludeClients(false);      // default unticked each time the dialog opens
+    setImpact(null);
+    try {
+      const res = await GetDisconnectImpact(auth?.organisationKeyID, activePlatform);
+      setImpact(res?.data ?? null);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -123,6 +138,34 @@ function XeroAuthentication() {
           moduleName="Xero"
           tooltipLabel="Authenticate Xero"
           key={getActivePlatform()}
+          onDisconnectOpen={loadDisconnectImpact}
+          disconnectExtraContent={
+            impact && impact.prospectCount > 0 ? (
+              <div className="alert alert-warning text-start mt-3 mb-0">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="includeClients"
+                    checked={includeClients}
+                    onChange={(e) => setIncludeClients(e.target.checked)}
+                  />
+                  <label className="form-check-label fw-semibold" htmlFor="includeClients">
+                    Also disconnect {impact.prospectCount} connected prospect
+                    {impact.prospectCount === 1 ? "" : "s"}
+                  </label>
+                </div>
+                <div className="small mt-2">
+                  {impact.prospects.map((p) => p.clientName).join(", ")}
+                  {impact.signedContractCount > 0 && (
+                    <> — covering <strong>{impact.signedContractCount}</strong> signed engagement
+                      letter{impact.signedContractCount === 1 ? "" : "s"} currently under review.
+                      Disconnecting stops those reviews.</>
+                  )}
+                </div>
+              </div>
+            ) : null
+          }
         />
       </div>
 

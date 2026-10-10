@@ -65,8 +65,6 @@ const Engagement_Letter = () => {
 
   const bookkeeping = JSON.parse(bookkeepingStorage.bookkeeping || "{}");
 
-  const isXeroEnabled = bookkeeping.Xero === true;
-  const isQuickBooksEnabled = bookkeeping.QuickBooks === true;
 
   // Declare State
   const [modelRequestData, setModelRequestData] = useState({
@@ -135,7 +133,10 @@ const Engagement_Letter = () => {
     userAccessData,
     GetCustomDate,
     formatValue,
+    hasBookkeeping,
   } = useContext(AuthContextProvider);
+  const isXeroEnabled = hasBookkeeping.Xero === true;
+  const isQuickBooksEnabled = hasBookkeeping.Quickbooks === true;
   const totalOldELPage = isMobile
     ? Math.ceil(oldElListCount / isMobileRecords)
     : Math.ceil(
@@ -164,12 +165,32 @@ const Engagement_Letter = () => {
       ? 5
       : desktopRecords;
 
+  const REVISION_BADGES = {
+    revision_draft: { label: "Revision — draft", cls: "bg-info-subtle text-info-emphasis border border-info-subtle" },
+    revision_sent: { label: "Revision — sent", cls: "bg-info-subtle text-info-emphasis border border-info-subtle" },
+    revision: { label: "Revision", cls: "bg-primary-subtle text-primary-emphasis border border-primary-subtle" },
+    revision_in_progress: { label: "Revision in progress", cls: "bg-warning-subtle text-warning-emphasis border border-warning-subtle" },
+    amended: { label: "Amended", cls: "bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle" },
+  };
+
   useEffect(() => {
     setTopbar("block");
     // GetEngagementListData(isCurrentPage);
     GetOldEngagementListData(1);
     GetEngagementListForSingleApiData(1);
   }, []);
+
+  // guard logic of user's EL is exhausted
+  useEffect(() => {
+    if (location.state?.showOutOfELModal) {
+      setShowModal(true);
+
+      navigate(location.pathname, {
+        replace: true,
+        state: null,
+      });
+    }
+  }, [location.state?.showOutOfELModal, location.pathname, navigate]);
 
   useEffect(() => {
     if (location.state && location.state.proposalType !== null) {
@@ -461,6 +482,25 @@ const Engagement_Letter = () => {
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const revisionTooltip = (e) => {
+    switch (e.revisionState) {
+      case "revision_draft":
+      case "revision_sent":
+      case "revision":
+        return e.revisionOfRefID ? `Replaces ${e.revisionOfRefID}` : "Created from a pricing deviation";
+      case "revision_in_progress":
+        return e.supersededByRefID
+          ? `A revised engagement letter (${e.supersededByRefID}) is being prepared. This one is still in force.`
+          : "A revised engagement letter is being prepared.";
+      case "amended":
+        return e.supersededByRefID
+          ? `Replaced by ${e.supersededByRefID}`
+          : "Replaced by a newer engagement letter";
+      default:
+        return "";
     }
   };
 
@@ -2146,7 +2186,17 @@ const Engagement_Letter = () => {
                                                   <>
                                                     <tr class="table_new">
                                                       <td className="table-content-font">
-                                                        {engagement.prefix}
+                                                        {engagement.prefix}{" "}
+                                                        {engagement.revisionState &&
+                                                          REVISION_BADGES[engagement.revisionState] && (
+                                                            <span
+                                                              className={`badge rounded-pill mt-1 fw-semibold ${REVISION_BADGES[engagement.revisionState].cls}`}
+                                                              style={{ fontSize: "0.68rem", letterSpacing: "0.02em" }}
+                                                              title={revisionTooltip(engagement)}
+                                                            >
+                                                              {REVISION_BADGES[engagement.revisionState].label}
+                                                            </span>
+                                                          )}
                                                       </td>
                                                       <td className="table-content-font">
                                                         {engagement.clientName}
@@ -3055,7 +3105,17 @@ const Engagement_Letter = () => {
                                                           )
                                                         }
                                                       />
-                                                      {engagement.prefix}
+                                                      {engagement.prefix}{" "}
+                                                      {engagement.revisionState &&
+                                                        REVISION_BADGES[engagement.revisionState] && (
+                                                          <span
+                                                            className={`badge rounded-pill mt-1 fw-semibold ${REVISION_BADGES[engagement.revisionState].cls}`}
+                                                            style={{ fontSize: "0.68rem", letterSpacing: "0.02em" }}
+                                                            title={revisionTooltip(engagement)}
+                                                          >
+                                                            {REVISION_BADGES[engagement.revisionState].label}
+                                                          </span>
+                                                        )}
                                                     </td>
                                                     <td className="table-content-font">
                                                       {engagement.clientName}

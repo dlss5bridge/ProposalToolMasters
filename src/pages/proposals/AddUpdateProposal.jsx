@@ -44,6 +44,8 @@ import ReactDOMServer from "react-dom/server";
 import {
   GetClientLookupList,
   GetProposalLookupList,
+  GetClientGlobalVariables,
+  AddUpdateClientGlobalVariables,
 } from "../../redux/Services/client/clientAPI";
 import { ERROR_MESSAGES } from "../../components/GlobalMessage";
 // import { SelectServices } from "../../components/SelectServices";
@@ -94,6 +96,9 @@ import {
   calculateCustomPackageRow,
   calculateCustomOneOffPackageFooter,
   calculateCustomOneOffPackageRow,
+  validateProspectVariables,
+  buildProspectVariablePayload,
+  initializeProspectVariable,
 } from "../../Middleware/helpers";
 import PriceAdjustedToZeroFloorValue from "../../components/PriceAdjustedToZeroFloorValue";
 const SelectServices = lazy(() => import("../../components/SelectServices"));
@@ -16405,6 +16410,8 @@ const Add_Update_Proposal = (props) => {
   const [additionalInformationList, setAdditionalInformationList] = useState(
     [],
   );
+  const [prospectVariables, setProspectVariables] = useState([]);
+  const [invalidProspectVariableIds, setInvalidProspectVariableIds] = useState([]);
   const [openSuccessModal, setOpenSuccessModal] = useState(false);
   const [selectedPackages, setSelectedPackages] = useState([]);
   const [isAddUpdatePricingActionDone, setIsAddUpdatePricingActionDone] =
@@ -20758,6 +20765,7 @@ const Add_Update_Proposal = (props) => {
         const mappedOptions = data.responseData.data.map((item) => ({
           value: item.clientID,
           label: item.clientName,
+          clientKeyID: item.clientKeyID,
         }));
         setLoader(false);
         setClientLookUpOptions(mappedOptions);
@@ -22457,7 +22465,8 @@ const Add_Update_Proposal = (props) => {
           item.driverTypeID === 3 ||
           item.driverTypeID === 6,
       );
-
+      const invalidPV = validateProspectVariables(prospectVariables);
+      setInvalidProspectVariableIds(invalidPV);
       // Check if any of the filtered items have driverValue as null, empty string, or undefined
       const hasInvalidValues = filteredList.some((i) => {
         if (i.driverTypeID === 5) {
@@ -22482,7 +22491,7 @@ const Add_Update_Proposal = (props) => {
           i.driverValue === "-"
         );
       });
-      if (hasInvalidValues) {
+      if (hasInvalidValues || invalidPV.length > 0) {
         setRequireMessage(true);
         setIsValidForm({
           ...isValidForm,
@@ -22490,6 +22499,10 @@ const Add_Update_Proposal = (props) => {
           AdditionalInfo: true,
         });
         setLoader(false);
+        if (invalidPV.length > 0 && !hasInvalidValues) {
+          scrollUpDownByElementID(`PV-${invalidPV[0]}`);
+        }
+        await SaveProspectVariables();
         return;
       }
     } else if (activeTab === ProposalHeader.ReviewServices) {
@@ -23851,7 +23864,8 @@ const Add_Update_Proposal = (props) => {
           item.driverTypeID === 3 ||
           item.driverTypeID === 6,
       );
-
+      const invalidPV = validateProspectVariables(prospectVariables);
+      setInvalidProspectVariableIds(invalidPV);
       // Check if any of the filtered items have driverValue as null, empty string, or undefined
       const hasInvalidValues = filteredList.some((i) => {
         if (i.driverTypeID === 5) {
@@ -23876,13 +23890,16 @@ const Add_Update_Proposal = (props) => {
           i.driverValue === "-"
         );
       });
-      if (hasInvalidValues) {
+      if (hasInvalidValues || invalidPV.length > 0) {
         setRequireMessage(true);
         setIsValidForm({
           ...isValidForm,
           PricingInfo: false,
           AdditionalInfo: true,
         });
+        if (invalidPV.length > 0 && !hasInvalidValues) {
+          scrollUpDownByElementID(`PV-${invalidPV[0]}`);
+        }
         return;
       } else {
         setRequireMessage(false);
@@ -24444,7 +24461,7 @@ const Add_Update_Proposal = (props) => {
     ServicesIDs = ServiceElementId,
   ) => {
     setLoader(true);
-
+    const pVars = await GetProspectVariablesData(ProposalObject.clientID);
     try {
       const data = await GetAdditionalInformationList({
         userKeyID: common.userKeyID,
@@ -24527,7 +24544,8 @@ const Add_Update_Proposal = (props) => {
             if (
               additionalInformationListData.filter(
                 (item) => item.driverTypeID !== 1,
-              ).length === 0
+              ).length === 0 &&
+              pVars.length === 0
             ) {
               setTabHide(false);
               setAdditionalInformationList([]);
@@ -24600,6 +24618,60 @@ const Add_Update_Proposal = (props) => {
     } catch (error) {
       setLoader(false);
       console.error(error);
+    }
+  };
+
+  const getClientKeyID = () =>
+    clientLookUpOptions?.find((c) => c.value == ProposalObject.clientID)
+      ?.clientKeyID || null;
+
+  const GetProspectVariablesData = async () => {
+    const clientKeyID = getClientKeyID();
+    if (!clientKeyID) {
+      setProspectVariables([]);
+      return [];
+    }
+    try {
+      const data = await GetClientGlobalVariables(clientKeyID);
+      const responseData = data?.data?.responseData?.data || [];
+      const formatted = responseData.map((item) => ({
+        prospectVariableKeyID: item.prospectVariableKeyID,   // <-- was missing
+        globalVariableKeyID: item.globalVariableKeyID,
+        globalVariableID: item.globalVariableID,
+        globalVariableName: item.globalVariableName,
+        dataType: item.dataType,
+        value: item.value ?? "",
+        variation: item.variation,
+        slab: item.slab,
+        text: item.text,
+        date: item.date,
+        quantity: item.quantity,
+      })).map(initializeProspectVariable);
+      setProspectVariables(formatted);
+      return formatted;
+    } catch (e) {
+      console.error(e);
+      setProspectVariables([]);
+      return [];
+    }
+  };
+
+  const SaveProspectVariables = async () => {
+    const clientKeyID = getClientKeyID();
+    if (!prospectVariables.length || !clientKeyID) return true;
+    try {
+      const res = await AddUpdateClientGlobalVariables(
+        buildProspectVariablePayload(
+          prospectVariables,
+          ProposalObject.clientID,
+          common.userKeyID,
+          common.organisationKeyID,
+        ),
+      );
+      return res?.data?.statusCode === 200;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   };
 
@@ -25497,6 +25569,10 @@ const Add_Update_Proposal = (props) => {
                     handleSaveAsDraft={handleSaveAsDraft}
                     moduleName={"Quote"}
                     proposalName={proposalName}
+                    prospectName={prospectName}
+                    prospectVariables={prospectVariables}
+                    setProspectVariables={setProspectVariables}
+                    invalidProspectVariableIds={invalidProspectVariableIds}
                   />
                 </Suspense>
               )}
@@ -25812,7 +25888,7 @@ const Add_Update_Proposal = (props) => {
                     selectedTemplateIDOneOff={selectedTemplateIDOneOff}
                     selectedTemplateID={selectedTemplateID}
                     visibleFieldsCustomTemp={visibleFieldsCustomTemp}
-                    taxName={taxName} 
+                    taxName={taxName}
                     vatPercentageOneOff={vatPercentageOneOff}
                   />
                 </Suspense>

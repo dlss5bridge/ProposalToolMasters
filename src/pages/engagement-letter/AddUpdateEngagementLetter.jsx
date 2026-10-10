@@ -35,6 +35,8 @@ import {
 import {
   GetClientLookupList,
   GetOfficersForQuoteAndContract,
+  GetClientGlobalVariables,
+  AddUpdateClientGlobalVariables,
 } from "../../redux/Services/client/clientAPI";
 import {
   GetCalculatedServicesPrice,
@@ -79,6 +81,9 @@ import {
   calculateCustomServiceFooter,
   calculateCustomServiceRow,
   hasCalculationValue,
+  validateProspectVariables,
+  buildProspectVariablePayload,
+  initializeProspectVariable,
 } from "../../Middleware/helpers";
 import { getServiceScopeDriverList } from "../../lib/utils";
 import PriceAdjustedToZeroFloorValue from "../../components/PriceAdjustedToZeroFloorValue";
@@ -9733,9 +9738,14 @@ const Add_Update_Engagement_Letter = () => {
   const [clientLookUpOptions, setClientLookUpOptions] = useState([]);
   const [recurringServiceList, setRecurringServiceList] = useState([]);
   const [oneOffServiceList, setOneOffServiceList] = useState([]);
+  const [servicesLoading, setServicesLoading] = useState(false); // Dedicated flag for the Select Services fetch. Services loader stays up until both lists are actually ready.
   const [templateLookUpOptions, setTemplateLookUpOptions] = useState([]);
   const [proposalLookUpOptions, setProposalLookUpOptions] = useState([]);
   const [additionalInformationList, setAdditionalInformationList] = useState(
+    [],
+  );
+  const [prospectVariables, setProspectVariables] = useState([]);
+  const [invalidProspectVariableIds, setInvalidProspectVariableIds] = useState(
     [],
   );
   const [taxName, setTaxName] = useState("");
@@ -10000,6 +10010,9 @@ const Add_Update_Engagement_Letter = () => {
   });
   const [refIdStore, setRefIdStore] = useState("");
   const [servicePackageName, setServicePackageName] = useState("");
+  const [deviationAutoAdvance, setDeviationAutoAdvance] = useState(
+    Boolean(location.state?.jumpToPricingTab),
+  );
   // B] Initial useEffect :
 
   // 1) Will Call Initial Api Like List Api
@@ -10072,6 +10085,36 @@ const Add_Update_Engagement_Letter = () => {
       setIsAddUpdatePricingActionDone(false);
     }
   }, [isAddUpdatePricingActionDone]);
+
+  // Step 1: contract model loaded -> leave Basic Information
+  useEffect(() => {
+    if (!deviationAutoAdvance) return;
+    if (activeTab !== EngagementLetterHeader.BasicInformation) return;
+    if (!engagementObj.contractKeyID || !engagementObj.ClientID) return;
+    HandleTabChange(EngagementLetterHeader.SelectServices, statusID.Sent);
+  }, [deviationAutoAdvance, activeTab, engagementObj.contractKeyID, engagementObj.ClientID]);
+
+  // Step 2: service lists loaded -> leave Select Services
+  // (does not fire for sourceID 2, which skips straight to tab 3 — handled naturally)
+  useEffect(() => {
+    if (!deviationAutoAdvance) return;
+    if (activeTab !== EngagementLetterHeader.SelectServices) return;
+    const hasSelection =
+      recurringServiceList?.some((c) => c.servicesList?.some((s) => s.isSelected)) ||
+      oneOffServiceList?.some((c) => c.servicesList?.some((s) => s.isSelected));
+    if (!hasSelection) return;
+    HandleTabChange(EngagementLetterHeader.AdditionalInformation, statusID.Sent);
+  }, [deviationAutoAdvance, activeTab, recurringServiceList, oneOffServiceList]);
+
+  // Step 3: additional info loaded -> compute pricing and land
+  useEffect(() => {
+    if (!deviationAutoAdvance) return;
+    if (activeTab !== EngagementLetterHeader.AdditionalInformation) return;
+    if (additionalInformationList === null) return;
+    const target = location.state?.jumpToPricingTab;
+    if (target) HandleTabChange(target, statusID.Sent);
+    setDeviationAutoAdvance(false);
+  }, [deviationAutoAdvance, activeTab, additionalInformationList]);
 
   function getFontNameById(id) {
     const font = Utils.FontFamily.find((f) => f.value === id);
@@ -10490,8 +10533,8 @@ const Add_Update_Engagement_Letter = () => {
 
   // load both recurring and one-off lists
   const loadServiceLists = async () => {
-    debugger;
     setLoader(true);
+    setServicesLoading(true);
     try {
       await Promise.all([
         GetRecurringServiceListData(),
@@ -10501,6 +10544,7 @@ const Add_Update_Engagement_Letter = () => {
       setErrorMessage("Failed to load services");
     } finally {
       setLoader(false);
+      setServicesLoading(false);
     }
   };
 
@@ -13844,11 +13888,62 @@ const Add_Update_Engagement_Letter = () => {
     }
   };
 
+  const GetProspectVariablesData = async (clientKeyID) => {
+    if (!clientKeyID) {
+      setProspectVariables([]);
+      return [];
+    }
+    try {
+      const data = await GetClientGlobalVariables(clientKeyID);
+      const responseData = data?.data?.responseData?.data || [];
+      const formatted = responseData
+        .map((item) => ({
+          prospectVariableKeyID: item.prospectVariableKeyID,
+          globalVariableKeyID: item.globalVariableKeyID,
+          globalVariableID: item.globalVariableID,
+          globalVariableName: item.globalVariableName,
+          dataType: item.dataType,
+          value: item.value ?? "",
+          variation: item.variation,
+          slab: item.slab,
+          text: item.text,
+          date: item.date,
+          quantity: item.quantity,
+        }))
+        .map(initializeProspectVariable);
+      setProspectVariables(formatted);
+      return formatted;
+    } catch (error) {
+      console.error(error);
+      setProspectVariables([]);
+      return [];
+    }
+  };
+
+  const SaveProspectVariables = async () => {
+    if (!prospectVariables.length || !engagementObj.ClientID) return true;
+    try {
+      const res = await AddUpdateClientGlobalVariables(
+        buildProspectVariablePayload(
+          prospectVariables,
+          engagementObj.clientKeyID,
+          common.userKeyID,
+          common.organisationKeyID,
+        ),
+      );
+      return res?.data?.statusCode === 200;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
   //11) Get Additional  services list data api  call
   const GetAdditionalInformationListData = async (
     ServicesIDs = ServiceElementId,
   ) => {
     setLoader(true);
+    const pVars = await GetProspectVariablesData(engagementObj.clientKeyID);
     try {
       const data = await GetAdditionalInformationList({
         userKeyID: common.userKeyID,
@@ -14905,7 +15000,17 @@ const Add_Update_Engagement_Letter = () => {
           item.driverTypeID === 6,
       );
       // Check if any of the filtered items have driverValue as null, empty string, or undefined
-
+      const invalidPV = validateProspectVariables(prospectVariables);
+      setInvalidProspectVariableIds(invalidPV);
+      if (invalidPV.length > 0) {
+        setRequireMessage(true);
+        scrollUpDownByElementID(`PV-${invalidPV[0]}`);
+        setIsValidForm({
+          ...isValidForm,
+          PricingInfo: false,
+        });
+        hasError = true;
+      }
       if (
         engagementObj.tnCTemplateID === null ||
         engagementObj.tnCTemplateID === undefined ||
@@ -15032,6 +15137,7 @@ const Add_Update_Engagement_Letter = () => {
         });
       } else {
         if (!hasError) {
+          await SaveProspectVariables();
           if (Status === statusID.Draft) {
             setRequireMessage(false);
             AddUpdateEngagementLatter(statusID.Draft, "AdditionalInformation");
@@ -18763,6 +18869,7 @@ const Add_Update_Engagement_Letter = () => {
               {activeTab === EngagementLetterHeader.SelectServices && (
                 <Suspense>
                   <SelectServices
+                    servicesLoading={servicesLoading}
                     DisableTabOnChange={DisableTabOnChange}
                     oneOffObj={oneOffObj}
                     requireMessage={requireMessage}
@@ -18818,6 +18925,10 @@ const Add_Update_Engagement_Letter = () => {
                     handleSelectTncTemplate={handleSelectTncTemplate}
                     additionalInformationList={additionalInformationList}
                     setAdditionalInformationList={setAdditionalInformationList}
+                    prospectVariables={prospectVariables}
+                    setProspectVariables={setProspectVariables}
+                    invalidProspectVariableIds={invalidProspectVariableIds}
+                    prospectName={prospectName}
                     recurringError={recurringError}
                     moduleName={"Contract"}
                     contractSignatoriesList={contractSignatoriesList}

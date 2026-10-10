@@ -415,14 +415,7 @@ export default function PreviewComponentPdf(props) {
     }
   };
 
-  useEffect(() => {
-    if (props?.moduleName === "Contract") {
-      props.setEngagementObj((prevState) => ({
-        ...prevState,
-        pdf: null,
-      }));
-    }
-  }, [props?.engagementObj]);
+
   const AcceptRecurringUrl = `https://$AppUrl$/${url}?quoteKeyID=$QuoteKeyID$&ServiceChargeTypeID=${ServiceChargeTypeEnum.Recurring}&Action=Accepted&ContractSignatoryKeyID=$ContractSignatoryKeyID$`;
   // const AcceptRecurringELOffUrl = `https://$AppUrl$/accept-decline-proposal?quoteKeyID=$QuoteKeyID$&ServiceChargeTypeID=${ServiceChargeTypeEnum.Recurring}&Action=Accepted`;
 

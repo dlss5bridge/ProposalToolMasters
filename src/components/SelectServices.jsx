@@ -5,6 +5,7 @@ import { Tooltip } from "@mui/material";
 import { AuthContextProvider } from "../AuthContext/AuthContext";
 import { useContext } from "react";
 import { statusID } from "../Middleware/enums";
+import Loader from "../loader/Loader";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-calendar/dist/Calendar.css";
@@ -356,57 +357,65 @@ export default function SelectServices(props) {
       .join("|") || "";
 
   useEffect(() => {
-    const list = props.oneOffServiceList || [];
-    const fullList = [
-      ...list.flatMap((c) =>
-        c.servicesList.map((s) => ({
-          ...s,
-          serviceCatID: c.serviceCatID,
-          serviceChargeTypeName: s.serviceChargeTypeName,
-        })),
-      ),
-      ...(props.recurringServiceList || []).flatMap((c) =>
-        c.servicesList.map((s) => ({
-          ...s,
-          serviceCatID: c.serviceCatID,
-          serviceChargeTypeName: s.serviceChargeTypeName,
-        })),
-      ),
-    ];
+    props.setOneOffServiceList((prev) => {
+      const list = prev || [];
+      if (list.length === 0) return prev;
+      const fullList = [
+        ...list.flatMap((c) =>
+          c.servicesList.map((s) => ({
+            ...s,
+            serviceCatID: c.serviceCatID,
+            serviceChargeTypeName: s.serviceChargeTypeName,
+          })),
+        ),
+        ...(props.recurringServiceList || []).flatMap((c) =>
+          c.servicesList.map((s) => ({
+            ...s,
+            serviceCatID: c.serviceCatID,
+            serviceChargeTypeName: s.serviceChargeTypeName,
+          })),
+        ),
+      ];
 
-    const updated = list.map((category) => ({
-      ...category,
-      servicesList: updateRecursiveVisibility(category.servicesList, fullList),
-    }));
-
-    props.setOneOffServiceList(updated);
+      return list.map((category) => ({
+        ...category,
+        servicesList: updateRecursiveVisibility(
+          category.servicesList,
+          fullList,
+        ),
+      }));
+    });
   }, [oneOffSignature, recurringSignature]);
 
   useEffect(() => {
-    const list = props.recurringServiceList || [];
-    const fullList = [
-      ...list.flatMap((c) =>
-        c.servicesList.map((s) => ({
-          ...s,
-          serviceCatID: c.serviceCatID,
-          serviceChargeTypeName: s.serviceChargeTypeName,
-        })),
-      ),
-      ...(props.oneOffServiceList || []).flatMap((c) =>
-        c.servicesList.map((s) => ({
-          ...s,
-          serviceCatID: c.serviceCatID,
-          serviceChargeTypeName: s.serviceChargeTypeName,
-        })),
-      ),
-    ];
+    props.setRecurringServiceList((prev) => {
+      const list = prev || [];
+      if (list.length === 0) return prev;
+      const fullList = [
+        ...list.flatMap((c) =>
+          c.servicesList.map((s) => ({
+            ...s,
+            serviceCatID: c.serviceCatID,
+            serviceChargeTypeName: s.serviceChargeTypeName,
+          })),
+        ),
+        ...(props.oneOffServiceList || []).flatMap((c) =>
+          c.servicesList.map((s) => ({
+            ...s,
+            serviceCatID: c.serviceCatID,
+            serviceChargeTypeName: s.serviceChargeTypeName,
+          })),
+        ),
+      ];
 
-    const updated = list.map((category) => ({
-      ...category,
-      servicesList: updateRecursiveVisibility(category.servicesList, fullList),
-    }));
-
-    props.setRecurringServiceList(updated);
+      return list.map((category) => ({
+        ...category,
+        servicesList: updateRecursiveVisibility(
+          category.servicesList,
+          fullList,
+        ),
+      }));
+    });
   }, [oneOffSignature, recurringSignature]);
 
   const handleRecurringServiceDependsServerClick = (
@@ -1718,6 +1727,7 @@ export default function SelectServices(props) {
   };
   return (
     <>
+      {props.servicesLoading && <Loader />}
       <div className="create-practice-height scrollbar">
         <div className="tab-content">
           <div className="tab-pane p-3 active">

@@ -406,6 +406,17 @@ const AuthContext = ({ children }) => {
     setMenuVisible(!isMenuVisible);
   };
 
+  // Derived straight from the redux store (not a one-off localStorage read) so
+  // it stays reactive: the moment a connection-status thunk updates
+  // state.auth.bookkeeping, every consumer re-renders and the Xero/QBO-gated UI
+  // (Link/Unlink buttons etc.) appears without a manual page refresh. The output
+  // shape is kept identical ({ Xero, Quickbooks }) for existing consumers.
+  const bookkeepingState = useSelector((state) => state.auth?.bookkeeping);
+  const hasBookkeeping = {
+    Xero: bookkeepingState?.Xero === true,
+    Quickbooks: bookkeepingState?.QuickBooks === true,
+  };
+
   // const updateImageUrlsInHtml = async (htmlContent) => {
   //   // Regular expression to match base64 images
   //   const base64ImageRegex =
@@ -3837,6 +3848,7 @@ const AuthContext = ({ children }) => {
         toggleMenuVisibility,
         maxCountToRecallApi,
         setMaxCountToRecallApi,
+        hasBookkeeping,
       }}
     >
       {children}
